@@ -8,6 +8,8 @@ const { spawn } = require('child_process');
 
 const garden = {};
 
+const REDIS_SERVER_LOCAL_PORT = 6379;
+
 let sharedMemoryProcess;
 let dataServerProcess;
 let redisserver;
@@ -27,7 +29,10 @@ class Gardener {
 
             log('Network', 'Network configuration loaded', 'success');
             log('Network', 'Spawning redis server', 'lilium');
-            redisserver = new RedisServer(6379);
+            redisserver = new RedisServer(REDIS_SERVER_LOCAL_PORT);
+
+            log('Network', 'Binding process termination', 'lilium');
+            process.on('SIGINT', this.onExit.bind(this));
 
             this.spawnSharedMemory();
             this.spawnDataServer();
@@ -122,6 +127,26 @@ class Gardener {
         
         this.spawnSharedMemory();
         this.spawnDataServer();
+    }
+
+    onExit() {
+        log();
+        log("Network", "----------------------------------------------", "lilium");
+        log('Network', 'Killing data server process', 'lilium');
+        dataServerProcess && dataServerProcess.kill("SIGHUP");
+
+        log('Network', 'Killing shared memory process', 'lilium');
+        sharedMemoryProcess && sharedMemoryProcess.kill("SIGHUP");
+
+        log('Network', 'Killing CAIJ process', 'lilium');
+        this.caijProc && this.caijProc.kill("SIGHUP");
+
+        const pids = Object.keys(garden);
+        log('Network', 'Killing Lilium processes with PIDs : ' + pids.join(', '), 'lilium');
+        pids.forEach(pid => garden[pid].kill("SIGHUP"));
+
+        log('Network', 'Gracefully terminated Lilium process', 'success');
+        process.exit();
     }
 
     broadcast(m) {

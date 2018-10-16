@@ -2,7 +2,6 @@ const log = require('./log.js');
 const hooks = require('./hooks.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
-const formBuilder = require('./formBuilder.js');
 const filelogic = require('./filelogic.js');
 const Admin = require('./backend/admin.js');
 

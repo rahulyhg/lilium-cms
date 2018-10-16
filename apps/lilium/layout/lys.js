@@ -40,6 +40,10 @@ export class Lys extends Component {
     createCommandFromProp(menus) {
         this.commands = [];
         menus.map(x => {
+            if (!x.lys) {
+                return [];
+            }
+
             return [{
                 command : x.lys.replace(/,/g, ''),
                 displayname : x.displayname,

@@ -4,6 +4,7 @@ import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
 import { getSession } from '../../data/cache';
+import { navigateTo } from '../../routing/link';
 import { castNotification } from '../../layout/notifications';
 import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
@@ -522,8 +523,107 @@ export default class EditView extends Component {
         });        
     }
 
+    submitForApproval(done) {
+        this.save(() => {
+            API.put('/publishing/validate/' + this.coldState.post._id, {}, (err, json, r) => {
+                if (r.status == 200) {  
+                    API.put('/publishing/submit/' + this.coldState.post._id, {}, (err, json, r) => {
+                        if (json && !json.error) {
+                            castNotification({
+                                type : "success",
+                                title : "Article sent",
+                                message : "Your article was successfully sent for approval."
+                            });
+                            navigateTo("/publishing");
+                        } else {
+                            castNotification({
+                                type : "warning",
+                                title : "Could not send article for approval",
+                                message : json.error
+                            });
+                        }
+
+                        done();
+                    });
+                } else {
+                    r.text().then(message => {
+                        castNotification({
+                            type : "warning",
+                            title : "Could not send article for approval",
+                            message
+                        });
+                    })
+                    done();
+                }
+
+            });
+        })
+    }
+
+    refuse() {
+        API.put('/publishing/refuse/' + this.coldState.post._id, {}, (err, json, r) => {
+            if (json && !json.error) {
+                castNotification({
+                    type : "success",
+                    title : "Article refused",
+                    message : "This article has been sent back to the writer. They will now be able to edit it."
+                });
+
+                navigateTo("/publishing");
+            } else {
+                castNotification({
+                    type : "warning",
+                    title : "Could not refuse submission",
+                    message : json.error
+                });
+            }
+
+            done();
+        });
+    }
+
+    destroy() {
+        API.delete('/publishing/destroy/' + this.coldState.post._id, {}, (err, json, r) => {
+            if (json && !json.error) {
+                castNotification({
+                    type : "success",
+                    title : "Article destroyed",
+                    message : "This article will no longer appear in the list of articles."
+                });
+                
+                navigateTo("/publishing");
+            } else {
+                castNotification({
+                    type : "warning",
+                    title : "Could not destroy article",
+                    message : json.error
+                });
+            }
+
+            done();
+        });
+    }
+
     commitchanges(done) {
-        
+        this.save(() => {
+            API.put('/publishing/refresh/' + this.coldState.post._id, {}, (err, json, r) => {
+                if (json && json.ok) {
+                    castNotification({
+                        type : "success",
+                        title : "Article refreshed",
+                        message : "The article was successfully updated, and the changes should appear on the website."
+                    });
+                } else {
+                    castNotification({
+                        type : "error",
+                        title : "Could not commit changes",
+                        message : "Error " + r.status
+                    });
+                }
+
+                done();
+            });
+        });
     }
 
     requestArticle(postid, done) {
@@ -556,21 +656,33 @@ export default class EditView extends Component {
         const status = this.coldState.post.status;
         const actions = [<ButtonWorker theme="white" text="Preview" work={this.preview.bind(this)} />];
 
-        if (status == "draft" || status == "deleted") {
-            actions.push(
-                <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
-                <ButtonWorker type="fill" theme="blue" text="Publish" work={this.validate.bind(this)} />
-            );
-        } else if (status == "published") {
-            actions.push(
-                <ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />, 
-                <ButtonWorker theme="red"  type="outline" text="Unpublish" work={this.unpublish.bind(this)} />
-            );
-        } else if (status == "reviewing") {
-            actions.push(
-                <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
-                <ButtonWorker type="fill" theme="blue" text="Approve and publish" work={this.validate.bind(this)} />
-            );
+        if (liliumcms.session.roles.includes('contributor')) {
+            if (status == "draft" || status == "deleted" || status == "refused") {
+                actions.push(
+                    <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
+                    <ButtonWorker type="fill" theme="blue" text="Submit for approval" work={this.submitForApproval.bind(this)} />,
+                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.destroy.bind(this)} />
+                );
+            } 
+        } else {
+            if (status == "draft" || status == "deleted") {
+                actions.push(
+                    <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
+                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.destroy.bind(this)} />,
+                    <ButtonWorker type="fill" theme="blue" text="Publish" work={this.validate.bind(this)} />
+                );
+            } else if (status == "published") {
+                actions.push(
+                    <ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />, 
+                    <ButtonWorker theme="red"  type="outline" text="Unpublish" work={this.unpublish.bind(this)} />
+                );
+            } else if (status == "reviewing") {
+                actions.push(
+                    <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
+                    <ButtonWorker type="fill" theme="blue" text="Approve and publish" work={this.validate.bind(this)} />,
+                    <ButtonWorker theme="red"  type="outline" text="Refuse submission" work={this.refuse.bind(this)} />
+                );
+            }
         }
 
         return actions;

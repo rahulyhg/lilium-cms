@@ -1,0 +1,78 @@
+#profile-header {
+    display: block;
+    text-align: center;
+
+    padding-top: 20px;
+    color: #333;
+}
+
+#profile-picture-wrapper {
+    margin: auto;
+}
+
+#me-badge-wrapper {
+    text-align: center;
+}
+
+#profile {
+    max-width: 780px;
+    margin: auto;
+}
+
+#me-badge-wrapper {
+    margin: 20px auto;
+}
+
+#profile-picture {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border: 6px solid #eadaf7;
+    border-radius: 50%;
+    background: #333;
+    overflow: hidden;
+    cursor: pointer;
+    
+    &:hover {
+        border-color: #f1e0ff;
+    }
+}
+
+#profile-info-wrapper {
+    text-align: left;
+}
+
+.me-decoration {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    margin: 0px 3px;
+
+    .badge-image {
+        height: 70px;
+        width: auto;
+    }
+
+    .fa {
+        display: block;
+        text-align: center;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 23px;
+        color: white;
+
+        &.level-7, &.level-6 {
+            top: 27px;
+        }
+    }
+}
+
+body.endpoint-me {
+    #lilium {
+        background-color: #fafafa;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' %3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%23dcb5ff'/%3E%3Cstop offset='1' stop-color='%23f2eef3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpattern id='b' width='24' height='24' patternUnits='userSpaceOnUse'%3E%3Ccircle fill='%23fafafa' cx='12' cy='12' r='12'/%3E%3C/pattern%3E%3Crect width='100%25' height='100%25' fill='url(%23a)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23b)' fill-opacity='0.1'/%3E%3C/svg%3E");
+        background-attachment: fixed;
+        background-size: cover;
+    }
+}

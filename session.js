@@ -43,7 +43,7 @@ var Sessions = function () {
         this.removeSession(cli, function () {
             cli.did('auth', 'logout');
             cli.response.setHeader('Set-Cookie', 'lmlsid'+cli._c.uid+'=""; ' + getFormattedPath(cli));
-            cli.redirect(cli._c.server.url + '/admin');
+            cli.redirect(cli._c.server.url + '/login');
         })
     }
 

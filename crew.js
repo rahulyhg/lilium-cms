@@ -13,7 +13,8 @@ const LIST_PROJECTION = {
     badgecount : { "$size": "$badges" },
     firstname : 1, lastname : 1,
     jobtitle : 1, phone : 1, email : 1,
-    enforce2fa: 1, confirmed2fa: 1
+    enforce2fa: 1, confirmed2fa: 1,
+    username : 1
 };
 
 class Crew {
