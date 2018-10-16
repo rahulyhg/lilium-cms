@@ -94,6 +94,8 @@ class ContentController {
                     if (resp.error) {
                         cli.throwHTTP(resp.code, resp.error, true);
                     } else {
+                        contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
+
                         cli.sendJSON(resp);
                     }
                 });
