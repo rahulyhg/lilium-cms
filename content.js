@@ -653,6 +653,14 @@ class ContentLib {
                                     at : Date.now(),
                                     by : caller
                                 }, "articlePublished");
+
+                                if (caller.toString() != (post.author && post.author.toString())) {
+                                    notifications.notifyUser(post.author, _c.id, {
+                                        title: "Article published",
+                                        msg: post.title + ' was published on the website.',
+                                        type: 'success'
+                                    });
+                                }
                             }, 'all');
                         });
                     });
@@ -686,11 +694,19 @@ class ContentLib {
             db.findUnique(defaultConfig, 'entities', { _id : author }, (err, contractor) => {
                 db.findUnique(defaultConfig, 'entities', {_id : contractor.reportsto}, (err, reportee) => {
                     db.findUnique(_c, 'content', { _id : postid }, (err, article) => {
-                        reportee && require('./mail.js').triggerHook(_c, 'article_sent_for_review', reportee.email, {
-                            to : reportee, 
-                            article, contractor
-                        });
-
+                        if (reportee) {
+                            require('./mail.js').triggerHook(_c, 'article_sent_for_review', reportee.email, {
+                                to : reportee, 
+                                article, contractor
+                            });
+    
+                            notifications.notifyUser(reportee, _c.id, {
+                                title: "Article sent for review",
+                                url : "/lilium/publishing/write/" + postid,
+                                msg: 'An article has been sent for review by ' + contractor.displayname,
+                                type: 'info'
+                            });
+                        }
 
                         hooks.fireSite(_c, 'article_sentForReview', { article, contractor });
                     });
@@ -704,6 +720,12 @@ class ContentLib {
             this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "draft" }), 'refused', historyentry => {
                 this.getFull(_c, postid, newstate => {
                     hooks.fireSite(_c, 'article_refusedSubmission', { article : newstate, by : caller });
+
+                    notifications.notifyUser(newstate.author, _c.id, {
+                        title: "Your article has been reviewed",
+                        msg: newstate.title[0] + ' was not accepted. Some modifications are needed before it can go live.',
+                        type: 'info'
+                    });
 
                     callback && callback({ historyentry, newstate });
                 });
@@ -774,7 +796,7 @@ class ContentLib {
                         log('Facebook', 'Debugger responded with title', "success");
                         notifications.notifyUser(userid, _c.id, {
                             title: "Facebook Graph",
-                            msg: '<i>'+article.title[0]+'</i> has been debugged on Facebook Graph.',
+                            msg: article.title[0]+ " has been debugged on Facebook Graph.",
                             type: 'log'
                         });
 
@@ -784,7 +806,7 @@ class ContentLib {
                         notifications.notifyUser(userid, _c.id, {
                             title: "Facebook Graph",
                             url : "https://developers.facebook.com/tools/debug/og/object/",
-                            msg: '<i>'+article.title[0]+'</i> was not debugged on Facebook Graph.',
+                            msg: article.title[0] + ' was not debugged on Facebook Graph.',
                             type: 'warning'
                         });
                     }

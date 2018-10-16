@@ -68,7 +68,6 @@ class Article {
             case 'haseditrights': if (cli.hasRightOrRefuse("create-articles")) this.haseditrights(cli); break;
             case 'liveedit': if (cli.hasRightOrRefuse("create-articles")) this.liveedit(cli); break;
             case 'package': if (cli.hasRightOrRefuse("create-articles")) this.packageArticle(cli); break;
-            case 'addwordtodico': if (cli.hasRightOrRefuse('create-articles')) this.addWordToDico(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
             case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
             case 'preview': if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview"); break;
@@ -375,13 +374,6 @@ class Article {
         });
     };
 
-    addWordToDico(cli) {
-        const Proofreader = require('./proofreader');
-        Proofreader.addWord(cli.postdata.data.word, cli.postdata.data.lang || "en", () => {
-            cli.sendJSON({ok : true});
-        });
-    };
-
     packageArticle(cli) {
         const lang = cli.postdata.data.lang;
 
@@ -445,21 +437,6 @@ class Article {
 
             nextpage();
         }, {content : 1, title : 1, subtitle : 1, facebooktitle : 1, facebooksubtitle : 1, isSponsored : 1, nsfw : 1, hasads : 1});
-    }
-
-    proofread(paragraphs, lang, send) {
-        const Proofreader = require('./proofreader');
-
-        Proofreader.proofread(paragraphs.map(x => x.textContent), lang, (report, lang) => {
-            send(report && { 
-                corrections : report.map(r => r.messages.map(x => { 
-                    return { reason : x.message, at : x.column, suggestions : x.expected,  } })
-                ),
-                keywords : report.map(r => r.data.keywords),
-                paragraphs : paragraphs.map(x => x.innerHTML),
-                language : lang
-            });
-        });
     }
 
     infoStrip(cli) {
@@ -1867,90 +1844,7 @@ class Article {
     };
 
     form() {
-        formBuilder.createForm('post_create', {
-                formWrapper: {
-                    'tag': 'div',
-                    'class': 'row',
-                    'id': 'article_new',
-                    'inner': true
-                },
-                fieldWrapper : "lmlform-fieldwrapper"
-            })
-            .addTemplate('article_base')
-            .trigger('fields')
-            .add('title-author', 'title', {
-                displayname : "Appearance"
-            })
-            .add('templatename', 'liveselect', {
-                endpoint : "themes.templates.article",
-                select : {
-                    value : 'file',
-                    displayname : 'displayname'
-                },
-                empty : {
-                    displayname : " - Use selected topic's template - "
-                },
-                displayname : "Article template"
-            })
-            .add('date', 'date', {
-                displayname : "Publish date",
-                datetime : true,
-                context : 'edit'
-            }, {
-                required : false
-            })
-            .beginSection('authorbox', {
-                show : {
-                    "role" : "editor"
-                }
-            })
-            .add('author', 'liveselect', {
-                endpoint : "entities.simple",
-                displayname : "Author",
-                select : {
-                    value : "_id",
-                    displayname : "displayname",
-                    readkey : "0._id"
-                }
-            })
-            .closeSection('authorbox')
-            .add('nsfw', 'checkbox', {
-                displayname : "Not safe for work (NSFW)"
-            })
-            .trigger('bottom')
-            .add('commtitle', 'title', {
-                displayname : "Internal communication"
-            })
-            .add('communication', 'snip', {
-                snip : "communication",
-                livevars : ["communications.get.article.{?1}"]
-            })
-            .add('title-action', 'title', {
-                displayname: "Publish"
-            })
-            .add('publish-set', 'buttonset', { buttons : [{
-                    'name' : 'save',
-                    'displayname': 'Save changes',
-                    'type' : 'button',
-                    'classes': ['btn-save']
-                }, {
-                    'name' : 'publish', 
-                    'displayname': 'Package and finalize',
-                    'type' : 'button',
-                    'classes': ['btn-publish']
-                }, {
-                    'name' : 'rebuild', 
-                    'displayname': 'Update and refresh',
-                    'type' : 'button',
-                    'classes': ['btn-rebuild']
-                }, {
-                    'name' : 'refuse',
-                    'displayname' : 'Refuse review',
-                    'type' : 'button',
-                    'classes': ["btn-refuse-review", "role-production"]
-                }
-            ]}
-        );
+        
     }
 
     handleNext(cli) {

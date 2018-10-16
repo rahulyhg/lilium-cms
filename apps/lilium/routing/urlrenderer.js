@@ -155,6 +155,11 @@ export class URLRenderer extends Component {
         this.state.classes = ev.detail.snapped ? ["snap"] : [];
     }
 
+    updateBodyClass(endpoint) {
+        document.body.classList.remove("endpoint-" + this.state.endpoint);
+        document.body.classList.add("endpoint-" + endpoint);
+    }
+
     refreshPath(extras= {}) {
         const paths = document.location.pathname.substring(1).split('/');
         paths.shift();
@@ -166,6 +171,7 @@ export class URLRenderer extends Component {
         resetPageCommands();
 
         const CurrentContainer = EndpointStore.getComponentFromEndpoint(endpoint);
+        this.updateBodyClass(endpoint);
         this.setState({ endpoint, levels, CurrentContainer, extras, rendererstyle : CurrentContainer.rendererstyle || {} }, () => {
             const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
             document.dispatchEvent(ev);
