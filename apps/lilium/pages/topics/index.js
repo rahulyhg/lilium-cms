@@ -21,6 +21,10 @@ export default class TopicsManagement extends Component {
         }
     }
 
+    addOne(topic) {
+        console.log(topic);
+    }
+
     setPage() {
         if (this.props.levels.length != 0) {
             this.setTopicFromID(this.props.levels[0]);
@@ -30,14 +34,14 @@ export default class TopicsManagement extends Component {
     setTopicFromID() {
         this.setState({ loading : true });
         API.get('/topics', {}, (err, json, r) => {
-
+            
         });
     }
 
     render() {
         return (
             <div class="manage-topics-page">
-                <TopicPicker session="manager" />
+                <TopicPicker session="manager" onAdd={this.addOne.bind(this)} />
             </div>
         );
     }
