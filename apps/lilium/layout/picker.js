@@ -45,7 +45,8 @@ export class Picker extends Component {
         super(props);
         this.state = {
             visible: false,
-            session: {}
+            session: {},
+            carouselElements: undefined
         };
 
         _singleton = this;
@@ -58,7 +59,8 @@ export class Picker extends Component {
         if (session) {
             log('Picker', 'Casting picker singleton', 'detail');
             const tabs = session.accept.map(x => PickerMap[x]);
-            _singleton.setState({ session: session, visible: true, tabs, callback: done });
+            const carouselElements = session.state == 'carousel' ? [] : undefined;
+            _singleton.setState({ session: session, visible: true, tabs, callback: done, carouselElements });
             window.addEventListener('keydown', _singleton.keydown_bound);
         } else {
             log('Picker', 'Cannot cast Picker without a Session object', 'error');
@@ -72,10 +74,30 @@ export class Picker extends Component {
     }
 
     /**
+     * Takes the appropriate action to handle an element being picked by a subpicker.
+     * If the current session is a carousel, adds the element to the carousel, otherwise, dismiss the picker and return the value to the caller
+     * @param {object} selectedVal 
+     */
+    static accept(selectedVal) {
+        if (this.state.session.type == 'carousel') _singleton.addToCarousel(selectedVal)
+        else Picker.finish(selectedVal)
+    }
+
+    /**
+     * Adds the specified element to the carousel
+     * @param {object} el The element to add to the carousel
+     */
+    addToCarousel(el) {
+        const carouselElements = this.state.carouselElements;
+        carouselElements.push(el);
+        this.setState({ carouselElements });
+    }
+
+    /**
      * Dismisses the Picker and returns the values selected by the user
      * @param {object} selectedVal Values selected by the user
      */
-    static accept(selectedVal) {
+    static finish(el) {
         if (selectedVal) {
             log('Picker', 'Selected image and calling back', 'detail');
             _singleton.state.callback && _singleton.state.callback(selectedVal);
@@ -109,6 +131,15 @@ export class Picker extends Component {
                             this.state.session.type == 'carousel' ? (
                                 <div className="picker-carousel">
                                     <div id="carousel-preview">
+                                        {
+                                            this.state.carouselElements && this.state.carouselElements.length ? (
+                                                this.state.carouselElements.map(el => (
+                                                    <p className="carousel-element">Carousel element</p>
+                                                ))
+                                            ) : (
+                                                <p>Elements added to the carousel will appear here</p>
+                                            )
+                                        }
                                         <p>No items in the carousel</p>
                                     </div>
                                     <button className='button fill purple' onClick={() => { alert('asd'); }}>Add carousel</button>
