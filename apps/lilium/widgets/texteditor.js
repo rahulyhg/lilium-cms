@@ -32,7 +32,7 @@ export class TextEditor extends Component {
             convert_urls : false,
             menubar: false,
             setup: editor => {
-                editor.addButton('insert-place', {
+                editor.addButton('insert-element', {
                     icon: 'fa fa-plus-circle',
                     tooltip: 'Insert Images, Places or Embeds',
                     onclick: () => {
@@ -67,7 +67,7 @@ export class TextEditor extends Component {
                 'searchreplace visualblocks code fullscreen hr',
                 'media paste wordcount'
             ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-place insert-carousel insertEmbed link | bullist numlist | fullscreen | code',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-element insert-carousel insertEmbed link | bullist numlist | fullscreen | code',
             content_css: [
                 '/compiled/theme/tinymce.css'
             ],

@@ -104,7 +104,8 @@ export class PlacePicker extends Component {
                             {
                                 this.state.places && this.state.places.length ? (
                                     this.state.places.map(place => (
-                                        <Place {...place} onSelect={this.placeSelected.bind(this)} key={place.place_id} selected={place.place_id== this.state.selectedPlace.place_id} />
+                                        <Place {...place} onSelect={this.placeSelected.bind(this)} key={place.place_id}
+                                                selected={this.state.selectedPlace ? place.place_id == this.state.selectedPlace : false} />
                                     ))
                                 ) : (
                                     <p>No places to show</p>
@@ -126,8 +127,8 @@ export class PlacePicker extends Component {
                         </div>
                     </div>
                     <div id="place-picker-actions-bar">
-                        <a role='button' className="button fill purple" onClick={Picker.accept.bind(this)}>Add Selected Place</a>
-                        <a role='button' className="button outline red" onClick={Picker.dismiss.bind(this)}>Cancel</a>
+                        <button className={"button purple " + (this.props.carousel ? 'outline' : 'fill')} onClick={Picker.accept.bind(this)}>Add Selected Place</button>
+                        <button className="button outline red" onClick={Picker.dismiss.bind(this)}>Cancel</button>
                     </div>
                 </div>
                 <div id="place-picker-map-pane">

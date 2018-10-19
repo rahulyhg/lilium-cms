@@ -31,6 +31,7 @@ class PickerSession {
 
         this.tab = sessionOptions.tab || this.getLastOpened() || this.accept[0];
         this.options = sessionOptions.options || {};
+        this.type = sessionOptions.type;
     }
 
     getLastOpened() {
@@ -88,6 +89,7 @@ export class Picker extends Component {
     }
 
     render() {
+        console.log(this.state);
         if (this.state.visible) {
             return (
                 <div id="picker-overlay">
@@ -97,7 +99,7 @@ export class Picker extends Component {
                                 this.state.tabs.map((SubPicker) => {
                                     return (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} options={this.state.session.options[SubPicker.slug]} />
+                                            <SubPicker onKeyDown={this.keydown.bind(this)} carousel={this.state.session.type == 'carousel'} options={this.state.session.options[SubPicker.slug]} />
                                         </Tab>
                                     )
                                 })
@@ -105,8 +107,11 @@ export class Picker extends Component {
                         </TabView>
                         {
                             this.state.session.type == 'carousel' ? (
-                                <div id="carousel-preview">
-                                    <p>No items in the carousel</p>
+                                <div className="picker-carousel">
+                                    <div id="carousel-preview">
+                                        <p>No items in the carousel</p>
+                                    </div>
+                                    <button className='button fill purple' onClick={() => { alert('asd'); }}>Add carousel</button>
                                 </div>
                             ) : null
                         }
