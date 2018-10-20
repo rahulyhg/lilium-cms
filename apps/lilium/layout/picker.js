@@ -46,7 +46,7 @@ export class Picker extends Component {
         this.state = {
             visible: false,
             session: {},
-            carouselElements: undefined
+            selectedElement: undefined
         };
 
         _singleton = this;
@@ -71,6 +71,8 @@ export class Picker extends Component {
         log('Picker', 'Dismissing image picker singleton', 'detail');
         _singleton.setState({ visible : false });
         window.removeEventListener('keydown', _singleton.keydown_bound);
+
+        // _singleton.state.callback && _singleton.state.callback(_singleton.state.selectedElement);
     }
 
     /**
@@ -79,7 +81,7 @@ export class Picker extends Component {
      * @param {object} selectedVal 
      */
     static accept(selectedVal) {
-        if (this.state.session.type == 'carousel') _singleton.addToCarousel(selectedVal)
+        if (_singleton.state.session.type == 'carousel') _singleton.addToCarousel(selectedVal)
         else Picker.finish(selectedVal)
     }
 
@@ -87,8 +89,8 @@ export class Picker extends Component {
      * Adds the specified element to the carousel
      * @param {object} el The element to add to the carousel
      */
-    addToCarousel(el) {
-        const carouselElements = this.state.carouselElements;
+    static addToCarousel(el) {
+        const carouselElements = _singleton.state.carouselElements;
         carouselElements.push(el);
         this.setState({ carouselElements });
     }
@@ -98,9 +100,9 @@ export class Picker extends Component {
      * @param {object} selectedVal Values selected by the user
      */
     static finish(el) {
-        if (selectedVal) {
+        if (el) {
             log('Picker', 'Selected image and calling back', 'detail');
-            _singleton.state.callback && _singleton.state.callback(selectedVal);
+            _singleton.state.callback && _singleton.state.callback(el);
             Picker.dismiss();
         }
     }
@@ -132,8 +134,8 @@ export class Picker extends Component {
                                 <div className="picker-carousel">
                                     <div id="carousel-preview">
                                         {
-                                            this.state.carouselElements && this.state.carouselElements.length ? (
-                                                this.state.carouselElements.map(el => (
+                                            this.state.selectedElement && this.state.selectedElement.length ? (
+                                                this.state.selectedElement.map(el => (
                                                     <p className="carousel-element">Carousel element</p>
                                                 ))
                                             ) : (

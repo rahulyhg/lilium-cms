@@ -38,6 +38,7 @@ export class TextEditor extends Component {
                     onclick: () => {
                         const session =  new Picker.Session({});
                         Picker.cast(session, place => {
+                            console.log("Place : ", place);
                             const dummyPlaceEl = document.createElement('div');
                             dummyPlaceEl.className = 'lml-placeholder-google-maps';
                             dummyPlaceEl.dataset.placeId = place._id;

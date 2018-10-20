@@ -127,7 +127,7 @@ export class PlacePicker extends Component {
                         </div>
                     </div>
                     <div id="place-picker-actions-bar">
-                        <button className={"button purple " + (this.props.carousel ? 'outline' : 'fill')} onClick={Picker.accept.bind(this)}>Add Selected Place</button>
+                        <button className={"button purple " + (this.props.carousel ? 'outline' : 'fill')} onClick={Picker.accept.bind(this, this.state.selectedPlace)}>Add Selected Place</button>
                         <button className="button outline red" onClick={Picker.dismiss.bind(this)}>Cancel</button>
                     </div>
                 </div>
