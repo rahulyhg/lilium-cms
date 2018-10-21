@@ -1,7 +1,18 @@
 import { getAPI, storeAPI } from './cache';
 
+let OFFLINE_REQUESTS = [];
 class API {
+    static processPendingRequests() {
+        OFFLINE_REQUESTS.forEach(x => API.request(...x));
+        OFFLINE_REQUESTS = [];
+    }
+
     static request(method = "GET", endpoint, params = {}, data, sendback, resptype = "json") {
+        if (!window.liliumcms.connected) {
+            OFFLINE_REQUESTS.push(arguments);
+            return;
+        }
+
         log('API', 'Requesting ' + method + ' to endpoint : ' + endpoint, 'detail');
         const now = Date.now();
         fetch(`${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include", method, body : data && JSON.stringify(data), headers: data && { "Content-Type": "application/json" } }).then(r => {
