@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import API from '../../data/api';
 import { TextField, SelectField, StackBox, CheckboxField } from '../../widgets/form';
 
-class ThemeSettingsForm extends Component {
+export class ThemeSettingsForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
