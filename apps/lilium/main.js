@@ -11,7 +11,7 @@ import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
 import { initLocal, setSession, mapUsers } from './data/cache';
-import { NotificationWrapper } from './layout/notifications';
+import { NotificationWrapper, castNotification } from './layout/notifications';
 import { makeGLobalLang, setLanguage } from './data/vocab';
 import { CakepopWrapper } from './layout/cakepopsmanager';
 import API from './data/api';
@@ -45,6 +45,22 @@ class Lilium extends Component {
     componentDidMount() {
         log('Lilium', 'Main component finished mounting', 'lilium');
         this.fetchUserData();
+
+        window.addEventListener('offline', () => {
+            castNotification({
+                title: "Internet connection lost, modifications will not be saved",
+                message: "You went offline, any modifications you make now will not be saved to the server",
+                type: "warning"
+            });
+        });
+
+        window.addEventListener('online', () => {
+            castNotification({
+                title: "Internet connection established",
+                message: "You are now connected to the Internet",
+                type: "success"
+            });
+        });
 
         document.addEventListener('castexitscreen', () => {
             this.setState({ loading : true });

@@ -426,6 +426,10 @@ export class TopicPicker extends FormField {
             })
         }
 
+        addOne(topic) {
+            this.props.onAdd && this.props.onAdd(topic);
+        }
+
         render() {
             return (
                 <div class="topic-children-slide">
@@ -434,6 +438,14 @@ export class TopicPicker extends FormField {
                             {topic.displayname}
                         </div>
                     )) }
+
+                    {
+                        this.props.session == "manager" ? (
+                            <div class="topic-children-item add-new" onClick={this.addOne.bind(this)}>
+                                <i class="far fa-plus"></i>
+                            </div>
+                        ) : null
+                    }
                 </div>
             )
         }
@@ -525,13 +537,17 @@ export class TopicPicker extends FormField {
         })
     }
 
+    addOne(topic) {
+        this.props.onAdd && this.props.onAdd(topic);
+    }
+
     getCurrentSelectedSlug() {
         if (this.state.stagedtopic && this.state.phase != "lock") {
             return (<div class="topic-picker-current">
                 <b>{this.state.stagedtopic.displayname}</b> <i>/{this.state.stagedtopic.completeSlug}</i>
             </div>);
         } else {
-            return null
+            return null;
         }
     }
 
@@ -562,7 +578,9 @@ export class TopicPicker extends FormField {
                 <div class="phase-tree">
                     {
                         this.state.topics.map((topicchildren, index) => (
-                            <TopicPicker.TopicSlide topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} index={index} />
+                            <TopicPicker.TopicSlide onAdd={this.addOne.bind(this)} session={this.props.session} 
+                                topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} 
+                                index={index} />
                         ))
                     }
                 </div>
@@ -588,7 +606,7 @@ export class TopicPicker extends FormField {
         return (
             <footer>
                 <span class="red clickable" onClick={this.reset.bind(this)}>Reset</span>
-                { this.state.stagedtopic ? (
+                { this.state.stagedtopic && this.props.session != "manager" ? (
                     <span class="clickable" onClick={this.lockin.bind(this)}><b>Lock in</b></span>
                 ) : null }
             </footer>
