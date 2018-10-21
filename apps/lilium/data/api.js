@@ -3,6 +3,8 @@ import { getAPI, storeAPI } from './cache';
 let OFFLINE_REQUESTS = [];
 class API {
     static processPendingRequests() {
+        log('API', "Handling pending requests", "info");
+
         OFFLINE_REQUESTS.forEach(x => API.request(...x));
         OFFLINE_REQUESTS = [];
     }

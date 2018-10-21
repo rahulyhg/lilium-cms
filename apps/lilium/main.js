@@ -19,7 +19,7 @@ import API from './data/api';
 window.liliumcms = {};
 // LILIUM_IMPORT_TEMPLATE
 
-liliumcms.connected = false;
+liliumcms.connected = true;
 
 makeGlobalLogger();
 makeGLobalLang();
@@ -51,15 +51,18 @@ class Lilium extends Component {
 
         bindRealtimeEvent('disconnect', ev => {
             window.liliumcms.connected = false;
+            log('Socket', "Lost internet connection, notifying user", 'socket');
 
             castNotification({
-                title: "Internet connection lost, modifications will not be saved",
-                message: "You went offline, any modifications you make now will not be saved to the server",
+                title: "Internet connection lost",
+                message: "You went offline. Any pending requests will be processed once your connection is restored.",
                 type: "warning"
             });
         });
 
         bindRealtimeEvent('reconnect', ev => {
+            log('Socket', "Internet connection restored, notifying user", 'socket');
+
             window.liliumcms.connected = true;
             API.processPendingRequests();
 

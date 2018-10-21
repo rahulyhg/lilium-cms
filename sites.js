@@ -186,12 +186,12 @@ var SiteInitializer = function (conf, siteobj) {
         hooks.bindSite(conf, 'preactAppInjectionPhase', pkg => {
             if (pkg.appname == "lilium") {
                 pkg.code += `// Lilium config
-                    window.liliumcms = Object.assign(window.liliumcms || {}, {
+                    window.liliumcms = {
                         env : "${conf.env}",
                         uid : "${conf.uid}",
                         url : "${conf.server.url}",
                         sitename : "${conf.website.sitetitle}"
-                    });
+                    };
                 `;
             }
         });
