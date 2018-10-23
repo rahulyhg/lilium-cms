@@ -4,6 +4,26 @@ import { BigList } from '../../widgets/biglist'
 import { navigateTo } from '../../routing/link'
 import * as entityLib from './lib'
 
+class EntityListItemAdd extends Component {
+    onClick() {
+        alert('Not implemented');
+        // castOverlay('create-entity');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="card flex create-new-entity-card">
+                <div>
+                    <i class="fal fa-plus"></i>
+                </div>
+                <div>
+                    <b>Create entity</b>
+                </div>
+            </div>
+        )
+    }
+}
+
 class EntityListItem extends Component {
     constructor(props) {
         super(props);
@@ -201,7 +221,7 @@ export default class Entities extends Component {
     render() {
         return (
             <div id="entities">
-                <BigList listitem={EntityListItem} endpoint='/entities/bunch' toolbar={Entities.TOOLBAR_CONFIG} />
+                <BigList listitem={EntityListItem} addComponent={EntityListItemAdd} endpoint='/entities/bunch' toolbar={Entities.TOOLBAR_CONFIG} />
             </div>
         )
     }
