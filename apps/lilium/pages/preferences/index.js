@@ -40,6 +40,11 @@ export default class Preferences extends Component {
     }
 
     valueChanged(name, value) {
+        if (name == "menuLocked") {
+            const ev = new CustomEvent("togglemenusnap", { detail : { snapped : value } });
+            document.dispatchEvent(ev);
+        }
+
         API.post('/preferences/updatePreference', {preferenceName: name, value: value }, err => {
             if (!err) {
                 log('Preferences', `Set preference ${name} to ${value}`, 'success');

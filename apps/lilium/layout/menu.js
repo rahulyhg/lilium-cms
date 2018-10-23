@@ -31,6 +31,10 @@ export class LiliumMenu extends Component {
     componentDidMount() {
         const ev = new CustomEvent("menusnap", { detail : { snapped : this.state.snapped } });
         document.dispatchEvent(ev);
+
+        document.addEventListener('togglemenusnap', (ev) => {
+            this.toggleSnap(ev.detail.snapped);
+        })
     }
 
     componentWillReceiveProps(props) {
@@ -54,13 +58,17 @@ export class LiliumMenu extends Component {
         this.focusedChanged(false);        
     }
 
-    clickOnSlideHandle() {
+    toggleSnap(snapped) {
         log('Menu', 'Handle snap was clicked', 'detail');
-        const ev = new CustomEvent("menusnap", { detail : { snapped : !this.state.snapped } });
+        const ev = new CustomEvent("menusnap", { detail : { snapped } });
         document.dispatchEvent(ev);
 
-        storeLocal(CACHEKEYS.SIDEBARSNAP, !this.state.snapped);
-        this.setState({ snapped : !this.state.snapped })
+        storeLocal(CACHEKEYS.SIDEBARSNAP, snapped);
+        this.setState({ snapped })
+    }
+
+    clickOnSlideHandle() {
+        this.toggleSnap(!this.state.snapped);
     }
 
     render() {
