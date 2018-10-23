@@ -690,7 +690,7 @@ class Tag extends Component {
                 {
                     (!this.props.readOnly) ? (
                         <i className="fal fa-times close-button"
-                            onClick={this.props.remove && this.props.remove.bind(this, this.props.text)}></i>
+                            onClick={this.props.remove && this.props.remove.bind(this, this.props.tagId)}></i>
                     ) : null
                 }
             </div>
@@ -845,7 +845,7 @@ export class MultiSelectBox extends FormField {
                         (this.state.selectedValues.length > 0) ? (
                             this.state.selectedValues.map(value => {
                                 const option = this.state.options.find(o => o.value == value) || {};
-                                return (<Tag text={option.displayName} key={value} readonly={true} />)
+                                return (<Tag text={option.displayName} tagId={value} key={value} remove={this.unselectOption.bind(this)} readonly={true} />)
                             })
                         ) : (
                             <p style={{margin: 8, color: '#555'}}>No values selected</p>
