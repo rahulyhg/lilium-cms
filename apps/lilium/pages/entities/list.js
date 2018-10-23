@@ -1,13 +1,12 @@
 import { Component, h } from 'preact';
 import { castNotification } from '../../layout/notifications';
-import { BigList } from '../../widgets/biglist'
-import { navigateTo } from '../../routing/link'
-import * as entityLib from './lib'
+import { BigList } from '../../widgets/biglist';
+import { navigateTo } from '../../routing/link';
+import { castOverlay } from '../../overlay/overlaywrap';
 
 class EntityListItemAdd extends Component {
     onClick() {
-        alert('Not implemented');
-        // castOverlay('create-entity');
+        castOverlay('create-entity');
     }
 
     render() {
@@ -139,9 +138,9 @@ class EntityListItem extends Component {
 
     render() {
         return (
-            <div class="card flex">
-                <div class="image-wrapper">
-                    <img src={this.state.user.avatarURL} alt={`${this.state.user.displayname}'s profile picture`} className="profile-picture"/>
+            <div class="card flex entity-card">
+                <div class={"image-wrapper " + (this.state.user.avatarURL ? "has-avatar" : "no-avatar")}>
+                    <img src={this.state.user.avatarURL || "/static/media/lmllogo.png"} alt={`${this.state.user.displayname}'s profile picture`} className="profile-picture"/>
                 </div>
 
                 <div class="detail-head">
