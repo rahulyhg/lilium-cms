@@ -1,6 +1,7 @@
 import { h, Component } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { Link } from '../../routing/link';
+import { castOverlay } from '../../overlay/overlaywrap';
 import dateformat from 'dateformat';
 
 const STATUS_TO_TEXT = {
@@ -20,6 +21,23 @@ const CakepopSingleStatus = props => (
         {STATUS_TO_TEXT[props.status] || STATUS_TO_TEXT.default}
     </span>
 );
+
+class CakepopListItemAdd extends Component {
+    onClick() {
+        castOverlay('create-cakepop');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="card create-new-cakepop-card">
+                <div>
+                    <i class="fal fa-plus"></i>
+                    <b>Create cakepop</b>
+                </div>
+            </div>
+        )
+    }
+}
 
 class CakepopSingle extends Component {
     render(){
@@ -69,7 +87,7 @@ export default class CakepopsList extends Component {
     render() {
         return (
             <div class="cakepops-big-list">
-                <BigList endpoint="/cakepop/bunch" listitem={CakepopSingle} toolbar={TOOLBAR_CONFIG} />
+                <BigList endpoint="/cakepop/bunch" addComponent={CakepopListItemAdd} listitem={CakepopSingle} toolbar={TOOLBAR_CONFIG} />
             </div>
         );
     }
