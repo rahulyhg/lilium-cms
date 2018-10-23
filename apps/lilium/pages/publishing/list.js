@@ -1,7 +1,8 @@
 import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import API from "../../data/api";
-import { BigList, BigListToolBarBuilder } from '../../widgets/biglist'
+import { BigList, BigListToolBarBuilder } from '../../widgets/biglist';
+import { castOverlay } from '../../overlay/overlaywrap';
 import { getSession } from '../../data/cache';
 import { POST_STATUS } from '../../data/const'
 
@@ -22,6 +23,25 @@ class PostListItem extends Component {
                         {this.props.item.headline}
                     </p>
                 </Link>
+            </div>
+        )
+    }
+}
+
+class PostListItemAdd extends Component {
+    onClick() {
+        castOverlay('create-article');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="card flex create-new-article-card">
+                <div>
+                    <i class="fal fa-plus"></i>
+                </div>
+                <div>
+                    <b>Create new post</b>
+                </div>
             </div>
         )
     }
@@ -83,7 +103,7 @@ export default class ListView extends Component {
         }
 
         return (
-            <BigList listitem={PostListItem} endpoint="/publishing/biglist" toolbar={this.state.toolbarConfig} />
+            <BigList listitem={PostListItem} endpoint="/publishing/biglist" toolbar={this.state.toolbarConfig} addComponent={PostListItemAdd} />
         )
     }
 }
