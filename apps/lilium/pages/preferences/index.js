@@ -1,7 +1,8 @@
 import { Component, h } from 'preact';
 import API from '../../data/api';
 import { castNotification } from '../../layout/notifications';
-import { SelectField, CheckboxField } from '../../widgets/form.js';
+import { SelectField, CheckboxField, ButtonWorker } from '../../widgets/form.js';
+import { overwriteV4Cache } from '../../data/cache';
 
 const styles ={
     preferencesEdit: {
@@ -59,6 +60,24 @@ export default class Preferences extends Component {
         });
     }
 
+    resetListFilters() {
+        const v4SettingString = localStorage.getItem('LiliumV4');
+        try {
+            const v4Settings = JSON.parse(v4SettingString);
+            Object.keys(v4Settings).filter(x => x.startsWith('LF_')).forEach(k => (delete v4Settings[k]));
+            localStorage.setItem('LiliumV4', JSON.stringify(v4Settings));
+            overwriteV4Cache(v4Settings);
+
+            castNotification({
+                type : 'success',
+                title : 'Preferences', 
+                message : 'List filters were reset.'
+            })
+        } catch (err) {
+            log('Preferences', 'Could not update preferences : ' + err, 'err');
+        }
+    }
+
     render() {
         if (this.state.ready) {
             return (
@@ -76,6 +95,9 @@ export default class Preferences extends Component {
                                         onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='badgesNotifications' placeholder='Enable badges popup notifications' initialValue={this.values['badgesNotifications']}
                                         onChange={this.valueChanged.bind(this)} />
+                    </div>
+                    <div>
+                        <ButtonWorker text="Reset all list filters" theme="red" type="outline" sync={true} work={this.resetListFilters.bind(this)} />
                     </div>
                 </div>
             );
