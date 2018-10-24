@@ -75,16 +75,16 @@ export class LiliumMenu extends Component {
         const links = [];
         this.state.menus.forEach(menu => {
             links.push(
-                (<div class="menu-item"><Link linkStyle="block" href={menu.absURL.replace('admin', '')}>
+                (<Link linkStyle="block" href={menu.absURL.replace('admin', '')}><div class="menu-item">
                     <i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span>
-                </Link></div>)
+                </div></Link>)
             );
 
             menu.children.map(child => {
                 links.push(
-                    (<div class="menu-item"><Link linkStyle="block" href={child.absURL.replace('admin', '')}>
+                    (<Link linkStyle="block" href={child.absURL.replace('admin', '')}><div class="menu-item">
                         <i className={"fa " + child.faicon}></i> <span>{child.displayname}</span>
-                    </Link></div>)
+                    </div></Link>)
                 );
             });
         });        
