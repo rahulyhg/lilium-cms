@@ -41,19 +41,23 @@ export default class Preferences extends Component {
     }
 
     valueChanged(name, value) {
-        if (name == "menuLocked") {
-            const ev = new CustomEvent("togglemenusnap", { detail : { snapped : value } });
-            document.dispatchEvent(ev);
-        }
-
         API.post('/preferences/updatePreference', {preferenceName: name, value: value }, err => {
             if (!err) {
                 log('Preferences', `Set preference ${name} to ${value}`, 'success');
+                liliumcms.session.preferences[name] = value;
                 castNotification({
                     type: 'success',
                     title: 'Preferences saved',
                     message: 'Your changes to your preferences were saved!'
                 });
+                
+                if (name == "menuLocked") {
+                    const ev = new CustomEvent("togglemenusnap", { detail : { snapped : value } });
+                    document.dispatchEvent(ev);
+                } else if (name == "activeReadersHeader") {
+                    const ev = new CustomEvent("toggleactivereadersheader");
+                    document.dispatchEvent(ev);   
+                }
             } else {
                 log('Preferences', `Error updating preferenc ${name}`, 'err');
             }
@@ -88,6 +92,8 @@ export default class Preferences extends Component {
                                         options={this.supportedLanguages.map(l => { return { displayname: l.displayName, value: l.languageName } })}
                                         onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='menuLocked' placeholder='Lock Left Menu' initialValue={this.values['menuLocked']}
+                                        onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='activeReadersHeader' placeholder='Display active readers in header' initialValue={this.values['activeReadersHeader']}
                                         onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='publishAnimations' placeholder='Enable publishing animations' initialValue={this.values['publishAnimations']}
                                         onChange={this.valueChanged.bind(this)} />

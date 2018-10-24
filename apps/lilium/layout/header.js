@@ -99,7 +99,8 @@ class HeaderRealtimeCounter extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            totalRT : 0
+            totalRT : 0,
+            visible : false
         };
     }
 
@@ -115,9 +116,19 @@ class HeaderRealtimeCounter extends Component {
         API.get('/googleanalytics/realtime', {}, (err, data) => {
             data && data.total && this.setState({ totalRT : data.total });
         });
+
+        document.addEventListener('toggleactivereadersheader', () => {
+            this.setState({ visible : liliumcms.session.preferences.activeReadersHeader })
+        });
+
+        this.setState({ visible : liliumcms.session.preferences.activeReadersHeader })
     }
 
     render() {
+        if (!this.state.visible) {
+            return null;
+        }
+
         return this.state.totalRT ? (
             <div id="headerRtCounter">
                 <b><AnimeNumber number={this.state.totalRT} /></b>
