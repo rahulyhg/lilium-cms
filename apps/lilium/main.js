@@ -8,7 +8,7 @@ import { PlacePicker } from './layout/placepicker';
 import { LoadingView } from './layout/loading';
 import { OverlayWrap } from './overlay/overlaywrap';
 import { Lys } from './layout/lys';
-import { initiateConnection } from './realtime/connection';
+import { initiateConnection, bindRealtimeEvent } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
 import { initLocal, setSession, mapUsers } from './data/cache';
 import { NotificationWrapper, castNotification } from './layout/notifications';
@@ -16,7 +16,10 @@ import { makeGLobalLang, setLanguage } from './data/vocab';
 import { CakepopWrapper } from './layout/cakepopsmanager';
 import API from './data/api';
 
+window.liliumcms = {};
 // LILIUM_IMPORT_TEMPLATE
+
+liliumcms.connected = true;
 
 makeGlobalLogger();
 makeGLobalLang();
@@ -46,15 +49,23 @@ class Lilium extends Component {
         log('Lilium', 'Main component finished mounting', 'lilium');
         this.fetchUserData();
 
-        window.addEventListener('offline', () => {
+        bindRealtimeEvent('disconnect', ev => {
+            window.liliumcms.connected = false;
+            log('Socket', "Lost internet connection, notifying user", 'socket');
+
             castNotification({
-                title: "Internet connection lost, modifications will not be saved",
-                message: "You went offline, any modifications you make now will not be saved to the server",
+                title: "Internet connection lost",
+                message: "You went offline. Any pending requests will be processed once your connection is restored.",
                 type: "warning"
             });
         });
 
-        window.addEventListener('online', () => {
+        bindRealtimeEvent('reconnect', ev => {
+            log('Socket', "Internet connection restored, notifying user", 'socket');
+
+            window.liliumcms.connected = true;
+            API.processPendingRequests();
+
             castNotification({
                 title: "Internet connection established",
                 message: "You are now connected to the Internet",
