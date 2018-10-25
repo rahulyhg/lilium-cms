@@ -30,7 +30,7 @@ export class CreateStyledPage extends Component {
 
     render() {
         return (
-            <div id="create-styled-page">
+            <div id="create-styled-page" class="overlay-form">
                 <h1>Create a new styled page</h1>
                 <TextField name='title' placeholder='Title' onChange={this.updateValues.bind(this)} />
 
