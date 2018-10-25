@@ -108,7 +108,7 @@ export class SelectField extends FormField {
         return (
             <div class="field-wrap">
                 { this.props.placeholder ? <b class="placeholder">{this.props.placeholder}</b> : null }
-                <select class="classic-field" value={this.value} onChange={this.changed.bind(this)}>
+                <select class="classic-field" value={this.value} onChange={ev => this.changed(ev.target.value)}>
                     { this.props.options.map(opt => (
                         <option value={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname}</option>
                     )) }
@@ -158,9 +158,9 @@ export class TextField extends FormField {
                 {
                     this.props.multiline ? 
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={this.props.style || {}} 
-                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}>{this.props.initialValue || this.props.value || this.value || ""}</textarea>) :
+                                    onChange={ev => this.changed(ev.target.value)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}>{this.props.initialValue || this.props.value || this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
-                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
+                                    onChange={ev => this.changed(ev.target.value)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
                                     onFocus={this.props.onFocus && this.props.onFocus.bind(this)} ref={el => {this.inputbox = el}} />)
                 }
             </div>
