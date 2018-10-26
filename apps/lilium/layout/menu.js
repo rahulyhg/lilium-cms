@@ -71,27 +71,16 @@ export class LiliumMenu extends Component {
         this.toggleSnap(!this.state.snapped);
     }
 
-    render() {
-        const links = [];
-        this.state.menus.forEach(menu => {
-            links.push(
-                (<Link linkStyle="block" href={menu.absURL.replace('admin', '')}><div class="menu-item">
-                    <i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span>
-                </div></Link>)
-            );
-
-            menu.children.map(child => {
-                links.push(
-                    (<Link linkStyle="block" href={child.absURL.replace('admin', '')}><div class="menu-item">
-                        <i className={"fa " + child.faicon}></i> <span>{child.displayname}</span>
-                    </div></Link>)
-                );
-            });
-        });        
+    render() {     
 
         return (
             <menu id="lilium-menu" class={this.state.snapped ? "snap" : ""} ref={x => (this.slider = x)} onMouseEnter={this.mousehover.bind(this)} onMouseLeave={this.mouseleave.bind(this)} >
-                { links }
+                { this.state.menus.map(menu => (
+                    <Link linkStyle="block" href={menu.absURL.replace('admin', '')}><div class="menu-item">
+                        <i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span>
+                    </div></Link>
+                ))}
+                
                 <div style={styles.handle} onClick={this.clickOnSlideHandle.bind(this)}>
                     <div style={styles.handlebar}></div>
                     <div style={styles.handlebar}></div>

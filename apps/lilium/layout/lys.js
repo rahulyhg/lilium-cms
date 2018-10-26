@@ -38,28 +38,13 @@ export class Lys extends Component {
     }
 
     createCommandFromProp(menus) {
-        this.commands = [];
-        menus.map(x => {
-            if (!x.lys) {
-                return [];
-            }
+        this.commands = menus.filter(x => x.lys).map(x => ({
+            command : x.lys.replace(/,/g, ''),
+            displayname : x.displayname,
+            icon : "fa " + x.faicon,
+            url : x.absURL.replace('admin', '')
+        }));
 
-            return [{
-                command : x.lys.replace(/,/g, ''),
-                displayname : x.displayname,
-                icon : "fa " + x.faicon,
-                url : x.absURL.replace('admin', '')
-            }, ...x.children.map( y => {
-                return {
-                    command : y.lys.replace(/,/g, ''),
-                    displayname : y.displayname,
-                    icon : "fa " + y.faicon,
-                    url : y.absURL.replace('admin', '')
-                }
-            })];
-        }).forEach(x => this.commands.push(...x));
-
-        commands = this.commands;
         log('Lys', 'Handling now ' + this.commands.length + ' built-in commands', 'success');
     }
 
