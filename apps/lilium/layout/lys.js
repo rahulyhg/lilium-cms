@@ -45,6 +45,7 @@ export class Lys extends Component {
             url : x.absURL.replace('admin', '')
         }));
 
+        commands = this.commands;
         log('Lys', 'Handling now ' + this.commands.length + ' built-in commands', 'success');
     }
 
