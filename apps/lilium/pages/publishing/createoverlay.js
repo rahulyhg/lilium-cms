@@ -21,7 +21,7 @@ export class CreateOverlay extends Component {
 
     submit(headline) {
         this.setState({ loading : true });
-        if (headline) {
+        if (headline && headline.trim()) {
             API.post("/publishing/new", { headline }, (err, resp) => {
                 if (resp && resp._id) {
                     navigateTo("/publishing/write/" + resp._id);
@@ -62,13 +62,13 @@ export class CreateOverlay extends Component {
 
     render() {
         return (
-            <div>
+            <div class="create-article-overlay-form">
                 {
                     this.state.loading ? (
                         <Spinner />
                     ) : (
                         <div>
-                            <input onKeyDown={this.keydown.bind(this)} ref={x => (this.textbox = x)} placeholder="Provide a title, and press Enter"  />
+                            <input onKeyDown={this.keydown.bind(this)} ref={x => (this.textbox = x)} placeholder="Headline"  />
                             <div>
                                 <ButtonWorker work={this.submitText.bind(this)} text="Create article" type="fill" theme="blue" />
                                 <ButtonWorker work={this.dismiss.bind(this)} text="Dismiss" type="outline" theme="red" />
