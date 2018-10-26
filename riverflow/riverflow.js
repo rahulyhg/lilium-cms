@@ -63,12 +63,6 @@ class Riverflow {
             }
         }
 
-        if (flow.admin_menu) {
-            Admin.registerAdminMenu(flow.admin_menu);
-        } else if (flow.admin_sub_menu) {
-            Admin.registerAdminSubMenu(flow.admin_sub_menu.parent, flow.admin_sub_menu);
-        }
-
         if (flow.post_leaf) {
             let leaf = flow.post_leaf;
             Postleaf.registerLeaf(leaf.name, leaf.displayname, leaf.script.add, leaf.script.edit, leaf.script.show);
@@ -105,9 +99,10 @@ class Riverflow {
         const Modules = require(flowsPath);
         
         log('Riverflow', "Loading " + Modules.rivers.length + " rivers");
-        for (let i = 0; i < Modules.rivers.length; i++) {
-            this.registerFlow(Modules.rivers[i]);
-        }
+        Modules.rivers.forEach(river => this.registerFlow(river));
+
+        log('Riverflow', "Registering " + Modules.menus.length + " admin menus");
+        Modules.menus.forEach(menu => Admin.registerAdminMenu(menu));
     }
 }
 
