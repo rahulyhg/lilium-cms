@@ -1,8 +1,28 @@
 import { Component, h } from 'preact';
 import { castNotification } from '../../layout/notifications';
-import { BigList } from '../../widgets/biglist'
-import { navigateTo } from '../../routing/link'
-import * as entityLib from './lib'
+import { BigList } from '../../widgets/biglist';
+import { navigateTo } from '../../routing/link';
+import { castOverlay } from '../../overlay/overlaywrap';
+import * as entityLib from './lib'; 
+
+class EntityListItemAdd extends Component {
+    onClick() {
+        castOverlay('create-entity');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="card flex create-new-entity-card">
+                <div>
+                    <i class="fal fa-plus"></i>
+                </div>
+                <div>
+                    <b>Create entity</b>
+                </div>
+            </div>
+        )
+    }
+}
 
 class EntityListItem extends Component {
     constructor(props) {
@@ -119,9 +139,9 @@ class EntityListItem extends Component {
 
     render() {
         return (
-            <div class="card flex">
-                <div class="image-wrapper">
-                    <img src={this.state.user.avatarURL} alt={`${this.state.user.displayname}'s profile picture`} className="profile-picture"/>
+            <div class="card flex entity-card">
+                <div class={"image-wrapper " + (this.state.user.avatarURL ? "has-avatar" : "no-avatar")}>
+                    <img src={this.state.user.avatarURL || "/static/media/lmllogo.png"} alt={`${this.state.user.displayname}'s profile picture`} className="profile-picture"/>
                 </div>
 
                 <div class="detail-head">
@@ -201,7 +221,7 @@ export default class Entities extends Component {
     render() {
         return (
             <div id="entities">
-                <BigList listitem={EntityListItem} endpoint='/entities/bunch' toolbar={Entities.TOOLBAR_CONFIG} />
+                <BigList listitem={EntityListItem} addComponent={EntityListItemAdd} endpoint='/entities/bunch' toolbar={Entities.TOOLBAR_CONFIG} />
             </div>
         )
     }

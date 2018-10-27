@@ -1,5 +1,5 @@
 import {h, Component} from 'preact';
-import { Link } from '../routing/link';
+import { Link, navigateTo } from '../routing/link';
 import { CACHEKEYS, storeLocal, getLocal } from '../data/cache'
 
 const styles = {
@@ -19,18 +19,79 @@ const styles = {
     }
 }
 
+class LiliumMenuSection extends Component {
+    constructor(props) {
+        super(props); 
+        this.state = {
+            
+        }
+    }
+    
+    componentDidMount() {
+
+    }
+    
+    render() {
+        return (
+            <div>
+
+            </div>
+        );
+    }
+}
+
+class LiliumMenuSectionHeader extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            
+        }
+    }
+    
+    componentDidMount() {
+        
+    }
+
+    clicked() {
+        this.props.onClick && this.props.onClick(this.props.section);
+    }
+    
+    render() {
+        return (
+            <div class={"lilium-menu-section-header " + (this.props.active ? "grad " : "") + this.props.grad} onClick={this.clicked.bind(this)}>
+                <i class={"fal fa-" + this.props.icon} />
+            </div>
+        );
+    }
+}
+
 export class LiliumMenu extends Component {
     constructor(props) {
         super(props);
         this.state = {
             menus : props.menus || [],
-            snapped : getLocal(CACHEKEYS.SIDEBARSNAP)
-        }
+            snapped : getLocal(CACHEKEYS.SIDEBARSNAP),
+            endpoint : document.location.pathname.split("/")[2],
+            section : ""
+        };
     }
 
     componentDidMount() {
         const ev = new CustomEvent("menusnap", { detail : { snapped : this.state.snapped } });
         document.dispatchEvent(ev);
+
+        document.addEventListener('togglemenusnap', (ev) => {
+            this.toggleSnap(ev.detail.snapped);
+        })
+
+        document.addEventListener('navigate', ev => {
+            this.setState({
+                endpoint : ev.detail.href.split('/')[1]
+            })
+        });
+
+        const selectedSection = this.state.menus.find(menu => document.location.pathname.includes(menu.absURL));
+        this.switchSection(selectedSection ? selectedSection.section : 'home');
     }
 
     componentWillReceiveProps(props) {
@@ -54,36 +115,63 @@ export class LiliumMenu extends Component {
         this.focusedChanged(false);        
     }
 
-    clickOnSlideHandle() {
+    toggleSnap(snapped) {
         log('Menu', 'Handle snap was clicked', 'detail');
-        const ev = new CustomEvent("menusnap", { detail : { snapped : !this.state.snapped } });
+        const ev = new CustomEvent("menusnap", { detail : { snapped } });
         document.dispatchEvent(ev);
 
-        storeLocal(CACHEKEYS.SIDEBARSNAP, !this.state.snapped);
-        this.setState({ snapped : !this.state.snapped })
+        storeLocal(CACHEKEYS.SIDEBARSNAP, snapped);
+        this.setState({ snapped })
     }
 
-    render() {
-        const links = [];
-        this.state.menus.forEach(menu => {
-            links.push(
-                (<div class="menu-item"><Link linkStyle="block" href={menu.absURL.replace('admin', '')}>
-                    <i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span>
-                </Link></div>)
-            );
+    clickOnSlideHandle() {
+        this.toggleSnap(!this.state.snapped);
+    }
 
-            menu.children.map(child => {
-                links.push(
-                    (<div class="menu-item"><Link linkStyle="block" href={child.absURL.replace('admin', '')}>
-                        <i className={"fa " + child.faicon}></i> <span>{child.displayname}</span>
-                    </Link></div>)
-                );
-            });
-        });        
+    switchSection(section) {
+        this.setState({ section }, () => {
+            // Array.from(this.sectionMenusElement.querySelectorAll('.sidebar-menu-item')).forEach((item, index) => {
+            //     setTimeout(() => {
+            //         item.classList.add('shown');
+            //     }, index * 30);
+            // });
+        });
+    }
 
+    goTo(menu) {
+        navigateTo(menu.absURL);
+    }
+
+    render() {  
+        return (
+            <div id="lilium-menu" class={this.state.snapped ? "snap" : ""}>
+                <div class="lilium-menu-sections-all">
+                    <LiliumMenuSectionHeader active={"home" == this.state.section} onClick={this.switchSection.bind(this)}       grad="pink"    section="home"      icon="home" />
+                    <LiliumMenuSectionHeader active={"publishing" == this.state.section} onClick={this.switchSection.bind(this)} grad="orange"   section="publishing" icon="paper-plane" />
+                    <LiliumMenuSectionHeader active={"management" == this.state.section} onClick={this.switchSection.bind(this)} grad="lemon" section="management" icon="address-card" />
+                    <LiliumMenuSectionHeader active={"lilium" == this.state.section} onClick={this.switchSection.bind(this)}     grad="sky"  section="lilium"     icon="cogs" />
+                </div>
+                <div class="lilium-menu-active" ref={ x => (this.sectionMenusElement = x) }>
+                    {
+                        this.state.menus.filter(x => x.section == this.state.section).map(menu => (
+                            <div key={menu.id} class={"sidebar-menu-item " + (document.location.pathname.includes(menu.absURL) ? "selected" : "")} onClick={this.goTo.bind(this, menu)}>
+                                <i class={"far " + menu.faicon}></i>
+                                <b>{menu.displayname}</b>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        );
+        
         return (
             <menu id="lilium-menu" class={this.state.snapped ? "snap" : ""} ref={x => (this.slider = x)} onMouseEnter={this.mousehover.bind(this)} onMouseLeave={this.mouseleave.bind(this)} >
-                { links }
+                { this.state.menus.map(menu => (
+                    <Link linkStyle="block" href={menu.absURL.replace('admin', '')}><div class="menu-item">
+                        <i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span>
+                    </div></Link>
+                ))}
+                
                 <div style={styles.handle} onClick={this.clickOnSlideHandle.bind(this)}>
                     <div style={styles.handlebar}></div>
                     <div style={styles.handlebar}></div>

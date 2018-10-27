@@ -2,11 +2,29 @@ import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { Link } from '../../routing/link';
 import { StatusIndicator } from '../../widgets/statusindicator';
+import { castOverlay } from '../../overlay/overlaywrap';
 
 const STATUS_TO_COLOR = {
     invisible : "",
     public : "green",
     magiclink : "orange"
+}
+
+class StyledPageListItemAdd extends Component {
+    onClick() {
+        castOverlay('create-styledpage');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="card create-new-styledpage-card">
+                <div>
+                    <i class="fal fa-plus"></i>
+                    <b>Create Styled Page</b>
+                </div>
+            </div>
+        )
+    }
 }
 
 class StyledPageListItem extends Component {
@@ -90,7 +108,7 @@ export class ListStyledPages extends Component {
     render() {
         return (
             <div id="styled-pages-list">
-                <BigList listitem={StyledPageListItem} endpoint='/styledpages/search' toolbar={ListStyledPages.TOOLBAR_CONFIG} liststyle={{ maxWidth: '800px', margin: '0 auto' }} />
+                <BigList listitem={StyledPageListItem} addComponent={StyledPageListItemAdd} endpoint='/styledpages/search' toolbar={ListStyledPages.TOOLBAR_CONFIG} liststyle={{ maxWidth: '800px', margin: '0 auto' }} />
             </div>
         );
     }

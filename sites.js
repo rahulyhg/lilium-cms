@@ -186,7 +186,7 @@ var SiteInitializer = function (conf, siteobj) {
         hooks.bindSite(conf, 'preactAppInjectionPhase', pkg => {
             if (pkg.appname == "lilium") {
                 pkg.code += `// Lilium config
-                    global.liliumcms = {
+                    window.liliumcms = {
                         env : "${conf.env}",
                         uid : "${conf.uid}",
                         url : "${conf.server.url}",

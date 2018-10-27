@@ -586,6 +586,10 @@ class Entities {
                 Math.random().toString().substring(3) + "_ml_" + 
                 Math.random().toString().substring(3) + "_" + new Date().getTime();
 
+            entity.username = entity.username.trim();
+            entity.displayname = entity.displayname.trim();
+            entity.email = entity.email.trim();
+            
             entity.magiclink = magiclink;
             entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
 
@@ -673,6 +677,11 @@ class Entities {
                     Math.random().toString().substring(3) + "_" + new Date().getTime();
 
                 entity.magiclink = magiclink;
+                
+                entity.username = entity.username.trim();
+                entity.displayname = entity.displayname.trim();
+                entity.email = entity.email.trim();
+
                 db.insert(_c.default(), 'entities', entity, callback, true);
 
                 if (entity.email && entity.displayname) {

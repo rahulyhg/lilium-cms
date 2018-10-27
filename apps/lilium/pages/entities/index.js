@@ -1,7 +1,10 @@
 import { h, Component } from "preact";
 import ListView from './list';
 import EditView from './edit';
+import { castOverlay, registerOverlay } from '../../overlay/overlaywrap';
 import { navigateTo } from '../../routing/link';
+import { CreateEntity } from './createoverlay';
+import { addAction } from '../../layout/lys';
 
 export default class Entities extends Component {
     constructor(props) {
@@ -12,6 +15,20 @@ export default class Entities extends Component {
         return {
             title : "Entities"
         };
+    }
+
+    static componentDidRegister() {
+        log('PongLinks', 'Registering overlay for CreateEntity', 'success');
+        addAction({
+            action : "#create",
+            command : "entity",
+            displayname : "Entity",
+            execute : () => {
+                castOverlay('create-entity');
+            }
+        });
+
+        registerOverlay('create-entity', CreateEntity, { title: 'Invite a new entity' });
     }
 
     render() {
