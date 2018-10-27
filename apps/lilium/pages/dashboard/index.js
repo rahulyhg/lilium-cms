@@ -100,7 +100,7 @@ class Last30Days extends Component {
 
     render() {
         return (
-            <div style={{ width : "50%", margin: 10 }}>
+            <div style={{ width : "50%", margin: 10, borderRadius : 10, overflow : 'hidden' }}>
                 <h2 style={styles.boxtitle}>Latest 30 days</h2>
                 <div style={styles.graphbg}>
                     <ChartGraph type="line" data={this.data} labels={this.labels} />
@@ -120,7 +120,7 @@ class TopPost extends Component {
 
     render() {
         return (
-            <div style={{ width : "50%", margin: 10, background : "white", boxShadow : "0px 2px 1px rgba(0,0,0,0.2)" }}>
+            <div style={{ width : "50%", margin: 10, background : "white", boxShadow : "0px 2px 1px rgba(0,0,0,0.2)", borderRadius : 10, overflow : 'hidden' }}>
                 <h2 style={styles.boxtitle}>Yesterday top post</h2>
                 <div style={{ position: "relative" }}>
                     <div style={{ fontSize : 18, padding: 10 }}>{this.state.toppost.article.title}</div>

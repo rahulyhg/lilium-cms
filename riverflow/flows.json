@@ -21,7 +21,7 @@
             "displayname": "Ponglinks",
             "priority": 330,
             "rights": ["ponglinks"],
-            "absURL": "admin/ponglinks",
+            "absURL": "/ponglinks",
             "section" : "publishing"
         },
         {
@@ -31,7 +31,7 @@
             "displayname": "Comment threads",
             "priority": 228,
             "rights": ["moderate"],
-            "absURL": "admin/comments",
+            "absURL": "/comments",
             "section" : "management"
         },
         {
@@ -41,7 +41,7 @@
             "displayname": "The Daily Lilium",
             "priority": 80,
             "rights": ["dash"],
-            "absURL": "admin/thedailylilium",
+            "absURL": "/thedailylilium",
             "section" : "home"
         },
         {
@@ -51,8 +51,8 @@
             "displayname": "Support",
             "priority": 2500,
             "rights": ["dash"],
-            "absURL": "admin/fix",
-            "section" : "management"
+            "absURL": "/fix",
+            "section" : "home"
         },
         {
             "id": "flagging",
@@ -61,7 +61,7 @@
             "displayname": "Flagging",
             "priority": 300,
             "rights": ["manage-flagging"],
-            "absURL": "admin/flagging",
+            "absURL": "/flagging",
             "section" : "management"
         },
         {
@@ -71,7 +71,7 @@
             "displayname": "Dashboard",
             "priority": 100,
             "rights": ["dash"],
-            "absURL": "admin/dashboard",
+            "absURL": "/dashboard",
             "section" : "home"
         },
         {
@@ -81,7 +81,7 @@
             "displayname": "Email Templates",
             "priority": 250,
             "rights": ["edit-emails"],
-            "absURL": "admin/mailtemplates/list",
+            "absURL": "/mailtemplates/list",
             "section" : "management"
         },
         {
@@ -91,7 +91,7 @@
             "displayname": "Publishing",
             "priority": 225,
             "rights": ["list-articles"],
-            "absURL": "admin/publishing/list",
+            "absURL": "/publishing",
             "section" : "publishing"
         },
         {
@@ -99,9 +99,9 @@
             "lys" : "topics,categories,category",
             "faicon": "fa-tags",
             "displayname": "Topics",
-            "priority": 210,
+            "priority": 273,
             "rights": ["manage-topics"],
-            "absURL": "admin/topics",
+            "absURL": "/topics",
             "section" : "publishing"
         }, 
         {
@@ -111,7 +111,7 @@
             "displayname": "Content Chains",
             "priority": 235,
             "rights": ["admin"],
-            "absURL": "admin/chains",
+            "absURL": "/chains",
             "section" : "publishing"
         }, 
         {
@@ -121,7 +121,7 @@
             "displayname": "Styled Pages",
             "priority": 250,
             "rights": ["styledpages"],
-            "absURL": "admin/styledpages/list",
+            "absURL": "/styledpages",
             "section" : "publishing"
         },
         {
@@ -131,7 +131,7 @@
             "displayname": "Crew",
             "priority": 500,
             "rights": ["dashboard"],
-            "absURL": "admin/crew",
+            "absURL": "/crew",
             "section" : "home"
         },
         {
@@ -141,7 +141,7 @@
             "displayname": "Entities",
             "priority": 500,
             "rights": ["list-entities"],
-            "absURL": "admin/entities",
+            "absURL": "/entities",
             "section" : "management"
         },
         {
@@ -151,7 +151,7 @@
             "displayname": "Roles",
             "priority": 510,
             "rights": ["manage-roles"],
-            "absURL": "admin/role/list",
+            "absURL": "/role/list",
             "section" : "management"
         },
         {
@@ -161,9 +161,20 @@
             "displayname": "Social Dispatch",
             "priority": 410,
             "rights": ["editor"],
-            "absURL": "admin/socialdispatch",
+            "absURL": "/socialdispatch",
             "section" : "publishing"
         },
+        {
+            "id": "preferences",
+            "lys" : "preferences",
+            "faicon": "fa-user-cog",
+            "displayname": "Preferences",
+            "priority": 580,
+            "rights": ["dashboad"],
+            "absURL": "/preferences",
+            "section" : "lilium"
+        },
+        
         {
             "id": "pwmanager",
             "lys" : "password,manager,pw,social,facebook,twitter,instagram",
@@ -171,7 +182,7 @@
             "displayname": "Password Manager",
             "priority": 440,
             "rights": ["manage-passwords"],
-            "absURL": "admin/pwmanager",
+            "absURL": "/pwmanager",
             "section" : "management"
         },
         {
@@ -181,7 +192,7 @@
             "displayname": "Cakepops",
             "priority": 415,
             "rights": ["cakepops"],
-            "absURL": "admin/cakepop",
+            "absURL": "/cakepop",
             "section" : "management"
         },
         {
@@ -191,7 +202,7 @@
             "displayname": "Settings",
             "priority": 1000,
             "rights": ["manage-settings"],
-            "absURL": "admin/settings",
+            "absURL": "/settings",
             "section" : "lilium"
         },
         {    
@@ -201,7 +212,7 @@
             "displayname": "Ads management",
             "priority": 400,
             "rights": ["admin"],
-            "absURL": "admin/ads",
+            "absURL": "/ads",
             "section" : "management"
         }, 
         {
@@ -211,7 +222,7 @@
             "displayname": "Themes",
             "priority": 600,
             "rights": ["manage-themes"],
-            "absURL": "admin/themes",
+            "absURL": "/themes",
             "section" : "lilium"            
         }, 
         {
@@ -221,7 +232,7 @@
             "displayname": "Dev Tools",
             "priority": 2000,
             "rights": ["develop"],
-            "absURL": "admin/devtools",
+            "absURL": "/devtools",
             "section" : "lilium"
         }, 
         {
@@ -231,7 +242,7 @@
             "displayname": "Plugins",
             "priority": 700,
             "rights": ["manage-plugins"],
-            "absURL": "admin/plugins",
+            "absURL": "/plugins",
             "section" : "lilium"
         }, 
         {    
@@ -241,7 +252,7 @@
             "displayname": "Translations",
             "priority": 3000,
             "rights": ["admin"],
-            "absURL": "admin/translations",
+            "absURL": "/translations",
             "section" : "lilium"            
         }
     ],

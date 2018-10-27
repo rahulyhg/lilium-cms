@@ -6,10 +6,6 @@ export default class e404 extends Component {
         super(props);
     }
 
-    static rendererstyle = {
-        position: "fixed", top: 50, left: 20, bottom: 0, right: 0
-    }
-
     render() {
         return (
             <div class="error-page font2" id="e404">
