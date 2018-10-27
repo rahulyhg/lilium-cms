@@ -17,6 +17,10 @@
 @monospaceFont  : Courier, monospace; 
 @serifFont      : 'Lora', serif;
 
+// Sizes
+@headerHeight   : 60px;
+@rendererBottom : 50px;
+
 // z-indices
 @z_urlRenderer:         1;
 @z_liliumMenu:          @z_urlRenderer + 1;
@@ -28,7 +32,6 @@
 @z_fullscreenOverlay:   @z_header + 1;
 @z_lys:                 @z_fullscreenOverlay + 1;
 @z_notification:        @z_lys + 1;
-
 
 .main-font      { font-family: @mainFont;      }
 .title-font     { font-family: @titleFont;     }
