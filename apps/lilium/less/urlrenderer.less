@@ -12,9 +12,14 @@
     border-bottom-left-radius: 10px;
 
     overflow-x: hidden;
-}
 
-#urlrenderer.snap {
-    left: 240px;
-    width: calc(100% - 240px);
+    &.stretched {
+        bottom: 0;
+        border-bottom-left-radius: 0px;
+    }
+
+    &.snap {
+        left: 240px;
+        width: calc(100% - 240px);
+    }
 }
