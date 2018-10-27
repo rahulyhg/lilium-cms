@@ -4,6 +4,8 @@ export const styles = {
         margin: 20,
         background: "white",
         display: "flex",
+        borderRadius : 10,
+        overflow : 'hidden',
         boxShadow: "0px 1px 2px rgba(0,0,0,0.2)"
     },
 
