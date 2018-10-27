@@ -165,12 +165,32 @@
             "section" : "publishing"
         },
         {
+            "id": "profile",
+            "lys" : "profile",
+            "faicon": "fa-user",
+            "displayname": "Profile",
+            "priority": 221,
+            "rights": ["dashboard"],
+            "absURL": "/me",
+            "section" : "management"
+        },        
+        {
+            "id": "notifications",
+            "lys" : "notifications",
+            "faicon": "fa-inbox",
+            "displayname": "Notifications",
+            "priority": 223,
+            "rights": ["dashboard"],
+            "absURL": "/notifications",
+            "section" : "management"
+        },        
+        {
             "id": "preferences",
             "lys" : "preferences",
             "faicon": "fa-user-cog",
             "displayname": "Preferences",
             "priority": 580,
-            "rights": ["dashboad"],
+            "rights": ["dashboard"],
             "absURL": "/preferences",
             "section" : "lilium"
         },
