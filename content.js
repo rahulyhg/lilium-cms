@@ -315,7 +315,7 @@ class ContentLib {
             subtitle : { $arrayElemAt : ["$subtitle", 0] },
             thumbnail : "$deepmedia.sizes.square.url",
             topic : "$fulltopic.displayname",
-            status : 1, date : 1, author : 1, shares : 1
+            status : 1, date : 1, author : 1, shares : 1, previewkey : 1, name : 1
         };
 
         if (filters.status) { $match.status = filters.status };

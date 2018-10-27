@@ -8,6 +8,7 @@
 @navDarkGray        : #222;
 @leftNavBackgroud   : lighten(@liliumPurple, 20%);
 @liliumBackground   : #f2eef3;
+@darkPurple         : #393351;
 
 // Fonts
 @mainFont       : "Nunito Sans", sans-serif;
@@ -15,6 +16,10 @@
 @subtitleFont   : "Yanone Kaffeesatz", sans-serif;
 @monospaceFont  : Courier, monospace; 
 @serifFont      : 'Lora', serif;
+
+// Sizes
+@headerHeight   : 60px;
+@rendererBottom : 50px;
 
 // z-indices
 @z_urlRenderer:         1;
@@ -24,10 +29,9 @@
 @z_aimagePicker:        @z_cakepopWrapper + 1;
 @z_modal:               @z_aimagePicker + 1;
 @z_header:              @z_modal  + 1;
-@z_fullscreenOverlay:   @z_header+ 1;
+@z_fullscreenOverlay:   @z_header + 1;
 @z_lys:                 @z_fullscreenOverlay + 1;
 @z_notification:        @z_lys + 1;
-
 
 .main-font      { font-family: @mainFont;      }
 .title-font     { font-family: @titleFont;     }

@@ -2,6 +2,7 @@ import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { getSession } from '../../data/cache';
 import { ButtonWorker } from '../../widgets/form';
+import { castOverlay } from '../../overlay/overlaywrap';
 import { Version } from './lib';
 import { Link } from '../../routing/link';
 
@@ -79,6 +80,24 @@ class Ponglink extends Component {
     }
 }
 
+
+class PonglinkListItemAdd extends Component {
+    onClick() {
+        castOverlay('create-ponglink');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="card create-new-ponglink-card">
+                <div>
+                    <i class="fal fa-plus"></i>
+                    <b>Create campaign</b>
+                </div>
+            </div>
+        )
+    }
+}
+
 const LoadMore = props => (
     <ButtonWorker text='Load More' sync={true} work={done => props.onClick()} style={styles.fullWidthBtn} />
 );
@@ -114,7 +133,7 @@ export class PonglinksList extends Component {
     render() {
         return (
             <div id="ponglinks-list">
-                <BigList listitem={Ponglink} batchsize={15} endpoint='/ponglinks/bunch' liststyle={{ maxWidth: 800, margin: 'auto' }} toolbar={PonglinksList.TOOLBAR_CONFIG} loadmoreButton={LoadMore} />                
+                <BigList listitem={Ponglink} addComponent={PonglinkListItemAdd} batchsize={15} endpoint='/ponglinks/bunch' liststyle={{ maxWidth: 800, margin: 'auto' }} toolbar={PonglinksList.TOOLBAR_CONFIG} loadmoreButton={LoadMore} />                
             </div>
         );
     }

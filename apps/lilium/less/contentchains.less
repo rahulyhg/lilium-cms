@@ -5,45 +5,45 @@
     width: 100%;
     margin: 20px;
     display: flex;
+
+    .content-chain-info {
+        padding: 25px;
+    }
+
+    .content-chain-no-image {
+        width: 320px;
+        height: 320px;
+        background-color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chain-title {
+        margin: 6px;
+    }
 }
 
 #content-chain-edit {
     max-width: 800px;
     margin: auto;
-}
-
-#content-chain-edit .content-chain-featured-image-picker {
-    background-color: #eee;
-    min-height: 50px;
-    cursor: pointer;
-}
-
-#content-chain-edit p.choose-featured-image {
-    margin: auto;
-    margin-top: 18px;
-}
-
-#content-chain-edit img.featured-image {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.content-chain .content-chain-info {
-    padding: 25px;
-}
-
-.content-chain .content-chain-no-image {
-    width: 320px;
-    height: 320px;
-    background-color: #eee;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.content-chain .chain-title {
-    margin: 6px;
+    
+    .content-chain-featured-image-picker {
+        background-color: #eee;
+        min-height: 50px;
+        cursor: pointer;
+    }
+    
+    p.choose-featured-image {
+        margin: auto;
+        margin-top: 18px;
+    }
+    
+    img.featured-image {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
 }
 
 .content-chain-list-articles-list {
@@ -66,4 +66,33 @@
     text-align: right;
     margin: 4px;
     padding: 0px;
+}
+
+#content-chains-list {
+    .card {
+        b.title {
+            font-size: 18px;
+        }
+    }
+
+    .create-new-chain-card {
+        text-align: center;
+        cursor: pointer;
+        color: #CCC;
+        line-height: 40px;
+        padding-top: 180px;
+        transition: color 0.1s;
+    
+        i {
+            font-size: 48px;
+        }
+    
+        b {
+            font-size: 32px;
+        }
+    
+        &:hover {    
+            color: #777;
+        }
+    }
 }
