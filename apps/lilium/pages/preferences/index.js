@@ -19,7 +19,8 @@ export default class Preferences extends Component {
         this.supportedLanguages = [];
         this.state = {
             ready: false,
-            preferences: {}
+            preferences: {}, 
+            values : liliumcms.session.preferences
         }
     }
 
@@ -31,7 +32,7 @@ export default class Preferences extends Component {
             if (data['/preferences'] && data['/translations/getSupportedLanguages']) {
                 this.values = data['/preferences'];
                 this.supportedLanguages = data['/translations/getSupportedLanguages'];
-                this.setState({ ready: true });
+                this.setState({ ready: true, values : this.values });
 
                 log('Preferences', 'Fetched user preferences', 'success');
             } else {
@@ -57,7 +58,14 @@ export default class Preferences extends Component {
                 } else if (name == "activeReadersHeader") {
                     const ev = new CustomEvent("toggleactivereadersheader");
                     document.dispatchEvent(ev);   
+                } else if (name == "stretchUserInterface") {
+                    const ev = new CustomEvent("togglestretchui");
+                    document.dispatchEvent(ev);
                 }
+
+                this.setState({
+                    values : liliumcms.session.preferences
+                });
             } else {
                 log('Preferences', `Error updating preferenc ${name}`, 'err');
             }
@@ -82,25 +90,31 @@ export default class Preferences extends Component {
         }
     }
 
+    componentWillReceiveProps(props) {
+
+    }
+
     render() {
         if (this.state.ready) {
             return (
                 <div id="preferences" style={ styles.preferencesEdit }>
                     <h1 style={{ margin: "15px 0 20px" }}>Preferences</h1>
                     <div id="preferences-edit">
-                        <SelectField name='uiLanguage' placeholder='User Interface Language' initialValue={liliumcms.session.uiLanguage || 'en-ca'}
-                                        options={this.supportedLanguages.map(l => { return { displayname: l.displayName, value: l.languageName } })}
-                                        onChange={this.valueChanged.bind(this)} />
-                        <CheckboxField name='menuLocked' placeholder='Lock Left Menu' initialValue={this.values['menuLocked']}
-                                        onChange={this.valueChanged.bind(this)} />
-                        <CheckboxField name='activeReadersHeader' placeholder='Display active readers in header' initialValue={this.values['activeReadersHeader']}
-                                        onChange={this.valueChanged.bind(this)} />
-                        <CheckboxField name='publishAnimations' placeholder='Enable publishing animations' initialValue={this.values['publishAnimations']}
-                                        onChange={this.valueChanged.bind(this)} />
-                        <CheckboxField name='fullscreenArticleEdit' placeholder='Enable fullscreen article editing' initialValue={this.values['fullscreenArticleEdit']}
-                                        onChange={this.valueChanged.bind(this)} />
-                        <CheckboxField name='badgesNotifications' placeholder='Enable badges popup notifications' initialValue={this.values['badgesNotifications']}
-                                        onChange={this.valueChanged.bind(this)} />
+                        <SelectField name='uiLanguage' placeholder='User Interface Language' initialValue={this.state.values.uiLanguage || 'en-ca'}
+                            options={this.supportedLanguages.map(l => ( { displayname: l.displayName, value: l.languageName } ))}
+                            onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='menuLocked' placeholder='Lock Left Menu' initialValue={this.state.values['menuLocked']}
+                            onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='activeReadersHeader' placeholder='Display active readers in header' initialValue={this.state.values['activeReadersHeader']}
+                            onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='stretchUserInterface' placeholder='Stretch user interface ' initialValue={this.state.values['stretchUserInterface']}
+                            onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='disablePubAnim' placeholder='Disable publishing animations' initialValue={this.state.values['disablePubAnim']}
+                            onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='fullscreenArticleEdit' placeholder='Enable fullscreen article editing' initialValue={this.state.values['fullscreenArticleEdit']}
+                            onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='badgesNotifications' placeholder='Enable badges popup notifications' initialValue={this.state.values['badgesNotifications']}
+                            onChange={this.valueChanged.bind(this)} />
                     </div>
                     <div>
                         <ButtonWorker text="Reset all list filters" theme="red" type="outline" sync={true} work={this.resetListFilters.bind(this)} />

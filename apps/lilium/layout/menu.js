@@ -84,9 +84,12 @@ export class LiliumMenu extends Component {
             this.toggleSnap(ev.detail.snapped);
         })
 
-        document.addEventListener('navigate', ev => {
+        document.addEventListener('navigate', ev => {        
+            const selectedSection = this.state.menus.find(menu => ev.detail.href.includes(menu.absURL));
+            const section = selectedSection ? selectedSection.section : this.state.section;
+
             this.setState({
-                endpoint : ev.detail.href.split('/')[1]
+                endpoint : ev.detail.href.split('/')[1], section
             })
         });
 
@@ -146,10 +149,10 @@ export class LiliumMenu extends Component {
         return (
             <div id="lilium-menu" class={this.state.snapped ? "snap" : ""}>
                 <div class="lilium-menu-sections-all">
-                    <LiliumMenuSectionHeader active={"home" == this.state.section} onClick={this.switchSection.bind(this)}       grad="pink"    section="home"      icon="home" />
-                    <LiliumMenuSectionHeader active={"publishing" == this.state.section} onClick={this.switchSection.bind(this)} grad="orange"   section="publishing" icon="paper-plane" />
+                    <LiliumMenuSectionHeader active={"home" == this.state.section} onClick={this.switchSection.bind(this)}       grad="purple"    section="home"      icon="home" />
+                    <LiliumMenuSectionHeader active={"publishing" == this.state.section} onClick={this.switchSection.bind(this)} grad="tangerine"   section="publishing" icon="paper-plane" />
                     <LiliumMenuSectionHeader active={"management" == this.state.section} onClick={this.switchSection.bind(this)} grad="lemon" section="management" icon="address-card" />
-                    <LiliumMenuSectionHeader active={"lilium" == this.state.section} onClick={this.switchSection.bind(this)}     grad="sky"  section="lilium"     icon="cogs" />
+                    <LiliumMenuSectionHeader active={"lilium" == this.state.section} onClick={this.switchSection.bind(this)}     grad="blue"  section="lilium"     icon="cogs" />
                 </div>
                 <div class="lilium-menu-active" ref={ x => (this.sectionMenusElement = x) }>
                     {

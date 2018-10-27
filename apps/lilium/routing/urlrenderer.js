@@ -102,6 +102,7 @@ export class URLRenderer extends Component {
         }
 
         getLocal(CACHEKEYS.SIDEBARSNAP) && this.state.classes.push("snap");
+        this.props.session.preferences.stretchUserInterface && this.state.classes.push("stretched")
     }
 
     componentDidMount() {
@@ -110,6 +111,14 @@ export class URLRenderer extends Component {
             const path = "/lilium" + ev.detail.href;
             window.history.pushState(path, undefined, path);
             this.refreshPath(ev.detail.extras);
+        });
+
+        document.addEventListener('togglestretchui', ev => {
+            const classes = liliumcms.session.preferences.stretchUserInterface ? 
+                [...this.state.classes, 'stretched'] : 
+                this.state.classes.filter(x => x != "stretched");
+            
+            this.setState({ classes })
         });
 
         if (document.location.pathname.substring(1).split('/').length == 1) {
