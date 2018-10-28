@@ -3,16 +3,47 @@ import { SingleTopic } from './single';
 import { TopicPicker } from '../../widgets/form';
 import API from '../../data/api';
 
+class TopicCategory extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    onClick() {
+        this.props.onClick && this.props.onClick(this.props.category);
+    }
+
+    render() {
+        return (
+            <div class="topic-category" onClick={this.onClick.bind(this)}>
+                {this.props.category}
+            </div>
+        );
+    }
+}
+
 export default class TopicsManagement extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            component : null
+            error : undefined,
+            component : null,
+            categories : []
         }
     }
     
     componentDidMount() {
-        this.setPage();
+        API.get('/topics/category', {}, (err, json, r) => {
+            if (err || !json) {
+                return this.setState({ error : "Could not fetch categories" });
+            }
+
+            this.setState({
+                categories : json
+            }, () => {
+                this.setPage();
+            });
+        });
     }
 
     componentWillReceiveProps(props) {
@@ -30,6 +61,10 @@ export default class TopicsManagement extends Component {
             this.setTopicFromID(this.props.levels[0]);
         } 
     }
+
+    selectCategory(category) {
+
+    }
     
     setTopicFromID() {
         this.setState({ loading : true });
@@ -39,9 +74,26 @@ export default class TopicsManagement extends Component {
     }
 
     render() {
+        if (this.state.error) {
+            return (
+                <div>
+                    <h2>
+                        There was an error loading this page
+                    </h2> 
+                </div>
+            );
+        }
+
+        // <TopicPicker session="manager" onAdd={this.addOne.bind(this)} />
         return (
             <div class="manage-topics-page">
-                <TopicPicker session="manager" onAdd={this.addOne.bind(this)} />
+                <h1>Topics</h1>
+
+                <div class="manage-topics-categories">
+                    {this.state.categories.map(category => (
+                        <TopicCategory category={category} onClick={this.selectCategory.bind(this)} />
+                    ))} 
+                </div>
             </div>
         );
     }
