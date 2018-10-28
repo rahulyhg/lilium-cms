@@ -486,7 +486,10 @@ export class TopicPicker extends FormField {
     loadChildrenTopicsFrom(topic, index) {
         log('Topics', 'Loading children topic from topic ' + topic.displayname + ' at index ' + index, 'info');
         API.get('/topics/childof/' + topic._id, {}, (err, children) => {
-            const newArray = [...this.state.topics.splice(0, index + 1), children];
+            const newArray = children && children.length != 0 ? 
+                [...this.state.topics.splice(0, index + 1), children] : 
+                [...this.state.topics.splice(0, index + 1)];
+
             this.setState({
                 phase : "tree",
                 topics : newArray,
