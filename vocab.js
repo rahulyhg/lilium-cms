@@ -45,29 +45,18 @@ class Vocab {
     }
 
     /**
-<<<<<<< HEAD
-     * R
-        eturns an array containing the information for all supported languages
-=======
      * Returns an array containing the information for all supported languages
->>>>>>> v4
      */
     getSUpportedLanguages() { return this.supportedLanguages; };
 
     /**
      * Returns an array containing the language codes of the supported languages
      */
-<<<<<<< HEAD
-    getSupportedLanguageCodes() { return this.supportedLanguages.map(l => l.languageName); }
-
-    /**
-=======
     getSupportedLanguageCodes() {
         return this.supportedLanguages.map(l => l.languageName);
     }
 
     /**jsvas
->>>>>>> v4
      * Returns an object containing the translation data for a language code
      * @param {string} langcode THe langcode of which to get the translations
      */
