@@ -15,7 +15,36 @@ class PostListItem extends Component {
         window.open(`/${this.props.item.name}`);
     }
 
+    componentWillMount() {
+        this.author = getSession("entities").find(x => x._id == this.props.item.author) || {
+            displayname : "Inactive user",
+            avatarURL : "/static/media/lmllogo.png"
+        };
+    }
+
     render() {
+        return (
+            <div class="flex-row publishing-list-item">
+                <div class="flex-col article-list-image-wrapper">
+                    {
+                        this.props.item.thumbnail ? (<img src={ this.props.item.thumbnail } />) : (<div class="article-list-no-image">No image</div>)
+                    }
+                </div>
+                <div class="flex-col article-list-title">
+                    {this.props.item.headline}
+                </div>
+                <div class="flex-col article-list-status">
+                    <span class={"article-list-status-" + this.props.item.status} style={{ backgroundColor : POST_STATUS[this.props.item.status].color }}>
+                        { POST_STATUS[this.props.item.status].w }
+                    </span>              
+                </div>              
+                <div class="flex-col article-list-author">
+                    <img src={this.author.avatarURL} />
+                    <span>{this.author.displayname}</span>
+                </div>
+            </div>
+        )
+            
         return (
             <div class="card flex publishing-list-item" style={ {  } }>
                 <Link href={"/publishing/write/" + this.props.item._id} linkStyle="block">  
@@ -47,6 +76,8 @@ class PostListItemAdd extends Component {
     }
 
     render() {
+        return null;
+
         return (
             <div onClick={this.onClick.bind(this)} class="card flex create-new-article-card">
                 <div>
