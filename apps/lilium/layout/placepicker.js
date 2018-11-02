@@ -93,8 +93,8 @@ export class PlacePicker extends Component {
         return (
             <div id="place-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
                 <div id="place-picker-search-pane">
-                    <div id="search-content-wrapper">
-                        <h1 className="title">Pick a place</h1>
+                    <h1 className="title">Pick a place</h1>
+                    <div id="search-content-wrapper" className='scroll-x'>
                         <div id="search-bar">
                             <div id="query">
                                 <DebouncedField name='query' placeholder='Search Query' onDebounce={this.search.bind(this)} />
@@ -117,7 +117,7 @@ export class PlacePicker extends Component {
                                 this.state.selectedPlace ? (
                                     <div id="place-details-form">
                                         <h1 id="det-place-name">{this.state.selectedPlace.displayname}</h1>
-                                        <TextField name='description' placeholder='Description' multiline value={this.state.selectedPlace.description}
+                                        <TextField id='place-description' name='description' placeholder='Description' value={this.state.selectedPlace.description}
                                                     onChange={this.updateValues.bind(this)} />
                                     </div>
                                 ) : (

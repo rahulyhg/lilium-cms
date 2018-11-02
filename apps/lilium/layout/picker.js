@@ -46,7 +46,7 @@ export class Picker extends Component {
         this.state = {
             visible: false,
             session: {},
-            selectedElement: undefined
+            selectedElement: {}
         };
 
         _singleton = this;
@@ -117,42 +117,66 @@ export class Picker extends Component {
         if (this.state.visible) {
             return (
                 <div id="picker-overlay">
-                    <div id="picker">
-                        <TabView>
+                    <div id="picker-wrapper">
+                        <div id="picker" className={this.state.session.type == 'carousel' && 'carousel-session'}>
+                            <TabView>
+                                {
+                                    this.state.tabs.map((SubPicker) => {
+                                        return (
+                                            <Tab title={SubPicker.tabTitle}>
+                                                <SubPicker onKeyDown={this.keydown.bind(this)} carousel={this.state.session.type == 'carousel'} options={this.state.session.options[SubPicker.slug]} />
+                                            </Tab>
+                                        )
+                                    })
+                                }
+                            </TabView>
                             {
-                                this.state.tabs.map((SubPicker) => {
-                                    return (
-                                        <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} carousel={this.state.session.type == 'carousel'} options={this.state.session.options[SubPicker.slug]} />
-                                        </Tab>
-                                    )
-                                })
+                                this.state.session.type == 'carousel' ? (
+                                    <Carousel />    
+                                ) : null
                             }
-                        </TabView>
-                        {
-                            this.state.session.type == 'carousel' ? (
-                                <div className="picker-carousel">
-                                    <div id="carousel-preview">
-                                        {
-                                            this.state.selectedElement && this.state.selectedElement.length ? (
-                                                this.state.selectedElement.map(el => (
-                                                    <p className="carousel-element">Carousel element</p>
-                                                ))
-                                            ) : (
-                                                <p>Elements added to the carousel will appear here</p>
-                                            )
-                                        }
-                                        <p>No items in the carousel</p>
-                                    </div>
-                                    <button className='button fill purple' onClick={() => { alert('asd'); }}>Add carousel</button>
-                                </div>
-                            ) : null
-                        }
+                        </div>
                     </div>
                 </div>
             )
         } else {
             return null;
         }
+    }
+}
+
+class CarouselElement extends Component {
+    constructor(props) {
+        super(props);
+        if (props.type == undefined || !PickerMap.includes(props.type)) throw "";
+    }
+}
+
+class Carousel extends Component {
+    constructor(props) {
+        super(props);
+        this.elements = props.elements || {};
+    }
+
+    render(props) {
+        return (
+            <div id="picker-carousel">
+                <div id="carousel-preview">
+                    {
+                        this.state.selectedElement && this.state.selectedElement.length ? (
+                            this.state.selectedElement.map(el => (
+                                <p className="carousel-element">Carousel element</p>
+                            ))
+                        ) : (
+                            <p>Elements added to the carousel will appear here</p>
+                        )
+                    }
+                    <p>No items in the carousel</p>
+                </div>
+                <div id="picker-carousel-actions">
+                    <button className='button fill purple' onClick={() => { alert('asd'); }}>Add carousel</button>
+                </div>
+            </div>
+        )
     }
 }

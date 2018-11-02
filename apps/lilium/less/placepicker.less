@@ -2,7 +2,7 @@
 #place-picker {
     display: flex;
     flex-direction: row;
-    height: 100%;
+    min-height: 100%;
 
     #place-picker-search-pane {
         flex-grow: 1;
@@ -15,6 +15,7 @@
             
             #search-results {
                 height: 205px;
+                background: @fieldBackgroundColor;
 
                 .place {
                     cursor: pointer;
@@ -48,6 +49,7 @@
 
         #place-picker-actions-bar {
             background-color: #F6F6F6;
+            align-self: flex-end;
             padding: 6px;
         }
     }
