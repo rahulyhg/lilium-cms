@@ -46,11 +46,6 @@ export default class Preferences extends Component {
             if (!err) {
                 log('Preferences', `Set preference ${name} to ${value}`, 'success');
                 liliumcms.session.preferences[name] = value;
-                castNotification({
-                    type: 'success',
-                    title: 'Preferences saved',
-                    message: 'Your changes to your preferences were saved!'
-                });
                 
                 if (name == "menuLocked") {
                     const ev = new CustomEvent("togglemenusnap", { detail : { snapped : value } });
