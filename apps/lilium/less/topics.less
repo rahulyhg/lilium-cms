@@ -1,7 +1,34 @@
+@topicManagerSidebarWidth : 300px;
+
 .manage-topics-page {
-    margin: 20px;
+    position: relative;
+    height: 100%;
+    
+    .manage-topics-categories {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: @topicManagerSidebarWidth;
+        background: #444;
+        color: white;
+
+        overflow: auto;
+        padding: 12px;
+
+        box-sizing: border-box;
+    }
+
+    .manage-topics-single-wrap {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        left: @topicManagerSidebarWidth;
+        overflow: auto;
+
+        color: #333;
+        box-sizing: border-box;
+    }
 }
 
-.manage-topics.categories {
-    
-}
