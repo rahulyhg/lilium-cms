@@ -197,6 +197,23 @@ class LMLTopics {
         }
     }
 
+    adminPUT(cli) {
+        if (!cli.hasRight('manage-topics')) {
+            return cli.throwHTTP(401);
+        }
+
+        if (!cli.routeinfo.path[2]) {
+            return cli.throwHTTP(401);
+        }
+
+        const _id = db.mongoID(cli.routeinfo.path[2]);
+        cli.readPostData(data => {
+            db.update(cli._c, 'topics', { _id }, { [data.field] : data.value }, (err, r) => {
+                cli.sendJSON({ ok : !err && r.modifiedCount });
+            });
+        });
+    }
+
     serveOrFallback(cli, fallback) {
         const that = this;
         let completeSlug = cli.routeinfo.fullpath;

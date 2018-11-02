@@ -357,7 +357,7 @@
         }, {
             "module" : "topics.js",
             "endpoint" : "topics",
-            "support" : ["admin_post", "livevar"]
+            "support" : ["admin_post", "admin_put", "livevar"]
         }, {
             "module" : "plugins.js",
             "endpoint" : "plugins",
