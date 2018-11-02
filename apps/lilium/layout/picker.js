@@ -67,6 +67,11 @@ export class Picker extends Component {
         }
     }
 
+    static registerEmbedType(name, pickerComponent, carouselPreviewComponent) {
+        
+        Picker.PickerMap[name] = { pickerComponent, carouselPreviewComponent };
+    }
+
     static dismiss() {
         log('Picker', 'Dismissing image picker singleton', 'detail');
         _singleton.setState({ visible : false });
@@ -121,18 +126,16 @@ export class Picker extends Component {
                         <div id="picker" className={this.state.session.type == 'carousel' && 'carousel-session'}>
                             <TabView>
                                 {
-                                    this.state.tabs.map((SubPicker) => {
-                                        return (
-                                            <Tab title={SubPicker.tabTitle}>
-                                                <SubPicker onKeyDown={this.keydown.bind(this)} carousel={this.state.session.type == 'carousel'} options={this.state.session.options[SubPicker.slug]} />
-                                            </Tab>
-                                        )
-                                    })
+                                    this.state.tabs.map((embedType) => (
+                                        <Tab title={embedType.tabTitle}>
+                                            <embedType onKeyDown={this.keydown.bind(this)} carousel={this.state.session.type == 'carousel'} options={this.state.session.options[embedType.slug]} />
+                                        </Tab>
+                                    ))
                                 }
                             </TabView>
                             {
                                 this.state.session.type == 'carousel' ? (
-                                    <Carousel />    
+                                    <CarouselPreview />
                                 ) : null
                             }
                         </div>
@@ -150,9 +153,20 @@ class CarouselElement extends Component {
         super(props);
         if (props.type == undefined || !PickerMap.includes(props.type)) throw "";
     }
+
+    render(props, state) {
+        return (
+            <div className="carousel-element-preview-card">
+                <i className="remove-carousel-element"></i>
+                {
+                    <props.previewComponent  />
+                }
+            </div>
+        )
+    }
 }
 
-class Carousel extends Component {
+class CarouselPreview extends Component {
     constructor(props) {
         super(props);
         this.elements = props.elements || {};
@@ -168,10 +182,12 @@ class Carousel extends Component {
                                 <p className="carousel-element">Carousel element</p>
                             ))
                         ) : (
-                            <p>Elements added to the carousel will appear here</p>
+                            <div id="carousel-empty-text">
+                                <p>Elements added to the carousel will appear here</p>
+                                <p>No items in the carousel</p>
+                            </div>
                         )
                     }
-                    <p>No items in the carousel</p>
                 </div>
                 <div id="picker-carousel-actions">
                     <button className='button fill purple' onClick={() => { alert('asd'); }}>Add carousel</button>

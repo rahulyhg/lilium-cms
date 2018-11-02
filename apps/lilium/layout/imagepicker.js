@@ -8,7 +8,6 @@ const styles = {
         fontSize: 28,
         padding: "8px 0px 1px",
         display: "block",
-        margin: "10px 20px",
         borderBottom: "1px solid #CCC"
     },
     noimagetitle : {
@@ -186,7 +185,7 @@ export class ImagePicker extends Component {
             });
         } else {
             this.setState(initState);
-        }          
+        }
     }
 
     castUpload() {
@@ -233,19 +232,21 @@ export class ImagePicker extends Component {
                     <b style={ styles.bigtitle }>Lilium gallery</b>
                     <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
                 </div>
+                
+                <div id="image-picker-flex-wrapper">
+                    <div id="image-gallery">
+                        <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
+                            <i class="far fa-plus-circle"></i>
+                        </div>
 
-                <div id="image-gallery">
-                    <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
-                        <i class="far fa-plus-circle"></i>
+                        {
+                            this.state.images.map(x => (<ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
+                        }
                     </div>
 
-                    {
-                        this.state.images.map(x => (<ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
-                    }
-                </div>
-
-                <div id="image-gallery-detail"> 
-                    <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker)} />       
+                    <div id="image-gallery-detail"> 
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker)} />       
+                    </div>
                 </div>
             </div>
         )
