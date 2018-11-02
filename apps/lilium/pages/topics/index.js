@@ -1,26 +1,9 @@
 import { h, Component } from 'preact';
 import { SingleTopic } from './single';
 import { TopicPicker } from '../../widgets/form';
+import { TreeView } from '../../widgets/treeview';
+import { navigateTo } from '../../routing/link';
 import API from '../../data/api';
-
-class TopicCategory extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
-    onClick() {
-        this.props.onClick && this.props.onClick(this.props.category);
-    }
-
-    render() {
-        return (
-            <div class="topic-category" onClick={this.onClick.bind(this)}>
-                {this.props.category}
-            </div>
-        );
-    }
-}
 
 export default class TopicsManagement extends Component {
     constructor(props) {
@@ -31,46 +14,80 @@ export default class TopicsManagement extends Component {
             categories : []
         }
     }
+
+    formatTopicsToTreeView(topics) {
+        const topLevelCategories = [];
+        topics.forEach(x => {
+            x.children = x.children || [];
+            if (x.parent) {
+                const maybeparent = topics.find(y => y._id == x.parent);
+                maybeparent.children = maybeparent.children || [];
+                maybeparent.children.push(x);
+            } else if (x.category) {
+                let maybecat = topLevelCategories.find(y => y._id == x.category);
+                if (!maybecat) {
+                    maybecat = {
+                        _id : x.category,
+                        displayname : x.category,
+                        children : []
+                    };
+                    topLevelCategories.push(maybecat);
+                }
+
+                maybecat.children.push(x);
+            }
+        });
+
+        return topLevelCategories;
+    }
     
     componentDidMount() {
-        API.get('/topics/category', {}, (err, json, r) => {
+        API.get('/topics/simple', {}, (err, json, r) => {
             if (err || !json) {
+                console.log(err, json);
                 return this.setState({ error : "Could not fetch categories" });
             }
 
             this.setState({
-                categories : json
+                topics : this.formatTopicsToTreeView(json)
             }, () => {
-                this.setPage();
+                this.setPage(this.props.levels[0]);
             });
         });
     }
 
-    componentWillReceiveProps(props) {
-        if (props.levels) {
-            this.setPage();
+    setPage(topicid) {
+        if (topicid) {
+            API.get('/topics/get/' + topicid, {}, (err, json, r) => {
+                if (json) {
+                    this.setState({ topic : json })
+                }
+            });
+        } else {
+            
         }
     }
 
-    addOne(topic) {
-        console.log(topic);
+    onEvent(name, extra) {
+        switch(name) {
+            case "selected":
+                navigateTo("/topics/" + extra);
+                break;
+
+            case "addChildren":
+
+                break;
+
+            case "addCategory":
+
+                break;
+        }
     }
 
-    setPage() {
-        if (this.props.levels.length != 0) {
-            this.setTopicFromID(this.props.levels[0]);
-        } 
-    }
-
-    selectCategory(category) {
-
-    }
-    
-    setTopicFromID() {
-        this.setState({ loading : true });
-        API.get('/topics', {}, (err, json, r) => {
-            
-        });
+    componentWillReceiveProps(props) {
+        if (props.levels) {
+            this.setPage(props.levels[0]);
+        }
     }
 
     render() {
@@ -80,19 +97,20 @@ export default class TopicsManagement extends Component {
                     <h2>
                         There was an error loading this page
                     </h2> 
+                    <h3>
+                        {this.state.error}
+                    </h3>
                 </div>
             );
         }
 
-        // <TopicPicker session="manager" onAdd={this.addOne.bind(this)} />
         return (
             <div class="manage-topics-page">
-                <h1>Topics</h1>
-
                 <div class="manage-topics-categories">
-                    {this.state.categories.map(category => (
-                        <TopicCategory category={category} onClick={this.selectCategory.bind(this)} />
-                    ))} 
+                    <TreeView onEvent={this.onEvent.bind(this)} nodes={this.state.topics} />
+                </div>
+                <div class="manage-topics-single-wrap">
+                    <SingleTopic topic={this.state.topic} />
                 </div>
             </div>
         );
