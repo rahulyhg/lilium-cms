@@ -21,15 +21,14 @@ class FormField extends Component {
     }
 
     componentWillReceiveProps(props) {
-        if (typeof props.initialValue != "undefined") {
+        if (typeof props.value != "undefined") {
+            this.value = props.value;
+            this.setState({ initialValue : this.value });
+        } else if (typeof props.initialValue != "undefined") {
             this.value = props.initialValue;
             this.setState({ initialValue : props.initialValue });
         }
 
-        if (typeof props.value != "undefined") {
-            this.value = props.value;
-            this.setState({ initialValue : this.value });
-        }
     }
 
     changed(value, oValue) {
@@ -114,7 +113,7 @@ export class SelectField extends FormField {
                 { this.props.placeholder ? <b class="placeholder">{this.props.placeholder}</b> : null }
                 <select class="classic-field" value={this.props.initialValue} onChange={ev => this.changed(ev.target.value)}>
                     { this.props.options.map(opt => (
-                        <option value={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname}</option>
+                        <option value={opt.value} key={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname}</option>
                     )) }
                 </select>
             </div> 
@@ -132,7 +131,6 @@ export class TextField extends FormField {
 
     componentWillReceiveProps(props) {
         if (typeof props.value != 'undefined') {
-            this.changed(props.value);
             this.inputbox.value = props.value;
         } else {
             this.inputbox.value = '';
@@ -177,23 +175,39 @@ export class StackBox extends FormField {
         super(props);
 
         this.state = {
-            values : Array.from(this.value || [])
+            values : Array.from(this.value || []).map(x => ({ 
+                text : x, 
+                _formid : Math.random().toString() + Math.random().toString() 
+            }))
         };
     }
 
+    componentWillReceiveProps(props) {
+        if (props.value) {
+            this.value = props.value;
+            this.setState({
+                values : Array.from(props.value || []).map(x => ({ 
+                    text : x, 
+                    _formid : Math.random().toString() + Math.random().toString() 
+                }))
+            });
+        }
+    }
+
     onChange() {
-        this.changed(this.state.values);
+        this.changed(this.state.values.map(x => x.text));
     }
 
     appendFromBox(text) {
-        this.setState({ values : [...this.state.values, text] }, () => {
+        const obj = { text, _formid : Math.random().toString() }
+        this.setState({ values : [...this.state.values, obj] }, () => {
             this.onChange();
         });
     }
 
     textEdited(index, value) {
         const newValues = [...this.state.values];
-        newValues[index] = value;
+        newValues[index].text = value;
         this.setState({ values : newValues }, () => {
             this.onChange();
         });
@@ -248,9 +262,9 @@ export class StackBox extends FormField {
                 <b class="placeholder">{this.props.placeholder || ""}</b>
                 <div class="stack-box-list">
                     {
-                        this.state.values.map((value, index) => (
-                            <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={slugify(value)}
-                                                index={index} lastInList={index == this.state.values.length - 1} initialValue={value}
+                        this.state.values.map((valueObj, index) => (
+                            <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={valueObj._formid}
+                                                index={index} lastInList={index == this.state.values.length - 1} initialValue={valueObj.text}
                                                 moveItemDown={this.moveItemDown.bind(this)} moveItemUp={this.moveItemUp.bind(this)} />
                         ))
                     }
@@ -658,6 +672,12 @@ export class CheckboxField extends FormField {
 
         this.value = !!props.initialValue;
         this.state = { checked: this.value };
+    }
+
+    componentWillReceiveProps(props) {
+        if (typeof props.value != "undefined") {
+            this.setState({ checked : props.value || false });
+        }
     }
 
     onChange() {
