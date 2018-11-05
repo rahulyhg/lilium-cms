@@ -6,7 +6,7 @@ module.exports = cli => `<!DOCTYPE html>
         <title>Lilium | ${cli._c.website.sitetitle}</title>
         <link rel="icon" type="image/png" href="${cli._c.server.protocol}${cli._c.server.url}/static/media/favicon.png">
         <link href="https://fonts.googleapis.com/css?family=Nunito+Sans|Oswald|Yanone+Kaffeesatz:700|Lora" rel="stylesheet">
-        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-87DrmpqHRiY8hPLIr7ByqhPIywuSsjuQAfMXAE0sMUpY3BM7nXjf+mLIUSvhDArs" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-j8y0ITrvFafF4EkV1mPW0BKm6dp3c+J9Fky22Man50Ofxo2wNe5pT1oZejDH9/Dt" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="${cli._c.server.protocol}${cli._c.server.url}/static/compiled/v4.css" />
         <link rel="stylesheet" type="text/css" href="${cli._c.server.protocol}${cli._c.server.url}/flatpickr/flatpickr.min.css" />    
     </head>
