@@ -68,17 +68,24 @@ export default class TopicsManagement extends Component {
         }
     }
 
-    onEvent(name, extra) {
+    onEvent(name, { _id, isRoot }) {
         switch(name) {
+            // Existing topic was selected with _id as extra
             case "selected":
-                navigateTo("/topics/" + extra);
+                if (isRoot) {
+                    return;
+                }
+
+                navigateTo("/topics/" + _id);
                 break;
 
-            case "addChildren":
-
+            // Add topic to parent with _id as "extra"
+            case "addto":
+                
                 break;
 
-            case "addCategory":
+            // Add new topic to new category
+            case "addroot":
 
                 break;
         }
@@ -107,7 +114,7 @@ export default class TopicsManagement extends Component {
         return (
             <div class="manage-topics-page">
                 <div class="manage-topics-categories">
-                    <TreeView onEvent={this.onEvent.bind(this)} nodes={this.state.topics} />
+                    <TreeView onEvent={this.onEvent.bind(this)} nodes={this.state.topics} topVerbatim="category" value={this.props.levels[0]} />
                 </div>
                 <div class="manage-topics-single-wrap">
                     <SingleTopic topic={this.state.topic} />
