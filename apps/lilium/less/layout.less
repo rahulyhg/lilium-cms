@@ -1,3 +1,17 @@
 .scroll-x {
     overflow-x: auto;
 }
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+ 
+::-webkit-scrollbar-track {
+    border: 0.5px inset rgba(0, 0, 0, 0.2);
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    border: 1px solid darken(@liliumPurple, 15%);
+    background: @liliumPurple;
+}

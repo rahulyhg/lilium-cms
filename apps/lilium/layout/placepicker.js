@@ -58,10 +58,11 @@ export class PlacePicker extends Component {
         this.values = { displayname: selectedPlace.structured_formatting.main_text }
         this.placeId = selectedPlace.place_id;
         this.upsert((err, data, r) => {
-            if (data.value) {PlacePicker
+            if (data.value) {
+                data.value.embedType = 'place';
                 this.setState({ selectedPlace: data.value });
             } else {
-                this.setState({ selectedPlace: { ...this.values, _id: this.placeId } });
+                this.setState({ selectedPlace: { ...this.values, _id: this.placeId, embedType: 'place' } });
             }
         });
     }

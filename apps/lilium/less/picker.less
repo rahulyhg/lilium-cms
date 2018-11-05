@@ -1,6 +1,7 @@
 /** Picker is a singleton */
 
-@pickerCarouselElementHeight: 150px;
+@pickerCarouselElementHeight: 150px + 12px; /* 12px for scrollbar */
+@carouselPreviewCardWidth: 150px;
 
 #picker-overlay {
     position: fixed;
@@ -27,6 +28,7 @@
 
             #picker-carousel {
                 min-height: @pickerCarouselElementHeight;
+                max-height: @pickerCarouselElementHeight;
                 background: @fieldBackgroundColor;
                 box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
                 display: flex;
@@ -35,6 +37,53 @@
                 #carousel-preview {
                     flex-grow: 1;
                     padding: 8px 16px;
+                    display: flex;
+                    flex-wrap: nowrap;
+                    overflow-x: scroll;
+
+                    & > .carousel-element-preview-card {
+                        border: 3px solid @liliumPurple;
+                        border-radius: 2px;
+                        background: lighten(@liliumPurple, 15%);
+                        color: white;
+                        width: @carouselPreviewCardWidth;
+                        margin: 0px 8px;
+                        position: relative;
+                        flex: 0 0 auto;
+
+                        & >.remove-carousel-element {
+                            background: @liliumPurple;
+                            border: inherit;
+                            border-radius: 50%;
+                            position: absolute;
+                            right: -8px;
+                            top: -8px;
+                            cursor: pointer;
+                        }
+
+                        img.carousel-image-preview {
+                            height: 100%;
+                            width: 100%;
+                        }
+
+                        .map-carousel-preview {
+                            width: 100%;
+                            height: 100%;
+                            flex-direction: column;
+                            
+                            i.map-marker-icon {
+                                padding-top: 12px;
+                                color: #ff5624;
+                                display: block;
+                                text-align: center;
+                            }
+
+                            p.place-name {
+                                color: white;
+                                text-align: center;
+                            }
+                        }
+                    }
                 }
 
                 #picker-carousel-actions {

@@ -46,8 +46,9 @@ class SelectedImage extends Component {
     componentWillReceiveProps(props) {
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
         this.imgtag && this.imgtag.getAttribute('src') != this.makeSrc(props.image) && this.imgtag.removeAttribute('src');
+        if (props.image) props.image.embedType = 'image';
         this.setState({
-            selected : props.image
+            selected: props.image
         })
     }
 
@@ -245,7 +246,7 @@ export class ImagePicker extends Component {
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker)} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, this.state.selected)} />       
                     </div>
                 </div>
             </div>
