@@ -35,7 +35,8 @@ export class SingleTopic extends Component {
             case "select": return (<SelectField 
                 name={name}
                 placeholder={entry.attr.displayname} 
-                initialValue={value} 
+                initialValue={value}
+                value={value}
                 onChange={this.overrideChanged.bind(this)}
                 options={entry.attr.datasource.map(s => { return { displayname : s.displayName, value : s.name } })}
             />);
@@ -45,11 +46,13 @@ export class SingleTopic extends Component {
                 placeholder={entry.attr.displayname}
                 onChange={this.overrideChanged.bind(this)}
                 initialValue={value || []}
+                value={value || []}
             />);
 
             case "checkbox": return (<CheckboxField 
                 name={name}
                 placeholder={entry.attr.displayname}
+                value={value}
                 onChange={this.overrideChanged.bind(this)}
                 initialValue={value}
             />);
@@ -58,6 +61,7 @@ export class SingleTopic extends Component {
                 name={name}
                 multiline={true}
                 placeholder={entry.attr.displayname} 
+                value={value}
                 onChange={this.overrideChanged.bind(this)}
                 initialValue={value} 
             />)
@@ -67,6 +71,7 @@ export class SingleTopic extends Component {
             case "text": default: return (<TextField 
                 name={name}
                 placeholder={entry.attr.displayname} 
+                value={value}
                 onChange={this.overrideChanged.bind(this)}
                 initialValue={value} 
             />);
@@ -114,7 +119,7 @@ export class SingleTopic extends Component {
                 <div class="theme-override-form">
                     <h2>{this.state.theme.dName} override for {this.state.topic.displayname}</h2>
                     { Object.keys(this.state.theme.settingForm).map(settingName => (
-                        <div class="theme-override-field">
+                        <div class="theme-override-field" key={settingName}>
                             {this.fieldFromInfoEntry(settingName, this.state.theme.settingForm[settingName], this.state.topic.override[settingName])}
                         </div>
                     ))}
