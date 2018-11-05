@@ -64,7 +64,7 @@ class TreeNodeCollection extends Component {
         return (
             <div class="tree-node-collection">
                 <div class="tree-node-children-list">
-                    { this.state.children.map(x => (<TreeNode onEvent={this.props.onEvent} displayname={x.displayname} children={x.children || []} _id={x._id} open={x.open} />)) }
+                    { this.state.children.map(x => (<TreeNode onEvent={this.props.onEvent} displayname={x.displayname} children={x.children || []} _id={x._id} key={x._id} open={x.open} />)) }
                 </div>
                 <div class="tree-node-add-child" onClick={this.props.onEvent.bind(this, 'addto', { _id : this.props._id, isRoot : this.props.isRoot })}>
                     <i class="far fa-plus"></i> 
@@ -107,7 +107,6 @@ export class TreeView extends Component {
             const searchChildrenNodes = arr => {
                 const maybeFound = arr.find(x => x._id == value || searchChildrenNodes(x.children || []));
                 if (maybeFound) {
-                    console.log('Found : ' + maybeFound._id);
                     maybeFound.open = true;
                     return true;
                 }
@@ -115,7 +114,6 @@ export class TreeView extends Component {
 
             const maybeFound = nodes.find(node => searchChildrenNodes(node.children || []));
             if (maybeFound) {
-                console.log('Found : ' + maybeFound._id);
                 maybeFound.open = true;
 
                 this.setState({ nodes })
@@ -136,6 +134,7 @@ export class TreeView extends Component {
                     isRoot={true}
                     open={x.open || false}
                     children={x.children || []}
+                    key={x._id}
                     _id={x._id}
                 />) }
 
