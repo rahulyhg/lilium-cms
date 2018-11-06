@@ -1,5 +1,4 @@
 var filelogic = require('./filelogic.js');
-var formBuilder = require('./formBuilder.js');
 var conf = require('./config.js');
 var db = require('./includes/db.js');
 var mongo = require('mongodb');

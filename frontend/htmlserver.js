@@ -6,6 +6,7 @@ var _conf = require('../config.js');
 var article = require('../article.js');
 var topics = require('../topics.js');
 var ipevents = require('../ipevents.js');
+var db = require('../includes/db');
 var noop = function() {};
 var log = require('../log.js');
 
@@ -26,9 +27,49 @@ const MIMES = {
     ".xml":"text/xml; charset=utf-8"
 }
 
+class BotResponder {
+    isBot(useragent) {
+        return useragent.includes("Googlebot") || useragent.includes("bingbot") || 
+               useragent.includes("comscore")  || useragent.includes("SemrushBot") ||
+               useragent.includes("DotBot");
+    }
 
-var HTMLServer = function() {
-    this.serveStatic = function(cli) {
+    handle(cli) {
+        log('BotResponder', 'Responding to not found bot request', 'info');
+        const authorPathIndex = cli.routeinfo.path.indexOf("author")
+        if (authorPathIndex != -1) {
+            const permalink = "/author/" + cli.routeinfo.path[authorPathIndex + 1];
+            log('BotResponder', 'Redirected to ' + permalink, 'info');
+            return cli.redirect(permalink, true);
+        }
+
+        const maybeslug = cli.routeinfo.path.find(x => x.length > 30);
+
+        db.findUnique(cli._c, 'content', {
+            $or : [
+                { name : maybeslug },
+                { aliases : maybeslug }
+            ],
+            status : "published"
+        }, (err, article) => {
+            if (article) {
+                const permalink = "/" + article.topicslug + "/" + article.name;
+                log('BotResponder', 'Redirected to ' + permalink, 'info');
+                return cli.redirect(permalink, true);
+            } else {
+                log('BotResponder', 'Could not redirect bot request from ' + cli.routeinfo.fullpath, 'warn');
+                cli.throwHTTP(404, undefined, true);
+            }
+        });
+    }
+}
+
+class HTMLServer {
+    constructor() {
+        this.botresponder = new BotResponder();
+    }
+
+    serveStatic(cli) {
 		cli.touch('htmlserver.serveStatic');
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
@@ -42,7 +83,7 @@ var HTMLServer = function() {
         });
     };
 
-	this.serveClient = function(cli) {
+	serveClient(cli) {
 		cli.touch('htmlserver.serveClient');
 
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
@@ -98,26 +139,30 @@ var HTMLServer = function() {
                                             });
                                         }
                                     } else {
-                                        log('HTMLServer', '404 => ' + cli._c.server.url + cli.routeinfo.fullpath + " from " + cli.ip + " with agent " + cli.request.headers["user-agent"], 'warn');
-                                        var cachekey = "404_html_" + cli._c.uid;
-
-                                        sharedcache.get(cachekey, function(html) {
-                                            if (html) {
-                                                cli.response.writeHead(404, {"content-type" : "text/html"});
-                                                cli.response.end(html);
-                                            } else {
-                                                filelogic.renderThemeLML(cli, '404', '404.html', {}, function(content) {
+                                        if (that.botresponder.isBot(cli.request.headers["user-agent"])) {
+                                            that.botresponder.handle(cli);
+                                        } else {
+                                            log('HTMLServer', '404 => ' + cli._c.server.url + cli.routeinfo.fullpath + " from " + cli.ip + " with agent " + cli.request.headers["user-agent"], 'warn');
+                                            var cachekey = "404_html_" + cli._c.uid;
+    
+                                            sharedcache.get(cachekey, function(html) {
+                                                if (html) {
                                                     cli.response.writeHead(404, {"content-type" : "text/html"});
-                                                    cli.response.end(content);
-        
-                                                    var setobj = {};
-                                                    setobj[cachekey] = content;
-                                                    sharedcache.set(setobj);
-                                                });
-                                            }
-
-                                            // ipevents.push(cli._c, cli.ip, 404, cli.request.url, {agent : cli.request.headers["user-agent"]});
-                                        });
+                                                    cli.response.end(html);
+                                                } else {
+                                                    filelogic.renderThemeLML(cli, '404', '404.html', {}, function(content) {
+                                                        cli.response.writeHead(404, {"content-type" : "text/html"});
+                                                        cli.response.end(content);
+            
+                                                        var setobj = {};
+                                                        setobj[cachekey] = content;
+                                                        sharedcache.set(setobj);
+                                                    });
+                                                }
+    
+                                                // ipevents.push(cli._c, cli.ip, 404, cli.request.url, {agent : cli.request.headers["user-agent"]});
+                                            });
+                                        }
                                     }
                                 }, true, pageIndex)
                             });
@@ -129,7 +174,7 @@ var HTMLServer = function() {
 
 	};
 
-	this.registerMime = function(ext, present) {
+	registerMime(ext, present) {
 		if (!this.mimeRegistered(ext)) {
 			_conf.default().MIMES[ext] = present;
 		} else {
@@ -137,19 +182,14 @@ var HTMLServer = function() {
 		}
 	};
 
-	this.mimeRegistered = function(ext) {
+	mimeRegistered(ext) {
 		return typeof _conf.default().MIMES[ext] !== 'undefined';
 	};
 
-	this.mimeOrRefused = function(ext) {
+	mimeOrRefused(ext) {
 		return MIMES[ext] || "application/x-lilium-nope";
 	};
-
-	var init = function() {
-
-	};
-
-	init();
 };
 
-module.exports = new HTMLServer();
+const that = new HTMLServer();
+module.exports = that;

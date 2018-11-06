@@ -1,6 +1,5 @@
 const db = require('./includes/db.js');
 const log = require('./log.js');
-const formBuilder = require('./formBuilder.js');
 const config = require('./config.js');
 const filelogic = require('./filelogic.js');
 const request = require('request');
@@ -447,48 +446,7 @@ class SocialDispatch {
     }
 
     form() {
-        formBuilder.createForm('networksocialaccounts', {
-            fieldWrapper: {
-                tag: 'div',
-                cssPrefix: 'settingsfield-'
-            },
-            cssClass: 'social-accounts-form'
-        })
-        .add('title', 'title', {
-            displayname : "Network Social accounts"
-        })
-        .add('accounts', 'stack', {
-            displayname : "Accounts",
-            scheme : {
-                columns : [
-                    {
-                        fieldName   : "displayname",
-                        dataType    : "text",
-                        displayname : "Display Name"
-                    }, {
-                        fieldName   : "network",
-                        dataType    : "text",
-                        displayname : "Network"
-                    }, {
-                        fieldName   : "color",
-                        dataType    : "text",
-                        displayname : "Color identifier"
-                    }, {
-                        fieldName   : "accountid",
-                        dataType    : "text",
-                        displayname : "Account ID"
-                    }, {
-                        fieldName   : "accesstoken",
-                        dataType    : "text",
-                        displayname : "Access Token"
-                    }
-                ]
-            }
-        })
-        .add('save', 'button', {
-            displayname : "Save",
-            classes : ["network-accounts-save"]
-        });
+
     }
 
     searchForFacebookCity(_c, q, send) {

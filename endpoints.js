@@ -72,7 +72,13 @@ class EndPoints {
     };
 
     unregister(site, endpoint, method) {
-        if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
+        if (site == '*') {
+            config.eachSync(config => {
+                var site = config.id;
+
+                delete registeredEndpoints[site][method][endpoint];
+            });
+        } else if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
             delete registeredEndpoints[site][method][endpoint];
         }
     };

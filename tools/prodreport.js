@@ -4,7 +4,6 @@ var config = require('../config.js');
 var noOp = require('../noop.js');
 var hooks = require('../hooks.js');
 var tablebuilder = require('../tableBuilder.js');
-var formbuilder = require('../formBuilder.js');
 var filelogic = require('../filelogic.js');
 
 var supportedAPIs = [
@@ -203,48 +202,7 @@ ProdReport.prototype.registerTable = function() {
 }
 
 ProdReport.prototype.registerForm = function() {
-    formbuilder.createForm('prodreportstack', {
-        formWrapper : {
-            tag : 'div',
-            class : 'row', 
-            id : 'prodreportstack'
-        }, 
-        fieldWrapper : "lmlform-fieldwrapper"
-    }).add('prodreportstack-title', 'title', {
-        displayname : "Information"
-    }).add('title', 'text', {
-        displayname : "Report Name"
-    }).add('notes', 'textarea', {
-        displayname : "Notes / Details"
-    }, {
-        required : false
-    }).add('prodreportstack-title2', 'title', {
-        displayname : "Endpoints"
-    }).add('endpoints', 'stack', {
-        scheme : {
-            columns : [{
-                fieldName : "type",
-                dataType : "select",
-                displayname : "Type",
-                dataSource : [
-                    {displayname : "Facebook Campaign", value : "fbcamp"},
-                    {displayname : "Facebook Post", value : "fbgraph"},
-                    {displayname : "URL", value : "url"},
-                    {displayname : "Lickstats", value : "lickstats"},
-                    {displayname : "Tweet", value : "twitter"},
-                    {displayname : "DFP Campaign", value : "dfp"},
-                    {displayname : "Instagram", value : "instagram"},
-                    {displayname : "Other", value : "other"}
-                ]
-            }, {
-                fieldName : "identifier",
-                dataType : "text",
-                displayname : "Identifier"
-            }]
-        }
-    }).add('Save and generate', 'submit', {
-        displayname : "Save and generate"
-    });
+
 };
 
 ProdReport.prototype.register = function() {

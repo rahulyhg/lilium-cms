@@ -54,6 +54,16 @@ const ALLOWED_ME_FIELDS = [
     "socialnetworks.facebook", "socialnetworks.twitter", "socialnetworks.instagram", "socialnetworks.googleplus"
 ];
 
+const ME_PROJECTION = {
+    displayname : 1, badges : 1, 
+    avatarURL : 1, description : 1,
+    personality : 1, socialnetworks : 1,
+    firstname : 1, lastname : 1,
+    jobtitle : 1, phone : 1, email : 1,
+    enforce2fa: 1, confirmed2fa: 1,
+    username : 1
+};
+
 class Entity {
     constructor() {
         this._id;
@@ -204,10 +214,6 @@ class Entities {
                 this.serveNew(cli);
                 break;
 
-            case "impersonate":
-                require('./backend/login.js').impersonate(cli);
-                break;
-
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -281,6 +287,8 @@ class Entities {
                     log('Entities', 'DB error while checking for user existance');
                 }
             })
+        } else if (cli.routeinfo.path[2] == "impersonate") {
+            require('./backend/login.js').impersonate(cli);
         } else if (cli.routeinfo.path[2] == "restore") {
             cli.hasRightOrRefuse('create-entities') && this.restore(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data.address, () => { 
                 this.sendNewMagicEmail(cli, db.mongoID(cli.routeinfo.path[3]), () => { 
@@ -780,12 +788,14 @@ class Entities {
                 sendback(arr); 
             });
         } else if (levels[0] == "me") {
-            require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
-                badges : data.badges,
-                huespin : data.huespin, 
-                levels : data.levels, 
-                user : data.items[0]
-            } : { error : "Not found" }));              
+            db.findUnique(_c.default(), "entities", { _id : db.mongoID(cli.userinfo.userid) }, (err, user) => {
+                require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
+                    badges : data.badges,
+                    huespin : data.huespin, 
+                    levels : data.levels, 
+                    user : Object.assign(user, data.items[0])
+                } : { error : "Not found" }));              
+            }, ME_PROJECTION)
         } else if (levels[0] == "bunch") {
             const filters = params.filters || {};
             const $match = { };

@@ -50,16 +50,33 @@ LiliumSocket.prototype.hit = function(param) {
     var uid = ls.clientId;
     var path = param.path;
 
-    sharedcache.hit('set', uid, path, () => {
-        for (var i = 0; i < namespaces.length; i++) {
-            require('./inbound.js').io().of(namespaces[i]).emit('userhit', {
-                _id : ls.clientId,
-                displayname : ls.session.data.displayname,
-                avatarURL : ls.session.data.avatarURL,
-                path : path
-            });
+    sharedcache.get("hit_" + sid, data => {
+        if (data) {
+            db.update(ls.config, 'hits', {
+                userid : db.mongoID(uid),
+                path : data.path
+            }, {
+                $set : {
+                    userid : db.mongoID(uid),
+                    path : data.path
+                },
+                $inc : {
+                    timespent : Date.now() - data.at
+                }
+            }, () => {
+
+            }, true, true, true);
         }
+
+        sharedcache.set({
+            ["hit_" + sid] : {
+                path, at : Date.now()
+            }
+        }, () => {
+            
+        });
     });
+
 };
 
 LiliumSocket.prototype.disconnect = function () {
@@ -69,6 +86,25 @@ LiliumSocket.prototype.disconnect = function () {
     
     var memObj = {};
     sharedcache.socket(uid, 'remove', sid, function(remainingSessions) {
+        sharedcache.get("hit_" + sid, data => {
+            if (data) {
+                db.update(ls.config, 'hits', {
+                    userid : db.mongoID(uid),
+                    path : data.path
+                }, {
+                    $set : {
+                        userid : db.mongoID(uid),
+                        path : data.path
+                    },
+                    $inc : {
+                        timespent : Date.now() - data.at
+                    }
+                }, () => {
+    
+                }, true, true, true);
+            }
+        });
+        /*
         var sessionCount = remainingSessions.length;
         for (var i = 0; i < namespaces.length; i++) {
             require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
@@ -78,6 +114,7 @@ LiliumSocket.prototype.disconnect = function () {
                 seshCount : sessionCount
             });
         }
+        */
     });
 };
 
