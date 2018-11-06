@@ -2,6 +2,7 @@ import { h, Component } from "preact";
 import API from '../../data/api';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 import { AnimeNumber, ordinal } from '../../widgets/animenumber';
+import { ChartGraph } from '../../widgets/chart';ChartGraph
 
 class LiveListOfPosts extends Component {
     constructor(props) {
@@ -56,6 +57,52 @@ class LiveListOfPosts extends Component {
     }
 }
 
+class HistoricalChartWrapper extends Component {
+    render() {
+        const pages = [...this.props.yesterday.ratio.pages].splice(0, 10);
+
+        return (
+            <div style={{ position : 'relative', height: '100%' }}>
+                <ChartGraph nowrap={true} chart={{
+                    type : 'bar',
+                    data : {
+                        labels : pages.map(x => x.page),
+                        datasets : [{
+                            data : pages.map(x => x.views),
+                            label : "Hits by URL",
+                            backgroundColor : [
+                                "#b48efb",
+                                "#ba8bf8",
+                                "#c189f5",
+                                "#c887f3",
+                                "#ce84f0",
+                                "#d582ee",
+                                "#dc80eb",
+                                "#e27de8",
+                                "#e97be6",
+                                "#f777e1"
+                            ].reverse()
+                        }]
+                    },
+                    options : {
+                        responsive : true,
+                        maintainAspectRatio : false,
+                        scales : {
+                            xAxes : [{ display: false }],
+                            yAxes : [{ color : '#333' }]
+                        },
+                        onClick : (ev, synth) => {
+                            if (synth && synth[0] && synth[0]._index) {
+                                window.open(this.props.yesterday.ratio.pages[synth[0]._index].page);
+                            }
+                        }
+                    }
+                }} />
+            </div>
+        );
+    }
+};
+
 class BigSideTabRealtime extends Component {
     constructor(props) {
         super(props);
@@ -90,6 +137,7 @@ class BigSideTabRealtime extends Component {
     getSelectedExpandFromIndex() {
         switch (this.state.tabIndex) {
             case 0 : return (<LiveListOfPosts posts={this.state.realtimePages || []} />);
+            case 1 : return (<HistoricalChartWrapper yesterday={this.state.yesterday}  />);
 
             default: return null;
         }
