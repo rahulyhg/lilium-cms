@@ -63,7 +63,6 @@ export class TextEditor extends Component {
                         const session =  new Picker.Session({});
                         Picker.cast(session, embed => {
                             log('TextEditor', "Picker callback received embed: ", embed, 'info');
-                            console.log(TextEditor.embedToMarkup(embed).outerHTML);
                             editor.insertContent(TextEditor.embedToMarkup(embed).outerHTML);
                         });
                     }
@@ -90,7 +89,6 @@ export class TextEditor extends Component {
                             }
                             
                             carouselPlaceholder.appendChild(carouselElement)
-                            console.log(carouselPlaceholder.outerHTML);
                             editor.insertContent(carouselPlaceholder.outerHTML);
                         });
                     }

@@ -234,7 +234,6 @@ class ImageCarouselPreview extends Component {
     }
 
     render(props, state) {
-        console.log(props.el);
         return (
             <img src={props.el.sizes.square.url} className='carousel-image-preview' alt="Carousel Image Embed"/>
         )
