@@ -120,13 +120,14 @@ class LMLTopics {
         if (cli.routeinfo.path[2] == "add") {
             let newTopic = cli.postdata.data;
 
-            if (newTopic && newTopic.displayname && newTopic.slug) {
+            if (newTopic && newTopic.displayname) {
                 if (newTopic.parent) {
                     newTopic.parent = db.mongoID(newTopic.parent);
                 } else {
                     delete newTopic.parent;
                 }
 
+                newTopic.slug = require('slug')(newTopic.displayname).toLowerCase();
                 newTopic.active = true;
                 db.insert(cli._c, 'topics', newTopic, (err, r) => {
                     this.updateFamily(cli._c, newTopic._id, newTopic.slug, () => {
@@ -135,6 +136,7 @@ class LMLTopics {
                             hooks.fireSite(cli._c, 'topicCreated', {topic : newTopic})
                             cli.sendJSON({
                                 created : true,
+                                _id : r.insertedId,
                                 reason : "Valid form"
                             });
                         });
