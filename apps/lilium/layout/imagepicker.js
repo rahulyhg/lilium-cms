@@ -221,9 +221,7 @@ export class ImagePicker extends Component {
 
     imageClicked(selected, comp) {
         log('ImagePicker', 'Image click event was caught by image picker', 'detail');
-        this.setState({
-            selected
-        });
+        this.setState({ selected });
     }
 
     render() {
@@ -246,7 +244,7 @@ export class ImagePicker extends Component {
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, this.state.selected)} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { embedType: 'image', image: this.state.selected })} />       
                     </div>
                 </div>
             </div>

@@ -23,7 +23,31 @@ export class TextEditor extends Component {
         this.rID = "txt-" + Math.random().toString().substring(2) + Date.now().toString()
     }
 
-    createEditor() {                
+    /**
+     * Parses an embed object and returns markup to be inserted in the article body.
+     * This markup is to be used bi the theme as an article is displayed by a client
+     * @param {object} embed The embed object to serialize as markup
+     */
+    static embedToMarkup(embed) {
+        const node = document.createElement('div');
+        node.className = 'lml-placeholder';
+        node.innerText = '';
+
+        switch (embed.embedType) {
+            case 'image':
+                node.classList.add('image');
+                node.dataset.placeId = embed.image._id;
+                break;
+            case 'place':
+                node.classList.add('place');
+                node.dataset.placeId = embed.place._id;
+                break;
+        }
+
+        return node;
+    }
+
+    createEditor() {
         log('TextEditor', 'Creating a new TinyMCE instance with ID ' + this.rID, 'detail');
 
         this.textarea ? tinymce.init({
@@ -34,16 +58,13 @@ export class TextEditor extends Component {
             setup: editor => {
                 editor.addButton('insert-element', {
                     icon: 'fa fa-plus-circle',
-                    tooltip: 'Insert Images, Places or Embeds',
+                    tooltip: 'Insert an image, a places or an embeds',
                     onclick: () => {
                         const session =  new Picker.Session({});
-                        Picker.cast(session, place => {
-                            console.log("Place : ", place);
-                            const dummyPlaceEl = document.createElement('div');
-                            dummyPlaceEl.className = 'lml-placeholder-google-maps';
-                            dummyPlaceEl.dataset.placeId = place._id;
-
-                            editor.insertContent(dummyPlaceEl.outerHTML);
+                        Picker.cast(session, embed => {
+                            log('TextEditor', "Picker callback received embed: ", embed, 'info');
+                            console.log(TextEditor.embedToMarkup(embed).outerHTML);
+                            editor.insertContent(TextEditor.embedToMarkup(embed).outerHTML);
                         });
                     }
                 });
@@ -53,12 +74,24 @@ export class TextEditor extends Component {
                     tooltip: 'Insert Carousel',
                     onclick: () => {
                         const session =  new Picker.Session({ type: 'carousel' });
-                        Picker.cast(session, place => {
-                            const dummyPlaceEl = document.createElement('div');
-                            dummyPlaceEl.className = 'lml-placeholder-carousel';
-                            dummyPlaceEl.dataset.placeId = place._id;
+                        Picker.cast(session, carousel => {
+                            log('TextEditor', "Picker callback received carousel: ", carousel, 'info');
+                            const carouselPlaceholder = document.createElement('div');
+                            carouselPlaceholder.className = 'lml-carousel-placeholder';
 
-                            editor.insertContent(dummyPlaceEl.outerHTML);
+                            const carouselElement = document.createElement('div');
+                            carouselElement.className = 'carousel-element';
+
+                            if (carousel.elements) {
+                                carousel.elements.forEach(element => {
+                                    const embed = TextEditor.embedToMarkup(element);
+                                    carouselElement.appendChild(embed);
+                                });
+                            }
+                            
+                            carouselPlaceholder.appendChild(carouselElement)
+                            console.log(carouselPlaceholder.outerHTML);
+                            editor.insertContent(carouselPlaceholder.outerHTML);
                         });
                     }
                 });

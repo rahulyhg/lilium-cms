@@ -91,7 +91,7 @@ export class Picker extends Component {
 
     /**
      * Adds the specified element to the carousel
-     * @param {object} el The element to add to the carousel
+     * @param {object} el The element to gabrielcardiadd to the carousel
      */
     static addToCarousel(el) {
         const carouselElements = _singleton.state.carouselElements;
@@ -104,11 +104,19 @@ export class Picker extends Component {
      * @param {object} selectedVal Values selected by the user
      */
     static finish(el) {
-        if (el) {
-            log('Picker', 'Selected image and calling back', 'detail');
-            _singleton.state.callback && _singleton.state.callback(el);
-            Picker.dismiss();
+        if (_singleton.state.session.type == 'carousel') {
+            log('Picker', "Got a carousel and calling back", 'detail');
+            _singleton.state.callback && _singleton.state.callback({ embedType: 'carousel', elements: _singleton.state.carouselElements });
+        } else {
+            if (el) {
+                log('Picker', `Got an individual embed of type: '${el.embedType}'`, 'detail');
+                _singleton.state.callback && _singleton.state.callback(el);
+            } else {
+                log('Picker', "Picker.finish() got an undefined param and session wasn't of type carousel", 'warn');
+            }
         }
+        
+        Picker.dismiss();
     }
 
     keydown(ev) {
@@ -116,24 +124,24 @@ export class Picker extends Component {
         ev.keyCode == "13" && Picker.accept();
     }
 
-    render() {
-        if (this.state.visible) {
+    render(props, state) {
+        if (state.visible) {
             return (
                 <div id="picker-overlay">
                     <div id="picker-wrapper">
-                        <div id="picker" className={this.state.session.type == 'carousel' && 'carousel-session'}>
+                        <div id="picker" className={state.session.type == 'carousel' && 'carousel-session'}>
                             <TabView>
                                 {
-                                    this.state.tabs.map((SubPicker) => (
+                                    state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} carousel={this.state.session.type == 'carousel'} options={this.state.session.options[SubPicker.slug]} />
+                                            <SubPicker onKeyDown={this.keydown.bind(this)} carousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]} />
                                         </Tab>
                                     ))
                                 }
                             </TabView>
                             {
-                                this.state.session.type == 'carousel' ? (
-                                    <CarouselPreview elements={this.state.carouselElements} />
+                                state.session.type == 'carousel' ? (
+                                    <CarouselPreview elements={state.carouselElements} />
                                 ) : null
                             }
                         </div>
@@ -196,7 +204,7 @@ class CarouselPreview extends Component {
                     }
                 </div>
                 <div id="picker-carousel-actions">
-                    <button className='button fill purple' onClick={() => { alert('asd'); }}>Add carousel</button>
+                    <button className='button fill purple' onClick={Picker.finish.bind(Picker, undefined)}>Add carousel</button>
                 </div>
             </div>
         )
@@ -213,7 +221,7 @@ class CarouselElement extends Component {
             <div className="carousel-element-preview-card">
                 <i className="remove-carousel-element fa fa-times" onClick={props.removeCarouselElement.bind(this, props.index)}></i>
                 {
-                    <props.PreviewComponent el={props.element} />
+                    <props.PreviewComponent el={props.element.image || props.element.place} />
                 }
             </div>
         )
