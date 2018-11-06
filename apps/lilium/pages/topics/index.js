@@ -42,18 +42,7 @@ export default class TopicsManagement extends Component {
     }
     
     componentDidMount() {
-        API.get('/topics/simple', {}, (err, json, r) => {
-            if (err || !json) {
-                console.log(err, json);
-                return this.setState({ error : "Could not fetch categories" });
-            }
-
-            this.setState({
-                topics : this.formatTopicsToTreeView(json)
-            }, () => {
-                this.setPage(this.props.levels[0]);
-            });
-        });
+        this.refreshTopicList();
     }
 
     setPage(topicid) {
@@ -68,7 +57,22 @@ export default class TopicsManagement extends Component {
         }
     }
 
-    onEvent(name, { _id, isRoot }) {
+    refreshTopicList(done) {
+        API.get('/topics/simple', {}, (err, json, r) => {
+            if (err || !json) {
+                console.log(err, json);
+                return this.setState({ error : "Could not fetch categories" });
+            }
+
+            this.setState({
+                topics : this.formatTopicsToTreeView(json)
+            }, () => {
+                done ? done() : this.setPage(this.props.levels[0]);
+            });
+        });
+    }
+
+    onEvent(name, { _id, isRoot, text }) {
         switch(name) {
             // Existing topic was selected with _id as extra
             case "selected":
@@ -81,7 +85,14 @@ export default class TopicsManagement extends Component {
 
             // Add topic to parent with _id as "extra"
             case "addto":
-                
+                API.post('/topics/add', {
+                    [isRoot ? 'category' : 'parent'] : _id,
+                    displayname : text
+                }, (err, json, r) => {
+                    this.refreshTopicList(() => {
+                        navigateTo("/topics/" + json._id);
+                    });
+                });
                 break;
 
             // Add new topic to new category
