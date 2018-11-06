@@ -8,3 +8,11 @@
     text-rendering: auto;
     line-height: 1;
 }
+
+#mce-modal-block.mce-in {
+    z-index: @z_fullscreenOverlay - 1 !important;
+} 
+
+.mce-window.mce-in {
+    z-index: @z_fullscreenOverlay !important;
+}

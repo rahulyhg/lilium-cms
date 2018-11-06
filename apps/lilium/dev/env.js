@@ -165,6 +165,8 @@ export class DevTools extends Component {
             )
         }
 
+        return null;
+
         log('Dev', 'Displaying dev tools bar', 'lilium');
         return (
             <div style={styles.devtools} class={"devtool-strip " + (this.state.hidden ? "hidden" : "")}>

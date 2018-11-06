@@ -115,6 +115,7 @@ server {
 * Samuel Rondeau-Millaire
 * Daniel McAuley
 * Era Sinbandith
+* Gabriel Cardinal
 * Narcity Media inc.
 
 ![bitmoji](https://render.bitstrips.com/v2/cpanel/9188364-18598575_8-s1-v1.png?transparent=1&palette=1&width=246)

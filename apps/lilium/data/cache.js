@@ -1,11 +1,15 @@
-const quickCache = {};
-const sessionCache = {};
+let quickCache = {};
+let sessionCache = {};
 
 const LILIUM_CACHE_KEY = "LiliumV4";
 export const CACHEKEYS = {
     SIDEBARSNAP : "sb1",
     API : "api"
 };
+
+export function overwriteV4Cache(obj) {
+    quickCache = obj;
+}
 
 export function getAPI(key) {
     return quickCache[CACHEKEYS.API + key];

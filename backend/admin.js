@@ -97,23 +97,6 @@ class Admin {
 		}
 	};
 
-    registerAdminSubMenu (parentMenuId, adminmenu) {
-        for (let index in AdminMenus) {
-            if (AdminMenus[index].id && AdminMenus[index].id == parentMenuId) {
-                if (adminmenu.priority == -1) {
-                    return new Error("Admin Menu Priority not set");
-                } else {
-                    while (typeof AdminMenus[index].children[adminmenu.priority] !== 'undefined') {
-                        adminmenu.priority++;
-                    }
-                    AdminMenus[index].children[adminmenu.priority] = adminmenu;
-                    return adminmenu;
-                }
-                break;
-            }
-        }
-    }
-
 	getAdminMenus () {
 		return AdminMenus;
 	};
@@ -142,17 +125,6 @@ class Admin {
             });
 
             valid && out.push(menus[name]);
-
-            menus[name].children && menus[name].children.forEach(child => {
-                let validc = true;
-                !all && child.rights.forEach(s => {
-                    if (validc && rights.indexOf(s) == -1) {
-                        validc = false;
-                    }
-                });
-
-                validc && out.push(child);
-            });
         }
 
         return out.map(x => { return { displayname : x.displayname, icon : x.faicon, id : x.id }; });
@@ -162,28 +134,36 @@ class Admin {
 		let that = this;
 
 		require('../livevars.js').registerLiveVariable('adminmenus', (cli, levels, params, callback) => {
-            const sortedMenus = [];
-            const menus = that.getAdminMenus();
-
-            for (let index in menus) {
-                let subMenu = [];
-
-                if (cli.hasRight(menus[index].rights)) {
-                    let submenus = [];
-
-                    for (let subindex in menus[index].children) {
-                        if (menus[index].children[subindex] && cli.hasRight(menus[index].children[subindex].rights)) {
-                            subMenu.push(menus[index].children[subindex]);
-                        }
+            if (!levels[0]) {
+                const sortedMenus = [];
+                const menus = that.getAdminMenus();
+    
+                for (let index in menus) {
+                    let subMenu = [];
+    
+                    if (cli.hasRight(menus[index].rights)) {
+                        sortedMenus.push(menus[index]);
                     }
-
-                    menus[index].children = subMenu;
-                    sortedMenus.push(menus[index]);
                 }
+                
+                callback(sortedMenus);
+            } else if (levels[0] == "sections") {
+                const sections = {};
+                const menus = that.getAdminMenus();
+
+                for (let prio in menus) {
+                    const m = menus[prio];
+
+                    if (!m.section) {
+                        m.section = "other";
+                    }
+                    sections[m.section] = sections[m.section] || [];
+                    cli.hasRight(m.rights) && sections[m.section].push(m);
+                }
+
+                callback(sections);
             }
-            
-            callback(sortedMenus);
-		});
+        });
 	};
 
 	registerAdminEndpoint (endpoint, method, func) {

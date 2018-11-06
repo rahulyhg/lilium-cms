@@ -1,27 +1,66 @@
 import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import API from "../../data/api";
-import { BigList, BigListToolBarBuilder } from '../../widgets/biglist'
+import { BigList, BigListToolBarBuilder } from '../../widgets/biglist';
+import { castOverlay } from '../../overlay/overlaywrap';
 import { getSession } from '../../data/cache';
 import { POST_STATUS } from '../../data/const'
 
 class PostListItem extends Component {
+    preview() {
+        window.open(`/publishing/preview/${this.props.item._id}/${this.props.item.previewkey}`)
+    }
+
+    viewonsite() {
+        window.open(`/${this.props.item.name}`);
+    }
+
+    componentWillMount() {
+        this.author = getSession("entities").find(x => x._id == this.props.item.author) || {
+            displayname : "Inactive user",
+            avatarURL : "/static/media/lmllogo.png"
+        };
+    }
+
     render() {
         return (
-            <div class="card flex">
-                <Link href={"/publishing/write/" + this.props.item._id} linkStyle="block">  
-                    <div class="image-wrapper article-list-thumbnail">
-                        {
-                            this.props.item.thumbnail ? (<img src={ this.props.item.thumbnail } />) : (<div class="article-list-no-image">No image</div>)
-                        }
-                    </div>        
-                    <div class={"article-list-status article-list-status-" + this.props.item.status} style={{ backgroundColor : POST_STATUS[this.props.item.status].color }}>
-                        { POST_STATUS[this.props.item.status].w }
-                    </div>              
-                    <p>
+            <div class="flex-row publishing-list-item">
+                <div class={"flex-col article-list-image-wrapper " + ( this.props.item.thumbnail ? "" : "gray-background" )}>
+                    <Link href={"/publishing/write/" + this.props.item._id} linkStyle="block">
+                        { this.props.item.thumbnail ? (<img src={ this.props.item.thumbnail } />) : (null) }
+                    </Link>
+                </div>
+                <div class="flex-col article-list-title">
+                    <Link href={"/publishing/write/" + this.props.item._id} linkStyle="block">
                         {this.props.item.headline}
-                    </p>
-                </Link>
+                    </Link>
+                </div>
+                <div class="flex-col article-list-status">
+                    <span class={"article-list-status-" + this.props.item.status} style={{ backgroundColor : POST_STATUS[this.props.item.status].color }}>
+                        { POST_STATUS[this.props.item.status].w }
+                    </span>              
+                </div>              
+                <div class="flex-col article-list-author">
+                    <img src={this.author.avatarURL} />
+                    <span title={this.author.displayname}>{this.author.displayname.split(' ')[0]}</span>
+                </div>
+            </div>
+        );
+    }
+}
+
+class PostListItemAdd extends Component {
+    onClick() {
+        castOverlay('create-article');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="flex-row publishing-list-item publishing-create-article">
+                <div class="flex-col article-list-image-wrapper gray-background"></div>
+                <div class="flex-col article-list-title">
+                    <b>Create new article</b>
+                </div>
             </div>
         )
     }
@@ -83,7 +122,7 @@ export default class ListView extends Component {
         }
 
         return (
-            <BigList listitem={PostListItem} endpoint="/publishing/biglist" toolbar={this.state.toolbarConfig} />
+            <BigList listitem={PostListItem} endpoint="/publishing/biglist" toolbar={this.state.toolbarConfig} addComponent={PostListItemAdd} />
         )
     }
 }

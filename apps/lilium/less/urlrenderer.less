@@ -1,14 +1,25 @@
-
 #urlrenderer {
-    position: relative;
-    top: 50px;
+    position: fixed;
+    top: @headerHeight;
     left: 30px;
+    bottom: @rendererBottom;
     width: calc(100% - 30px);
     transition: all 0.2s;
     z-index: @z_urlRenderer;
-}
+    background: @liliumBackground;
 
-#urlrenderer.snap {
-    left: 240px;
-    width: calc(100% - 240px);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+
+    overflow-x: hidden;
+
+    &.stretched {
+        bottom: 0;
+        border-bottom-left-radius: 0px;
+    }
+
+    &.snap {
+        left: 240px;
+        width: calc(100% - 240px);
+    }
 }

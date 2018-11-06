@@ -116,12 +116,77 @@ class PublishingHistory extends Component {
     }
 }
 
+class PublishingActions extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            post : props.post
+        }
+    }
+
+    componentWillReceiveProps(props) {
+        const newState = {};
+
+        props.post && (newState.post = props.post);
+
+        this.setState(newState);
+    }
+
+    makeButtonSection() {
+        const acts = [];
+        const status = this.state.post.status;
+
+        if (liliumcms.session.roles.includes('contributor')) {
+            if (status == "draft" || status == "deleted" || status == "refused") {
+                acts.push(
+                    <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
+                    <ButtonWorker type="fill" theme="blue" text="Submit for approval" work={this.props.actions.submitForApproval.bind(this)} />,
+                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.props.actions.destroy.bind(this)} />
+                );
+            } 
+        } else {
+            if (status == "draft" || status == "deleted") {
+                acts.push(
+                    <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
+                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.props.actions.destroy.bind(this)} />,
+                    <ButtonWorker type="fill" theme="blue" text="Publish" work={this.props.actions.validate.bind(this)} />
+                );
+            } else if (status == "published") {
+                acts.push(
+                    <ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.props.actions.commitchanges.bind(this)} />, 
+                    <ButtonWorker theme="red"  type="outline" text="Unpublish" work={this.props.actions.unpublish.bind(this)} />
+                );
+            } else if (status == "reviewing") {
+                acts.push(
+                    <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
+                    <ButtonWorker type="fill" theme="blue" text="Approve and publish" work={this.props.actions.validate.bind(this)} />,
+                    <ButtonWorker theme="red"  type="outline" text="Refuse submission" work={this.props.actions.refuse.bind(this)} />
+                );
+            }
+        }
+
+        return acts;
+    }
+
+    render() {
+        return (
+            <div>
+                <div>
+                    <ButtonWorker theme="white" text="Preview" work={this.props.actions.preview.bind(this)} />
+                </div>
+                <div>
+                    {this.makeButtonSection()}
+                </div>
+            </div>
+        )
+    }
+}
+
 class PublishingSidebar extends Component {
     constructor(props) {
         super(props);
         this.state = {
             post : props.post,
-            actions : props.actions || [],
             history : props.history || []
         }
     }
@@ -131,7 +196,6 @@ class PublishingSidebar extends Component {
 
         props.history && (newState.history = props.history);
         props.post && (newState.post = props.post);
-        props.actions && (newState.actions = props.actions);
 
         this.setState(newState);
     }
@@ -145,7 +209,7 @@ class PublishingSidebar extends Component {
             <div>
                 <b style={styles.sidebarTitle}>Manage</b>
                 <div style={{ padding : 10 }}>
-                    {this.state.actions}
+                    <PublishingActions post={this.state.post} actions={this.props.actions} />
                 </div>
 
                 <b style={styles.sidebarTitle}>Activity</b>
@@ -331,9 +395,18 @@ export default class EditView extends Component {
 
         this.state = {
             loading : true,
-            actions : [],
-            lastEdit : undefined,
+            lastEdit : undefined
+        };
 
+        this.actions = {
+            preview : this.preview.bind(this),
+            save : this.save.bind(this),
+            submitForApproval : this.submitForApproval.bind(this),
+            destroy : this.destroy.bind(this),
+            validate : this.validate.bind(this),
+            commitchanges : this.commitchanges.bind(this),
+            unpublish : this.unpublish.bind(this),
+            refuse : this.refuse.bind(this)
         };
 
         this.coldState = {};
@@ -453,11 +526,7 @@ export default class EditView extends Component {
                 }, () => {
                     this.coldState.post = this.state.post; 
 
-                    this.setState({
-                        actions : this.getActionFromColdState()
-                    }, () => {
-                        done(r.status);
-                    });
+                    done(r.status);    
                 });
             } else {
                 r.text().then(message => {
@@ -486,10 +555,6 @@ export default class EditView extends Component {
                     }}
                 }, () => {
                     this.coldState.post = this.state.post; 
-
-                    this.setState({
-                        actions : this.getActionFromColdState()
-                    })   
                 });
             } else {
                 r.text().then(message => {
@@ -507,7 +572,7 @@ export default class EditView extends Component {
 
     preview(done) {
         this.save(() => {
-            const loc = document.location.protocol + liliumcms.url + "/publishing/preview/" + this.props.postid + "/" + this.state.post.previewkey;
+            const loc = document.location.protocol + liliumcms.url + "/publishing/preview/" + this.props.postid + "/" + (this.state.post.previewkey || "");
             try {
                 if (this.previewWindow && !this.previewWindow.closed) {
                     this.previewWindow.document.location = loc;
@@ -646,47 +711,12 @@ export default class EditView extends Component {
                 log('Publishing', 'Article not found : ' + postid, 'warn');
             
             this.coldState.post = post;
-            this.setState(post ? { post, loading: false, actions : this.getActionFromColdState(), history : resp[endpoints.history.endpoint] } : { error : "Article not Found", loading : false }, () => {
+            this.setState(post ? { post, loading: false, history : resp[endpoints.history.endpoint] } : { error : "Article not Found", loading : false }, () => {
                 done && done();
             });
         });
     }
 
-    getActionFromColdState() {
-        const status = this.coldState.post.status;
-        const actions = [<ButtonWorker theme="white" text="Preview" work={this.preview.bind(this)} />];
-
-        if (liliumcms.session.roles.includes('contributor')) {
-            if (status == "draft" || status == "deleted" || status == "refused") {
-                actions.push(
-                    <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
-                    <ButtonWorker type="fill" theme="blue" text="Submit for approval" work={this.submitForApproval.bind(this)} />,
-                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.destroy.bind(this)} />
-                );
-            } 
-        } else {
-            if (status == "draft" || status == "deleted") {
-                actions.push(
-                    <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
-                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.destroy.bind(this)} />,
-                    <ButtonWorker type="fill" theme="blue" text="Publish" work={this.validate.bind(this)} />
-                );
-            } else if (status == "published") {
-                actions.push(
-                    <ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />, 
-                    <ButtonWorker theme="red"  type="outline" text="Unpublish" work={this.unpublish.bind(this)} />
-                );
-            } else if (status == "reviewing") {
-                actions.push(
-                    <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
-                    <ButtonWorker type="fill" theme="blue" text="Approve and publish" work={this.validate.bind(this)} />,
-                    <ButtonWorker theme="red"  type="outline" text="Refuse submission" work={this.refuse.bind(this)} />
-                );
-            }
-        }
-
-        return actions;
-    }
 
     fieldChanged(name, value) {
         this.edits[name] = value;
@@ -834,7 +864,7 @@ export default class EditView extends Component {
                 </div>
 
                 <div class="publishing-sidebar">
-                    <PublishingSidebar post={this.state.post} actions={this.state.actions} history={this.state.history} />
+                    <PublishingSidebar post={this.state.post} actions={this.actions} history={this.state.history} />
                 </div>
             </div>
         )

@@ -2,13 +2,14 @@ import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import dateformat from 'dateformat';
 import { Link } from '../../routing/link';
+import { castOverlay } from '../../overlay/overlaywrap';
 
 class ContentChainListItem extends Component {
     constructor(props) {
         super(props);
         this.state = {};
     }
-
+    
     render() {
         return (
             <div class="card flex">
@@ -17,8 +18,8 @@ class ContentChainListItem extends Component {
                     {
                         (this.props.item.media) ? (
                             <img src={this.props.item.media.sizes.square.url} alt=""/>
-                        ) : (
-                            <div className="no-image">
+                            ) : (
+                                <div className="no-image">
                                 No Image
                             </div>
                         )
@@ -27,7 +28,7 @@ class ContentChainListItem extends Component {
                 </div>
                 <div class="detail-head">
                     <Link display="block" href={`/chains/edit/${this.props.item._id}`}>
-                        <div class="big-title">{this.props.item.title}</div>
+                        <b class="title">{this.props.item.title}</b>
                     </Link>
                     <h2 className='subtitle'>{this.props.item.subtitle}</h2>
                 </div>
@@ -42,12 +43,31 @@ class ContentChainListItem extends Component {
     }
 }
 
+class ContentChainListItemAdd extends Component {
+    onClick() {
+        castOverlay('create-cc');
+    }
+
+    render() {
+        return (
+            <div onClick={this.onClick.bind(this)} class="card flex create-new-chain-card">
+                <div>
+                    <i class="fal fa-plus"></i>
+                </div>
+                <div>
+                    <b>Create new chain</b>
+                </div>
+            </div>
+        )
+    }
+}
+
 export class ListContentChains extends Component {
     constructor(props) {
         super(props);
         this.state = { contentChains: [] };
     }
-
+    
     static get TOOLBAR_CONFIG() {
         return {
             id : "contentchains",
@@ -66,7 +86,7 @@ export class ListContentChains extends Component {
     render() {
         return (
             <div id="content-chains-list">
-                <BigList listitem={ContentChainListItem} endpoint='/chains/search' toolbar={ListContentChains.TOOLBAR_CONFIG} />
+                <BigList listitem={ContentChainListItem} addComponent={ContentChainListItemAdd} endpoint='/chains/search' toolbar={ListContentChains.TOOLBAR_CONFIG} />
             </div>
         );
     }

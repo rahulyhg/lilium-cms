@@ -76,7 +76,7 @@ export class CreatePonglink extends Component {
 
     render() {
         return (
-            <div id="create-ponglink">
+            <div id="create-ponglink" class="overlay-form">
                 <h1>Ponglink campaign information</h1>
                 <TextField name='identifier' placeholder='Ponglink identifier' onChange={this.updateValues.bind(this)} />
                 <TextField name='defaultDestinationUrl' type='url' placeholder='Default destination URL' onChange={this.updateValues.bind(this)} />

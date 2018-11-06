@@ -586,6 +586,10 @@ class Entities {
                 Math.random().toString().substring(3) + "_ml_" + 
                 Math.random().toString().substring(3) + "_" + new Date().getTime();
 
+            entity.username = entity.username.trim();
+            entity.displayname = entity.displayname.trim();
+            entity.email = entity.email.trim();
+            
             entity.magiclink = magiclink;
             entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
 
@@ -673,6 +677,11 @@ class Entities {
                     Math.random().toString().substring(3) + "_" + new Date().getTime();
 
                 entity.magiclink = magiclink;
+                
+                entity.username = entity.username.trim();
+                entity.displayname = entity.displayname.trim();
+                entity.email = entity.email.trim();
+
                 db.insert(_c.default(), 'entities', entity, callback, true);
 
                 if (entity.email && entity.displayname) {
@@ -789,12 +798,20 @@ class Entities {
             });
         } else if (levels[0] == "me") {
             db.findUnique(_c.default(), "entities", { _id : db.mongoID(cli.userinfo.userid) }, (err, user) => {
-                require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
-                    badges : data.badges,
-                    huespin : data.huespin, 
-                    levels : data.levels, 
-                    user : Object.assign(user, data.items[0])
-                } : { error : "Not found" }));              
+                db.join(_c.default(), 'roles', [
+                    { $match : { name : { $in : user.roles } } },
+                    { $unwind : "$rights" },
+                    { $group : { _id : "rights", rights : { $push : "$rights" } } }
+                ], arr => {
+                    const rights = arr && arr[0] ? arr[0].rights : [];
+
+                    require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
+                        badges : data.badges,
+                        huespin : data.huespin, 
+                        levels : data.levels, 
+                        user : Object.assign(user, data.items[0], { rights })
+                    } : { error : "Not found" }));              
+                });
             }, ME_PROJECTION)
         } else if (levels[0] == "bunch") {
             const filters = params.filters || {};
@@ -968,12 +985,25 @@ class Entities {
 
     setup () {
         livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
-            db.findToArray(_c.default(), 'entities', {
+            db.findUnique(_c.default(), 'entities', {
                 _id: db.mongoID(cli.session.data._id)
-            }, function (err, arr) {
-                callback(err || arr);
+            }, (err, user) => {
+                if (user) {
+                    db.join(_c.default(), 'roles', [
+                        { $match : { name : { $in : user.roles } } },
+                        { $unwind : "$rights" },
+                        { $group : { _id : "rights", rights : { $push : "$rights" } } }
+                    ], arr => {
+                        const rights = arr && arr[0] ? arr[0].rights : [];
+                        user.rights = Array.from(new Set(rights.filter(x => x)));
+
+                        callback([ user ]);
+                    });
+                } else {
+                    callback({ error : 'Not found' });
+                }
             });
-        }, []);
+        });
 
         require('./backend/admin').registerAdminEndpoint('initialLogin', 'POST', cli => {
             this.commitProfilePic(cli, cli.postdata.data.picture, (err, images) => {

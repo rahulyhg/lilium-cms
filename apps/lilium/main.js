@@ -7,16 +7,20 @@ import { Picker } from './layout/picker';
 import { LoadingView } from './layout/loading';
 import { OverlayWrap } from './overlay/overlaywrap';
 import { Lys } from './layout/lys';
-import { initiateConnection } from './realtime/connection';
+import { LiliumSession } from './data/session';
+import { initiateConnection, bindRealtimeEvent } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
 import { initLocal, setSession, mapUsers } from './data/cache';
-import { NotificationWrapper } from './layout/notifications';
+import { NotificationWrapper, castNotification } from './layout/notifications';
 import { makeGLobalLang, setLanguage } from './data/vocab';
 import { CakepopWrapper } from './layout/cakepopsmanager';
 
 import API from './data/api';
 
+window.liliumcms = {};
 // LILIUM_IMPORT_TEMPLATE
+
+liliumcms.connected = true;
 
 makeGlobalLogger();
 makeGLobalLang();
@@ -46,12 +50,36 @@ class Lilium extends Component {
         log('Lilium', 'Main component finished mounting', 'lilium');
         this.fetchUserData();
 
+        bindRealtimeEvent('disconnect', ev => {
+            window.liliumcms.connected = false;
+            log('Socket', "Lost internet connection, notifying user", 'socket');
+
+            castNotification({
+                title: "Internet connection lost",
+                message: "You went offline. Any pending requests will be processed once your connection is restored.",
+                type: "warning"
+            });
+        });
+
+        bindRealtimeEvent('reconnect', ev => {
+            log('Socket', "Internet connection restored, notifying user", 'socket');
+
+            window.liliumcms.connected = true;
+            API.processPendingRequests();
+
+            castNotification({
+                title: "Internet connection established",
+                message: "You are now connected to the Internet",
+                type: "success"
+            });
+        });
+
         document.addEventListener('castexitscreen', () => {
             this.setState({ loading : true });
         });
     }
 
-    fetchUserData() {        
+    fetchUserData() { 
         log('Lilium', 'Requesting current session information', 'lilium');
         API.getMany([
             { endpoint : '/me', params : {} },
@@ -66,23 +94,13 @@ class Lilium extends Component {
                 setLanguage(currentLanguage, () => {
                     setSession("entities", resp["/entities/simple"]);
                     setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
-                    liliumcms.session = resp["/me"][0];
-                    liliumcms.session.allowedEndpoints = [
+                    liliumcms.session = new LiliumSession(resp["/me"][0]);
+                    liliumcms.session.setAllowedEndpoints([
                         "me", "preferences", "logout", "notifications", 
                         ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
-                    ];
+                    ]);
 
-                    resp["/adminmenus"]
-                        .filter(x => x.children && x.children.length != 0)
-                        .map(x => x.children)
-                        .forEach(x => 
-                            x.forEach(y => 
-                                liliumcms.session.allowedEndpoints.push(y.absURL.split('/')[1]
-                            )
-                        )
-                    );
-
-                    this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false, currentLanguage });            
+                    this.setState({ session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage });            
                 });
             }   
         });

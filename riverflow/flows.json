@@ -1,17 +1,280 @@
 {
-    "version" : 1.1,
+    "version" : 1.2,
 
     "supported" : [
-        "admin_get", "admin_post",
-        "get", "post",
+        "admin_post", "admin_put", "admin_delete",
+        "get", "post", "put", "delete",
         "livevar", "setup"
     ],
 
     "extensions" : [
         "admin_menu",
         "admin_sub_menu",
-        "hooks",
-        "post_leaf"
+        "hooks"
+    ],
+
+    "menus" : [
+        {
+            "id": "ponglinks",
+            "lys" : "ponglinks",
+            "faicon": "fa-external-link",
+            "displayname": "Ponglinks",
+            "priority": 330,
+            "rights": ["ponglinks"],
+            "absURL": "/ponglinks",
+            "section" : "publishing"
+        },
+        {
+            "id": "comments",
+            "lys" : "comments,threads",
+            "faicon": "fa-comments",
+            "displayname": "Comment threads",
+            "priority": 228,
+            "rights": ["moderate"],
+            "absURL": "/comments",
+            "section" : "management"
+        },
+        {
+            "id": "thedailylilium",
+            "lys" : "daily,lilium",
+            "faicon": "fa-newspaper",
+            "displayname": "The Daily Lilium",
+            "priority": 80,
+            "rights": ["dash"],
+            "absURL": "/thedailylilium",
+            "section" : "home"
+        },
+        {
+            "id": "support",
+            "lys" : "support,help,github",
+            "faicon": "fa-life-ring",
+            "displayname": "Support",
+            "priority": 2500,
+            "rights": ["dash"],
+            "absURL": "/fix",
+            "section" : "home"
+        },
+        {
+            "id": "flagging",
+            "lys": "flagging,report,banning",
+            "faicon": "fa-flag",
+            "displayname": "Flagging",
+            "priority": 300,
+            "rights": ["manage-flagging"],
+            "absURL": "/flagging",
+            "section" : "management"
+        },
+        {
+            "id": "dashboard",
+            "lys": "dashboard,home,traffic,trafic,realtime",
+            "faicon": "fa-tachometer",
+            "displayname": "Dashboard",
+            "priority": 100,
+            "rights": ["dash"],
+            "absURL": "/dashboard",
+            "section" : "home"
+        },
+        {
+            "id": "mailtemplates",
+            "lys" : "mail,templates,email",
+            "faicon": "fa-envelope",
+            "displayname": "Email Templates",
+            "priority": 250,
+            "rights": ["edit-emails"],
+            "absURL": "/mailtemplates/list",
+            "section" : "management"
+        },
+        {
+            "id" : "publishing",
+            "lys" : "articles,publishing,content",
+            "faicon": "fa-pencil",
+            "displayname": "Publishing",
+            "priority": 225,
+            "rights": ["list-articles"],
+            "absURL": "/publishing",
+            "section" : "publishing"
+        },
+        {
+            "id": "articles-topics",
+            "lys" : "topics,categories,category",
+            "faicon": "fa-tags",
+            "displayname": "Topics",
+            "priority": 273,
+            "rights": ["manage-topics"],
+            "absURL": "/topics",
+            "section" : "publishing"
+        }, 
+        {
+            "id": "contentchains",
+            "lys" : "chains,content,series",
+            "faicon": "fa-link",
+            "displayname": "Content Chains",
+            "priority": 235,
+            "rights": ["admin"],
+            "absURL": "/chains",
+            "section" : "publishing"
+        }, 
+        {
+            "id": "styledpages",
+            "lys" : "styledpages,static,pages",
+            "faicon": "fa-paragraph",
+            "displayname": "Styled Pages",
+            "priority": 250,
+            "rights": ["styledpages"],
+            "absURL": "/styledpages",
+            "section" : "publishing"
+        },
+        {
+            "id": "crew",
+            "lys" : "crew,people,users",
+            "faicon": "fa-beer",
+            "displayname": "Crew",
+            "priority": 500,
+            "rights": ["dashboard"],
+            "absURL": "/crew",
+            "section" : "home"
+        },
+        {
+            "id": "entities",
+            "lys" : "entities,users,people",
+            "faicon": "fa-users",
+            "displayname": "Entities",
+            "priority": 500,
+            "rights": ["list-entities"],
+            "absURL": "/entities",
+            "section" : "management"
+        },
+        {
+            "id": "entities-rights",
+            "lys" : "roles,rights",
+            "faicon": "fa-minus-circle",
+            "displayname": "Roles",
+            "priority": 510,
+            "rights": ["manage-roles"],
+            "absURL": "/role/list",
+            "section" : "management"
+        },
+        {
+            "id": "socialdispatch",
+            "lys" : "social,dispatch,facebook,twitter",
+            "faicon": "fa-share-alt",
+            "displayname": "Social Dispatch",
+            "priority": 410,
+            "rights": ["editor"],
+            "absURL": "/socialdispatch",
+            "section" : "publishing"
+        },
+        {
+            "id": "profile",
+            "lys" : "profile",
+            "faicon": "fa-user",
+            "displayname": "Profile",
+            "priority": 221,
+            "rights": ["dashboard"],
+            "absURL": "/me",
+            "section" : "management"
+        },        
+        {
+            "id": "notifications",
+            "lys" : "notifications",
+            "faicon": "fa-inbox",
+            "displayname": "Notifications",
+            "priority": 223,
+            "rights": ["dashboard"],
+            "absURL": "/notifications",
+            "section" : "management"
+        },        
+        {
+            "id": "preferences",
+            "lys" : "preferences",
+            "faicon": "fa-user-cog",
+            "displayname": "Preferences",
+            "priority": 580,
+            "rights": ["dashboard"],
+            "absURL": "/preferences",
+            "section" : "lilium"
+        },
+        
+        {
+            "id": "pwmanager",
+            "lys" : "password,manager,pw,social,facebook,twitter,instagram",
+            "faicon": "fa-key",
+            "displayname": "Password Manager",
+            "priority": 440,
+            "rights": ["manage-passwords"],
+            "absURL": "/pwmanager",
+            "section" : "management"
+        },
+        {
+            "id": "cakepop",
+            "lys" : "cakepop,popups",
+            "faicon": "fa-window-maximize",
+            "displayname": "Cakepops",
+            "priority": 415,
+            "rights": ["cakepops"],
+            "absURL": "/cakepop",
+            "section" : "management"
+        },
+        {
+            "id": "settings",
+            "lys" : "settings,configurations,",
+            "faicon": "fa-cogs",
+            "displayname": "Settings",
+            "priority": 1000,
+            "rights": ["manage-settings"],
+            "absURL": "/settings",
+            "section" : "lilium"
+        },
+        {    
+            "id": "ads",
+            "lys" : "advertising,banners,ads",
+            "faicon": "fa-usd-square",
+            "displayname": "Ads management",
+            "priority": 400,
+            "rights": ["admin"],
+            "absURL": "/ads",
+            "section" : "management"
+        }, 
+        {
+            "id": "themes",
+            "lys" : "themes,website,appearance",
+            "faicon": "fa-paint-brush",
+            "displayname": "Themes",
+            "priority": 600,
+            "rights": ["manage-themes"],
+            "absURL": "/themes",
+            "section" : "lilium"            
+        }, 
+        {
+            "id": "devtools",
+            "lys" : "dev,tools,programming",
+            "faicon": "fa-hashtag",
+            "displayname": "Dev Tools",
+            "priority": 2000,
+            "rights": ["develop"],
+            "absURL": "/devtools",
+            "section" : "lilium"
+        }, 
+        {
+            "id": "plugins",
+            "lys" : "plugins",
+            "faicon": "fa-plug",
+            "displayname": "Plugins",
+            "priority": 700,
+            "rights": ["manage-plugins"],
+            "absURL": "/plugins",
+            "section" : "lilium"
+        }, 
+        {    
+            "id": "translations",
+            "lys" : "translations,languages",
+            "faicon": "fa-globe",
+            "displayname": "Translations",
+            "priority": 3000,
+            "rights": ["admin"],
+            "absURL": "/translations",
+            "section" : "lilium"            
+        }
     ],
 
     "rivers" : [
@@ -26,17 +289,7 @@
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
-            "support" : ["livevar", "admin_post", "setup"],
-            "admin_menu" : {
-                "id": "ponglinks",
-                "lys" : "ponglinks",
-                "faicon": "fa-external-link",
-                "displayname": "Ponglinks",
-                "priority": 330,
-                "rights": ["ponglinks"],
-                "absURL": "admin/ponglinks",
-                "children": []
-            }
+            "support" : ["livevar", "admin_post", "setup"]
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "pong",
@@ -44,17 +297,7 @@
         }, {
             "module" : "comments.js",
             "endpoint" : "comments",
-            "support" : ["admin_post", "admin_delete", "livevar", "get"],
-            "admin_menu" : {
-                "id": "comments",
-                "lys" : "comments,threads",
-                "faicon": "fa-comments",
-                "displayname": "Comment threads",
-                "priority": 228,
-                "rights": ["moderate"],
-                "absURL": "admin/comments",
-                "children": []
-            }
+            "support" : ["admin_post", "admin_delete", "livevar", "get"]
         }, {
             "module" : "notifications.js",
             "endpoint" : "notifications",
@@ -74,11 +317,11 @@
         }, {
             "module" : "history.js",
             "endpoint" : "history",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "datareader.js",
             "endpoint" : "datareader",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "livevars.js",
             "endpoint" : "livevars",
@@ -86,21 +329,11 @@
         }, {
             "module" : "thedailylilium.js",
             "endpoint" : "thedailylilium",
-            "support" : ["admin_get", "admin_post", "livevar"],
-            "admin_menu" : {
-                "id": "thedailylilium",
-                "lys" : "daily,lilium",
-                "faicon": "fa-newspaper",
-                "displayname": "The Daily Lilium",
-                "priority": 80,
-                "rights": ["dash"],
-                "absURL": "admin/thedailylilium",
-                "children": []
-            }
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "passwordrecovery.js",
             "endpoint" : "accesscheckpoint",
-            "support" : ["get", "post", "admin_get"]
+            "support" : ["get", "post"]
         }, {
             "module" : "lys.js",
             "endpoint" : "lys",
@@ -120,57 +353,27 @@
         }, {
             "module" : "fix.js",
             "endpoint" : "fix",
-            "support" : ["livevar", "admin_get", "admin_post"],
-            "admin_menu" : {
-                "id": "support",
-                "lys" : "support,help,github",
-                "faicon": "fa-life-ring",
-                "displayname": "Support",
-                "priority": 2500,
-                "rights": ["dash"],
-                "absURL": "admin/fix",
-                "children": []
-            }
+            "support" : ["livevar","admin_post"]
         }, {
             "module" : "topics.js",
             "endpoint" : "topics",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "admin_put", "livevar"]
         }, {
             "module" : "plugins.js",
             "endpoint" : "plugins",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "flagging.js",
             "endpoint" : "flagging",
-            "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"],
-            "admin_menu" : {
-                "id": "flagging",
-                "lys": "flagging,report,banning",
-                "faicon": "fa-flag",
-                "displayname": "Flagging",
-                "priority": 300,
-                "rights": ["manage-flagging"],
-                "absURL": "admin/flagging",
-                "children": []
-            }
+            "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"]
         }, {
             "module" : "themes.js",
             "endpoint" : "themes",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "dashboard.js",
             "endpoint" : "dashboard",
-            "support" : ["admin_get", "livevar"],
-            "admin_menu" : {
-                "id": "dashboard",
-                "lys": "dashboard,home,traffic,trafic,realtime",
-                "faicon": "fa-tachometer",
-                "displayname": "Dashboard",
-                "priority": 100,
-                "rights": ["dash"],
-                "absURL": "admin/dashboard",
-                "children": []
-            }
+            "support" : ["livevar"]
         }, {
             "module" : "analytics.js",
             "endpoint" : "googleanalytics",
@@ -196,33 +399,23 @@
             "support" : ["setup", "admin_post", "livevar", "admin_delete"],
             "hooks" : [
                 {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
-            ],
-            "admin_menu" : {
-                "id": "mailtemplates",
-                "lys" : "mail,templates,email",
-                "faicon": "fa-envelope",
-                "displayname": "Email Templates",
-                "priority": 250,
-                "rights": ["edit-emails"],
-                "absURL": "admin/mailtemplates/list",
-                "children": []
-            }
+            ]
         }, {
             "module" : "snip.js",
             "endpoint" : "snips",
-            "support" : ["admin_get"]
+            "support" : []
         }, {
             "module" : "secrets.js",
             "endpoint" : "secrets",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "devtools.js",
             "endpoint" : "devtools",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "embed.js",
             "endpoint" : "embed",
-            "support" : ["admin_get"]
+            "support" : []
         }, {
             "module" : "sharedcache.js",
             "endpoint" : "sharedcache",
@@ -230,11 +423,11 @@
         }, {
             "module" : "conversations.js",
             "endpoint" : "conversations",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "feed.js",
             "endpoint" : "feed",
-            "support" : ["setup", "admin_get", "livevar"]
+            "support" : ["setup","livevar"]
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
@@ -253,48 +446,11 @@
         }, {
             "module" : "contentcontroller.js",
             "endpoint" : "publishing",
-            "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "get", "livevar"],
-            "admin_menu" : {
-                "id" : "publishing",
-                "lys" : "articles,publishing,content",
-                "faicon": "fa-pencil",
-                "displayname": "Publishing",
-                "priority": 225,
-                "rights": ["list-articles"],
-                "absURL": "admin/publishing/list",
-                "children": [{
-                    "id": "articles-topics",
-                    "lys" : "topics,categories,category",
-                    "faicon": "fa-tags",
-                    "displayname": "Topics",
-                    "priority": 210,
-                    "rights": ["manage-topics"],
-                    "absURL": "admin/topics",
-                    "children": []
-                }, {
-                    "id": "contentchains",
-                    "lys" : "chains,content,series",
-                    "faicon": "fa-link",
-                    "displayname": "Content Chains",
-                    "priority": 235,
-                    "rights": ["admin"],
-                    "absURL": "admin/chains",
-                    "children": []
-                }, {
-                    "id": "styledpages",
-                    "lys" : "styledpages,static,pages",
-                    "faicon": "fa-paragraph",
-                    "displayname": "Styled Pages",
-                    "priority": 250,
-                    "rights": ["styledpages"],
-                    "absURL": "admin/styledpages/list",
-                    "children": []
-                }]
-            }
+            "support" : ["admin_post", "admin_put", "admin_delete", "get", "livevar"]
         }, {
             "module" : "article.js",
             "endpoint" : "article",
-            "support" : ["admin_get", "admin_post", "api_get", "api_post"]
+            "support" : ["admin_post", "api_get", "api_post"]
         }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
@@ -306,55 +462,26 @@
         }, {
             "module" : "crew.js",
             "endpoint" : "crew",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"],
-            "admin_menu" : {
-                "id": "crew",
-                "lys" : "crew,people,users",
-                "faicon": "fa-beer",
-                "displayname": "Crew",
-                "priority": 500,
-                "rights": ["dashboard"],
-                "absURL": "admin/crew",
-                "children": []
-            }
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "entities.js",
             "endpoint" : "entities",
-            "support" : ["admin_get", "admin_post", "livevar", "setup", "api_get", "api_post"],
-            "admin_menu" : {
-                "id": "entities",
-                "lys" : "entities,users,people",
-                "faicon": "fa-users",
-                "displayname": "Entities",
-                "priority": 500,
-                "rights": ["list-entities"],
-                "absURL": "admin/entities",
-                "children": [{
-                    "id": "entities-rights",
-                    "lys" : "roles,rights",
-                    "faicon": "fa-minus-circle",
-                    "displayname": "Roles",
-                    "priority": 510,
-                    "rights": ["manage-roles"],
-                    "absURL": "admin/role/list",
-                    "children": []
-                }]
-            }
+            "support" : ["admin_post", "livevar", "setup", "api_get", "api_post"]
         }, {
             "module" : "entityrelationship.js",
             "endpoint" : "entityrelationship",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "personas.js",
             "endpoint" : "persona",
-            "support" : ["admin_get", "admin_post", "livevar"],
+            "support" : ["admin_post", "livevar"],
             "hooks" : [
                 { "name" : "post_create_persona", "priority" : 15, "callback" : "postCreatePersona" }
             ]
         }, {
             "module" : "role.js",
             "endpoint" : "role",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "preferences.js",
             "endpoint" : "preferences",
@@ -362,7 +489,7 @@
         }, {
             "module" : "media.js",
             "endpoint" : "media",
-            "support" : ["admin_get", "admin_post", "setup"]
+            "support" : ["admin_post", "setup"]
         }, {
             "module" : "translations.js",
             "endpoint" : "translations",
@@ -370,35 +497,15 @@
         }, {
             "module" : "badges.js",
             "endpoint" : "decorations",
-            "support" : ["setup", "livevar", "admin_post", "admin_get"]
+            "support" : ["setup", "livevar", "admin_post"]
         }, {
             "module" : "socialdispatch.js",
             "endpoint" : "socialdispatch",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"],
-            "admin_menu" : {
-                "id": "socialdispatch",
-                "lys" : "social,dispatch,facebook,twitter",
-                "faicon": "fa-share-alt",
-                "displayname": "Social Dispatch",
-                "priority": 410,
-                "rights": ["editor"],
-                "absURL": "admin/socialdispatch",
-                "children": []
-            }
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "pwmanager.js",
             "endpoint" : "pwmanager",
-            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"],
-            "admin_menu" : {
-                "id": "pwmanager",
-                "lys" : "password,manager,pw,social,facebook,twitter,instagram",
-                "faicon": "fa-key",
-                "displayname": "Password Manager",
-                "priority": 440,
-                "rights": ["manage-passwords"],
-                "absURL": "admin/pwmanager",
-                "children": []
-            }
+            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
             "module" : "amp.js",
             "endpoint" : "amp",
@@ -406,17 +513,7 @@
         }, {
             "module" : "cakepop.js",
             "endpoint" : "cakepop",
-            "support" : ["admin_post", "livevar"],
-            "admin_menu" : {
-                "id": "cakepop",
-                "lys" : "cakepop,popups",
-                "faicon": "fa-window-maximize",
-                "displayname": "Cakepops",
-                "priority": 415,
-                "rights": ["cakepops"],
-                "absURL": "admin/cakepop",
-                "children": []
-            }
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "ipevents.js",
             "endpoint" : "ipevents",
@@ -424,7 +521,7 @@
         }, {
             "module" : "sites.js",
             "endpoint" : "sites",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "session.js",
             "endpoint" : "session",
@@ -432,62 +529,7 @@
         }, {
             "module" : "settings.js",
             "endpoint" : "settings",
-            "support" : ["admin_get", "admin_post", "livevar"],
-            "admin_menu" : {
-                "id": "settings",
-                "lys" : "settings,configurations,",
-                "faicon": "fa-cogs",
-                "displayname": "Settings",
-                "priority": 1000,
-                "rights": ["manage-settings"],
-                "absURL": "admin/settings",
-                "children": [{    
-                    "id": "ads",
-                    "lys" : "advertising,banners,ads",
-                    "faicon": "fa-usd-square",
-                    "displayname": "Ads management",
-                    "priority": 400,
-                    "rights": ["admin"],
-                    "absURL": "admin/ads",
-                    "children": []
-                }, {
-                    "id": "themes",
-                    "lys" : "themes,website,appearance",
-                    "faicon": "fa-paint-brush",
-                    "displayname": "Themes",
-                    "priority": 600,
-                    "rights": ["manage-themes"],
-                    "absURL": "admin/themes",
-                    "children": []
-                }, {
-                    "id": "devtools",
-                    "lys" : "dev,tools,programming",
-                    "faicon": "fa-hashtag",
-                    "displayname": "Dev Tools",
-                    "priority": 2000,
-                    "rights": ["develop"],
-                    "absURL": "admin/devtools",
-                    "children": []
-                }, {
-                    "id": "plugins",
-                    "lys" : "plugins",
-                    "faicon": "fa-plug",
-                    "displayname": "Plugins",
-                    "priority": 700,
-                    "rights": ["manage-plugins"],
-                    "absURL": "admin/plugins",
-                    "children": []
-                }, {    
-                    "id": "translations",
-                    "lys" : "translations,languages",
-                    "faicon": "fa-globe",
-                    "displayname": "Translations",
-                    "priority": 3000,
-                    "rights": ["admin"],
-                    "absURL": "admin/translations",
-                    "children": []
-                }]
-            }
+            "support" : ["admin_post", "livevar"]
         }       
     ]
 }

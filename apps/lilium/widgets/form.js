@@ -4,6 +4,7 @@ import flatpickr from 'flatpickr';
 import { Spinner } from '../layout/loading'
 import { Picker } from '../layout/imagepicker';
 import slugify from "slugify";
+import { ImagePicker } from '../layout/imagepicker';
 
 class FormField extends Component {
     constructor(props) {
@@ -21,16 +22,21 @@ class FormField extends Component {
     }
 
     componentWillReceiveProps(props) {
-        if (typeof props.initialValue != "undefined") {
+        if (typeof props.value != "undefined") {
+            this.value = props.value;
+            this.setState({ initialValue : this.value });
+        } else if (typeof props.initialValue != "undefined") {
             this.value = props.initialValue;
             this.setState({ initialValue : props.initialValue });
         }
+
     }
 
-    changed(ev) {
-        const oldValue = this.value;
-        this.value = this.props.format ? this.props.format(ev.target.value) : ev.target.value;
-        this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue);
+    changed(value, oValue) {
+        const oldValue = typeof oValue != "undefined" ? oValue : this.value;
+        this.value = this.props.format ? this.props.format(value) : value;
+        this.valid = this.props.validate ? this.props.validate(value) : true;
+        this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
 
         if (this.autosave) {
             this.setState({ saving : true });
@@ -106,9 +112,9 @@ export class SelectField extends FormField {
         return (
             <div class="field-wrap">
                 { this.props.placeholder ? <b class="placeholder">{this.props.placeholder}</b> : null }
-                <select class="classic-field" value={this.value} onChange={this.changed.bind(this)}>
+                <select class="classic-field" value={this.props.initialValue} onChange={ev => this.changed(ev.target.value)}>
                     { this.props.options.map(opt => (
-                        <option value={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname}</option>
+                        <option value={opt.value} key={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname}</option>
                     )) }
                 </select>
             </div> 
@@ -125,11 +131,8 @@ export class TextField extends FormField {
     }
 
     componentWillReceiveProps(props) {
-        if (typeof props.value != 'undefined' ) {
-            if (props.value != this.inputbox.value) {
-                this.changed({ target : { value : props.value }});
-                this.inputbox.value = props.value;
-            }
+        if (typeof props.value != 'undefined') {
+            this.inputbox.value = props.value;
         } else {
             this.inputbox.value = '';
         }
@@ -158,9 +161,9 @@ export class TextField extends FormField {
                 {
                     this.props.multiline ? 
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={this.props.style || {}} 
-                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}>{this.props.initialValue || this.props.value || this.value || ""}</textarea>) :
+                                    onChange={ev => this.changed(ev.target.value)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}>{this.props.initialValue || this.props.value || this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
-                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
+                                    onChange={ev => this.changed(ev.target.value)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
                                     onFocus={this.props.onFocus && this.props.onFocus.bind(this)} ref={el => {this.inputbox = el}} />)
                 }
             </div>
@@ -173,27 +176,39 @@ export class StackBox extends FormField {
         super(props);
 
         this.state = {
-            values : Array.from(this.value || [])
+            values : Array.from(this.value || []).map(x => ({ 
+                text : x, 
+                _formid : Math.random().toString() + Math.random().toString() 
+            }))
         };
     }
 
+    componentWillReceiveProps(props) {
+        if (props.value) {
+            this.value = props.value;
+            this.setState({
+                values : Array.from(props.value || []).map(x => ({ 
+                    text : x, 
+                    _formid : Math.random().toString() + Math.random().toString() 
+                }))
+            });
+        }
+    }
+
     onChange() {
-        this.changed({
-            target : {
-                value : this.state.values
-            }
-        });
+        this.changed(this.state.values.map(x => x.text));
     }
 
     appendFromBox(text) {
-        this.setState({ values : [...this.state.values, text] }, () => {
+        const obj = { text, _formid : Math.random().toString() }
+        this.setState({ values : [...this.state.values, obj] }, () => {
             this.onChange();
         });
     }
 
     textEdited(index, value) {
         const newValues = [...this.state.values];
-        newValues[index] = value;
+        newValues[index].text = value;
         this.setState({ values : newValues }, () => {
             this.onChange();
         });
@@ -248,9 +263,9 @@ export class StackBox extends FormField {
                 <b class="placeholder">{this.props.placeholder || ""}</b>
                 <div class="stack-box-list">
                     {
-                        this.state.values.map((value, index) => (
-                            <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={slugify(value)}
-                                                index={index} lastInList={index == this.state.values.length - 1} initialValue={value}
+                        this.state.values.map((valueObj, index) => (
+                            <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={valueObj._formid}
+                                                index={index} lastInList={index == this.state.values.length - 1} initialValue={valueObj.text}
                                                 moveItemDown={this.moveItemDown.bind(this)} moveItemUp={this.moveItemUp.bind(this)} />
                         ))
                     }
@@ -369,14 +384,7 @@ export class MediaPickerField extends FormField {
             selected : this.state.mediaID || undefined
         }, image => {
             if (image) {
-                this.changed({
-                    target : {
-                        name : this.props.name, 
-                        value : image,
-                        
-                        oldValue : this.state.mediaURL
-                    }
-                });
+                this.changed(image, this.state.mediaURL);
 
                 this.setState({ mediaURL : this.extractImageFromResponse(image), mediaID : image._id });
             }
@@ -428,6 +436,10 @@ export class TopicPicker extends FormField {
             })
         }
 
+        addOne(topic) {
+            this.props.onAdd && this.props.onAdd(topic);
+        }
+
         render() {
             return (
                 <div class="topic-children-slide">
@@ -436,6 +448,14 @@ export class TopicPicker extends FormField {
                             {topic.displayname}
                         </div>
                     )) }
+
+                    {
+                        this.props.session == "manager" ? (
+                            <div class="topic-children-item add-new" onClick={this.addOne.bind(this)}>
+                                <i class="far fa-plus"></i>
+                            </div>
+                        ) : null
+                    }
                 </div>
             )
         }
@@ -485,19 +505,17 @@ export class TopicPicker extends FormField {
     loadChildrenTopicsFrom(topic, index) {
         log('Topics', 'Loading children topic from topic ' + topic.displayname + ' at index ' + index, 'info');
         API.get('/topics/childof/' + topic._id, {}, (err, children) => {
-            const newArray = [...this.state.topics.splice(0, index + 1), children];
+            const newArray = children && children.length != 0 ? 
+                [...this.state.topics.splice(0, index + 1), children] : 
+                [...this.state.topics.splice(0, index + 1)];
+
             this.setState({
                 phase : "tree",
                 topics : newArray,
                 stagedtopic : topic
             });
 
-            this.changed({
-                target : {
-                    name : this.props.name, 
-                    value : topic
-                }
-            });
+            this.changed(topic);
         });
     }
 
@@ -527,13 +545,17 @@ export class TopicPicker extends FormField {
         })
     }
 
+    addOne(topic) {
+        this.props.onAdd && this.props.onAdd(topic);
+    }
+
     getCurrentSelectedSlug() {
         if (this.state.stagedtopic && this.state.phase != "lock") {
             return (<div class="topic-picker-current">
                 <b>{this.state.stagedtopic.displayname}</b> <i>/{this.state.stagedtopic.completeSlug}</i>
             </div>);
         } else {
-            return null
+            return null;
         }
     }
 
@@ -564,7 +586,9 @@ export class TopicPicker extends FormField {
                 <div class="phase-tree">
                     {
                         this.state.topics.map((topicchildren, index) => (
-                            <TopicPicker.TopicSlide topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} index={index} />
+                            <TopicPicker.TopicSlide onAdd={this.addOne.bind(this)} session={this.props.session} 
+                                topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} 
+                                index={index} />
                         ))
                     }
                 </div>
@@ -590,7 +614,7 @@ export class TopicPicker extends FormField {
         return (
             <footer>
                 <span class="red clickable" onClick={this.reset.bind(this)}>Reset</span>
-                { this.state.stagedtopic ? (
+                { this.state.stagedtopic && this.props.session != "manager" ? (
                     <span class="clickable" onClick={this.lockin.bind(this)}><b>Lock in</b></span>
                 ) : null }
             </footer>
@@ -626,13 +650,8 @@ export class DatePicker extends FormField {
             defaultDate : new Date(this.value) || new Date(),
             onChange : dateArr => {
                 const [value] = dateArr;
-                const oldValue = this.value;
 
-                this.changed({
-                    target : {
-                        name : this.props.name, value, oldValue
-                    }
-                });        
+                this.changed( value ); 
             }
         });
     }
@@ -656,14 +675,16 @@ export class CheckboxField extends FormField {
         this.state = { checked: this.value };
     }
 
+    componentWillReceiveProps(props) {
+        if (typeof props.value != "undefined") {
+            this.setState({ checked : props.value || false });
+        }
+    }
+
     onChange() {
         this.value = !this.value;
         this.setState({ checked: this.value }, () => {
-            this.changed({
-                target : {
-                    name : this.props.name, value : this.state.checked
-                }
-            });
+            this.changed(this.state.checked);
         });
     }
 
@@ -692,7 +713,7 @@ class Tag extends Component {
                 {
                     (!this.props.readOnly) ? (
                         <i className="fal fa-times close-button"
-                            onClick={this.props.remove && this.props.remove.bind(this, this.props.text)}></i>
+                            onClick={this.props.remove && this.props.remove.bind(this, this.props.tagId)}></i>
                     ) : null
                 }
             </div>
@@ -713,7 +734,7 @@ export class MultitagBox extends FormField {
             tags.push(text);
             this.setState({ tags });
             
-            this.changed();
+            this.changed(tags);
         } else {
             log('MultitagBox', 'MultitagBox will not add a duplicate tag', 'warn');
         }
@@ -723,7 +744,7 @@ export class MultitagBox extends FormField {
         const tags = this.state.tags.filter(tag => tag != key);
         this.setState({ tags });
 
-        this.changed();
+        this.changed(tags);
     }
 
     popTag() {
@@ -731,11 +752,7 @@ export class MultitagBox extends FormField {
         tags.pop();
         this.setState({ tags });
 
-        this.changed();
-    }
-
-    changed() {
-        this.props.onChange && this.props.onChange(this.props.name, this.state.tags);
+        this.changed(tags);
     }
 
     onKeyDown(ev) {
@@ -825,17 +842,13 @@ export class MultiSelectBox extends FormField {
         const selectedValues = [...this.state.selectedValues];
         selectedValues.push(val);
         this.setState({ selectedValues });
-        this.changed();
+        this.changed(selectedValues);
     }
 
     unselectOption(val) {
-        const selectedValues = this.state.selectedValues;
-        this.setState({ selectedValues: selectedValues.filter(v => v != val) });
-        this.changed();
-    }
-
-    changed() {
-        this.props.onChange && this.props.onChange(this.props.name, this.state.selectedValues);
+        const selectedValues = this.state.selectedValues.filter(v => v != val);
+        this.setState({ selectedValues });
+        this.changed(selectedValues);
     }
 
     render() {
@@ -847,7 +860,7 @@ export class MultiSelectBox extends FormField {
                         (this.state.selectedValues.length > 0) ? (
                             this.state.selectedValues.map(value => {
                                 const option = this.state.options.find(o => o.value == value) || {};
-                                return (<Tag text={option.displayName} key={value} readonly={true} />)
+                                return (<Tag text={option.displayName} tagId={value} key={value} remove={this.unselectOption.bind(this)} readonly={true} />)
                             })
                         ) : (
                             <p style={{margin: 8, color: '#555'}}>No values selected</p>

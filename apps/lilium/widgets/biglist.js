@@ -23,8 +23,10 @@ const LOCALSTORAGE_PREFIX = "LF_";
  *      action : A function passed to every list item to link the BigList parent with the items through a callback,
  *      items : Array of initial items. Can be set later. If passed after mount, will replace the entire array with the new one.
  *      loadmoreButton : A component representing the load more button inside the list,
- *      keyid : List item key for Preact mapping. Defaults to : _id 
- *      liststyle : Style of the inner container wrapping the list items
+ *      keyid : List item key for Preact mapping. Defaults to : _id.
+ *      addComponent : First component to appear in the big list. Can be used as a "add" handle.
+ *      emptyComponent : Shown when no list items are available.
+ *      liststyle : Style of the inner container wrapping the list items.
  * }
  */
 export class BigList extends Component {
@@ -38,6 +40,7 @@ export class BigList extends Component {
         this.coldState = {
             endpoint : props.endpoint,
             component : props.listitem,
+            addComponent : props.addComponent || BigListNullComponent,
             emptyComponent : props.emptyComponent || BigListEmptyTemplate,
             index : 0,
             batchsize : props.batchsize || 30,
@@ -134,9 +137,9 @@ export class BigList extends Component {
                     {
                         this.state.items.length == 0 ? (
                             <this.coldState.emptyComponent />
-                        ) : this.state.items.map(x => (
+                        ) : [(<this.coldState.addComponent />), ...this.state.items.map(x => (
                             <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
-                        ))
+                        ))]
                     }
                 </div>
 
@@ -148,6 +151,10 @@ export class BigList extends Component {
             </div>
         );
     }
+}
+
+class BigListNullComponent {
+    render() { return null; }
 }
 
 class BigListEmptyTemplate {
