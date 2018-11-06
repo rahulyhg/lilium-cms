@@ -1,5 +1,63 @@
 import { Component, h } from "preact";
 
+class AddToBubble extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            input : false
+        };
+    }
+
+    addTo(text) {
+        this.props.onEvent('addto', { _id : this.props._id, isRoot : this.props.isRoot, text });
+    }
+
+    toggle() {
+        this.setState({
+            input : true
+        }, () => {
+            this.inputEl.focus();
+        });
+    }
+
+    maybeSubmit(text) {
+        if (text) {
+            this.addTo(text);
+        } 
+
+        this.setState({
+            input : false
+        })
+    }
+
+    onKeyDown(ev) {
+        if (ev.key == "Enter") {
+            this.maybeSubmit(ev.target.value);
+        }
+    }
+
+    onBlur(ev) {
+        this.setState({ input : false })
+    }
+
+    render() {
+        if (this.state.input) {
+            return (
+                <div class="tree-node-add-child">
+                    <input ref={x => (this.inputEl = x)} type="text" class="tree-node-seemless-input" placeholder="Item name, then Enter" onKeyDown={this.onKeyDown.bind(this)} onBlur={this.onBlur.bind(this)} />
+                </div>
+            )
+        }
+
+        return (
+            <div class="tree-node-add-child" onClick={ this.toggle.bind(this) }>
+                <i class="far fa-plus"></i> 
+                <span>Add to {this.props.displayname}</span>
+            </div>
+        )
+    }
+}
+
 class TreeNode extends Component {
     constructor(props) {
         super(props);
@@ -16,6 +74,7 @@ class TreeNode extends Component {
     }
 
     toggle() {
+        this.props.node.open = !this.props.node.open;
         this.setState({ open : !this.state.open });
     }
 
@@ -64,12 +123,9 @@ class TreeNodeCollection extends Component {
         return (
             <div class="tree-node-collection">
                 <div class="tree-node-children-list">
-                    { this.state.children.map(x => (<TreeNode onEvent={this.props.onEvent} displayname={x.displayname} children={x.children || []} _id={x._id} key={x._id} open={x.open} />)) }
+                    { this.state.children.map(x => (<TreeNode onEvent={this.props.onEvent} displayname={x.displayname} children={x.children || []} _id={x._id} key={x._id} open={x.open} node={x} />)) }
                 </div>
-                <div class="tree-node-add-child" onClick={this.props.onEvent.bind(this, 'addto', { _id : this.props._id, isRoot : this.props.isRoot })}>
-                    <i class="far fa-plus"></i> 
-                    <span>Add to {this.props.displayname}</span>
-                </div>
+                <AddToBubble onEvent={this.props.onEvent} _id={this.props._id} isRoot={this.props.isRoot} displayname={this.props.displayname} />
             </div>
         );
     }
@@ -125,23 +181,35 @@ export class TreeView extends Component {
         this.props.onEvent && this.props.onEvent(ev, params);
     }
 
+    onMasterEvent(ev, params) {
+        this.props.onEvent && this.props.onEvent('addroot', params);
+        const newNode = {
+            children : [],
+            _id : params.text,
+            displayname : params.text
+        };
+
+        const nodes = [this.state.nodes, newNode];
+        this.setState({ nodes });
+    }
+
     render() {
         return (
             <div class="tree-view">
-                { this.state.nodes.map(x => <TreeNode 
-                    onEvent={this.onEvent.bind(this)} 
-                    displayname={x.displayname}
-                    isRoot={true}
-                    open={x.open || false}
-                    children={x.children || []}
-                    key={x._id}
-                    _id={x._id}
-                />) }
-
-                <div class="tree-node-add-child" onClick={this.props.onEvent.bind(this, 'addroot', {})}>
-                    <i class="far fa-plus"></i> 
-                    <span>Add {this.props.topVerbatim || ""}</span>
+                <div>
+                    { this.state.nodes.map(x => <TreeNode 
+                        onEvent={this.onEvent.bind(this)} 
+                        displayname={x.displayname}
+                        isRoot={true}
+                        open={x.open || false}
+                        children={x.children || []}
+                        key={x._id}
+                        node={x}
+                        _id={x._id}
+                    />) }
                 </div>
+
+                <AddToBubble onEvent={this.onMasterEvent.bind(this)} isRoot={true} displayname={this.props.topVerbatim} />
             </div>
         )
     }

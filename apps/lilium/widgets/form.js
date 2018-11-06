@@ -3,7 +3,6 @@ import API from '../data/api';
 import flatpickr from 'flatpickr';
 import { Spinner } from '../layout/loading'
 import { ImagePicker } from '../layout/imagepicker';
-import slugify from "slugify";
 
 class FormField extends Component {
     constructor(props) {
