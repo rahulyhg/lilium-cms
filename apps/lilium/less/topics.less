@@ -1,4 +1,56 @@
-.manage-topics-page {
-    margin: 20px;
-}
+@topicManagerSidebarWidth : 300px;
 
+.manage-topics-page {
+    position: relative;
+    height: 100%;
+    
+    .manage-topics-categories {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: @topicManagerSidebarWidth;
+        background: #444;
+        color: white;
+
+        overflow: auto;
+        padding: 12px;
+
+        box-sizing: border-box;
+    }
+
+    .manage-topics-single-wrap {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        left: @topicManagerSidebarWidth;
+        overflow: auto;
+
+        color: #333;
+        box-sizing: border-box;
+    }
+
+    .single-topic-form {
+        padding: 20px;
+        box-shadow: 0px 1px 7px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #DDD;
+        font-size: 26px;
+
+        small {
+            font-weight: normal;
+            color: #777;
+            margin-left: 6px;
+            font-size: 18px;
+        }
+    }
+
+    .theme-override-form {
+        padding: 20px;
+    }
+}

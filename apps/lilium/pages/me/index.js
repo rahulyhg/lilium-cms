@@ -140,14 +140,14 @@ class ProfileHeader extends Component {
                 </div>
 
                 <div id="profile-info-wrapper" >
-                    <TextField name="displayname"  initialValue={this.state.user.displayname}
+                    <TextField name="displayname"  initialValue={this.state.user.displayname} value={this.state.user.jobtitle}
                         onChange={asyncFieldUpdate.bind(this)}  placeholder="Full name" />
 
-                    <TextField name="jobtitle" initialValue={this.state.user.jobtitle || ''} placeholder='Job Title'
+                    <TextField name="jobtitle" initialValue={this.state.user.jobtitle || ''} value={this.state.user.jobtitle} placeholder='Job Title'
                         onChange={asyncFieldUpdate.bind(this)}   />
 
                     <TextField name="description" className='change-placeholder' id="descriptichange-placeholderon" 
-                        placeholder='Write a small introduction paragraph' multiline={true} 
+                        placeholder='Write a small introduction paragraph' multiline={true} value={this.state.user.description}
                         onChange={asyncFieldUpdate.bind(this)} initialValue={this.state.user.description} />
                 </div>
             </div>

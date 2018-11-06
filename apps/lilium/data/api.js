@@ -17,24 +17,41 @@ class API {
 
         log('API', 'Requesting ' + method + ' to endpoint : ' + endpoint, 'detail');
         const now = Date.now();
-        fetch(`${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include", method, body : data && JSON.stringify(data), headers: data && { "Content-Type": "application/json" } }).then(r => {
-            if (Math.floor(r.status / 200) == 1) {
-                log('API', '['+ r.status +'] API call to ' + endpoint + ' replied in ' + (Date.now() - now) + "ms", 'success');
-                r[resptype]().then(resp => {
-                    log('API', resptype + ' parsed successfully', 'detail');
-                    sendback(undefined, resp, r);
-                }).catch(err => {
-                    log('API', resptype + ' failed to parse for endpoint ' + endpoint, 'warn');
-                    sendback(err, undefined, r);
-                });
+
+        // Create request object
+        const xhr = new XMLHttpRequest();
+
+        // Callback will be evaluated after request responds or fails
+        xhr.addEventListener("load", () => {
+            // If response code is in the 2xx range
+            if (Math.floor(xhr.status / 200) == 1) {
+                log('API', '['+ xhr.status +'] API call to ' + endpoint + ' replied in ' + (Date.now() - now) + "ms", 'success');
+                let json = xhr.responseText;
+
+                // Try to parse response as JSON
+                if (resptype == "json") {
+                    try {
+                        json = JSON.parse(xhr.responseText);
+                        log('API', resptype + ' parsed successfully', 'detail');
+                    } catch (err) {
+                        log('API', resptype + ' failed to parse for endpoint ' + endpoint, 'warn');
+                    }
+                }
+
+                sendback(undefined, json, xhr);
             } else {               
-                log('API', '['+r.status+'] API call to ' + endpoint + ' replied in ' + (Date.now() - now) + "ms", 'warn');
+                log('API', '['+xhr.status+'] API call to ' + endpoint + ' replied in ' + (Date.now() - now) + "ms", 'warn');
                 sendback(undefined, {
-                    code : r.status,
-                    response : r
-                }, r);
+                    code : xhr.status,
+                    response : xhr
+                }, xhr);
             }
         });
+
+        // Open HTTP socket, maybe set headers, and send
+        xhr.open(method, `${endpoint}?p=${JSON.stringify(params)}`);
+        data && xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(data && JSON.stringify(data));
     }
 
     static get(endpoint, params, sendback, usecache) {

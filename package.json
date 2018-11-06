@@ -120,7 +120,7 @@
     "readdirp": "latest",
     "redis-server": "latest",
     "simple-encryptor": "latest",
-    "slug": "latest",
+    "slug": "^0.9.2",
     "slugify": "latest",
     "socket.io": "^2.1.0",
     "socket.io-client": "^2.1.1",

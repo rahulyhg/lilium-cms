@@ -7,175 +7,93 @@ import { Spinner } from '../../layout/loading';
 import { ChartGraph } from '../../widgets/chart';
 import { getSession } from '../../data/cache';
 
-class RealtimeTicker extends Component {
+import { PublishingTab } from './publishing';
+import { PonglinkTab } from './ponglink';
+import { PerformanceTab } from './performance';
+
+const TAB_COMPONENTS = [
+    PublishingTab, PonglinkTab, PerformanceTab
+];
+
+class DashboardTabs extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            totalreaders : 0,
-            list : [],
-            ready : false
+            selectedTab : props.selectedTab
         }
     }
 
-    componentDidMount() {
-        this.rtid = bindRealtimeEvent("analytics_realtime", data => {
-            data && data.total && this.updateCounters(data);
-        });
-
-        API.get('/googleanalytics/realtime', {}, (err, data) => {
-            data && data.total && this.updateCounters(data);
-        });
+    clickedOn(tab) {
+        this.props.onClick(tab);
     }
 
-    updateCounters(data) {
-        this.setState({ totalreaders : data.total, list : data.pages, ready : true });
-    }
-
-    componentWillUnmount() {
-        unbindRealtimeEvent('analytics_realtime', this.rtid);
-    }
-
-    generateSourceIcons(item) {
-        const sources = [];
-        switch (item.source) {
-            case "google":   sources.push(<i class="rt-source-icon fab fa-google"></i>); break;
-            case "facebook": sources.push(<i class="rt-source-icon fab fa-facebook"></i>); break;
-            case "pinterest":sources.push(<i class="rt-source-icon fab fa-pinterest-p"></i>); break;
-            case "twitter":  sources.push(<i class="rt-source-icon fab fa-twitter"></i>); break;
-            case "flipboard":sources.push(<i class="rt-source-icon fab fa-flipboard"></i>); break;
-            case "(direct)":
-            case "direct":   sources.push(<i class="rt-source-icon far fa-globe-americas"></i>); break;
-
-            default: sources.push(<i class="rt-source rt-source-word">{item.source}</i>);
-        }
-
-        item.url.includes('/amp') && sources.push(<i class="rt-source-icon far fa-bolt"></i>);
-        item.query && item.query.includes("utm_source") && sources.push(<i class="rt-source-icon far fa-dollar-sign"></i>);
-
-        return sources;
+    componentWillReceiveProps(props) {
+        this.setState({ selectedTab : props.selectedTab });
     }
 
     render() {
         return (
-            <div style={styles.realtimeTicker} class="realtime-ticker">
-                <div style={styles.activeReadersCounter} class="active-readers-counter">
-                    {
-                        this.state.ready ? (
-                            <div>
-                                <b ref={ctn => (this.ctn = ctn)} style={styles.totalReadersBigNum}><AnimeNumber number={this.state.totalreaders} /></b>
-                                <span style={styles.totalReadersTitle}>active readers on {liliumcms.sitename}</span>
-                            </div>
-                        ) : null
-                    }
-                </div>
-                <div style={styles.realtimeListWrapper}>
-                    {
-                        this.state.list.map(item => (
-                            <div key={item.url} class="realtime-listitem">
-                                <b class="realtime-listitem-count"><AnimeNumber number={item.count} /></b>
-                                <a class="realtime-listitem-title" href={item.url.replace(' - ' + liliumcms.sitename, '')} target="_blank">
-                                    <span>{item.title}</span>
-                                    <div class="realtime-sources-list">                                    
-                                        {this.generateSourceIcons(item)}
-                                    </div>
-                                </a>
-                            </div>
-                        ))
-                    }
-                </div>
+            <div class="dashboard-tabs">
+                { this.props.tabs.map(tab => (
+                    <div class={"dashboard-tab " + (tab == this.state.selectedTab ? "selected" : "")} key={tab.tabprops.id} onClick={this.clickedOn.bind(this, tab)}>
+                        {tab.tabprops.text}
+                    </div>
+                ) ) }
             </div>
+        )
+    }
+};
+
+class DashboardView extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { tab : props.tab }
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState({ tab : props.tab });
+    }
+
+    render() {
+        return (
+            <div class="dashboard-view">
+                <this.state.tab />
+            </div>  
         );
     }
 }
 
-class Last30Days extends Component {
-    constructor(props) {
-        super(props);
-
-        this.data   = props.stats.daily.map(x => x.views);
-        this.labels = props.stats.daily.map((x, i) => "");
-
-        log('Dashboard', 'Displaying Last 30 Days component', 'detail');
-    }
-
-    render() {
-        return (
-            <div style={{ width : "50%", margin: 10, borderRadius : 10, overflow : 'hidden' }}>
-                <h2 style={styles.boxtitle}>Latest 30 days</h2>
-                <div style={styles.graphbg}>
-                    <ChartGraph type="line" data={this.data} labels={this.labels} />
-                </div>                
-            </div>                
-        )
-    }
-}
-
-class TopPost extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            toppost : props.toppost
-        };
-    }
-
-    render() {
-        return (
-            <div style={{ width : "50%", margin: 10, background : "white", boxShadow : "0px 2px 1px rgba(0,0,0,0.2)", borderRadius : 10, overflow : 'hidden' }}>
-                <h2 style={styles.boxtitle}>Yesterday top post</h2>
-                <div style={{ position: "relative" }}>
-                    <div style={{ fontSize : 18, padding: 10 }}>{this.state.toppost.article.title}</div>
-                    <img src={this.state.toppost.article.facebookmedia} style={{ display: "block", width : "100%", height : "auto"}} />
-                </div>
-            </div>
-        )
-    }
-}
-
-class HistoricalDashboard extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            loading : true
+export default class DashboardPage extends Component {
+    static registerDashboardTab(tabComponent) {
+        if (!tabComponent || !tabComponent.tabprops) {
+            throw new Error("Dashboard tab component must implement static get tabprops()");
         }
+
+        TAB_COMPONENTS.push(tabComponent);
+    }
+
+    constructor(props) {
+        super(props);
+        this.state = { 
+            tabs : TAB_COMPONENTS.filter(x => liliumcms.session.hasRight(x.tabprops.right)) 
+        };
+
+        this.state.selectedTab = this.state.tabs[0];
     }
 
     componentDidMount() {
-        API.get('/googleanalytics/dashboard', {}, (err, data) => {
-            this.setState({
-                loading: false,
-                ...data.performance
-            });
-        });
+        
     }
-    
-    render() {
-        if (this.state.loading) {
-            return (
-                <div>
-                    <Spinner />
-                </div>
-            )
-        }
 
-        return (
-            <div style={{ display : "flex", padding : "0px 10px" }}>
-                <Last30Days stats={this.state.last30days} />
-                <TopPost toppost={this.state.yesterday.toppage} />
-            </div>
-        )
-    }
-}
-
-export default class Dashboard extends Component {
-    constructor(props) {
-        super(props);
+    tabClicked(tab) {
+        this.setState({ selectedTab : tab })
     }
 
     render() {
         return (
-            <div id="dashboard">
-                <RealtimeTicker />
-                <HistoricalDashboard />
+            <div>
+                <DashboardTabs tabs={ this.state.tabs } selectedTab={ this.state.selectedTab } onClick={this.tabClicked.bind(this)} />
+                <DashboardView tab={ this.state.selectedTab } />
             </div>
         );
     }
