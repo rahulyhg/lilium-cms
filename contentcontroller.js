@@ -244,6 +244,8 @@ class ContentController {
             }
 
             contentlib.bunch(cli._c, params.filters, params.filters && params.filters.sort, params.limit, params.skip, sendback);
+        } else if (levels[0] == "pastpublished") {
+            contentlib.getPastPublished(cli._c, params, stats => sendback(stats));
         } else if (levels[0] == "write") {
             contentlib.getFull(cli._c, levels[1], post => sendback(post));
         } else if (levels[0] == "auto") {

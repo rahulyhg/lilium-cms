@@ -23,6 +23,12 @@ const PUBLICATION_REPORT_TODAY_PROJECTION = {
     date : 1, name : 1, facebookmedia : 1, topicslug : 1, author : 1
 };
 
+const PAST_PUBLISHED_PROJECTION = {
+    headline : { $arrayElemAt : ["$title", 0] }, 
+    "fulltopic.displayname" : 1, "fulltopic._id" : 1, "fulltopic.completeSlug" : 1,
+    author : 1, date : 1
+};
+
 const countOcc = (article, occ) => {
     var content = article.content || article || [""];
     var total = 0;
@@ -473,6 +479,24 @@ class ContentLib {
             } else {
                 callback({message : "Slug already used by another article", type : "exists"});
             }
+        });
+    }
+
+    getPastPublished(_c, params, done) {
+        const $gt = new Date(params.from || (Date.now() - (1000 * 60 * 60 * 24)));
+        const $lt = new Date(params.until || Date.now());
+
+        const pipeline = [
+            { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
+            { $lookup : { from : "topics", as : "fulltopic", localField : 'topic', foreignField : '_id' } },
+            { $project : PAST_PUBLISHED_PROJECTION },
+            { $group : { _id : { day: {$dayOfYear : "$date"}, year : { $year : "$date" } }, articles : { $push : "$$ROOT" } } },
+            { $sort : { _id : 1 } },
+            { $project : { date : "$_id", _id : 0, articles : 1 } }
+        ]
+
+        db.join(_c, 'content', pipeline, posts => {
+            done(posts);
         });
     }
 
