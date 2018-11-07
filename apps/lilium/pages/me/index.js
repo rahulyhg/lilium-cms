@@ -248,7 +248,7 @@ class PasswordResetForm extends Component {
                 <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
                         onChange={this.updatePasswordField.bind(this)} />
 
-                <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} />
+                <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} theme='purple' type='fill' />
             </div>
         );
     }
