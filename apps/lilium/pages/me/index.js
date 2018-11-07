@@ -46,7 +46,6 @@ export default class ProfilePage extends Component {
     componentDidMount() {
         API.get('/entities/me', {}, (err, data) => {
             if (!err && data) {
-                console.log(err, data);
                 /// Remap social network for convenience
                 let socialNetworks = data.user.socialnetworks;
                 data.user.socialnetworks = {};
