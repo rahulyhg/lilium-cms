@@ -67,13 +67,23 @@ class GoogleAnalyticsRequest {
         lastSun.setDate(lastSun.getDate() - lastSun.getDay());
 
         const beforeSun = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate() - 7);
+        const weekBefore = new Date(beforeSun.getFullYear(), beforeSun.getMonth(), beforeSun.getDate() - 7);
 
         gAnalytics.getData(_c, {
             "start-date" : require('dateformat')(beforeSun, 'yyyy-mm-dd'),
             "end-date" : require('dateformat')(lastSun, 'yyyy-mm-dd'),
             "metrics" : defaultMetrics,
             "dimensions" : defaultDimensions
-        }, send);
+        }, (err, lastweek) => {
+            gAnalytics.getData(_c, {
+                "start-date" : require('dateformat')(weekBefore, 'yyyy-mm-dd'),
+                "end-date" : require('dateformat')(beforeSun, 'yyyy-mm-dd'),
+                "metrics" : defaultMetrics,
+                "dimensions" : defaultDimensions
+            }, (err, weekbefore) => {
+                send(err, { lastweek, weekbefore })
+            });
+        });
     }
 
     static yesterdayAuthor(_c, gAnalytics, send) {
@@ -164,8 +174,9 @@ class GoogleAnalyticsRequest {
             GoogleAnalyticsRequest.last30Days(_c, gAnalytics, (err, data) => {
                 base.performance.last30days = StatsBeautifier.toPresentableArray(data.data || data);
 
-                GoogleAnalyticsRequest.lastWeek(_c, gAnalytics, (err, data) => {
-                    base.performance.lastweek = StatsBeautifier.toPresentable(data.data || data);
+                GoogleAnalyticsRequest.lastWeek(_c, gAnalytics, (err, { lastweek, weekbefore }) => {
+                    base.performance.lastweek = StatsBeautifier.toPresentable(lastweek.data || lastweek);
+                    base.performance.weekbefore = StatsBeautifier.toPresentable(weekbefore.data || weekbefore);
 
                     GoogleAnalyticsRequest.sameDay(_c, gAnalytics, (err, data) => {
                         base.performance.sameday = StatsBeautifier.toPresentable(data.data || data);
