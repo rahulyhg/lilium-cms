@@ -1,7 +1,7 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
 import { TextField, ButtonWorker } from '../../widgets/form';
-import { Picker } from '../../layout/imagepicker';
+import { Picker } from '../../layout/picker';
 import { castNotification } from '../../layout/notifications';
 import { Loading } from '../../layout/loading';
 
@@ -102,15 +102,15 @@ class ProfileHeader extends Component {
     }
 
     selectNewProfilePicture() {
-        Picker.cast({}, image => {
-            if (image) {
-                const avatarURL = image.sizes.square.url;
+        Picker.cast({ accept: ['uploads'] }, picked => {
+            if (picked) {
+                const avatarURL = picked.image.sizes.square.url;
                 API.post('/me/updateOneField', { field: "avatarURL", value: avatarURL }, (err, data) => {
                     if (!err) {
                         log('ProfilePage', 'Updated profile picture', 'success');
 
                         const user = this.state.user;
-                        user.avatarURL = image.sizes.square.url;
+                        user.avatarURL = picked.image.sizes.square.url;
                         this.setState({ user })
                     } else {
                         console.log(err);
