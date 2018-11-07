@@ -2,7 +2,8 @@ import { h, Component } from "preact";
 import API from '../../data/api';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 import { AnimeNumber, ordinal } from '../../widgets/animenumber';
-import { ChartGraph } from '../../widgets/chart';ChartGraph
+import { ChartGraph } from '../../widgets/chart';
+import dateformat from 'dateformat';
 
 class LiveListOfPosts extends Component {
     constructor(props) {
@@ -138,6 +139,7 @@ class BigSideTabRealtime extends Component {
         switch (this.state.tabIndex) {
             case 0 : return (<LiveListOfPosts posts={this.state.realtimePages || []} />);
             case 1 : return (<HistoricalChartWrapper yesterday={this.state.yesterday}  />);
+            case 2 : return (<LastWeekPublishedHistory />);
 
             default: return null;
         }
@@ -149,7 +151,7 @@ class BigSideTabRealtime extends Component {
                 <div class="dashboard-side-tabs">
                     <BigSideTab selected={this.state.tabIndex == 0} index={0} onClick={this.switchTab.bind(this)} text="Active readers" value={this.state.realtimeTotal ? this.state.realtimeTotal : 0} />
                     <BigSideTab selected={this.state.tabIndex == 1} index={1} onClick={this.switchTab.bind(this)} text="Yesterday" ordinal={true} value={this.state.yesterday ? this.state.yesterday.metrics.sessions : 0} diff={this.state.sameday && (this.state.yesterday.metrics.sessions - this.state.sameday.sessions)} />
-                    <BigSideTab selected={this.state.tabIndex == 2} index={2} onClick={this.switchTab.bind(this)} text="Last week" ordinal={true} value={this.state.lastweek ? this.state.lastweek.sessions : 0} />
+                    <BigSideTab selected={this.state.tabIndex == 2} index={2} onClick={this.switchTab.bind(this)} text="Last week" ordinal={true} value={this.state.lastweek ? this.state.lastweek.sessions : 0} diff={this.state.lastweek && (this.state.weekbefore.sessions - this.state.lastweek.sessions)} />
                     <BigSideTab selected={this.state.tabIndex == 3} index={3} onClick={this.switchTab.bind(this)} text="Last month" ordinal={true} value={this.state.lastmonth ? this.state.lastmonth.lastmonth.sessions : 0} diff={this.state.lastmonth && (this.state.lastmonth.lastmonth.sessions - this.state.lastmonth.monthbefore.sessions)} />
                 </div>
                 <div class="dashboard-selected-expand-tab">
@@ -157,6 +159,50 @@ class BigSideTabRealtime extends Component {
                 </div>
             </div>
         );
+    }
+}
+
+class LastWeekPublishedHistory extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data : undefined
+        };
+    }
+
+    componentDidMount() {
+        const lastSun = new Date();
+        lastSun.setHours(0);
+        lastSun.setMinutes(0);
+        lastSun.setSeconds(0);
+        lastSun.setDate(lastSun.getDate() - lastSun.getDay());
+        const beforeSun = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate() - 7);
+
+        API.get("/publishing/pastpublished", {
+            from : beforeSun.getTime(),
+            until : lastSun.getTime()
+        }, (err, json, r) => {
+            json && this.setState({
+                data : json,
+                from : beforeSun,
+                to : lastSun
+            });
+        });
+    }
+
+    render() {
+        if (!this.state.data) {
+            return null;
+        }
+
+        return (
+            <div>
+                <h2>{dateformat(this.state.from, 'mmmm dd')} - {dateformat(this.state.to, 'mmmm dd')}</h2>
+                <div>
+                    
+                </div>
+            </div>
+        )
     }
 }
 
@@ -207,6 +253,9 @@ export class PublishingTab extends Component {
         return (
             <div>
                 <BigSideTabRealtime />
+                <div>
+                    
+                </div>
             </div>
         )
     }
