@@ -1,13 +1,13 @@
 import { h, Component } from 'preact';
 import { TextField, ButtonWorker } from '../widgets/form';
 import API from '../data/api';
+import { Picker } from './picker';
 
 const styles = {
     bigtitle : {
         fontSize: 28,
         padding: "8px 0px 1px",
         display: "block",
-        margin: "10px 20px",
         borderBottom: "1px solid #CCC"
     },
     noimagetitle : {
@@ -46,8 +46,9 @@ class SelectedImage extends Component {
     componentWillReceiveProps(props) {
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
         this.imgtag && this.imgtag.getAttribute('src') != this.makeSrc(props.image) && this.imgtag.removeAttribute('src');
+        if (props.image) props.image.embedType = 'image';
         this.setState({
-            selected : props.image
+            selected: props.image
         })
     }
 
@@ -155,58 +156,36 @@ class ImageThumbnail extends Component {
     }
 }
 
-let _singleton;
 export class ImagePicker extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            visible : false,
-            params : {},
             images : [],
             selected : undefined
         };
-
-        _singleton && log('ImagePicker', 'Overriding _singleton reference value because the ImagePicker class was instanciated multiple times', 'watning');
-        _singleton = this;
-        this.keydown_bound = this.keydown.bind(this);
     }
 
-    static cast(params, done) {
-        log('ImagePicker', 'Casting image picker singleton', 'detail');
+    static tabTitle =  'Uploads';
+    static slug =  'uploads';
+
+    componentDidMount(params, done) {
+        log('ImagePicker', 'Displaying image picker singleton', 'detail');
         const initState = { params, visible : true, selected : undefined, callback : done };
         if (params && params.selected) {
             initState.loading = true;
-            _singleton.setState(initState);
+            this.setState(initState);
 
-            _singleton.fetchLatest(allImages => {
+            this.fetchLatest(allImages => {
                 API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
                     allImages.unshift(upload);
                     initState.images = allImages;
                     initState.selected = upload;
 
-                    _singleton.setState(initState);
+                    this.setState(initState);
                 });
             });
         } else {
-            _singleton.setState(initState);
-        }          
-        
-        window.addEventListener('keydown', _singleton.keydown_bound);
-        document.addEventListener('navigate', ImagePicker.dismiss);
-    }
-
-    static dismiss() {
-        log('ImagePicker', 'Dismissing image picker singleton', 'detail');
-        _singleton.setState({ visible : false });
-        window.removeEventListener('keydown', _singleton.keydown_bound);
-        document.removeEventListener('navigate', ImagePicker.dismiss);
-    }
-
-    static accept() {        
-        if (_singleton.state.selected) {
-            log('ImagePicker', 'Selected image and calling back', 'detail');
-            _singleton.state.callback && _singleton.state.callback(_singleton.state.selected);        
-            ImagePicker.dismiss();
+            this.setState(initState);
         }
     }
 
@@ -230,11 +209,6 @@ export class ImagePicker extends Component {
         }
     }
 
-    keydown(ev) {
-        ev.keyCode == "27" && ImagePicker.dismiss();
-        ev.keyCode == "13" && ImagePicker.accept();
-    }
-
     fetchLatest(sendback) {
         API.get('/uploads', { limit : 100, skip : 0 }, (err, uploads) => {
             sendback ? sendback(uploads) : this.setState({ images : uploads });
@@ -247,22 +221,18 @@ export class ImagePicker extends Component {
 
     imageClicked(selected, comp) {
         log('ImagePicker', 'Image click event was caught by image picker', 'detail');
-        this.setState({
-            selected
-        });
+        this.setState({ selected });
     }
 
     render() {
-        if (!this.state.visible) return null;
-
         return (
-            <div id="image-picker-overlay">
-                <div id="image-picker">
-                    <div>
-                        <b style={ styles.bigtitle }>Lilium gallery</b>
-                        <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
-                    </div>
-
+            <div id="image-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
+                <div>
+                    <b style={ styles.bigtitle }>Lilium gallery</b>
+                    <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
+                </div>
+                
+                <div id="image-picker-flex-wrapper">
                     <div id="image-gallery">
                         <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
                             <i class="far fa-plus-circle"></i>
@@ -274,7 +244,7 @@ export class ImagePicker extends Component {
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={ImagePicker.accept.bind(ImagePicker)} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { embedType: 'image', image: this.state.selected })} />       
                     </div>
                 </div>
             </div>

@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../data/api';
-import { ImagePicker } from '../layout/imagepicker';
-import { PlacePicker } from '../layout/placepicker';
+import { Picker } from '../layout/picker';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -24,7 +23,31 @@ export class TextEditor extends Component {
         this.rID = "txt-" + Math.random().toString().substring(2) + Date.now().toString()
     }
 
-    createEditor() {                
+    /**
+     * Parses an embed object and returns markup to be inserted in the article body.
+     * This markup is to be used bi the theme as an article is displayed by a client
+     * @param {object} embed The embed object to serialize as markup
+     */
+    static embedToMarkup(embed) {
+        const node = document.createElement('div');
+        node.className = 'lml-placeholder';
+        node.innerText = '';
+
+        switch (embed.embedType) {
+            case 'image':
+                node.classList.add('image');
+                node.dataset.placeId = embed.image._id;
+                break;
+            case 'place':
+                node.classList.add('place');
+                node.dataset.placeId = embed.place._id;
+                break;
+        }
+
+        return node;
+    }
+
+    createEditor() {
         log('TextEditor', 'Creating a new TinyMCE instance with ID ' + this.rID, 'detail');
 
         this.textarea ? tinymce.init({
@@ -33,28 +56,40 @@ export class TextEditor extends Component {
             convert_urls : false,
             menubar: false,
             setup: editor => {
-                editor.addButton('insert-image', {
-                    icon: 'image',
-                    tooltip: 'Insert Image',
+                editor.addButton('insert-element', {
+                    icon: 'fa fa-plus-circle',
+                    tooltip: 'Insert an image, a places or an embeds',
                     onclick: () => {
-                        ImagePicker.cast({}, image => {
-                            alert('Yay, you chose an image');
+                        const session =  new Picker.Session({});
+                        Picker.cast(session, embed => {
+                            log('TextEditor', "Picker callback received embed: ", embed, 'info');
+                            editor.insertContent(TextEditor.embedToMarkup(embed).outerHTML);
                         });
                     }
                 });
 
-                editor.addButton('insert-place', {
-                    icon: 'fa fa-map-marker-alt',
-                    tooltip: 'Insert Place',
+                editor.addButton('insert-carousel', {
+                    icon: 'fa fa-images',
+                    tooltip: 'Insert Carousel',
                     onclick: () => {
-                        PlacePicker.cast({}, place => {
-                            console.log(place);
-                            
-                            const dummyPlaceEl = document.createElement('div');
-                            dummyPlaceEl.className = 'lml-placeholder-google-maps';
-                            dummyPlaceEl.dataset.placeId = place._id;
+                        const session =  new Picker.Session({ type: 'carousel' });
+                        Picker.cast(session, carousel => {
+                            log('TextEditor', "Picker callback received carousel: ", carousel, 'info');
+                            const carouselPlaceholder = document.createElement('div');
+                            carouselPlaceholder.className = 'lml-carousel-placeholder';
 
-                            editor.insertContent(dummyPlaceEl.outerHTML);
+                            const carouselElement = document.createElement('div');
+                            carouselElement.className = 'carousel-element';
+
+                            if (carousel.elements) {
+                                carousel.elements.forEach(element => {
+                                    const embed = TextEditor.embedToMarkup(element);
+                                    carouselElement.appendChild(embed);
+                                });
+                            }
+                            
+                            carouselPlaceholder.appendChild(carouselElement)
+                            editor.insertContent(carouselPlaceholder.outerHTML);
                         });
                     }
                 });
@@ -64,7 +99,7 @@ export class TextEditor extends Component {
                 'searchreplace visualblocks code fullscreen hr',
                 'media paste wordcount'
             ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-image insert-place insertEmbed link | bullist numlist | fullscreen | code',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-element insert-carousel insertEmbed link | bullist numlist | fullscreen | code',
             content_css: [
                 '/compiled/theme/tinymce.css'
             ],

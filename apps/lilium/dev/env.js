@@ -1,6 +1,6 @@
 import API from '../data/api';
 import { h, Component } from 'preact';
-import { ImagePicker } from '../layout/imagepicker';
+import { Picker } from '../layout/imagepicker';
 import { castNotification } from '../layout/notifications';
 import { addCommand } from '../layout/lys.js';
 import { dumpCache } from '../data/cache';
@@ -116,7 +116,7 @@ export class DevTools extends Component {
 
     pickimage(done) {
         log('Dev', 'Casting image picker from dev tool', 'lilium');
-        ImagePicker.cast({
+        Picker.cast({
 
         }, result => {
             
