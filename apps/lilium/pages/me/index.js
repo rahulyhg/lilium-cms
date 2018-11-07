@@ -32,7 +32,6 @@ class UserBadge extends Component {
 }
 
 export default class ProfilePage extends Component {
-
     constructor(props) {
         super(props);
 
@@ -44,9 +43,10 @@ export default class ProfilePage extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         API.get('/entities/me', {}, (err, data) => {
             if (!err && data) {
+                console.log(err, data);
                 /// Remap social network for convenience
                 let socialNetworks = data.user.socialnetworks;
                 data.user.socialnetworks = {};
@@ -54,7 +54,6 @@ export default class ProfilePage extends Component {
                     data.user.socialnetworks[socialNetworks[i].network] = socialNetworks[i].username || "";
                 }
 
-                console.log(data.user);
                 this.setState({ user: data.user, err: undefined, loading: false });
             } else {
                 this.setState({ err, loading: false });
@@ -63,6 +62,7 @@ export default class ProfilePage extends Component {
     }
 
     render() {
+        console.log('render', this.state);
         if (this.state.loading) {
             return (<Loading />);
         }
@@ -257,10 +257,10 @@ class PasswordResetForm extends Component {
 class Manage2FAForm extends Component {
     constructor(props) {
         super(props);
-        this.staate = {
+        this.state = {
             confirmed2fa: this.props.user.confirmed2fa,
             qrCode: '',
-            token2fa: ''
+            token2fa: '',
         };
     }
 
@@ -279,9 +279,7 @@ class Manage2FAForm extends Component {
     activate2fa(done) {
         API.post('/2fa/activate', {token2fa: this.state.token2fa}, (err, data) => {
             if (!err) {
-                const user = this.state.user;
-                user.confirmed2fa = true;
-                this.setState({ user });
+                this.setState({ confirmed2fa: true });
                 log('ProfilePage', 'Activated 2FA', 'success');
                 done && done();
             } else {
@@ -294,9 +292,7 @@ class Manage2FAForm extends Component {
     deactivate2fa(done) {
         API.post('/2fa/deactivate', {token2fa: this.state.token2fa}, (err, data) => {
             if (!err) {
-                const user = this.state.user;
-                user.confirmed2fa = false;
-                this.setState({ user });
+                this.setState({ confirmed2fa: false });                
                 log('ProfilePage', 'Deactivated 2FA', 'success');
                 done && done();
             } else {
@@ -326,12 +322,12 @@ class Manage2FAForm extends Component {
                     <li>You should now see an account named 'Lilium CMS &gt;company name&lt; (&gt;username&lt;). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
                 </ol>
 
-                <img src={this.state.qrCode} id="qr-code-2fa" alt="" />
+                <img src={this.state.qrCode} id="qr-code-2fa" alt="Something went wrong when displaying the 2FA QRCode" />
 
                 <TextField name='token2fa' placeholder='2FA Token' onChange={(name, value) => this.setState({ token2fa: value })} />
 
                 {
-                    this.state.user.confirmed2fa ? (
+                    this.state.confirmed2fa ? (
                         <ButtonWorker text='Deactivate 2FA for my account'
                                 theme='red' type='outline' work={this.deactivate2fa.bind(this)} />
                     ) : (
