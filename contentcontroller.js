@@ -244,6 +244,8 @@ class ContentController {
             }
 
             contentlib.bunch(cli._c, params.filters, params.filters && params.filters.sort, params.limit, params.skip, sendback);
+        } else if (levels[0] == "pastpublished") {
+            contentlib.getPastPublished(cli._c, params, stats => sendback(stats));
         } else if (levels[0] == "write") {
             contentlib.getFull(cli._c, levels[1], post => sendback(post));
         } else if (levels[0] == "auto") {
@@ -252,6 +254,8 @@ class ContentController {
             contentlib.getHistoryList(cli._c, levels[1], list => sendback(list));
         } else if (levels[0] == "report") {
             contentlib.generatePublicationReport(cli._c, db.mongoID(levels[1]), report => sendback(report));
+        } else if (levels[0] == "bulkstats") {
+            contentlib.generateBulkStats(cli._c, levels[1], params, stats => sendback(stats));
         } else {
             sendback([]);
         }

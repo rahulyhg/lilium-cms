@@ -23,6 +23,12 @@ const PUBLICATION_REPORT_TODAY_PROJECTION = {
     date : 1, name : 1, facebookmedia : 1, topicslug : 1, author : 1
 };
 
+const PAST_PUBLISHED_PROJECTION = {
+    headline : { $arrayElemAt : ["$title", 0] }, 
+    "fulltopic.displayname" : 1, "fulltopic._id" : 1, "fulltopic.completeSlug" : 1,
+    author : 1, date : 1
+};
+
 const countOcc = (article, occ) => {
     var content = article.content || article || [""];
     var total = 0;
@@ -476,6 +482,24 @@ class ContentLib {
         });
     }
 
+    getPastPublished(_c, params, done) {
+        const $gt = new Date(params.from || (Date.now() - (1000 * 60 * 60 * 24)));
+        const $lt = new Date(params.until || Date.now());
+
+        const pipeline = [
+            { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
+            { $lookup : { from : "topics", as : "fulltopic", localField : 'topic', foreignField : '_id' } },
+            { $project : PAST_PUBLISHED_PROJECTION },
+            { $group : { _id : { day: {$dayOfYear : "$date"}, year : { $year : "$date" } }, articles : { $push : "$$ROOT" } } },
+            { $sort : { _id : 1 } },
+            { $project : { date : "$_id", _id : 0, articles : 1 } }
+        ]
+
+        db.join(_c, 'content', pipeline, posts => {
+            done(posts);
+        });
+    }
+
     fetchDeepFieldsFromDiff(_c, post, deepdiff, done) {        
         const fields = deepdiff.diffs.map( x => x.field );
 
@@ -756,6 +780,32 @@ class ContentLib {
                 }, true);
             });
         });
+    }
+
+    // /publishing/bulkstats/$type
+    generateBulkStats(_c, type, params, sendback) {
+        const $gt = new Date(params.from || (Date.now() - (1000 * 60 * 60 * 24)));
+        const $lt = new Date(params.until || Date.now());
+
+        if (type == "populartopics") {
+            const pipeline = [
+                { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
+                { $group : { _id : "$topic", published : { $sum : 1 } } },
+                { $lookup : { from : "topics", as : "fulltopic", localField : '_id', foreignField : '_id' } },
+                { $sort : { published : -1 } },
+                { $project : { 
+                    _id : 0, 
+                    topicname : { $arrayElemAt : ["$fulltopic.displayname", 0]}, 
+                    topicslug : { $arrayElemAt : ["$fulltopic.completeSlug", 0]}, 
+                    published : 1 
+                } },
+                { $limit : 10 }
+            ];
+
+            db.join(_c, 'content', pipeline, arr => sendback(arr));
+        } else {
+            sendback(["Unknown type " + type]);
+        }
     }
 
     destroy(_c, postid, caller, callback) {

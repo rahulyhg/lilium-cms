@@ -37,7 +37,7 @@ export class ChartGraph extends Component {
 
     componentDidMount() {
         this.ctx = this.canvas.getContext('2d');
-        const opt = {
+        const opt = this.props.chart || {
             type : this.props.type || "line",
             data : {
                 labels : this.state.labels,
@@ -62,6 +62,7 @@ export class ChartGraph extends Component {
     }
 
     componentWillUnmount() {
+        this.chart && this.chart.destroy();
         window.removeEventListener('resize', this.resize_bound);
     }
 
@@ -70,10 +71,14 @@ export class ChartGraph extends Component {
     }
 
     render() {
-        return (
-            <div>
-                <canvas ref={x => (this.canvas = x)}></canvas>
-            </div>
-        )
+        if (this.props.nowrap) {
+            return (<canvas id={this.props.id || Math.random()} ref={x => (this.canvas = x)}></canvas>);
+        } else {
+            return (
+                <div>
+                    <canvas id={this.props.id || Math.random()} ref={x => (this.canvas = x)}></canvas>
+                </div>
+            )
+        }
     }
 } 

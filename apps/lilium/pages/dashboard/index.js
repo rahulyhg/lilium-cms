@@ -5,7 +5,7 @@ import API from '../../data/api';
 import { AnimeNumber } from '../../widgets/animenumber';
 import { Spinner } from '../../layout/loading';
 import { ChartGraph } from '../../widgets/chart';
-import { getSession } from '../../data/cache';
+import { getSession, getLocal, storeLocal } from '../../data/cache';
 
 import { PublishingTab } from './publishing';
 import { PonglinkTab } from './ponglink';
@@ -78,7 +78,7 @@ export default class DashboardPage extends Component {
             tabs : TAB_COMPONENTS.filter(x => liliumcms.session.hasRight(x.tabprops.right)) 
         };
 
-        this.state.selectedTab = this.state.tabs[0];
+        this.state.selectedTab = this.state.tabs[getLocal("TAB_dashboard") || 0];
     }
 
     componentDidMount() {
@@ -86,7 +86,8 @@ export default class DashboardPage extends Component {
     }
 
     tabClicked(tab) {
-        this.setState({ selectedTab : tab })
+        storeLocal("TAB_dashboard", TAB_COMPONENTS.indexOf(tab));
+        this.setState({ selectedTab : tab });
     }
 
     render() {
