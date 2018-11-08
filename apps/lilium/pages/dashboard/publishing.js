@@ -221,15 +221,37 @@ class YesterdayTopPost extends Component {
     render() {
         if (!this.state.toppost) {
             return ( 
-                <div class="dashbaord-yesterday-top-post" style={{ position: 'relative' }}>
-                    <Spinner />
+                <div class="dashboard-yesterday-top-post">
+                    <Spinner centered={true} />
                 </div> 
             );
         }
 
+        // Medal credit to be added : <div>Icons made by <a href="https://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
         return (
-            <div>
-                {this.state.toppost.article.title}
+            <div class="dashboard-yesterday-top-post">
+                <div>
+                    <img class="top-post-badge-icon" src="/static/svg/medal.svg" />
+
+                    <div class="dashboard-top-post-badge">
+                        <span>
+                            <b>Yesterday's top post</b>
+                            <div>{ordinal(this.state.toppost.hits)} hits</div>
+                        </span>
+                    </div>
+
+                    <div class="dashboard-top-post-featured-image">
+                        <img src={this.state.toppost.article.facebookmedia} />
+                    </div>
+                    <h2>{this.state.toppost.article.title}</h2>
+                    <h3>{this.state.toppost.article.subtitle}</h3>
+                    <div class="top-post-author">
+                        <img src={this.state.toppost.article.author.avatarURL} class="top-post-author-image" />
+                        <b class="top-post-author-name">{this.state.toppost.article.author.displayname}</b>
+                        <span> - </span>
+                        <span>Published on {dateformat(new Date(this.state.toppost.article.date), 'dddd, mmmm dd')}</span>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -251,7 +273,7 @@ class PopularTopics extends Component {
         if (!this.state.stats) {
             return ( 
                 <div class="popular-topics-pie" style={{ position: 'relative' }}>
-                    <Spinner />
+                    <Spinner centered={true} />
                 </div> 
             );
         }
