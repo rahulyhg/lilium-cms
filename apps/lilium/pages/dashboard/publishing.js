@@ -65,7 +65,7 @@ class HistoricalChartWrapper extends Component {
 
         return (
             <div style={{ position : 'relative', height: '100%' }}>
-                <ChartGraph nowrap={true} chart={{
+                <ChartGraph id="historical-chart-wrapper" nowrap={true} chart={{
                     type : 'bar',
                     data : {
                         labels : pages.map(x => x.page),
@@ -101,7 +101,7 @@ class LastWeekPublishedHistory extends Component {
     render() {
         return (
             <div style={{ position: 'relative', height : '100%' }}>
-                <ChartGraph nowrap={true} chart={{
+                <ChartGraph id="last-week-published-history" nowrap={true} chart={{
                     type : 'line',
                     data : {
                         labels : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -127,7 +127,7 @@ class LastMonthPublishedHistory extends Component {
     render() {
         return (
             <div style={{ position: 'relative', height : '100%' }}>
-                <ChartGraph nowrap={true} chart={{
+                <ChartGraph id="last-month-published-history" nowrap={true} chart={{
                     type : 'line',
                     data : {
                         labels : (this.props.lastmonth.daily.length > this.props.monthbefore.daily.length ? this.props.lastmonth.daily : this.props.monthbefore.daily).map((x, i) => "Day #" + (i + 1)),
@@ -341,7 +341,6 @@ export class PublishingTab extends Component {
     }
 
     render() {
-        console.log(this.state);
         return (
             <div>
                 <BigSideTabRealtime performance={this.state.performance} />
