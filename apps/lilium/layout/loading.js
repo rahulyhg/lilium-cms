@@ -32,6 +32,14 @@ const styles = {
 
 export class Spinner extends Component {
     render() {
+        if (this.props.centered) {
+            return (
+                <center>
+                    <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
+                </center>
+            );
+        } 
+
         return (
             <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
         );
