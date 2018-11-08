@@ -1,0 +1,64 @@
+#pending-payment-overviews {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+
+    & > #pending-payments-list {
+        flex: 0 0 20%;
+        overflow-y: scroll;
+
+        .pending-payment-card {
+            margin: 1px;
+            padding: 6px;
+            font-weight: bold;
+            position: relative;
+            box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+            
+            &.selected {
+                background: @liliumPurple;
+                color: white;
+
+                .payment-selection-boc {
+                    border-color: white;
+                    background-color: white;
+                }
+            }
+
+            .contractor-info {
+                display: flex;
+                align-content: center;
+
+                img.contractor-avatar {
+                    width: 40px;
+                    height: 40px;
+                    border: 1px solid white;
+                    border-radius: 50%;
+                }
+
+                .contractor-name {
+                    margin: 6px 6px 6px 12px;
+                }
+            }
+
+            p.payment-text-detail {
+                margin: 6px 0px;
+            }
+
+            .payment-selection-boc {
+                cursor: pointer;
+                position: absolute;
+                right: 6px;
+                top: 6px;
+                background: transparent;
+                border: 2px solid rgba(0, 0, 0, 0.4);
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    #payment-details-column {
+        flex-grow: 1;
+    }
+}

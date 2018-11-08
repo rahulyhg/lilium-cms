@@ -170,13 +170,11 @@ class ContractorHandler {
     }
 
     livevarManage(cli, levels, params, sendback) {
-        console.log('management livevar');
         if (!cli.hasRight("manage-contractors")) {
             return cli.refuse();
         }
 
         const levelone = levels[0];
-        console.log('levelone: ' + levelone);
         
         if (levelone == "pending") {
             const $match = {
@@ -194,8 +192,6 @@ class ContractorHandler {
                     const resp = {};
                     let totalowed = 0;
 
-                    console.log(authors);
-
                     authors.forEach( x => { 
                         x.articles = []; 
                         x.owed = 0; 
@@ -212,7 +208,7 @@ class ContractorHandler {
                     });
 
                     sendback({ contractors : Object.values(resp), totalowed });
-                }, { displayname : 1, avatarURL : 1, stripeuserid : 1 });
+                }, { displayname : 1, avatarURL : 1, stripeuserid : 1, currency: 1 });
             });
         } else if (levelone == "invoices") {
             sendback({ invoices : [] })
@@ -226,7 +222,6 @@ class ContractorHandler {
         if (levelone == 'management') {
             const managementLevels = levels;
             managementLevels.splice(0, 1);
-            console.log(managementLevels);
             this.livevarManage(cli, managementLevels, params, sendback);
         } else if (levelone == "posts") {
             const $match = {

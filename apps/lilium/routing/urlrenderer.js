@@ -30,6 +30,7 @@ import PluginsMan       from '../pages/plugins/index';
 import CakepopsMan      from '../pages/cakepops/index';
 import FlaggingMan      from '../pages/flagging/index';
 import PwManager        from '../pages/pwmanager/index';
+import PaymentDashboard from '../pages/paymentsdashboard/index';
 import e404             from '../pages/errors/404';
 import e403             from '../pages/errors/403';
 
@@ -88,6 +89,7 @@ EndpointStore.registerEndpoint('plugins', PluginsMan);
 EndpointStore.registerEndpoint('cakepop', CakepopsMan); 
 EndpointStore.registerEndpoint('flagging', FlaggingMan);
 EndpointStore.registerEndpoint('pwmanager', PwManager);
+EndpointStore.registerEndpoint('paymentdashboard', PaymentDashboard);
 EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('_e403', e403);
 
