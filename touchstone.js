@@ -8,11 +8,9 @@ const clearCache = () => {
 }
 
 const thirdparties = [
-    "jsdom", "request", "googleapis", "busboy", "canvas", "deep-diff", "diff", "facebook-ads-sdk",
-    "franc-min", "js-beautify", "mongodb", "mkdirp", "readdirp", "redis-server",
-    "retext", "slugify", "socket.io", "socket.io-redis", "stackpath", "websocket", "ws",
-    'retext', 'retext-diacritics', 'retext-repeated-words', 'retext-spell', 'retext-keywords',
-    'retext-syntax-mentions', 'retext-overuse', 'retext-syntax-urls'
+    "jsdom", "request", "googleapis", "busboy", "canvas", "deep-diff", "diff", 
+    "mongodb", "mkdirp", "readdirp", "redis-server",
+    "slugify", "socket.io", "socket.io-redis", "ws"
 ];
 
 const libLoadTimes = [];
