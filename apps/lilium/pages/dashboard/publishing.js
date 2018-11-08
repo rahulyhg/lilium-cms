@@ -3,6 +3,7 @@ import API from '../../data/api';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 import { AnimeNumber, ordinal } from '../../widgets/animenumber';
 import { ChartGraph } from '../../widgets/chart';
+import { Spinner } from '../../layout/loading';
 import dateformat from 'dateformat';
 
 class LiveListOfPosts extends Component {
@@ -72,16 +73,8 @@ class HistoricalChartWrapper extends Component {
                             data : pages.map(x => x.views),
                             label : "Hits by URL",
                             backgroundColor : [
-                                "#b48efb",
-                                "#ba8bf8",
-                                "#c189f5",
-                                "#c887f3",
-                                "#ce84f0",
-                                "#d582ee",
-                                "#dc80eb",
-                                "#e27de8",
-                                "#e97be6",
-                                "#f777e1"
+                                "#b48efb", "#ba8bf8", "#c189f5", "#c887f3", "#ce84f0",
+                                "#d582ee", "#dc80eb", "#e27de8", "#e97be6", "#f777e1"
                             ].reverse()
                         }]
                     },
@@ -104,6 +97,59 @@ class HistoricalChartWrapper extends Component {
     }
 };
 
+class LastWeekPublishedHistory extends Component {
+    render() {
+        return (
+            <div style={{ position: 'relative', height : '100%' }}>
+                <ChartGraph nowrap={true} chart={{
+                    type : 'line',
+                    data : {
+                        labels : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                        datasets : [
+                            { data : this.props.lastweek.daily.map(x => x.sessions), label : "Last week", backgroundColor : "#b48efb77" },
+                            { data : this.props.weekbefore.daily.map(x => x.sessions), label : "Week before", backgroundColor : "#f777e177" }
+                        ]
+                    },
+                    options : {
+                         responsive : true,
+                         maintainAspectRatio : false,
+                         scales : {
+                             yAxes : [{ color : '#333' }]
+                         }
+                    }
+                }} />
+            </div>
+        )
+    }
+}
+
+class LastMonthPublishedHistory extends Component {
+    render() {
+        return (
+            <div style={{ position: 'relative', height : '100%' }}>
+                <ChartGraph nowrap={true} chart={{
+                    type : 'line',
+                    data : {
+                        labels : (this.props.lastmonth.daily.length > this.props.monthbefore.daily.length ? this.props.lastmonth.daily : this.props.monthbefore.daily).map((x, i) => "Day #" + (i + 1)),
+                        datasets : [
+                            { data : this.props.lastmonth.daily.map(x => x.sessions),   label : "Last month", backgroundColor : "#b48efb77" },
+                            { data : this.props.monthbefore.daily.map(x => x.sessions), label : "Month before", backgroundColor : "#f777e177" }
+                        ]
+                    },
+                    options : {
+                         responsive : true,
+                         maintainAspectRatio : false,
+                         scales : {
+                             xAxes : [{ display: false }],
+                             yAxes : [{ color : '#333' }]
+                         }
+                    }
+                }} />
+            </div>
+        )
+    }
+}
+
 class BigSideTabRealtime extends Component {
     constructor(props) {
         super(props);
@@ -121,10 +167,10 @@ class BigSideTabRealtime extends Component {
         API.get('/googleanalytics/realtime', {}, (err, data) => {
             data && data.total && this.setState({ realtimeTotal : data.total, realtimePages : data.pages });
         });
+    }
 
-        API.get('/googleanalytics/dashboard', {}, (err, data) => {
-            data && this.setState({ ...data.performance });
-        });
+    componentWillReceiveProps(props) {
+        this.setState(props.performance);
     }
 
     componentWillUnmount() {
@@ -139,7 +185,8 @@ class BigSideTabRealtime extends Component {
         switch (this.state.tabIndex) {
             case 0 : return (<LiveListOfPosts posts={this.state.realtimePages || []} />);
             case 1 : return (<HistoricalChartWrapper yesterday={this.state.yesterday}  />);
-            case 2 : return (<LastWeekPublishedHistory />);
+            case 2 : return (<LastWeekPublishedHistory lastweek={this.state.lastweek} weekbefore={this.state.weekbefore} />);
+            case 3 : return (<LastMonthPublishedHistory lastmonth={this.state.lastmonth.lastmonth} monthbefore={this.state.lastmonth.monthbefore} />);
 
             default: return null;
         }
@@ -162,47 +209,85 @@ class BigSideTabRealtime extends Component {
     }
 }
 
-class LastWeekPublishedHistory extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            data : undefined
-        };
+class YesterdayTopPost extends Component {
+    componentDidMount() {
+        
     }
 
-    componentDidMount() {
-        const lastSun = new Date();
-        lastSun.setHours(0);
-        lastSun.setMinutes(0);
-        lastSun.setSeconds(0);
-        lastSun.setDate(lastSun.getDate() - lastSun.getDay());
-        const beforeSun = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate() - 7);
-
-        API.get("/publishing/pastpublished", {
-            from : beforeSun.getTime(),
-            until : lastSun.getTime()
-        }, (err, json, r) => {
-            json && this.setState({
-                data : json,
-                from : beforeSun,
-                to : lastSun
-            });
-        });
+    componentWillReceiveProps(props) {
+        this.setState({ toppost : props.toppost });
     }
 
     render() {
-        if (!this.state.data) {
-            return null;
+        if (!this.state.toppost) {
+            return ( 
+                <div class="dashbaord-yesterday-top-post" style={{ position: 'relative' }}>
+                    <Spinner />
+                </div> 
+            );
         }
 
         return (
             <div>
-                <h2>{dateformat(this.state.from, 'mmmm dd')} - {dateformat(this.state.to, 'mmmm dd')}</h2>
-                <div>
-                    
+                {this.state.toppost.article.title}
+            </div>
+        );
+    }
+}
+
+class PopularTopics extends Component {
+    componentDidMount() {
+        const now = new Date();
+        const fewdaysago = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+        API.get('/publishing/bulkstats/populartopics', {
+            from : fewdaysago.getTime(),
+            until : now.getTime()
+        }, (err, json, r) => {
+            this.setState({ stats : json })
+        });
+    }
+
+    render() {
+        if (!this.state.stats) {
+            return ( 
+                <div class="popular-topics-pie" style={{ position: 'relative' }}>
+                    <Spinner />
+                </div> 
+            );
+        }
+    
+        return (
+            <div>
+                <h2>Popular topics</h2>
+                <h3>From articles published in the last 30 days</h3>
+                <div class="popular-topics-pie" style={{ position: 'relative', height: 420 }}>
+                    <ChartGraph nowrap={true} chart={{
+                        type : 'pie',
+                        data : {
+                            labels : this.state.stats.map(t => t.topicname + " @" + t.topicslug + ""),
+                            datasets : [
+                                { 
+                                    data : this.state.stats.map(x => x.published),   
+                                    label : "Article published", 
+                                    backgroundColor : [
+                                        "#b48efb", "#ba8bf8", "#c189f5", "#c887f3", "#ce84f0",
+                                        "#d582ee", "#dc80eb", "#e27de8", "#e97be6", "#f777e1"
+                                    ].reverse()
+                                },
+                            ]
+                        },
+                        options : {
+                            responsive : true,
+                            maintainAspectRatio : false,
+                            legend : {
+                               //  display: false
+                            }
+                        }
+                    }} />
+
                 </div>
             </div>
-        )
+        );
     }
 }
 
@@ -249,12 +334,20 @@ export class PublishingTab extends Component {
         }
     }
 
+    componentDidMount() {
+        API.get('/googleanalytics/dashboard', {}, (err, data) => {
+            data && this.setState({ performance : data.performance });
+        });
+    }
+
     render() {
+        console.log(this.state);
         return (
             <div>
-                <BigSideTabRealtime />
-                <div>
-                    
+                <BigSideTabRealtime performance={this.state.performance} />
+                <div class="dashboard-dual-flex">
+                    <PopularTopics />
+                    <YesterdayTopPost toppost={this.state.performance && this.state.performance.yesterday.toppage} />
                 </div>
             </div>
         )

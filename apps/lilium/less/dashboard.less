@@ -150,7 +150,6 @@
                 background : linear-gradient(55deg, rgba(180, 142, 251, 1) 0%, rgba(247, 119, 225, 1) 100%);
                 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#B48EFB',endColorstr='#F777E1' , GradientType=1);
             }
-
         }
     }
 }
@@ -158,5 +157,35 @@
 .dashboard-live-list-posts {
     height: 100%;
     overflow-y: scroll;
-
 }
+
+.dashboard-dual-flex {
+    display: flex;
+    margin-top: 20px;
+
+    &>* {
+        h2 {
+            text-align: center;
+            margin: 10px 0px 0px;
+        }
+
+        h3 {
+            text-align: center;
+            margin: 8px 0px 12px;
+            font-weight: normal;
+            font-size: 20px;
+        }
+
+        width: 50%;
+
+        background: #F6F6F6;
+        border-radius: 10px;
+        box-shadow: 0px 2px 1px rgba(0,0,0,0.2);
+        padding: 10px;
+
+        &:first-child { margin-right: 10px; }
+        &:last-child  { margin-left: 10px;  }
+    }
+}
+
+
