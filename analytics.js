@@ -1,7 +1,6 @@
 // Libraries inclusion
 const log = require('./log.js');
 const db = require('./includes/db.js');
-const livevars = require('./livevars.js');
 const sharedcache = require('./sharedcache.js');
 const hooks = require('./hooks.js');
 const notifications = require('./notifications.js');
@@ -20,7 +19,7 @@ const defaultMetrics = ["ga:users", "ga:pageviews", "ga:organicSearches", "ga:se
 const defaultDimensions = "ga:pagePath";
 
 // Monthly
-const monthlyMetrics = ["ga:sessions", "ga:users", "ga:pageviews", "ga:percentNewSessions", "ga:sessionsPerUser", "ga:avgSessionDuration"].join(',');
+const monthlyMetrics = ["ga:users", "ga:pageviews", "ga:organicSearches", "ga:sessions"/*, "ga:percentNewSessions", "ga:sessionsPerUser", "ga:avgSessionDuration"*/].join(',');
 const monthlyDimensions = "ga:pagePath";
 
 // Cached Analytics Responses
@@ -73,13 +72,13 @@ class GoogleAnalyticsRequest {
             "start-date" : require('dateformat')(beforeSun, 'yyyy-mm-dd'),
             "end-date" : require('dateformat')(lastSun, 'yyyy-mm-dd'),
             "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions
+            "dimensions" : "ga:nthDay"
         }, (err, lastweek) => {
             gAnalytics.getData(_c, {
                 "start-date" : require('dateformat')(weekBefore, 'yyyy-mm-dd'),
                 "end-date" : require('dateformat')(beforeSun, 'yyyy-mm-dd'),
                 "metrics" : defaultMetrics,
-                "dimensions" : defaultDimensions
+                "dimensions" : "ga:nthDay"
             }, (err, weekbefore) => {
                 send(err, { lastweek, weekbefore })
             });
@@ -134,7 +133,7 @@ class GoogleAnalyticsRequest {
             "start-date" : require('dateformat')(lastMonthStart, 'yyyy-mm-dd'),
             "end-date" : require('dateformat')(lastMonthEnd, 'yyyy-mm-dd'),
             "metrics" : monthlyMetrics,
-            "dimensions" : monthlyDimensions
+            "dimensions" : "ga:nthDay"
         }, (err, lastmonthdata) => {
             const monthBefore = new Date(now.getFullYear(), now.getMonth() - 2, 1);
             const monthBeforeEnd = new Date(now.getFullYear(), now.getMonth() - 1, 0);
@@ -143,7 +142,7 @@ class GoogleAnalyticsRequest {
                 "start-date" : require('dateformat')(monthBefore, 'yyyy-mm-dd'),
                 "end-date" : require('dateformat')(monthBeforeEnd, 'yyyy-mm-dd'),
                 "metrics" : monthlyMetrics,
-                "dimensions" : monthlyDimensions
+                "dimensions" : "ga:nthDay"
             }, (err, monthbeforedata) => {
                 send({ lastmonth : lastmonthdata, monthbefore : monthbeforedata });
             });
@@ -167,16 +166,16 @@ class GoogleAnalyticsRequest {
         GoogleAnalyticsRequest.lastMonth(_c, gAnalytics, (data) => {
             data = data.data || data;
             base.performance.lastmonth = {
-                lastmonth : StatsBeautifier.toPresentable(data.lastmonth),
-                monthbefore : StatsBeautifier.toPresentable(data.monthbefore)
+                lastmonth : StatsBeautifier.toPresentableArray(data.lastmonth),
+                monthbefore : StatsBeautifier.toPresentableArray(data.monthbefore)
             }; 
 
             GoogleAnalyticsRequest.last30Days(_c, gAnalytics, (err, data) => {
                 base.performance.last30days = StatsBeautifier.toPresentableArray(data.data || data);
 
                 GoogleAnalyticsRequest.lastWeek(_c, gAnalytics, (err, { lastweek, weekbefore }) => {
-                    base.performance.lastweek = StatsBeautifier.toPresentable(lastweek.data || lastweek);
-                    base.performance.weekbefore = StatsBeautifier.toPresentable(weekbefore.data || weekbefore);
+                    base.performance.lastweek = StatsBeautifier.toPresentableArray(lastweek.data || lastweek);
+                    base.performance.weekbefore = StatsBeautifier.toPresentableArray(weekbefore.data || weekbefore);
 
                     GoogleAnalyticsRequest.sameDay(_c, gAnalytics, (err, data) => {
                         base.performance.sameday = StatsBeautifier.toPresentable(data.data || data);
