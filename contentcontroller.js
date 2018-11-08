@@ -254,6 +254,8 @@ class ContentController {
             contentlib.getHistoryList(cli._c, levels[1], list => sendback(list));
         } else if (levels[0] == "report") {
             contentlib.generatePublicationReport(cli._c, db.mongoID(levels[1]), report => sendback(report));
+        } else if (levels[0] == "bulkstats") {
+            contentlib.generateBulkStats(cli._c, levels[1], params, stats => sendback(stats));
         } else {
             sendback([]);
         }

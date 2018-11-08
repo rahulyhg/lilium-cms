@@ -782,6 +782,32 @@ class ContentLib {
         });
     }
 
+    // /publishing/bulkstats/$type
+    generateBulkStats(_c, type, params, sendback) {
+        const $gt = new Date(params.from || (Date.now() - (1000 * 60 * 60 * 24)));
+        const $lt = new Date(params.until || Date.now());
+
+        if (type == "populartopics") {
+            const pipeline = [
+                { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
+                { $group : { _id : "$topic", published : { $sum : 1 } } },
+                { $lookup : { from : "topics", as : "fulltopic", localField : '_id', foreignField : '_id' } },
+                { $sort : { published : -1 } },
+                { $project : { 
+                    _id : 0, 
+                    topicname : { $arrayElemAt : ["$fulltopic.displayname", 0]}, 
+                    topicslug : { $arrayElemAt : ["$fulltopic.completeSlug", 0]}, 
+                    published : 1 
+                } },
+                { $limit : 10 }
+            ];
+
+            db.join(_c, 'content', pipeline, arr => sendback(arr));
+        } else {
+            sendback(["Unknown type " + type]);
+        }
+    }
+
     destroy(_c, postid, caller, callback) {
         db.update(_c, 'content', { _id : postid }, { status : "destroyed" }, () => {
             this.getFull(_c, postid, fullpost => {
