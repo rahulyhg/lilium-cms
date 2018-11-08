@@ -12,8 +12,7 @@ class Vocab {
     }
 
     /**
-     * Converts the multilingual data sotred in the 'masterVocab' file into language specific files
-     * that can then be fetched by a client accordfring to it's prefered language
+     * Initializes language JSON files that will be requested by clients
      * @param {callback} done 
      */
     preloadDicos(done) {
@@ -101,6 +100,7 @@ class Vocab {
 
         log('Vocab', 'Compiled language resource file for language ' + lang, 'info');
         compiled.__ = this.languagesData[lang].__;
+
         return compiled;
     }
 
@@ -151,7 +151,11 @@ class Vocab {
     }
 
     removeField(pageName, slug, done) {
-        this.supportedLanguages.forEach(lang => {   
+        console.log(pageName, slug);
+        
+        this.supportedLanguages.forEach(lang => {
+            console.log(lang);
+            
             delete this.languagesData[lang][pageName][slug];
         });
 
