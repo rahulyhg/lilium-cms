@@ -270,13 +270,88 @@
 
 .dashboard-ponglinks-campaigns {
     display: flex;
+    padding-bottom: 10px;
 
     .dashboard-ponglink-campaign {
         background: #F6F6F6;
         margin-right: 10px;
-        padding: 10px;
+        padding: 20px;
         border-radius: 10px;
         box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
         cursor: pointer;
+        height: 260px;
+        position: relative;
+
+        .dashboard-ponglink-card-date {
+            font-weight: bold;
+            color: #999;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }       
+
+        .dashboard-ponglink-card-clicks {
+            font-weight: bold;
+            font-size: 16px;
+            color: #46354c;
+        }
+
+        .dashboard-ponglink-card-bot {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+        }
+
+        .dashboard-ponglink-card-author {
+            margin-top: 10px;
+
+            img {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                object-fit: cover;
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            span {
+                display: inline-block;
+                vertical-align: middle;
+                margin-left: 10px;
+                font-size: 14px;
+            }
+        }
+
+        .dashboard-ponglink-card-id {
+            font-size: 22px;
+        }
     }
+}
+
+.dashboard-ponglink-details {
+    padding-top: 20px;
+}
+
+.versions-chart-wrapper {
+    height: 300px;
+    position: relative;
+}
+
+.dashboard-daily-chart-wrapper {
+    height: 400px;
+    position: relative;
+}
+
+.dashboard-ponglink-graph-wrap {
+    background: #F6F6F6;
+    padding: 20px;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+    border-radius: 10px;
+
+    h2 {
+        text-align: center;
+    }
+
+    margin-bottom: 20px;
 }
