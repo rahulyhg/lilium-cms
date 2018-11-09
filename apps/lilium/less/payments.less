@@ -3,6 +3,30 @@
     flex-direction: row;
     height: 100%;
 
+    img.contractor-avatar {
+        height: 100%;
+        width: auto;
+        border: 1px solid white;
+        border-radius: 50%;
+    }
+
+    .contractor-info {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        
+        &.big {
+            height: 100px;
+        }
+        &.small {
+            height: 40px;
+        }
+
+        .contractor-name {
+            margin: 6px 6px 6px 12px;
+        }
+    }
+
     & > #pending-payments-list {
         flex: 0 0 20%;
         overflow-y: scroll;
@@ -16,27 +40,12 @@
             
             &.selected {
                 background: @liliumPurple;
+                background: -webkit-linear-gradient(35deg, #b48efb 0%, #f777e1 100%);
                 color: white;
 
                 .payment-selection-boc {
                     border-color: white;
                     background-color: white;
-                }
-            }
-
-            .contractor-info {
-                display: flex;
-                align-content: center;
-
-                img.contractor-avatar {
-                    width: 40px;
-                    height: 40px;
-                    border: 1px solid white;
-                    border-radius: 50%;
-                }
-
-                .contractor-name {
-                    margin: 6px 6px 6px 12px;
                 }
             }
 
@@ -59,6 +68,29 @@
     }
 
     #payment-details-column {
+        padding: 0px 20px;
         flex-grow: 1;
+        
+        #payment-details-header {
+            display: flex;
+
+            img {
+                height: 100px;
+                width: auto;
+            }
+
+            #detailled-payment-info {
+                flex-grow: 1;
+                margin-left: 12px;
+
+                & > * {
+                    margin: 6px 0px;
+                }
+            }
+
+            #pay-individual {
+                flex: 0 0 150px;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 import { h, Component } from 'preact'
 import { TabView, Tab } from '../../widgets/tabview';
+import { ButtonWorker } from '../../widgets/form';
 import API from '../../data/api';
 
 export default class PaymentDashboard extends Component {
@@ -50,7 +51,7 @@ export default class PaymentDashboard extends Component {
                         <div id="pending-payments-list">
                             {
                                 state.pendingPayments.map(contractor => (
-                                    <PendingPaymentCard {...contractor} key={contractor._id} selected={!!state.selectedPayments.find(p => p._id == contractor._id)}
+                                    <PendingPaymentCard contractor={contractor} key={contractor._id} selected={!!state.selectedPayments.find(p => p._id == contractor._id)}
                                                            onClick={this.selectOne.bind(this)} toggleSelected={this.toggleSelected.bind(this)} />
                                 ))
                             }
@@ -61,7 +62,7 @@ export default class PaymentDashboard extends Component {
                                     <PaymentsBreakdown payments={state.selectedPayments} />
                                 ) : (
                                     state.selectedPayments.length != 0 ? (
-                                        <PaymentDetails {...state.selectedPayments[0]} />
+                                        <PaymentDetails contractorPayment={state.selectedPayments[0]} />
                                     ) : (
                                         <h4>No selected payment</h4>
                                     )
@@ -78,6 +79,19 @@ export default class PaymentDashboard extends Component {
     }
 }
 
+const ContractorInfo = props => (
+    <div className={`contractor-info ${props.big ? 'big' : 'small'}`}>
+        <img src={props.contractor.avatarURL} alt="" className='contractor-avatar' />
+        {
+            props.big ? (
+                <h2 className='contractor-name'>{props.contractor.displayname}</h2>
+            ) : (
+                <h4 className='contractor-name'>{props.contractor.displayname}</h4>
+            )
+        }
+    </div>
+)
+
 class PendingPaymentCard extends Component {
     constructor(props) {
         super(props);
@@ -90,26 +104,27 @@ class PendingPaymentCard extends Component {
     
     render(props) {
         return (
-            <div className={`pending-payment-card ${props.selected ? 'selected': ''}`} onClick={() => { props.onClick(props._id) }}>
-                <div className="contractor-info">
-                    <img src={props.avatarURL} alt="" className='contractor-avatar' />
-                    <h4 className='contractor-name'>{props.displayname}</h4>
-                </div>
+            <div className={`pending-payment-card ${props.selected ? 'selected': ''}`} onClick={() => { props.onClick(props.contractor._id) }}>
+                <ContractorInfo contractor={props.contractor} />
                 <div className="payment-info">
-                    <p className='payment-text-detail'>{`Owed ${props.owed} ${props.currency} for ${props.articles.length} articles`}</p>
+                    <p className='payment-text-detail'>{`Owed ${props.contractor.owed} ${props.contractor.currency} for ${props.contractor.articles.length} articles`}</p>
                 </div>
-                <div role='checkbox' className="payment-selection-boc" onClick={e => { e.stopPropagation(); props.toggleSelected(props._id); }}></div>
+                <div role='checkbox' className="payment-selection-boc" onClick={e => { e.stopPropagation(); props.toggleSelected(props.contractor._id); }}></div>
             </div>
         );
     }
 }
 
-class PaymentDetails extends Component {
+export class PaymentDetails extends Component {
     constructor(props) {
         super(props);
+        const contractorPayment = props.contractorPayment;
+        contractorPayment.articles.sort((a, b) => a < b);
         this.state = {
-            payment: props.payment || {}
+            contractorPayment
         }
+
+        console.log(this.state);
     }
     
     componentDidMount() {
@@ -118,13 +133,29 @@ class PaymentDetails extends Component {
     
     componentWillReceiveProps(props) {
         if (props.payment) {
-            this.setState({ payment: props.payment });
+            this.setState({ payment: props.contractorPayment });
         }
     }
 
-    render() {
+    formatDate(date) {
+        return date.substring(0, 10);
+    }
+
+    render(props, state) {
         return (
-            <div>Payment Details</div>
+            <div id="payment-details">
+                <div id="payment-details-header">
+                    <img src={props.contractorPayment.avatarURL} alt="" className='contractor-avatar' />
+                    <div id="detailled-payment-info">
+                        <h2 className='contractor-name'>{props.contractorPayment.displayname}</h2>
+                        <p className='payment-text-detail'>{`Owed ${props.contractorPayment.owed} ${props.contractorPayment.currency} for ${props.contractorPayment.articles.length} articles`}</p>
+                        <p id="payment-period">{`From ${this.formatDate(state.contractorPayment.articles[0].date)} to ${this.formatDate(state.contractorPayment.articles[state.contractorPayment.articles.length - 1].date)}`}</p>
+                    </div>
+                    <div id="pay-individual">
+                        <ButtonWorker text={`Pay ${props.contractorPayment.owed} ${props.contractorPayment.currency}`} theme='purple' type='fill' />
+                    </div>
+                </div>
+            </div>
         );
     }
 }
