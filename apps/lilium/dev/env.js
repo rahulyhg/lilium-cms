@@ -89,9 +89,9 @@ export class DevTools extends Component {
             command : "css,buildcss,less",
             displayname : "Build Less",
             execute : this.bundleCSS.bind(this)
-        })
+        });
 
-        window.addEventListener('keydown', ev => ev.key == "b" && ev.ctrlKey && this.bundleJS()); 
+        window.addEventListener('keydown', ev => ev.key == "b" && ev.ctrlKey && this.bundleJS());
     }
 
     onerror(error) {
