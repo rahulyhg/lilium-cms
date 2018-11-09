@@ -141,7 +141,7 @@ class PongLinks {
             db.join(cli._c, 'ponglinks', [
                 { $match : { status : 'active', clicks : { $gt : 5 } } },
                 { $sort : { _id : -1 } },
-                { $limit : 10 },
+                { $limit : 25 },
                 { $sort : { clicks : -1 } },
                 { $project : {
                     identifier : 1, _id : 1, createdAt : 1, 
