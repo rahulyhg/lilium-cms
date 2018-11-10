@@ -1,7 +1,7 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
 import { TextField, ButtonWorker } from '../../widgets/form';
-import { Picker } from '../../layout/imagepicker';
+import { Picker } from '../../layout/picker';
 import { castNotification } from '../../layout/notifications';
 import { Loading } from '../../layout/loading';
 
@@ -32,7 +32,6 @@ class UserBadge extends Component {
 }
 
 export default class ProfilePage extends Component {
-
     constructor(props) {
         super(props);
 
@@ -44,7 +43,7 @@ export default class ProfilePage extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         API.get('/entities/me', {}, (err, data) => {
             if (!err && data) {
                 /// Remap social network for convenience
@@ -54,15 +53,15 @@ export default class ProfilePage extends Component {
                     data.user.socialnetworks[socialNetworks[i].network] = socialNetworks[i].username || "";
                 }
 
-                console.log(data.user);
-                this.setState({ user: data.user, err: undefined, loading : false });
+                this.setState({ user: data.user, err: undefined, loading: false });
             } else {
-                this.setState({ err, loading : false });
+                this.setState({ err, loading: false });
             }
         });
     }
 
     render() {
+        console.log('render', this.state);
         if (this.state.loading) {
             return (<Loading />);
         }
@@ -102,15 +101,15 @@ class ProfileHeader extends Component {
     }
 
     selectNewProfilePicture() {
-        Picker.cast({}, image => {
-            if (image) {
-                const avatarURL = image.sizes.square.url;
+        Picker.cast({ accept: ['uploads'] }, picked => {
+            if (picked) {
+                const avatarURL = picked.image.sizes.square.url;
                 API.post('/me/updateOneField', { field: "avatarURL", value: avatarURL }, (err, data) => {
                     if (!err) {
                         log('ProfilePage', 'Updated profile picture', 'success');
 
                         const user = this.state.user;
-                        user.avatarURL = image.sizes.square.url;
+                        user.avatarURL = picked.image.sizes.square.url;
                         this.setState({ user })
                     } else {
                         console.log(err);
@@ -248,7 +247,7 @@ class PasswordResetForm extends Component {
                 <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
                         onChange={this.updatePasswordField.bind(this)} />
 
-                <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} />
+                <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} theme='purple' type='fill' />
             </div>
         );
     }
@@ -257,10 +256,10 @@ class PasswordResetForm extends Component {
 class Manage2FAForm extends Component {
     constructor(props) {
         super(props);
-        this.staate = {
+        this.state = {
             confirmed2fa: this.props.user.confirmed2fa,
             qrCode: '',
-            token2fa: ''
+            token2fa: '',
         };
     }
 
@@ -292,7 +291,7 @@ class Manage2FAForm extends Component {
     deactivate2fa(done) {
         API.post('/2fa/deactivate', {token2fa: this.state.token2fa}, (err, data) => {
             if (!err) {
-                this.setState({ confirmed2fa: false });
+                this.setState({ confirmed2fa: false });                
                 log('ProfilePage', 'Deactivated 2FA', 'success');
                 done && done();
             } else {
@@ -322,13 +321,19 @@ class Manage2FAForm extends Component {
                     <li>You should now see an account named 'Lilium CMS &gt;company name&lt; (&gt;username&lt;). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
                 </ol>
 
-                <img src={this.state.qrCode} id="qr-code-2fa" alt="" />
+                <img src={this.state.qrCode} id="qr-code-2fa" alt="Something went wrong when displaying the 2FA QRCode" />
 
                 <TextField name='token2fa' placeholder='2FA Token' onChange={(name, value) => this.setState({ token2fa: value })} />
 
-                <ButtonWorker text={`${(this.state.confirmed2fa) ? 'Deactivate' : 'Activate'} 2FA for my account`}
-                        theme={(this.state.confirmed2fa) ? 'red' : ''}
-                        work={(this.state.confirmed2fa) ? this.deactivate2fa.bind(this) : this.activate2fa.bind(this)} />
+                {
+                    this.state.confirmed2fa ? (
+                        <ButtonWorker text='Deactivate 2FA for my account'
+                                theme='red' type='outline' work={this.deactivate2fa.bind(this)} />
+                    ) : (
+                        <ButtonWorker text='Activate 2FA for my account'
+                                theme='purple' type='fill' work={ this.activate2fa.bind(this)} />
+                    )
+                }
             </div>
         );
     }

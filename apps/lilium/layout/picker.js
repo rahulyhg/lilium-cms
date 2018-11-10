@@ -59,6 +59,7 @@ export class Picker extends Component {
         if (session) {
             log('Picker', 'Casting picker singleton', 'detail');
             const tabs = session.accept.map(x => PickerMap[x]);
+            if (!session.options) session.options = {};
             _singleton.setState({ session: session, visible: true, tabs, callback: done });
             window.addEventListener('keydown', _singleton.keydown_bound);
         } else {
