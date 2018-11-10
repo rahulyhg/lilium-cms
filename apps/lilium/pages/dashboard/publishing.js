@@ -227,7 +227,7 @@ class YesterdayTopPost extends Component {
             );
         }
 
-        if (!this.state.toppost.facebookmedia) {
+        if (!this.state.toppost || !this.state.toppost.article || !this.state.toppost.article.facebookmedia) {
             return null;
         }
 
@@ -290,7 +290,7 @@ class PopularTopics extends Component {
                     <ChartGraph nowrap={true} chart={{
                         type : 'pie',
                         data : {
-                            labels : this.state.stats.map(t => t.topicname + " @" + t.topicslug + ""),
+                            labels : this.state.stats.map(t => t.topicname),
                             datasets : [
                                 { 
                                     data : this.state.stats.map(x => x.published),   
@@ -305,8 +305,10 @@ class PopularTopics extends Component {
                         options : {
                             responsive : true,
                             maintainAspectRatio : false,
-                            legend : {
-                               //  display: false
+                            tooltips: {
+                                callbacks: {
+                                    title : (tooltipItem, data) => this.state.stats[tooltipItem[0].index].topicname + " @" + this.state.stats[tooltipItem[0].index].topicslug
+                                }
                             }
                         }
                     }} />
