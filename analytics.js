@@ -87,11 +87,26 @@ class GoogleAnalyticsRequest {
 
     static yesterdayAuthor(_c, gAnalytics, send) {
         gAnalytics.getData(_c, {
-            "metrics" : "ga:pageviews", 
-            "dimensions" : "ga:dimentions" + (_c.analytics && _c.analytics.userDimension ? _c.analytics.userDimension : "2"), 
-            "sort" : "-ga:pageviews", 
-            "max-results" : 20
-        }, send, true);
+            "metrics" : "ga:sessions", 
+            "start-date" : "7daysAgo", 
+            "end-date" : "today", 
+            "dimensions" : "ga:dimension" + (_c.analytics && _c.analytics.userDimension ? _c.analytics.userDimension : "2"), 
+            "sort" : "-ga:sessions", 
+            "max-results" : 10
+        }, send);
+    }
+
+    static authorDashboard(_c, gAnalytics, userid, send) {
+        db.findUnique(require('./config').default(), 'entities', { _id : userid }, (err, user) => {
+            gAnalytics.getData(_c, {
+                "metrics" : defaultMetrics, 
+                "start-date" : "30daysAgo", 
+                "end-date" : "yesterday", 
+                "sort" : "ga:nthDay",
+                "dimensions" : "ga:nthDay",
+                "filter" : "ga:dimension" + (_c.analytics && _c.analytics.userDimension ? _c.analytics.userDimension : "2") + "==" + user.displayname
+            }, send);
+        });
     }
 
     static realtime(_c, gAnalytics, send) {
@@ -690,20 +705,22 @@ class GoogleAnalytics {
                 }
             });
         } else if (topLevel == "author") {
-            const cachekey = 'analytics_dashboard_author_' + cli._c.id;
+            const cachekey = 'analytics_dashboard_author_' + cli.userinfo.userid;
 
             sharedcache.get(cachekey, (data) => {
                 if (data && new Date().getTime() - data.cachedAt < (1000 * 60 * 60 * 6)) {
                     send(data);
                 } else {
-                    GoogleAnalyticsRequest.yesterdayAuthor(cli._c, this, (err, data) => {
+                    GoogleAnalyticsRequest.authorDashboard(cli._c, this, db.mongoID(cli.userinfo.userid), (err, data) => {
                         if (data) {
+                            data = StatsBeautifier.toPresentableArray(data.data || data);
                             send(data);
 
                             data.cachedAt = Date.now();
                             sharedcache.set({[cachekey] : data});
                         } else {
-                            send({ error : err && err.toString(), valid : false, err_json : JSON.stringify(err || {})});
+                            console.log(err.toString());
+                            send({ error : err && err.toString(), valid : false});
                         }
                     });
                 }
