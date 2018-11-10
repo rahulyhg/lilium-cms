@@ -78,6 +78,8 @@
     }
 }
 
+
+
 .dashboard-publishing-board {
     display: flex;
     border-radius: 10px;
@@ -281,6 +283,32 @@
         cursor: pointer;
         height: 260px;
         position: relative;
+
+        &:hover {
+            background:#FCFCFC;
+        }
+
+        &.active {
+            background: -moz-linear-gradient(-3.38% 87.38% 35deg, #b48efb 0%, #f777e1 100%);
+            background: -webkit-linear-gradient(35deg, #b48efb 0%, #f777e1 100%);
+            background: -webkit-gradient(linear, -3.38% 87.38%, 103.38% 12.62%, color-stop(0, #b48efb), color-stop(1, #f777e1));
+            background: -o-linear-gradient(35deg, #b48efb 0%, #f777e1 100%);
+            background: -ms-linear-gradient(35deg, #b48efb 0%, #f777e1 100%);
+            -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#B48EFB', endColorstr='#F777E1' ,GradientType=0)";
+            background: linear-gradient(55deg, #b48efb 0%, #f777e1 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#B48EFB', endColorstr='#F777E1', GradientType=1);
+
+            color: white;
+
+            .dashboard-ponglink-card-date,
+            .dashboard-ponglink-card-clicks {
+                color: white;
+            }
+
+            .dashboard-ponglink-card-author {
+                font-weight: bold;
+            }
+        }
 
         .dashboard-ponglink-card-date {
             font-weight: bold;

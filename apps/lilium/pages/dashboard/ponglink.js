@@ -11,8 +11,8 @@ class PonglinkCampaignDetails extends Component {
     }
 
     componentWillReceiveProps(props) {
-        this.setState({ loading : true });
         if (props.campaignid && props.campaignid != this.state.campaignid) {
+            this.setState({ loading : true });
             API.get("/ponglinks/insights/" + props.campaignid, {}, (err, json, r) => {
                 this.setState({ loading : false, insights : json, campaignid : props.campaignid });
             })
@@ -88,9 +88,18 @@ class PonglinkCampaignDetails extends Component {
 }
 
 class CampaignCard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { active : props.active }
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState({ active : props.active });
+    }
+
     render() {
         return (
-            <div style={{ width : this.props.width }} class="dashboard-ponglink-campaign" onClick={this.props.onClick.bind(this, this.props.campaign)}>
+            <div style={{ width : this.props.width }} class={"dashboard-ponglink-campaign " + (this.state.active ? "active" : "")} onClick={this.props.onClick.bind(this, this.props.campaign)}>
                 <div class="dashboard-ponglink-card-date">{dateformat(new Date(this.props.campaign.createdAt), 'dd, mmmm yyyy')}</div>
                 <div class="dashboard-ponglink-card-id">{this.props.campaign.identifier}</div>
 
@@ -144,7 +153,7 @@ export class PonglinkTab extends Component {
                     <div class="dashboard-ponglinks-campaigns" style={{ width : CARD_WIDTH * this.state.campaigns.length }}>
                         {
                             this.state.campaigns ? this.state.campaigns.map(campaign => (
-                                <CampaignCard width={CARD_WIDTH} author={cachedusers.find(x => x._id == campaign.creatorid)} campaign={campaign} onClick={this.selectOne.bind(this)} />
+                                <CampaignCard width={CARD_WIDTH} active={campaign == this.state.selected} author={cachedusers.find(x => x._id == campaign.creatorid)} campaign={campaign} onClick={this.selectOne.bind(this)} />
                             )) : <Spinner centered={true} />
                         }
                     </div>
