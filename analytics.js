@@ -98,14 +98,18 @@ class GoogleAnalyticsRequest {
 
     static authorDashboard(_c, gAnalytics, userid, send) {
         db.findUnique(require('./config').default(), 'entities', { _id : userid }, (err, user) => {
-            gAnalytics.getData(_c, {
+            const req = {
                 "metrics" : defaultMetrics, 
                 "start-date" : "30daysAgo", 
                 "end-date" : "yesterday", 
                 "sort" : "ga:nthDay",
                 "dimensions" : "ga:nthDay",
-                "filter" : "ga:dimension" + (_c.analytics && _c.analytics.userDimension ? _c.analytics.userDimension : "2") + "==" + user.displayname
-            }, send);
+                "filters" : "ga:dimension" + (_c.analytics && _c.analytics.userDimension ? _c.analytics.userDimension : "2") + "==" + user.displayname
+            };
+
+            gAnalytics.getData(_c, req, (err, data) => {
+                send(err, data);
+            });
         });
     }
 
@@ -713,7 +717,7 @@ class GoogleAnalytics {
                 } else {
                     GoogleAnalyticsRequest.authorDashboard(cli._c, this, db.mongoID(cli.userinfo.userid), (err, data) => {
                         if (data) {
-                            data = StatsBeautifier.toPresentableArray(data.data || data);
+                            data = StatsBeautifier.toPresentableArray(data.data || data)
                             send(data);
 
                             data.cachedAt = Date.now();
