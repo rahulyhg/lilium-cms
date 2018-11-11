@@ -48,7 +48,7 @@ const SOCIAL_NETWORKS = {
 
 const ALLOWED_ME_FIELDS = [ 
     // Basic information
-    "displayname", "description", "email", "phone", "personality", 'jobtitle', 'avatarURL',
+    "displayname", "description", "email", "phone", "personality", 'jobtitle', 'avatarURL', 'currency',
 
     // Social profiles
     "socialnetworks.facebook", "socialnetworks.twitter", "socialnetworks.instagram", "socialnetworks.googleplus"
@@ -61,7 +61,7 @@ const ME_PROJECTION = {
     firstname : 1, lastname : 1,
     jobtitle : 1, phone : 1, email : 1,
     enforce2fa: 1, confirmed2fa: 1,
-    username : 1
+    username : 1, currency: 1
 };
 
 class Entity {

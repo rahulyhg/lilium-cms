@@ -1,0 +1,96 @@
+#pending-payment-overviews {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+
+    img.contractor-avatar {
+        height: 100%;
+        width: auto;
+        border: 1px solid white;
+        border-radius: 50%;
+    }
+
+    .contractor-info {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        
+        &.big {
+            height: 100px;
+        }
+        &.small {
+            height: 40px;
+        }
+
+        .contractor-name {
+            margin: 6px 6px 6px 12px;
+        }
+    }
+
+    & > #pending-payments-list {
+        flex: 0 0 20%;
+        overflow-y: scroll;
+
+        .pending-payment-card {
+            margin: 1px;
+            padding: 6px;
+            font-weight: bold;
+            position: relative;
+            box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+            
+            &.selected {
+                background: @liliumPurple;
+                background: -webkit-linear-gradient(35deg, #b48efb 0%, #f777e1 100%);
+                color: white;
+
+                .payment-selection-boc {
+                    border-color: white;
+                    background-color: white;
+                }
+            }
+
+            p.payment-text-detail {
+                margin: 6px 0px;
+            }
+
+            .payment-selection-boc {
+                cursor: pointer;
+                position: absolute;
+                right: 6px;
+                top: 6px;
+                background: transparent;
+                border: 2px solid rgba(0, 0, 0, 0.4);
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    #payment-details-column {
+        padding: 0px 20px;
+        flex-grow: 1;
+        
+        #payment-details-header {
+            display: flex;
+
+            img {
+                height: 100px;
+                width: auto;
+            }
+
+            #detailled-payment-info {
+                flex-grow: 1;
+                margin-left: 12px;
+
+                & > * {
+                    margin: 6px 0px;
+                }
+            }
+
+            #pay-individual {
+                flex: 0 0 150px;
+            }
+        }
+    }
+}

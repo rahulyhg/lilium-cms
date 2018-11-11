@@ -135,7 +135,8 @@
     "util": "latest",
     "validator": "latest",
     "xml2js": "^0.4.19",
-    "xxhashjs": "^0.2.2"
+    "xxhashjs": "^0.2.2",
+    "stripe": "^5.4.0"
   },
   "devDependencies": {
     "babel-cli": "latest",

@@ -44,6 +44,26 @@
             "absURL": "/thedailylilium",
             "section" : "home"
         },
+        {    
+            "id": "paymentdashboard",
+            "lys" : "payments,contractors",
+            "faicon": "fa-dollar-sign",
+            "displayname": "Payments Dashboard",
+            "priority": 3000,
+            "rights": ["hr"],
+            "absURL": "/paymentdashboard",
+            "section" : "home"            
+        },
+        {    
+            "id": "paymenthistory",
+            "lys" : "payments,history,contractors",
+            "faicon": "fa-history",
+            "displayname": "Payments history",
+            "priority": 3000,
+            "rights": ["hr"],
+            "absURL": "/paymentshistory",
+            "section" : "home"            
+        },
         {
             "id": "support",
             "lys" : "support,help,github",
@@ -530,6 +550,10 @@
             "module" : "settings.js",
             "endpoint" : "settings",
             "support" : ["admin_post", "livevar"]
-        }       
+        }, {
+            "module" : "contractorspayments.js",
+            "endpoint" : "contractorspayments",
+            "support" : ["admin_post", "livevar"]
+        }
     ]
 }

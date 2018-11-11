@@ -20,20 +20,21 @@ class FlowHandle {
         this.type = type;
 
         switch (this.type) {
-            case "admin_get"   : log("Riverflow", "Used Riverflow admin_get method, but it's deprecated", "warn"); break; 
-            case "admin_post"  : Admin.registerAdminEndpoint(this.flow.endpoint, 'POST', this.river.adminPOST.bind(this.river)); break;
-            case "admin_put"   : Admin.registerAdminEndpoint(this.flow.endpoint, 'PUT',  this.river.adminPUT.bind(this.river));  break;
-            case "admin_delete": Admin.registerAdminEndpoint(this.flow.endpoint, 'DELETE', this.river.adminDELETE.bind(this.river)); break;
-            case "livevar"     : Livevar.registerLiveVariable(this.flow.endpoint, this.river.livevar.bind(this.river));          break;
-            case "get"         : Endpoints.register('*', this.flow.endpoint, 'GET', this.river.GET.bind(this.river));            break;
-            case "post"        : Endpoints.register('*', this.flow.endpoint, 'POST', this.river.POST.bind(this.river));          break;
-            case "api_get"     : API.registerApiEndpoint(this.flow.endpoint, 'GET', this.river.apiGET.bind(this.river));         break;
-            case "api_post"    : API.registerApiEndpoint(this.flow.endpoint, 'POST', this.river.apiPOST.bind(this.river));       break;
-            case "api_put"     : API.registerApiEndpoint(this.flow.endpoint, 'PUT', this.river.apiPUT.bind(this.river));         break;
-            case "api_delete"  : API.registerApiEndpoint(this.flow.endpoint, 'DELETE', this.river.apiDELETE.bind(this.river));   break;
-            case "form"        : this.river.form.apply(this.river);                                                              break;
-            case "table"       : this.river.table.apply(this.river);                                                             break;
-            case "setup"       : this.river.setup.apply(this.river);                                                             break;
+            case "livevar"     : Livevar.registerLiveVariable(this.flow.endpoint,           this.river[this.flow.overrides.livevar && "livevar"].bind(this.river));         break;
+            case "admin_post"  : Admin.registerAdminEndpoint(this.flow.endpoint, 'POST',    this.river[this.flow.overrides.adminPOST && "adminPOST"].bind(this.river));     break;
+            case "admin_put"   : Admin.registerAdminEndpoint(this.flow.endpoint, 'PUT',     this.river[this.flow.overrides.adminPUT && "adminPUT"].bind(this.river));       break;
+            case "admin_delete": Admin.registerAdminEndpoint(this.flow.endpoint, 'DELETE',  this.river[this.flow.overrides.adminDELETE && "adminDELETE"].bind(this.river)); break;
+            case "get"         : Endpoints.register('*', this.flow.endpoint,     'GET',     this.river[this.flow.overrides.GET && "GET"].bind(this.river));                 break;
+            case "post"        : Endpoints.register('*', this.flow.endpoint,     'POST',    this.river[this.flow.overrides.POST && "POST"].bind(this.river));               break;
+            case "put"         : Endpoints.register('*', this.flow.endpoint,     'PUT',     this.river[this.flow.overrides.PUT && "PUT"].bind(this.river));                 break;
+            case "delete"      : Endpoints.register('*', this.flow.endpoint,     'DELETE',  this.river[this.flow.overrides.DELETE && "DELETE"].bind(this.river));           break;
+            case "api_get"     : API.registerApiEndpoint(this.flow.endpoint,     'GET',     this.river[this.flow.overrides.apiGET && "apiGET"].bind(this.river));           break;
+            case "api_post"    : API.registerApiEndpoint(this.flow.endpoint,     'POST',    this.river[this.flow.overrides.apiPOST && "apiPOST"].bind(this.river));         break;
+            case "api_put"     : API.registerApiEndpoint(this.flow.endpoint,     'PUT',     this.river[this.flow.overrides.apiPUT && "apiPUT"].bind(this.river));           break;
+            case "api_delete"  : API.registerApiEndpoint(this.flow.endpoint,     'DELETE',  this.river[this.flow.overrides.apiDELETE && "apiDELETE"].bind(this.river));     break;
+            case "setup"       : this.river.setup.apply(this.river);                                                                                                        break;
+
+            default : log("Riverflow", "Used unknown Riverflow handle " + this.type, "warn"); return this; 
         }
 
         log('Riverflow', "Created '" + this.type + "' handle for flow with endpoint : " + this.flow.endpoint);
@@ -51,10 +52,11 @@ class Riverflow {
 
         let river = require(config.default().server.base + flow.module);
         river.handles = {};
+        flow.overrides = river.overrides || {};
         
-        for (let i = 0; i < flow.support.length; i++) {
-            river.handles[flow.support[i]] = new FlowHandle(river, flow).bind(flow.support[i]);
-        }
+        flow.support.forEach(support => {
+            river.handles[support] = new FlowHandle(river, flow).bind(support);
+        });
 
         if (flow.hooks) {
             for (let i = 0; i < flow.hooks.length; i++) {

@@ -53,7 +53,7 @@ export default class ProfilePage extends Component {
                     data.user.socialnetworks[socialNetworks[i].network] = socialNetworks[i].username || "";
                 }
 
-                this.setState({ user: data.user, err: undefined, loading: false });
+                this.setState({ user: data.user, err: undefined, loading : false });
             } else {
                 this.setState({ err, loading: false });
             }
@@ -73,6 +73,7 @@ export default class ProfilePage extends Component {
                     <div id="other-info">
                         <ContactInfo user={this.state.user} />
                         <SocialMedia user={this.state.user} />
+                        <PaymentInfo user={this.state.user} />
 
                         <div id="login-info">
                             <PasswordResetForm />
@@ -197,6 +198,17 @@ class SocialMedia extends Component {
             </div>
         );
     }
+}
+
+const PaymentInfo = props => {
+    return (
+        <div id="payment-info">
+            <h2>Payment Information</h2>
+
+            <SelectField name='currency' placeholder='Payment Currency' initialValue={props.user.currency || 'CAD'} 
+                            options={[{ value: 'CAD' }, { value:'USD' }]} onChange={asyncFieldUpdate.bind(this)} />
+        </div>
+    )
 }
 
 class PasswordResetForm extends Component {
