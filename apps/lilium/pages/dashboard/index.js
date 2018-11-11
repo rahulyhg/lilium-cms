@@ -10,9 +10,10 @@ import { getSession, getLocal, storeLocal } from '../../data/cache';
 import { PublishingTab } from './publishing';
 import { PonglinkTab } from './ponglink';
 import { PerformanceTab } from './performance';
+import { ContractorTab } from './contractor';
 
 const TAB_COMPONENTS = [
-    PublishingTab, PonglinkTab, PerformanceTab
+    PublishingTab, PonglinkTab, PerformanceTab, ContractorTab
 ];
 
 class DashboardTabs extends Component {
