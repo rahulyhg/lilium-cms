@@ -32,7 +32,7 @@ class PonglinkCampaignDetails extends Component {
             <div class="dashboard-ponglink-details">
                 <h2>{this.state.insights.link.identifier}</h2>
 
-                { this.state.insights.versions.length > 1 ? (<div class="dashboard-ponglink-graph-wrap">
+                { this.state.insights.versions.length > 1 ? (<div class="dashboard-ponglink-graph-wrap dashboard-graph-wrap">
                     <h2>Clicks by version</h2>
                     <div class="versions-chart-wrapper">
                         <ChartGraph nowrap={true} chart={{
@@ -62,7 +62,7 @@ class PonglinkCampaignDetails extends Component {
                     </div>
                 </div>) : null }
 
-                <div class="dashboard-ponglink-graph-wrap">
+                <div class="dashboard-ponglink-graph-wrap dashboard-graph-wrap">
                     <h2>Daily clicks</h2>
                     <div class="dashboard-daily-chart-wrapper">
                         <ChartGraph nowrap={true} chart={{
