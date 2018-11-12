@@ -87,7 +87,7 @@ export default class DashboardPage extends Component {
     }
 
     tabClicked(tab) {
-        storeLocal("TAB_dashboard", TAB_COMPONENTS.indexOf(tab));
+        storeLocal("TAB_dashboard", this.state.tabs.indexOf(tab));
         this.setState({ selectedTab : tab });
     }
 
