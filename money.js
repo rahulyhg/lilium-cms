@@ -125,17 +125,24 @@ module.exports = class Money {
     }
 
     dispatchPending(payload, requester, done) {
+        console.log(payload);
+        
         log("Money", "Preparing Stripe requests with a payload of " + payload.length + " contractors", "detail");
         let index = -1;
         const nextItem = () => {
             if (++index == payload.length) {
-                return done && done();
+                return db.update(mainsite, 'entities', {_id: { $in: payload.map(x => db.mongoID(x._id)) }}, { isBeingPaid: false }, () => {
+                    done && done();
+                });
             }
 
             this.dispatchOne(db.mongoID(payload[index].id), payload[index].currency, requester, () => { nextItem(); });
         };
 
-        nextItem();
+        const mainsite = require(liliumroot + '/config').default();
+        db.update(mainsite, 'entities', {_id: { $in: payload.map(x => db.mongoID(x._id)) }}, { isBeingPaid: true }, () => {
+            nextItem();
+        });
     }
 
     retryFailedTransaction(number, done) {

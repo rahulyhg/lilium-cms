@@ -78,17 +78,9 @@ class ContractorHandler {
         });
     }
 
-    adminManageGET(cli) {
-        if (!cli.hasRight("manage-contractors")) {
-            return cli.refuse();
-        }
-
-        filelogic.serveAdminLML3(cli, false, {
-            stripeoauth : money.generateOAuthURL(cli._c) 
-        }, undefined, "plugins/contractors");
-    }
-
-    adminManagePOST(cli) {
+    adminPOST(cli) {
+        console.log('ADMIN POST');
+        
         if (!cli.hasRight("manage-contractors")) {
             return cli.refuse();
         }
@@ -165,10 +157,6 @@ class ContractorHandler {
         });
     }
 
-    adminPOST(cli) {
-
-    }
-
     livevarManage(cli, levels, params, sendback) {
         if (!cli.hasRight("manage-contractors")) {
             return cli.refuse();
@@ -208,7 +196,7 @@ class ContractorHandler {
                     });
 
                     sendback({ contractors : Object.values(resp), totalowed });
-                }, { displayname : 1, avatarURL : 1, stripeuserid : 1, currency: 1 });
+                }, { displayname : 1, avatarURL : 1, stripeuserid : 1, currency: 1, isBeingPaid: 1 });
             });
         } else if (levelone == "invoices") {
             sendback({ invoices : [] })
