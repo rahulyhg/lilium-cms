@@ -68,7 +68,7 @@ class Ponglink extends Component {
                         {
                             this.state.versions.map(version => {
                                 return (
-                                    <Version medium={version.medium} dest={`https://www.narcity.com/pong/${this.state.hash}/${version.hash}`} />
+                                    <Version medium={version.medium} redir={version.destination} dest={`https://www.narcity.com/pong/${this.state.hash}/${version.hash}`} />
                                 );
                             })
                         }
