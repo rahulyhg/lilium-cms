@@ -269,8 +269,8 @@ class ContractorHandler {
                     status : "published"
                 }},
             ], (arr) => {
-                const total = arr.reduce((total, x) => total + x.worth, 0);
-                sendback(total);
+                const amount = arr.reduce((total, x) => total + x.worth, 0);
+                sendback({ amount, totalposts : arr.length });
             });
         } else if (levelone == "allinvoices") {
             if (!cli.hasRight('manage-contractors')) {

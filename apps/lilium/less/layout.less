@@ -4,14 +4,18 @@
 
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
  
 ::-webkit-scrollbar-track {
-    border: 0.5px inset rgba(0, 0, 0, 0.2);
+    border: 0.5px solid #CCC;
 }
  
 ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    border: 1px solid darken(@liliumPurple, 15%);
-    background: @liliumPurple;
+    background: #DDD;
 }
+
+*:hover::-webkit-scrollbar-thumb {
+    background: darken(@liliumPurple, 20%);
+}
+

@@ -210,12 +210,15 @@ export class Lys extends Component {
     }
 
     renderSuggs() {
+        let i = 0;
+
         return (
             <div>
                 <div id="lys-sugg-cmds">
                 {
                     this.state.pageChoices.map(cmd => (
                         <div class="lys-sugg lys-sugg-cmd lys-sugg-page-cmd" onClick={cmd.execute}>
+                            <div class="lys-shift-num"><i class="fal fa-arrow-alt-up"></i> <b>{++i}</b></div>
                             <i class="far fa-bolt" style={{ background : "#fffae0" }}></i>
                             <b>{cmd.displayname}</b>
                         </div>
@@ -223,6 +226,7 @@ export class Lys extends Component {
                 } {
                     this.state.choices.map(cmd => (
                         <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
+                            <div class="lys-shift-num"><i class="fal fa-arrow-alt-up"></i> <b>{++i}</b></div>
                             <i class={"fal " + cmd.icon} style={{ background : "#daf5ff" }}></i>
                             <b>{cmd.displayname}</b>
                         </div>
@@ -230,6 +234,7 @@ export class Lys extends Component {
                 } {
                     this.state.customChoices.map(cmd => (
                         <div class="lys-sugg lys-sugg-cmd" onClick={() => cmd.execute()}>
+                            <div class="lys-shift-num"><i class="fal fa-arrow-alt-up"></i> <b>{++i}</b></div>
                             <i class="far fa-bolt" style={{ background : "#fffae0" }}></i>
                             <b>{cmd.displayname}</b>
                         </div>
@@ -240,6 +245,7 @@ export class Lys extends Component {
                 {
                     this.state.hashactions.map(cmd => (
                         <div class="lys-sugg lys-sugg-act" onClick={cmd.execute}>
+                            <div class="lys-shift-num"><i class="fal fa-arrow-alt-up"></i> <b>{++i}</b></div>
                             <i class="far fa-hashtag" style={{ background : "rgb(255, 135, 135)" }}></i>
                             {cmd.action} <b>{cmd.displayname}</b>
                         </div>
@@ -250,6 +256,7 @@ export class Lys extends Component {
                 {
                     this.state.posts.map(post => (
                         <div class="lys-sugg lys-sugg-post" onClick={() => this.goAndHide("/publishing/write/" + post._id)}>
+                            <div class="lys-shift-num"><i class="fal fa-arrow-alt-up"></i> <b>{++i}</b></div>
                             <i class="far fa-pencil" style={{ background : "#ffdffe" }}></i>
                             <b>{post.headline}</b>
                         </div>
@@ -260,6 +267,7 @@ export class Lys extends Component {
                 {
                     this.state.entities.map(entity => (
                         <div class="lys-sugg lys-sugg-entity" onClick={() => this.goAndHide("/entities/edit/" + entity._id)}>
+                            <div class="lys-shift-num"><i class="fal fa-arrow-alt-up"></i> <b>{++i}</b></div>
                             <i class="far fa-user" style={{ background : "#e1ffdf" }}></i>
                             <b>{entity.displayname}</b>
                         </div>
@@ -346,3 +354,4 @@ export class Lys extends Component {
         );
     }
 }
+
