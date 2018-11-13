@@ -70,7 +70,8 @@ export class LiliumMenu extends Component {
         super(props);
         this.state = {
             menus : props.menus || [],
-            snapped : getLocal(CACHEKEYS.SIDEBARSNAP),
+            snapped : liliumcms.session.preferences["menuLocked"],
+            unified : liliumcms.session.preferences["unifiedSidebar"],
             endpoint : document.location.pathname.split("/")[2],
             section : ""
         };
@@ -83,6 +84,12 @@ export class LiliumMenu extends Component {
         document.addEventListener('togglemenusnap', (ev) => {
             this.toggleSnap(ev.detail.snapped);
         })
+
+        document.addEventListener('toggleUnifiedSidebar', ev => {
+            this.setState({
+                unified : !this.state.unified
+            });
+        });
 
         document.addEventListener('navigate', ev => {        
             const selectedSection = this.state.menus.find(menu => ev.detail.href.includes(menu.absURL));
@@ -146,6 +153,23 @@ export class LiliumMenu extends Component {
     }
 
     render() {  
+        if (this.state.unified) {
+            return (
+                <div id="lilium-menu" class={this.state.snapped ? "snap" : ""}>
+                    <div class="lilium-menu-active" ref={ x => (this.sectionMenusElement = x) }>
+                    {
+                        this.state.menus.map(menu => (
+                            <div key={menu.id} class={"sidebar-menu-item " + (document.location.pathname.includes(menu.absURL) ? "selected" : "")} onClick={this.goTo.bind(this, menu)}>
+                                <i class={"far " + menu.faicon}></i>
+                                <b>{menu.displayname}</b>
+                            </div>
+                        ))
+                    }
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div id="lilium-menu" class={this.state.snapped ? "snap" : ""}>
                 <div class="lilium-menu-sections-all">
@@ -166,20 +190,5 @@ export class LiliumMenu extends Component {
                 </div>
             </div>
         );
-        
-        return (
-            <menu id="lilium-menu" class={this.state.snapped ? "snap" : ""} ref={x => (this.slider = x)} onMouseEnter={this.mousehover.bind(this)} onMouseLeave={this.mouseleave.bind(this)} >
-                { this.state.menus.map(menu => (
-                    <Link linkStyle="block" href={menu.absURL.replace('admin', '')}><div class="menu-item">
-                        <i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span>
-                    </div></Link>
-                ))}
-                
-                <div style={styles.handle} onClick={this.clickOnSlideHandle.bind(this)}>
-                    <div style={styles.handlebar}></div>
-                    <div style={styles.handlebar}></div>
-                </div>
-            </menu>
-        )
     }
 }

@@ -56,6 +56,9 @@ export default class Preferences extends Component {
                 } else if (name == "stretchUserInterface") {
                     const ev = new CustomEvent("togglestretchui");
                     document.dispatchEvent(ev);
+                } else if (name == "unifiedSidebar") {
+                    const ev = new CustomEvent("toggleUnifiedSidebar");
+                    document.dispatchEvent(ev);
                 }
 
                 this.setState({
@@ -103,6 +106,8 @@ export default class Preferences extends Component {
                         <CheckboxField name='activeReadersHeader' placeholder='Display active readers in header' initialValue={this.state.values['activeReadersHeader']}
                             onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='stretchUserInterface' placeholder='Stretch user interface ' initialValue={this.state.values['stretchUserInterface']}
+                            onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='unifiedSidebar' placeholder='Unified sidebar menu' initialValue={this.state.values['unifiedSidebar']}
                             onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='disablePubAnim' placeholder='Disable publishing animations' initialValue={this.state.values['disablePubAnim']}
                             onChange={this.valueChanged.bind(this)} />
