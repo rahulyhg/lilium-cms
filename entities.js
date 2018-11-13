@@ -991,18 +991,6 @@ class Entities {
                     sendback({err, entity});
                 });
             }
-        } else if (levels[0] == "staffing") {
-            if (!levels[1]) {
-                db.findUnique(_c.default(), 'staffing', { _id: db.mongoID(cli.session.data._id) }, (err, staffinfo) => {
-                    sendback({err, staffinfo});
-                });
-            } else if (cli.hasRight('hr')) {
-                db.findUnique(_c.default(), 'staffing', { _id: db.mongoID(levels[1]) }, (err, staffinfo) => {
-                    sendback({err, staffinfo});
-                });
-            } else {
-                cli.throwHTTP(401, undefined, true);
-            }
         } else {
             if (!cli.hasRight('list-entities') && levels[0] !== cli.session.data.username) {
                 sendback([]);

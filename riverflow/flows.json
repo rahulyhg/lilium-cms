@@ -165,6 +165,17 @@
             "section" : "management"
         },
         {
+            "id": "staffing",
+            "lys" : "staffing,hire,contractors",
+            "faicon": "fa-address-card",
+            "displayname": "Staffing",
+            "priority": 505,
+            "rights": ["manage-staff"],
+            "absURL": "/staffing",
+            "section" : "management"
+        },
+
+        {
             "id": "entities-rights",
             "lys" : "roles,rights",
             "faicon": "fa-minus-circle",
@@ -487,6 +498,10 @@
             "module" : "entities.js",
             "endpoint" : "entities",
             "support" : ["admin_post", "livevar", "setup", "api_get", "api_post"]
+        }, {
+            "module" : "staffing.js",
+            "endpoint" : "staffing",
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "entityrelationship.js",
             "endpoint" : "entityrelationship",
