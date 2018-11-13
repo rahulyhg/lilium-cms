@@ -90,7 +90,7 @@ class PublishingActivity extends Component {
 
         return (
             <div class="dashboard-dual-flex">
-                <div class="dashboard-publishing-activities">
+                <div class="dashboard-publishing-activities dashboard-ponglink-graph-wrap">
                     <h2>Publishing week momentum</h2>
                     <div style={{ position: "relative", height: 380 }}>
                         <ChartGraph nowrap={true} chart={{
@@ -117,7 +117,7 @@ class PublishingActivity extends Component {
                         }} />
                     </div>
                 </div>
-                <div class="dashboard-favourite-topics">
+                <div class="dashboard-favourite-topics dashboard-ponglink-graph-wrap">
                     <h2>Favourite topics</h2>
                     <div style={{ position: "relative", height: 380 }}>
                         <ChartGraph nowrap={true} chart={{

@@ -233,7 +233,7 @@ class YesterdayTopPost extends Component {
 
         // Medal credit to be added : <div>Icons made by <a href="https://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
         return (
-            <div class="dashboard-yesterday-top-post">
+            <div class="dashboard-yesterday-top-post dashboard-ponglink-graph-wrap">
                 <div>
                     <img class="top-post-badge-icon" src="/static/svg/medal.svg" />
 
@@ -283,7 +283,7 @@ class PopularTopics extends Component {
         }
     
         return (
-            <div>
+            <div class="dashboard-ponglink-graph-wrap">
                 <h2>Popular topics</h2>
                 <h3>From articles published in the last 30 days</h3>
                 <div class="popular-topics-pie" style={{ position: 'relative', height: 420 }}>
