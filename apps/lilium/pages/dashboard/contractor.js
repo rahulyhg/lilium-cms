@@ -39,31 +39,39 @@ class ContractorHistorical extends Component {
 
         return (
             <div>
-                <div>
-                    <div class="dashboard-graph-wrap">
-                        <h2>Payment history</h2>
-                        <div style={{ position: 'relative', height: 350 }} class="dashboard-contractor-payment-history-chart">
-                            <ChartGraph nowrap={true} chart={{
-                                type : "line",
-                                data : {
-                                    labels : this.state.history.map(x => dateformat(new Date(x.at), 'dd/mm/yy')),
-                                    datasets : [{
-                                        data : this.state.history.map(x => x.total),
-                                        label : "Amount paid",
-                                        backgroundColor : "#b48efb77"
-                                    }]
-                                },
-                                options : {
-                                    responsive : true,
-                                    maintainAspectRatio: false,
-                                    cubicInterpolationMode : 'monotone'
-                                }
-                            
-                            }} />
-                        </div>
+             <div style={{ display: 'flex' }}>
+                <div class="dashboard-ponglink-graph-wrap" style={{ flexGrow : 1, marginRight : 20 }}>
+                    <h2>Payout history</h2>
+                    <div class="dashboard-payout-chart-wrapper" style={{ height: 350 }}>
+                        <ChartGraph nowrap={true} chart={{
+                            type : 'line',
+                            data : {
+                                labels : this.state.history.map(x => dateformat(new Date(x.at), 'dd/mm/yy')),
+                                datasets : [{
+                                    data : this.state.history.map(x => x.total),
+                                    label : "Invoice total amount",
+                                    backgroundColor : "#b48efb99"
+                                }]
+                            },
+                            options : {
+                                responsive : true,
+                                maintainAspectRatio: false,
+                            }
+                        }} />
                     </div>
                 </div>
-            </div>
+                <div class="dashboard-ponglink-graph-wrap" style={{ flex : '0 0 320px' }}>
+                    <h2>Payments</h2>
+                    <div class="" style={{ height: 350, overflowY: 'auto' }}>
+                        {
+                            this.state.history.map(invoice => (
+                                <ContractorHistoricalInvoiceItem invoice={invoice} />
+                            ))
+                        }
+                   </div>
+              </div>
+           </div>
+           </div>
         );
     }
 }
