@@ -196,17 +196,15 @@
 
         width: 50%;
 
-        background: #F6F6F6;
-        border-radius: 10px;
-        box-shadow: 0px 2px 1px rgba(0,0,0,0.2);
         padding: 10px;
+        margin: 0px;
 
         &:first-child { margin-right: 10px; }
         &:last-child  { margin-left: 10px;  }
     }
 }
 
-.dashboard-yesterday-top-post {
+.dashboard-yesterday-top-post.dashboard-ponglink-graph-wrap {
     padding: 0;
     position: relative;
 
@@ -388,7 +386,7 @@
 }
 
 .dashboard-ponglink-graph-wrap {
-    background: #F6F6F6;
+    background: #FCFCFC;
     padding: 20px;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
     border-radius: 10px;
@@ -399,3 +397,51 @@
 
     margin-bottom: 20px;
 }
+
+.dashboard-contractor-invoice-list-item {
+    display: flex;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background: #F3F3F3;
+
+        .dashboard-contractor-invoice-bill-icon {
+            background: #96f381;
+        }
+    }
+
+    .dashboard-contractor-invoice-bill-icon {
+        width: 50px;
+        text-align: center;
+        background: #bff5b3;
+        border-radius: 50%;
+        height: 50px;
+        padding-top: 14px;
+        box-sizing: border-box;
+        margin-right: 10px;
+
+        i {
+            font-size: 22px;
+            color: #59944c;
+        }
+    }
+
+    .dashboard-contractor-invoice-item-details {
+        flex-grow: 1;
+
+        b {
+            display: block;
+        }
+
+        small {
+            display: block;
+        }
+    }
+}
+
+
