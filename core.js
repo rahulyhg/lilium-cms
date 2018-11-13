@@ -56,6 +56,7 @@ class Core {
 
             log('Core', 'Created global library', 'success');
 
+            loadCurrencies();
             maybeRunCAIJ();
             loadHooks(readyToRock);
             loadEndpoints();
@@ -201,6 +202,10 @@ const loadImageSizes = () => {
     imageSize.add("facebook", 1200, 630);
 
     hooks.fire('image_sized_loaded');
+};
+
+const loadCurrencies = () => {
+    require('./money').preloadCurrencies();
 };
 
 const loadPlugins = (cb) => {
