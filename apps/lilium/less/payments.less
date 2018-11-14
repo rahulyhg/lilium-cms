@@ -10,6 +10,10 @@
         width: 20px;
         height:  20px;
         border-radius: 4px;
+
+        i.fa {
+            display: none;
+        }
     }
     
     .contractor-info {
@@ -63,6 +67,12 @@
                 .selection-box-wrapper {
                     .payment-selection-boc {
                         background-color: white;
+
+                        i.fa {
+                            display: initial;
+                            color: #333;
+                            margin-left: 2px;
+                        }
                     }
                 }
             }
@@ -86,7 +96,10 @@
         background: @bodyBackgroundGray;
 
         #no-selected-payment {
-            margin: 40px;
+            margin: 40px auto;
+            padding: 12px;
+            width: 30%;
+            text-align: center;
         }
 
         #payment-details-header {

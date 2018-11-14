@@ -26,7 +26,9 @@ module.exports.PendingPaymentCard = PendingPaymentCard;
 
 const SelectionBox = props => (
     <div className="selection-box-wrapper">
-        <div role='checkbox' className="payment-selection-boc" onClick={e => { e.stopPropagation(); props.onClick && props.onClick(); }}></div>
+        <div role='checkbox' className="payment-selection-boc" onClick={e => { e.stopPropagation(); props.onClick && props.onClick(); }}>
+            <i className="fa fa-check"></i>
+        </div>
     </div>
 )
 

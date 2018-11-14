@@ -43,8 +43,9 @@ export default class PaymentDashboard extends Component {
     componentDidMount() {
         API.get('/contractorspayments/management/pending', {}, (err, data, r) => {
             if (r.status == 200) {
-                const selectedPayments = [data.contractors[0] || undefined];
-                this.setState({ pendingPayments: data.contractors.filter(x => !x.isBeingPaid), selectedPayments });
+                const pendingPayments = data.contractors.filter(x => !x.beingPaid && x.stripeuserid);
+                const selectedPayments = [pendingPayments[0] || undefined];
+                this.setState({ pendingPayments, selectedPayments });
             } else {
                 log('PaymentDashboard', 'Error fetching pending payments', 'error');
             }
@@ -139,8 +140,7 @@ export default class PaymentDashboard extends Component {
                     <div id="pending-payment-overviews">
                         <div id="pending-payments-list">
                             <div id="list-controls">
-                                <SelectionBox onClick={this.selectAll.bind(this)} />
-                                <h4>Select All</h4>
+                                <ButtonWorker text='Select all' sync={true} work={this.selectAll.bind(this)} theme='blue' type='outline' />
                             </div>
                             <div className="scroll">
                                 {

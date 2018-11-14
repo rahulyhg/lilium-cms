@@ -80,8 +80,6 @@ class ContractorHandler {
     }
 
     adminPOST(cli) {
-        console.log('ADMIN POST');
-        
         if (!cli.hasRight("manage-contractors")) {
             return cli.refuse();
         }
