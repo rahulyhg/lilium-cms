@@ -4,30 +4,32 @@ import { ButtonWorker, TextField } from '../../widgets/form';
 import API from '../../data/api';
 import Modal from '../../widgets/modal';
 import { castNotification } from '../../layout/notifications';
+import { BigList } from '../../widgets/biglist';
 import { Link } from '../../routing/link';
 import { SelectionBox, PendingPaymentCard, PaymentDetails, PaymentsBreakdown,  } from './pendingpayments';
+import { CreditCard, AddCreditCard } from './creditcard';
 
 export default class PaymentDashboard extends Component {
     constructor(props) {
         super(props);
         this.token2fa;
+        const hardCodedCreditCards = [
+            { number: '1234567843218765', cvv: '213', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvv: '543', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvv: '256', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvv: '783', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvv: '556', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvv: '011', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvv: '683', expiryMonth: '1', expiryYear: '2018' },
+        ]
         this.state = {
             pendingPayments: [], selectedPayments: [],
-            paymentModalVisible: false
+            paymentModalVisible: false,
+            totalCAD: 0, totalUSD: 0,
+            creditCards: hardCodedCreditCards
         }
     }
     
-    componentDidMount() {
-        API.get('/contractorspayments/management/pending', {}, (err, data, r) => {
-            if (r.status == 200) {
-                this.setState({ pendingPayments: data.contractors.filter(x => !x.isBeingPaid), selectedPayments: [data.contractors[0] || undefined] });
-            } else {
-                log('PaymentDashboard', 'Error fetching pending payments', 'error');
-            }
-        });
-    }
-
-
     static calculateTotalPayout(payments) {
         const payout = { totalCAD: 0, totalUSD: 0 };
         if (!payments) return payout;
@@ -36,6 +38,17 @@ export default class PaymentDashboard extends Component {
         payout.totalUSD = payments.filter(c => c.currency && c.currency.toUpperCase() == 'USD').reduce((a, b) => a + parseInt(b.owed), 0);
 
         return payout;
+    }
+
+    componentDidMount() {
+        API.get('/contractorspayments/management/pending', {}, (err, data, r) => {
+            if (r.status == 200) {
+                const selectedPayments = [data.contractors[0] || undefined];
+                this.setState({ pendingPayments: data.contractors.filter(x => !x.isBeingPaid), selectedPayments });
+            } else {
+                log('PaymentDashboard', 'Error fetching pending payments', 'error');
+            }
+        });
     }
 
     toggleSelected(contractorId) {
@@ -47,13 +60,11 @@ export default class PaymentDashboard extends Component {
                 // Disallow 'unselect' when only one is selected
                 if (this.state.selectedPayments.length > 1) {
                     selectedPayments.splice(i, 1);
-                    const payout = PaymentDashboard.calculateTotalPayout(selectedPayments);
-                    this.setState({ selectedPayments, ...payout });
+                    this.setState({ selectedPayments });
                 }
             } else {
                 selectedPayments.push(contractorPayment);
-                const payout = PaymentDashboard.calculateTotalPayout(selectedPayments);
-                this.setState({ selectedPayments, ...payout });
+                this.setState({ selectedPayments });
             }
         }
     }
@@ -62,16 +73,14 @@ export default class PaymentDashboard extends Component {
         const contractorPayment = this.state.pendingPayments.find(p => p._id == contractorId);
         if (contractorPayment) {
             const selectedPayments = [contractorPayment];
-            const payout = PaymentDashboard.calculateTotalPayout(selectedPayments);
-            this.setState({ selectedPayments, ...payout });
+            this.setState({ selectedPayments });
         }
     }
 
     selectAll() {
         if (this.state.selectedPayments.length != this.state.pendingPayments.length) {
             const selectedPayments = [...this.state.pendingPayments];
-            const payout = PaymentDashboard.calculateTotalPayout(selectedPayments);
-            this.setState({ selectedPayments, ...payout });
+            this.setState({ selectedPayments });
         } else {
             this.setState({ selectedPayments: [], totalCAD: 0, totalUSD: 0 });
         }        
@@ -113,15 +122,14 @@ export default class PaymentDashboard extends Component {
     }
 
     render(props, state) {
-        console.log(state);
-        
+        const payout = PaymentDashboard.calculateTotalPayout(state.selectedPayments);
         return (
             <TabView>
                 <Tab title='Pending Payments'>
                     <Modal visible={state.paymentModalVisible} title='Pay Contractors'>
                         <h2>Pay contractors</h2>
                         <p>
-                            You are about to pay <b>{`${state.totalCAD} CAD + ${state.totalUSD} USD to ${state.selectedPayments.length} contractor(s)`}</b>.
+                            You are about to pay <b>{`${payout.totalCAD} CAD + ${payout.totalUSD} USD to ${state.selectedPayments.length} contractor(s)`}</b>.
                             In order to proceed, please provide you <Link href='/me'><b>two factor authentication token</b></Link>.
                         </p>
                         <TextField placeholder='Two Factor Authentication token' onChange={(name, val) => { this.token2fa = val; }} />
@@ -147,7 +155,7 @@ export default class PaymentDashboard extends Component {
                             {
                                 state.selectedPayments.length > 1 ? (
                                     <PaymentsBreakdown contractorPayments={state.selectedPayments} payContractors={this.castPaymentModal.bind(this)}
-                                                        totalCAD={state.totalCAD} totalUSD={state.totalUSD} />
+                                                        totalCAD={payout.totalCAD} totalUSD={payout.totalUSD} />
                                 ) : (
                                     state.selectedPayments.length != 0 ? (
                                         <PaymentDetails contractorPayment={state.selectedPayments[0]} payContractors={this.castPaymentModal.bind(this)} />
@@ -160,7 +168,12 @@ export default class PaymentDashboard extends Component {
                     </div>
                 </Tab>
                 <Tab title='Credit Cards'>
-                    <h1>Credit card management</h1>
+                    {
+                        state.creditCards.map(cc => (
+                            <CreditCard {...cc} />
+                        ))
+                    }
+                    {/* <BigList listitem={CreditCard} addComponent={AddCreditCard} batchsize={50} endpoint='/ponglinks/bunch' liststyle={{ maxWidth: 800, margin: 'auto' }} />                                     */}
                 </Tab>
             </TabView>
         );

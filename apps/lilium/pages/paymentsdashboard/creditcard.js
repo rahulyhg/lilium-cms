@@ -14,7 +14,11 @@ export class CreditCard extends Component {
     
     render() {
         return (
-            <div></div>
+            <div className="credit-card">
+
+                <div className="lines-down"></div>
+                <div className="lines-up"></div>
+            </div>
         );
     }
 }

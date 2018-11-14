@@ -1,0 +1,32 @@
+@cardBg: @liliumPurple;
+
+.credit-card {
+    background: @cardBg;
+    border: 1px solid darken(@cardBg, 5%);
+    color: white;
+    border-radius: 10px;
+    width: 90mm;
+    height: 53mm;
+    margin: 8px;
+    position: relative;
+
+    .lines-down {
+        position: relative;
+        top: 100px;
+        right: 0px;
+        bottom: 0px;
+        left: 100px;
+        .gradient-radial(white, @cardBg);
+    }
+}
+
+.gradient-radial (@color1, @color2) {
+    background: rgb(red(@color1), green(@color1), blue(@color1)); /* Old browsers */
+    background: -moz-radial-gradient(center, ellipse cover, @color1 100%, @color2 100%); /* FF3.6+ */
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,@color1), color-stop(100%,@color2)); /* Chrome,Safari4+ */
+    background: -webkit-radial-gradient(center, ellipse cover, @color1 100%, @color2 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, ellipse cover, @color1 44%, @color2 100%); /* Opera 12+ */
+    background: -ms-radial-gradient(center, ellipse cover, @color1 44%, @color2 100%); /* IE10+ */
+    background: radial-gradient(ellipse at center, @color1 44%, @color2 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="@{color1}", endColorstr="@{color2}",GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
