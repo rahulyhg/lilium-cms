@@ -4,6 +4,7 @@ import { ButtonWorker, TextField } from '../../widgets/form';
 import API from '../../data/api';
 import Modal from '../../widgets/modal';
 import { castNotification } from '../../layout/notifications';
+import { Link } from '../../routing/link';
 
 /**
  * Extracts the date part of an ISO datetime string
@@ -54,8 +55,6 @@ export default class PaymentDashboard extends Component {
                 if (this.state.selectedPayments.length > 1) {
                     selectedPayments.splice(i, 1);
                     const payout = PaymentDashboard.calculateTotalPayout(selectedPayments);
-                    console.log(payout);
-                    
                     this.setState({ selectedPayments, ...payout });
                 }
             } else {
@@ -69,16 +68,19 @@ export default class PaymentDashboard extends Component {
     selectOne(contractorId) {
         const contractorPayment = this.state.pendingPayments.find(p => p._id == contractorId);
         if (contractorPayment) {
-            this.setState({ selectedPayments: [ contractorPayment ] });
+            const selectedPayments = [contractorPayment];
+            const payout = PaymentDashboard.calculateTotalPayout(selectedPayments);
+            this.setState({ selectedPayments, ...payout });
         }
     }
 
     selectAll() {
         if (this.state.selectedPayments.length != this.state.pendingPayments.length) {
             const selectedPayments = [...this.state.pendingPayments];
-            this.setState({ selectedPayments });
+            const payout = PaymentDashboard.calculateTotalPayout(selectedPayments);
+            this.setState({ selectedPayments, ...payout });
         } else {
-            this.setState({ selectedPayments: [] });
+            this.setState({ selectedPayments: [], totalCAD: 0, totalUSD: 0 });
         }        
     }
 
@@ -92,7 +94,7 @@ export default class PaymentDashboard extends Component {
                 if (r.status == 200) {
                     let pendingPayments = this.state.pendingPayments;
                     pendingPayments = pendingPayments.filter(p => this.state.selectedPayments.findIndex(x => x._id == p._id) < 0);
-                    this.setState({ pendingPayments, selectedPayments: [pendingPayments[0]] || undefined, paymentModalVisible: false });
+                    this.setState({ pendingPayments, selectedPayments: [pendingPayments[0]] || [], paymentModalVisible: false });
                     done && done();
                     castNotification({
                         title: 'Payments sent to Stripe',
@@ -126,8 +128,8 @@ export default class PaymentDashboard extends Component {
                     <Modal visible={state.paymentModalVisible} title='Pay Contractors'>
                         <h2>Pay contractors</h2>
                         <p>
-                            You are about to pay <b>{`${state.totalCAD} CAD + ${state.totalUSD} USD to ${state.selectedPayments.length} contractors`}</b>.
-                            In order to proceed, please provide you <b>two factor authentication token</b>.
+                            You are about to pay <b>{`${state.totalCAD} CAD + ${state.totalUSD} USD to ${state.selectedPayments.length} contractor(s)`}</b>.
+                            In order to proceed, please provide you <Link href='/me'><b>two factor authentication token</b></Link>.
                         </p>
                         <TextField placeholder='Two Factor Authentication token' onChange={(name, val) => { this.token2fa = val; }} />
                         <ButtonWorker text='Pay' theme='purple' type='fill' work={this.payContractors.bind(this)} />
@@ -157,7 +159,7 @@ export default class PaymentDashboard extends Component {
                                     state.selectedPayments.length != 0 ? (
                                         <PaymentDetails contractorPayment={state.selectedPayments[0]} payContractors={this.castPaymentModal.bind(this)} />
                                     ) : (
-                                        <h4>No selected payment</h4>
+                                        <h4 id='no-selected-payment' className='card'>No selected payment</h4>
                                     )
                                 )
                             }
@@ -286,15 +288,16 @@ class PaymentsBreakdown extends Component {
         super(props);
     }
 
-    componentWillReceiveProps(props) {
-        if (this.props.contractorPayments) {
-            this.setState({ contractorPayments: props.contractorPayments });
-        }
+    componentWillReceiveProps(newProps) {
+        const newState = {};
+        if (newProps.contractorPayments) newState.contractorPayments = newProps.contractorPayments;
+        if (newProps.totalCAD) newState.totalCAD = newProps.totalCAD;
+        if (newProps.totalUSD) newState.totalUSD = newProps.totalUSD;
+
+        this.setState(newState);
     }
 
     render(props, state) {
-        console.log(props, state);
-        
         return (
             <div className="payments-breakdown">
                 <div id="breakdown-header">
