@@ -39,6 +39,10 @@ class Staffing {
                 } 
             }
 
+            if (params.filters.search) {
+                $match.legalname = new RegExp(params.filters.search, 'i');
+            }
+
             db.join(configLib.default(), 'staffing', [
                 { $match },
                 { $lookup : { from : 'entities', as : 'entity', localField : 'entityid', foreignField : '_id' } },
