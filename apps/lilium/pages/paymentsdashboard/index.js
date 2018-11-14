@@ -14,13 +14,13 @@ export default class PaymentDashboard extends Component {
         super(props);
         this.token2fa;
         const hardCodedCreditCards = [
-            { number: '1234567843218765', cvv: '213', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvv: '543', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvv: '256', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvv: '783', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvv: '556', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvv: '011', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvv: '683', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvc: '213', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvc: '543', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvc: '256', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvc: '783', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvc: '556', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvc: '011', expiryMonth: '1', expiryYear: '2018' },
+            { number: '1234567843218765', cvc: '683', expiryMonth: '1', expiryYear: '2018' },
         ]
         this.state = {
             pendingPayments: [], selectedPayments: [],
@@ -84,7 +84,7 @@ export default class PaymentDashboard extends Component {
             this.setState({ selectedPayments });
         } else {
             this.setState({ selectedPayments: [], totalCAD: 0, totalUSD: 0 });
-        }        
+        }
     }
 
     castPaymentModal() {
@@ -167,12 +167,14 @@ export default class PaymentDashboard extends Component {
                         </div>
                     </div>
                 </Tab>
-                <Tab title='Credit Cards'>
-                    {
-                        state.creditCards.map(cc => (
-                            <CreditCard {...cc} />
-                        ))
-                    }
+                <Tab title='Credit Cards Management'>
+                    <div id="credit-card-list">
+                        {
+                            state.creditCards.map(cc => (
+                                <CreditCard {...cc} />
+                            ))
+                        }
+                    </div>
                     {/* <BigList listitem={CreditCard} addComponent={AddCreditCard} batchsize={50} endpoint='/ponglinks/bunch' liststyle={{ maxWidth: 800, margin: 'auto' }} />                                     */}
                 </Tab>
             </TabView>
