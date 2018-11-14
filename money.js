@@ -8,7 +8,18 @@ const LML3 = require(liliumroot + '/lml3/compiler');
 let stripeconfig; // sk, pk, connectid
 let stripe;
 
+const CURRENCIES = [];
+
 module.exports = class Money {
+    static preloadCurrencies() {
+        log('Money', 'Loading currencies from directory', 'info');
+        const fs = require('fs');
+        const files = fs.readdirSync('./currency');
+
+        files.forEach(file => CURRENCIES.push(require("./currency/" + file)));
+        log('Money', 'Loaded a total of ' + CURRENCIES.length + ' currencies', 'success');
+    }
+
     getConfig() {
         if (stripeconfig) {
             return stripeconfig;

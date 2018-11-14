@@ -6,6 +6,10 @@ export default class Modal extends Component {
         this.state = { visible: this.props.visible || false };
     }
 
+    fireClose() {
+        this.props.onClose && this.props.onClose();
+    }
+
     close() {
         this.setState({ visible: false });
     }
@@ -37,7 +41,9 @@ export default class Modal extends Component {
                     <div className="modal-body">
                         <div className="modal-header">
                             <h3 className="modal-title">{this.props.title}</h3>
-                            <span className="close-btn" title='Close' onClick={this.close.bind(this)}><i style={{ color: 'red', float: 'right' }} class="fas fa-circle"></i></span>
+                            { this.props.onClose ? (
+                                <span className="close-btn" title='Close' onClick={this.fireClose.bind(this)}><i style={{ color: 'red', float: 'right' }} class="fas fa-circle"></i></span>
+                            ) : null }
                         </div>
                         <div className="modal-content">
                             {
@@ -45,7 +51,7 @@ export default class Modal extends Component {
                             }
                         </div>
                         <div className="modal-footer">
-                        
+                            
                         </div>
                     </div>
                 </div>

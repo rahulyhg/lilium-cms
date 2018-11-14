@@ -132,7 +132,7 @@ var LiveVariables = function() {
             let params = cli.routeinfo.params.p;
             try {
                 params = JSON.parse(params);
-            } catch (err) { }
+            } catch (error) { params = { error }; }
 
             RegisteredLiveVariables[cli.routeinfo.path[2]] ? RegisteredLiveVariables[cli.routeinfo.path[2]].callback(
                 cli, cli.routeinfo.path.splice(3), params, 

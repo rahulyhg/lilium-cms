@@ -10,9 +10,10 @@ import { getSession, getLocal, storeLocal } from '../../data/cache';
 import { PublishingTab } from './publishing';
 import { PonglinkTab } from './ponglink';
 import { PerformanceTab } from './performance';
+import { ContractorTab } from './contractor';
 
 const TAB_COMPONENTS = [
-    PublishingTab, PonglinkTab, PerformanceTab
+    PublishingTab, PonglinkTab, PerformanceTab, ContractorTab
 ];
 
 class DashboardTabs extends Component {
@@ -86,7 +87,7 @@ export default class DashboardPage extends Component {
     }
 
     tabClicked(tab) {
-        storeLocal("TAB_dashboard", TAB_COMPONENTS.indexOf(tab));
+        storeLocal("TAB_dashboard", this.state.tabs.indexOf(tab));
         this.setState({ selectedTab : tab });
     }
 

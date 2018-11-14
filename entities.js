@@ -864,6 +864,37 @@ class Entities {
                 displayname : 1, 
                 avatarURL : 1
             });
+        } else if (levels[0] == "dashboardstats") {
+            const now = new Date();
+
+            db.join(cli._c, 'content', [
+                { $match : { status : "published", author : db.mongoID(cli.userinfo.userid) } },
+                { $group : { _id : "$topic", posts : { $sum : 1 } } },
+                { $lookup : { from : "topics", as : "topic", localField : '_id', foreignField : '_id' } },
+                { $project : { _id : 0, posts : 1, topic : "$topic.displayname", topicslug : "$topic.completeSlug" } },
+                { $sort : { posts : -1 } },
+                { $unwind : "$topic" },
+                { $unwind : "$topicslug" },
+            ], topics => {
+                db.join(cli._c, 'content', [
+                    { $match : { 
+                        status : "published", 
+                        author : db.mongoID(cli.userinfo.userid),
+                        date : { 
+                            $gt : new Date(now.getFullYear(), now.getMonth(), now.getDate() - 90) } 
+                        } 
+                    },
+                    { $group : { _id : { $dayOfWeek : "$date" }, published : { $sum : 1 } } },
+                    { $sort : { _id : 1 } },
+                    { $project : { day : "$_id", published : 1, _id : 0 } }
+                ], activity => {
+                    sendback({
+                        totalposts : topics.reduce((acc, cur) => acc + cur.posts, 0),
+
+                        topics, activity
+                    });
+                });
+            });
         } else if (levels[0] == "cached") {
             db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, function(e, a) {sendback(a);}, {displayname : 1, avatarURL : 1});
         } else if (levels[0] == "simple") {

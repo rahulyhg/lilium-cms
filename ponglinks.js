@@ -113,11 +113,11 @@ class PongLinks {
                 db.join(cli._c, 'pongclicks', [
                     { $match : { hash : link.hash } },
                     { $group: { 
-                        _id: { $dayOfYear: "$at" },
+                        _id: { day : {$dayOfYear: "$at"}, year : {$year : "$at"} },
                         clicks: { $sum: 1 }
                     } },
                     { $project : {
-                        day : "$_id", clicks : 1, _id : 0 
+                        day : "$_id.day", year : "$_id.year", clicks : 1, _id : 0 
                     } },
                     { $sort : {
                         day : -1
@@ -136,6 +136,19 @@ class PongLinks {
                         sendback({ link, daily, versions });
                     });
                 });
+            });
+        } else if (levels[0] == "dashboard") {
+            db.join(cli._c, 'ponglinks', [
+                { $match : { status : 'active', clicks : { $gt : 5 } } },
+                { $sort : { _id : -1 } },
+                { $limit : 25 },
+                { $sort : { clicks : -1 } },
+                { $project : {
+                    identifier : 1, _id : 1, createdAt : 1, 
+                    creatorid : 1, clicks : 1
+                } }
+            ], arr => {
+                sendback(arr);
             });
         } else {
             if (params.filters.search) {

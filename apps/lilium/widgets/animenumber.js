@@ -59,7 +59,7 @@ export class AnimeNumber extends Component {
             easing: 'easeOutSine',
             duration : this.coldState.duration,
             update : () => {
-                elem.textContent = this.props.ordinal ? ordinal(obj.number) : obj.number;
+                elem.textContent = (this.props.ordinal ? ordinal(obj.number) : obj.number) + (this.props.unit || "");
                 this.onupdate();
             },
             complete : () => {

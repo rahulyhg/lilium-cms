@@ -51,19 +51,33 @@
 .lys-sugg {
     cursor: pointer;
     margin: 5px 0px;
-}
 
-.lys-sugg i {
-    width: 32px;
-    height: 32px;
-    border: 1px solid #AAA;
-    background: #EEE;
-    color: #333;
-    text-align: center;
-    box-sizing: border-box;
-    padding-top: 7px;
-    margin-right: 6px;
-    font-weight: 300;
+    &>i {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #AAA;
+        background: #EEE;
+        color: #333;
+        text-align: center;
+        box-sizing: border-box;
+        padding-top: 7px;
+        margin-right: 6px;
+        font-weight: 300;
+    }
+
+    // Shift quick command, hidden for now
+    .lys-shift-num {
+        display: none;
+
+        font-size: 12px;
+        background: #dadada;
+        color: #555;
+        padding: 2px 6px;
+        border: 0.5px solid #999;
+        float: right;
+        border-radius: 3px;
+        margin-top: 4px;
+    }
 }
 
 #lys-sugg-cmds {
