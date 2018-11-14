@@ -107,7 +107,7 @@ module.exports = class Money {
                                             if (contractor && contractor.email) {
                                                 require(liliumroot + "/lml3/compiler").compile(
                                                     require(liliumroot + '/config').fetchConfig(siteid), 
-                                                    liliumroot + "/plugins/contractors/invoice.lml3",
+                                                    liliumroot + "/backend/dynamic/invoice.lml3",
                                                     { invoice, contractor },
                                                     markup => {
                                                         mailLib.triggerHook(require(liliumroot + '/config').fetchConfig(siteid), 'send_invoice_to_contractor', contractor.email, {
@@ -136,8 +136,6 @@ module.exports = class Money {
     }
 
     dispatchPending(payload, requester, done) {
-        console.log(payload);
-        
         log("Money", "Preparing Stripe requests with a payload of " + payload.length + " contractors", "detail");
         let index = -1;
         const nextItem = () => {

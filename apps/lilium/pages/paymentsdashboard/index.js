@@ -92,7 +92,7 @@ export default class PaymentDashboard extends Component {
 
     payContractors(done) {
         if (this.state.selectedPayments) {
-            API.post('/contractorspayments/generate/', { ids: this.state.selectedPayments.map(c => c._id), secret: this.token2fa }, (err, data, r) => {
+            API.post('/contractorspayments/generate/', { ids: this.state.selectedPayments.map(c => ({ id: c._id, currency: c.currency }) ), secret: this.token2fa }, (err, data, r) => {
                 if (r.status == 200) {
                     let pendingPayments = this.state.pendingPayments;
                     pendingPayments = pendingPayments.filter(p => this.state.selectedPayments.findIndex(x => x._id == p._id) < 0);

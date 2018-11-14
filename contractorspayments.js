@@ -93,6 +93,9 @@ class ContractorHandler {
             if (!dat.secret || !dat.ids || dat.ids.length == 0) {
                 return cli.throwHTTP(400, undefined, true);
             }
+            if (dat.ids.filter(i => !i.id || !i.currency).length != 0) {
+                return cli.throwHTTP(400, undefined, true);
+            }
             
             if (twoFactor.validate2fa(cli.userinfo.user, dat.secret)) {
                 cli.sendJSON({ working : true });
@@ -143,7 +146,7 @@ class ContractorHandler {
             (err, contractor) => {
                 require(liliumroot + "/lml3/compiler").compile(
                     cli._c, 
-                    liliumroot + "/plugins/contractors/invoice.lml3",
+                    liliumroot + "/backend/dynamic/invoice.lml3",
                     { invoice, contractor },
                     markup => {
                         cli.sendHTML(markup, 200);
