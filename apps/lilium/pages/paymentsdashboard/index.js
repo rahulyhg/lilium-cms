@@ -99,11 +99,17 @@ export default class PaymentDashboard extends Component {
                         message: 'Payments sent to Stripe and are now pending',
                         type: 'info'
                     })
+                } else if (r.status == 403) {
+                    castNotification({
+                        title: 'Forbidden, 2FA authentication failed',
+                        message: 'The two factor authentication failed, make sure that you have 2FA enabled and that you provide the code provided by your 2FA application on your smartphone. Visit your profile page to enable 2FA',
+                        type: 'error'
+                    });
                 } else {
                     castNotification({
                         title: 'Error while paying contractors',
                         type: 'error'
-                    })
+                    });
                 }
 
                 done && done();
