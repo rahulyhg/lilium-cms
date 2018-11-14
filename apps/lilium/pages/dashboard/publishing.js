@@ -21,13 +21,14 @@ class LiveListOfPosts extends Component {
     generateSourceIcons(item) {
         const sources = [];
         switch (item.source) {
-            case "google":   sources.push(<i class="rt-source-icon fab fa-google"></i>); break;
-            case "facebook": sources.push(<i class="rt-source-icon fab fa-facebook"></i>); break;
-            case "pinterest":sources.push(<i class="rt-source-icon fab fa-pinterest-p"></i>); break;
-            case "twitter":  sources.push(<i class="rt-source-icon fab fa-twitter"></i>); break;
-            case "flipboard":sources.push(<i class="rt-source-icon fab fa-flipboard"></i>); break;
+            case "google":    sources.push(<i class="rt-source-icon fab fa-google"></i>); break;
+            case "facebook":  sources.push(<i class="rt-source-icon fab fa-facebook"></i>); break;
+            case "instagram": sources.push(<i class="rt-source-icon fab fa-instagram"></i>); break;
+            case "pinterest": sources.push(<i class="rt-source-icon fab fa-pinterest-p"></i>); break;
+            case "twitter":   sources.push(<i class="rt-source-icon fab fa-twitter"></i>); break;
+            case "flipboard": sources.push(<i class="rt-source-icon fab fa-flipboard"></i>); break;
             case "(direct)":
-            case "direct":   sources.push(<i class="rt-source-icon far fa-globe-americas"></i>); break;
+            case "direct":    sources.push(<i class="rt-source-icon far fa-globe-americas"></i>); break;
 
             default: sources.push(<i class="rt-source rt-source-word">{item.source}</i>);
         }
