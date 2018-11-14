@@ -569,6 +569,10 @@
             "module" : "contractorspayments.js",
             "endpoint" : "contractorspayments",
             "support" : ["admin_post", "livevar"]
+        }, {
+            "module" : "creditcards.js",
+            "endpoint" : "creditcards",
+            "support" : ["admin_post", "livevar"]
         }
     ]
 }
