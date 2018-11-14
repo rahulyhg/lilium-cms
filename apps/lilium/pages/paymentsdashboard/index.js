@@ -5,6 +5,7 @@ import API from '../../data/api';
 import Modal from '../../widgets/modal';
 import { castNotification } from '../../layout/notifications';
 import { Link } from '../../routing/link';
+import { SelectionBox, PendingPaymentCard, PaymentDetails, PaymentsBreakdown,  } from './pendingpayments';
 
 export default class PaymentDashboard extends Component {
     constructor(props) {

@@ -1,3 +1,5 @@
+import { h, Component } from 'preact'
+
 export class CreditCard extends Component {
     constructor(props) {
         super(props);

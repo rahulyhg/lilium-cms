@@ -30,6 +30,8 @@ const SelectionBox = props => (
     </div>
 )
 
+module.exports.SelectionBox = SelectionBox;
+
 export class PaymentDetails extends Component {
     constructor(props) {
         super(props);
@@ -70,7 +72,7 @@ export class PaymentDetails extends Component {
     }
 }
 
-export class PaymentArticlesSummary extends Component {
+class PaymentArticlesSummary extends Component {
     constructor(props) {
         super(props);
         this.state = {
