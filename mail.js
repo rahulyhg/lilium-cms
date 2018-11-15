@@ -234,35 +234,41 @@ class LMLMail {
     }
 
     sendGMail(email, callback) {
-        if (!email.to || !email.subject || (!email.content && !email.html)) {
-            log('Gmail', 'Could not send email due to missing fields', 'warn');
-            callback && callback(new Error("Could not send email : missing fields"));
-        } else {
-            log('Gmail', 'Sending email from ' + senderInfo[email.siteid].user + ' to ' + email.to);
-            let _c = require('./config.js').fetchConfig(email.siteid);
-
-            let emailobj = {
-                from : '"' + senderInfo[email.siteid].from + '" <' + senderInfo[email.siteid].user + ">",
-                to : email.to,
-                subject : email.subject,
-                cc : email.cc
-            };
-
-            if (email.html) {
-                emailobj.html = email.html;
+        const sender = senderInfo[email.siteid];
+        if (sender) {
+            if (!email.to || !email.subject || (!email.content && !email.html)) {
+                log('Gmail', 'Could not send email due to missing fields', 'warn');
+                callback && callback(new Error("Could not send email : missing fields"));
             } else {
-                emailobj.text = email.content;
-            }
-
-            senderInfo[email.siteid].transporter.sendMail(emailobj, (err, res) => {
-                if (err) {
-                    log('Mail', 'Could not send email => ' + err, 'err');
+                log('Gmail', 'Sending email from ' + senderInfo[email.siteid].user + ' to ' + email.to);
+                let _c = require('./config.js').fetchConfig(email.siteid);
+    
+                let emailobj = {
+                    from : '"' + senderInfo[email.siteid].from + '" <' + senderInfo[email.siteid].user + ">",
+                    to : email.to,
+                    subject : email.subject,
+                    cc : email.cc
+                };
+    
+                if (email.html) {
+                    emailobj.html = email.html;
                 } else {
-                    log('Mail', 'Sent email successfully to ' + email.to, 'success');
+                    emailobj.text = email.content;
                 }
-
-                callback && callback(err, res);
-            });
+    
+                senderInfo[email.siteid].transporter.sendMail(emailobj, (err, res) => {
+                    if (err) {
+                        log('Mail', 'Could not send email => ' + err, 'err');
+                    } else {
+                        log('Mail', 'Sent email successfully to ' + email.to, 'success');
+                    }
+    
+                    callback && callback(err, res);
+                });
+            }
+        } else {
+            log('Mail', 'Will not attempt to send email because mail configuration could not be found', 'warn');
+            callback && callback({ message: 'Email sender configuration could not be found for the site' }, undefined);            
         }
     }
 

@@ -1,0 +1,151 @@
+const settings = {};
+
+const css = `<style>
+
+body {
+    font-family : "Ubuntu", "Helvetica", "Arial", sans-serif;
+    padding: 0; margin: 0;
+}
+
+#wrap {
+    width: 600px;
+    margin: 20px auto;
+    border: 1px solid #DDD;
+    padding: 20px;
+
+    position: relative;
+}
+
+h1, h2, h3 {
+    margin: 0;
+}
+
+h3 {
+    font-size: 14px;
+    font-weight: normal;
+}
+
+#indate {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#total {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    text-align: right;
+}
+
+#total b {
+    display: block;
+    font-size : 12px;
+}
+
+#total span {
+    font-size: 18px;
+}
+
+#billto {
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+
+small {
+    color: #777;
+}
+
+#billto p {
+    margin-top: 0px;
+    margin-bottom: 4px;
+}
+
+#billto b {
+    margin-bottom: 8px;
+    font-size: 18px;
+    display: block;
+}
+
+table {
+    width: 100%;
+}
+
+tbody td {
+    padding-bottom: 20px;
+}
+
+th {
+    text-align: left;
+}
+
+tfoot tr:first-child td {
+    padding-top: 12px;
+}
+
+</style>`;
+
+const dateformat = require('dateformat');
+const compile = (o, context) => { o(`<!DOCTYPE html><html>
+<head>
+    <meta charset="utf-8"> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Invoice #${context.invoice.number} - Narcity Media</title>
+    ${css}
+</head>
+<body><div id="wrap">
+    <h1>Invoice #${context.invoice.number}</h1>
+    <h2>${context.contractor.displayname}</h2>
+    <h3>${context.contractor.email}</h3>
+    <b id="indate">${dateformat(new Date(context.invoice.at), 'mmmm dd, yyyy')}</b>
+    <div id="total">
+        <b>Amount paid</b>
+        <span>${context.invoice.total}.00$</span>
+    </div>
+
+    <div id="billto">
+        <b>Bill to</b>
+        <p>Narcity Media inc.</p>
+        <p>147 Liberty Street</p>
+        <p>Unit 209</p>
+        <p>Toronto ON M6K 3G3</p>
+        <p>Canada</p>
+        <p>&nbsp;</p>
+        <p>accounting@narcitymedia.com</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Headline and URL trail</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            `);
+            context.invoice.products.forEach(post => {
+                o(`
+                    <tr>
+                        <td>
+                            ${post.headline}<br />
+                            <small>/${post.topicslug}/${post.name}</small>
+                        </td>
+                        <td>${post.worth}.00$</td>
+                    </tr>
+                `)
+            });
+            o(`
+        </tbody>    
+        <tfoot>
+            <tr>
+                <td><b>Subtotal</b></td> <td>${context.invoice.total}.00$</td>
+            </tr>
+            <tr>
+                <td><b>total</b></td> <td>${context.invoice.total}.00$</td>
+            </tr>
+        </tfoot>
+    </table>
+</div></body>
+
+</html>`)};
+
+module.exports = { settings, compile };
