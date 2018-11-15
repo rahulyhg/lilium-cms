@@ -17,8 +17,10 @@ class StaffListItem extends Component {
         return (
             <div class="tr staff-list-row">
                 <div class="td">
-                    <img class="staff-list-avatar" src={this.props.item.entity.avatarURL} />
-                    <span class="staff-list-name">{ this.props.item.legalname }</span>
+                    <Link href={"/staffing/single/" + this.props.item._id}>
+                        <img class="staff-list-avatar" src={this.props.item.entity.avatarURL} />
+                        <span class="staff-list-name">{ this.props.item.legalname }</span>
+                    </Link>
                 </div>
                 <div class="td">{ this.props.item.entity.email }</div>
                 <div class="td staff-list-status">
