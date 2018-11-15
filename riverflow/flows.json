@@ -330,6 +330,10 @@
             "endpoint" : "comments",
             "support" : ["admin_post", "admin_delete", "livevar", "get"]
         }, {
+            "module" : "money.js",
+            "endpoint" : "money",
+            "support" : ["livevar"]
+        }, {
             "module" : "notifications.js",
             "endpoint" : "notifications",
             "support" : ["admin_post"]
