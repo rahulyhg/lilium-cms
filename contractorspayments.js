@@ -5,6 +5,7 @@ const dateFormat = require('dateformat');
 const Money = require("./money");
 const request = require('request');
 const CryptoJS = require('crypto-js');
+const twoFactor = require('./twoFactor');
 
 const money = new Money();
 
@@ -78,17 +79,7 @@ class ContractorHandler {
         });
     }
 
-    adminManageGET(cli) {
-        if (!cli.hasRight("manage-contractors")) {
-            return cli.refuse();
-        }
-
-        filelogic.serveAdminLML3(cli, false, {
-            stripeoauth : money.generateOAuthURL(cli._c) 
-        }, undefined, "plugins/contractors");
-    }
-
-    adminManagePOST(cli) {
+    adminPOST(cli) {
         if (!cli.hasRight("manage-contractors")) {
             return cli.refuse();
         }
@@ -100,15 +91,11 @@ class ContractorHandler {
             if (!dat.secret || !dat.ids || dat.ids.length == 0) {
                 return cli.throwHTTP(400, undefined, true);
             }
-
-            db.match(require(liliumroot + "/config").default(), 'entities', { 
-                _id : db.mongoID(cli.userinfo.userid),
-                shhh : CryptoJS.SHA256(dat.secret).toString(CryptoJS.enc.Hex)
-            }, found => {
-                if (!found) {
-                    return cli.sendJSON({ error : "password", message : "The provided password does not match the one in the database." });
-                }
-
+            if (dat.ids.filter(i => !i.id || !i.currency).length != 0) {
+                return cli.throwHTTP(400, undefined, true);
+            }
+            
+            if (twoFactor.validate2fa(cli.userinfo.user, dat.secret)) {
                 cli.sendJSON({ working : true });
                 money.dispatchPending(dat.ids, db.mongoID(cli.userinfo.userid), () => {
                     require(liliumroot + "/notifications").notifyUser(
@@ -118,7 +105,9 @@ class ContractorHandler {
                         "managecontractors"
                     );
                 });
-            });
+            } else {
+                cli.throwHTTP(403, 'Unauthorized because of wrong 2FA', true);
+            }
         } else if (action == "retry") {
             const number = parseInt(cli.routeinfo.path[3]);
             if (number) {
@@ -155,7 +144,7 @@ class ContractorHandler {
             (err, contractor) => {
                 require(liliumroot + "/lml3/compiler").compile(
                     cli._c, 
-                    liliumroot + "/plugins/contractors/invoice.lml3",
+                    liliumroot + "/backend/dynamic/invoice.lml3",
                     { invoice, contractor },
                     markup => {
                         cli.sendHTML(markup, 200);
@@ -163,10 +152,6 @@ class ContractorHandler {
                 );
             });
         });
-    }
-
-    adminPOST(cli) {
-
     }
 
     livevarManage(cli, levels, params, sendback) {
@@ -208,7 +193,7 @@ class ContractorHandler {
                     });
 
                     sendback({ contractors : Object.values(resp), totalowed });
-                }, { displayname : 1, avatarURL : 1, stripeuserid : 1, currency: 1 });
+                }, { displayname : 1, avatarURL : 1, stripeuserid : 1, currency: 1, isBeingPaid: 1 });
             });
         } else if (levelone == "invoices") {
             sendback({ invoices : [] })

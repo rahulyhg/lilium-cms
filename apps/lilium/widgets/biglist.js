@@ -22,6 +22,7 @@ const LOCALSTORAGE_PREFIX = "LF_";
  *      prepend : Wether the additional items will be added at the start or end of list. Setting this to "true" will add items at start of list,
  *      action : A function passed to every list item to link the BigList parent with the items through a callback,
  *      items : Array of initial items. Can be set later. If passed after mount, will replace the entire array with the new one.
+ *      topElement : Component above all list items, displayed under the filters.
  *      loadmoreButton : A component representing the load more button inside the list,
  *      keyid : List item key for Preact mapping. Defaults to : _id.
  *      addComponent : First component to appear in the big list. Can be used as a "add" handle.
@@ -41,6 +42,7 @@ export class BigList extends Component {
             endpoint : props.endpoint,
             component : props.listitem,
             addComponent : props.addComponent || BigListNullComponent,
+            topElement : props.topElement,
             emptyComponent : props.emptyComponent || BigListEmptyTemplate,
             index : 0,
             batchsize : props.batchsize || 30,
@@ -134,6 +136,8 @@ export class BigList extends Component {
                 }
 
                 <div class="big-list-items" style={this.props.liststyle || {}}>
+                    { this.coldState.topElement ? <this.coldState.topElement /> : null }
+
                     {
                         this.state.items.length == 0 ? (
                             <this.coldState.emptyComponent />

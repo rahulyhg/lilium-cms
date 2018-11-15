@@ -373,12 +373,12 @@ class PostDetails extends Component {
                     <span class="red clickable" onClick={this.triggerPreviewLinkInvalidation.bind(this)}>Invalidate preview link</span>
                 </footer>
 
-                <Modal visible={this.state.updatingSlug} title='Update slug'>
+                <Modal visible={this.state.updatingSlug} title='Update slug' onClose={ () => this.setState({ updatingSlug : false }) }>
                     <TextField name='name' placeholder='URL Slug' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.name} />
                     <ButtonWorker text='Update' work={this.updateSlug.bind(this)} />
                 </Modal>
 
-                <Modal visible={this.state.updatingAuthor} title='Update author'>
+                <Modal visible={this.state.updatingAuthor} title='Update author' onClose={ () => this.setState({ updatingAuthor : false }) }>
                     <SelectField name='author' placeholder='Author' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.author} options={
                         getSession("entities").map(user => ({ value : user._id, displayname : user.displayname }))
                     } />

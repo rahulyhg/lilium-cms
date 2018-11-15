@@ -1,9 +1,9 @@
 import { h, Component } from "preact";
-import API from '../data/api';
 import flatpickr from 'flatpickr';
+import slugify from "slugify";
+import API from '../data/api';
 import { Spinner } from '../layout/loading'
 import { Picker } from '../layout/imagepicker';
-import slugify from "slugify";
 import { ImagePicker } from '../layout/imagepicker';
 
 class FormField extends Component {
@@ -39,19 +39,21 @@ class FormField extends Component {
         this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
 
         if (this.autosave) {
+            this.savedTimeout && clearTimeout(this.savedTimeout);
             this.setState({ saving : true });
+
             API[this.savemethod](this.endpoint, { 
                 [this.fieldkey] : this.props.name, [this.valuekey] : this.value 
             }, (err, resp, r) => {
-                if (err || r.status / 200 != 1) {
+                if (!err && Math.floor(r.status / 200) == 1) {
                     this.setState({ saving : false, saved : true });
+
+                    this.savedTimeout = setTimeout(() => {
+                        this.setState({ saved : false, saveerror : false })
+                    }, 3000);
                 } else {
                     this.setState({ saving : false, saveerror : true });
                 }
-
-                setTimeout(() => {
-                    this.setState({ saved : false, saveerror : false })
-                }, 3000);
             })
         }
     }
@@ -108,13 +110,23 @@ export class ButtonWorker extends Component {
 }
 
 export class SelectField extends FormField {
+    componentDidMount() {
+        this.ref.value = this.value;
+    }
+
+    componentWillReceiveProps(props) {
+        if (props.value) {
+            this.ref.value = props.value;
+        }
+    }
+
     render() {
         return (
             <div class="field-wrap">
                 { this.props.placeholder ? <b class="placeholder">{this.props.placeholder}</b> : null }
-                <select class="classic-field" value={this.props.initialValue} onChange={ev => this.changed(ev.target.value)}>
+                <select ref={x => (this.ref = x)} class="classic-field" onChange={ev => this.changed(ev.target.value)}>
                     { this.props.options.map(opt => (
-                        <option value={opt.value} key={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname|| opt.value}</option>
+                        <option value={opt.value} key={opt.value}>{opt.text || opt.displayname || opt.value}</option>
                     )) }
                 </select>
             </div> 
@@ -138,6 +150,10 @@ export class TextField extends FormField {
         }
     }
 
+    componentDidMount() {
+        this.inputbox.value = this.value;
+    }
+
     shouldComponentUpdate(nextProps) {
         return !nextProps.value;
     }
@@ -155,17 +171,20 @@ export class TextField extends FormField {
 
     render() {
         return (
-            <div class="field-wrap" style={this.props.wrapstyle || {}}>
+            <div class={"field-wrap " + (this.state.saving ? "saving" : "") + (this.state.saved ? "saved" : "")} style={this.props.wrapstyle || {}}>
                 { this.props.placeholder && this.props.placeholderType != "inside" ? <b class="placeholder">{this.props.placeholder}</b> : null }
 
                 {
                     this.props.multiline ? 
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={this.props.style || {}} 
-                                    onChange={ev => this.changed(ev.target.value)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}>{this.props.initialValue || this.props.value || this.value || ""}</textarea>) :
-                        ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
+                                    onChange={ev => this.changed(ev.target.value)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}></textarea>) :
+                        ( <input class={"classic-field text-field " + (this.state.saving ? "saving" : "")} placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'}
                                     onChange={ev => this.changed(ev.target.value)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
                                     onFocus={this.props.onFocus && this.props.onFocus.bind(this)} ref={el => {this.inputbox = el}} />)
                 }
+
+                { this.state.saving ? <Spinner /> : null }
+                { this.state.saved ? <i class="far fa-check field-saved-check"></i> : null }
             </div>
         )
     }
@@ -654,6 +673,12 @@ export class DatePicker extends FormField {
                 this.changed( value ); 
             }
         });
+    }
+
+    componentWillReceiveProps(props) {
+        if (props.value) {
+            this.picker.setDate(new Date(props.value));
+        }
     }
 
     render() {

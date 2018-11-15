@@ -8,7 +8,26 @@ const LML3 = require(liliumroot + '/lml3/compiler');
 let stripeconfig; // sk, pk, connectid
 let stripe;
 
+const CURRENCIES = [];
+
 module.exports = class Money {
+    static preloadCurrencies() {
+        log('Money', 'Loading currencies from directory', 'info');
+        const fs = require('fs');
+        const files = fs.readdirSync('./currency');
+
+        files.forEach(file => CURRENCIES.push(require("./currency/" + file)));
+        log('Money', 'Loaded a total of ' + CURRENCIES.length + ' currencies', 'success');
+    }
+
+    static livevar(cli, levels, params, sendback) {
+        if (levels[0] == "currencies") {
+            sendback({ currencies : CURRENCIES });
+        } else {
+            sendback([]);
+        }
+    }
+
     getConfig() {
         if (stripeconfig) {
             return stripeconfig;
@@ -96,7 +115,7 @@ module.exports = class Money {
                                             if (contractor && contractor.email) {
                                                 require(liliumroot + "/lml3/compiler").compile(
                                                     require(liliumroot + '/config').fetchConfig(siteid), 
-                                                    liliumroot + "/plugins/contractors/invoice.lml3",
+                                                    liliumroot + "/backend/dynamic/invoice.lml3",
                                                     { invoice, contractor },
                                                     markup => {
                                                         mailLib.triggerHook(require(liliumroot + '/config').fetchConfig(siteid), 'send_invoice_to_contractor', contractor.email, {
@@ -129,13 +148,18 @@ module.exports = class Money {
         let index = -1;
         const nextItem = () => {
             if (++index == payload.length) {
-                return done && done();
+                return db.update(mainsite, 'entities', {_id: { $in: payload.map(x => db.mongoID(x._id)) }}, { isBeingPaid: false }, () => {
+                    done && done();
+                });
             }
 
             this.dispatchOne(db.mongoID(payload[index].id), payload[index].currency, requester, () => { nextItem(); });
         };
 
-        nextItem();
+        const mainsite = require(liliumroot + '/config').default();
+        db.update(mainsite, 'entities', {_id: { $in: payload.map(x => db.mongoID(x._id)) }}, { isBeingPaid: true }, () => {
+            nextItem();
+        });
     }
 
     retryFailedTransaction(number, done) {
