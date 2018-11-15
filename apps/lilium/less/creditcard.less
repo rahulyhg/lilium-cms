@@ -1,0 +1,22 @@
+@cardBg: @liliumPurple;
+
+.credit-card {
+    background-color: @cardBg;
+    background: linear-gradient(to right, lighten(@cardBg, 3%) 60%, darken(@cardBg, 5%) 90%);
+    border: 1px solid darken(@cardBg, 5%);
+    color: white;
+    border-radius: 10px;
+    width: 85mm;
+    height: 53mm;
+    margin: 8px;
+    position: relative;
+    box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.2);
+    font-family: monospace;
+}
+
+#credit-card-list {
+    .credit-card {
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,113 @@
+.staff-list-row {
+    .staff-list-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        vertical-align: middle;
+        display: inline-block;
+        margin-right: 12px;
+    }
+
+    .staff-list-name {
+        vertical-align: middle;
+        display: inline-block;
+    }
+
+    &>.td {
+        padding: 10px;
+    }
+
+    .staff-list-status {
+        span {
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        .staff-list-status-bubble {
+            vertical-align: middle;
+            display: inline-block;
+            height: 12px;
+            width: 12px;
+            background: #333;
+            border-radius: 50%;
+            margin-right: 8px;
+
+            &.status-active {
+                background: #8279e2;
+            }
+
+            &.status-terminated {
+                background: #d66664;
+            }
+        }
+    }
+}
+
+.staff-list-header {
+    &>.th {
+        font-weight: bold;
+        padding: 10px;
+        border-bottom: 1px solid #DDD;
+        background: #F6F6F6;
+    }
+}
+
+.single-staff-header {
+    padding: 50px;
+    background: #F9F9F9;
+    border-bottom: 1px solid #DDD;
+    display: flex;
+    align-content : center;
+
+    img {
+        width: 128px;
+        height: 128px;
+
+        vertical-align: middle;
+        border-radius: 50%;
+        box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.2);
+    }
+
+    .single-staff-header-details {
+        align-self: center;
+        margin-left: 18px;
+
+        h2 {
+            margin: 0px;
+            font-size: 36px;
+            font-weight: normal;
+        }
+
+        small {
+            display: inline-block;
+            background-color: #777;
+            color: white;
+            padding: 2px 4px 1px;
+            border-radius: 3px;
+        }
+    }
+
+    .single-staff-actions {
+        flex-grow: 1;
+        text-align: right;
+        align-self: center;
+    }   
+}
+
+.single-staff-form {
+    h2 {
+        margin-top: 40px;
+    }
+
+    .single-staff-double-field {
+        display: flex;
+        &>:first-child {
+            width: 80px;
+            margin-right: 10px;
+        }
+
+        &>:last-child {
+            flex-grow: 1;
+        }
+    }
+}

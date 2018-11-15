@@ -165,6 +165,17 @@
             "section" : "management"
         },
         {
+            "id": "staffing",
+            "lys" : "staffing,hire,contractors",
+            "faicon": "fa-address-card",
+            "displayname": "Staffing",
+            "priority": 505,
+            "rights": ["manage-staff"],
+            "absURL": "/staffing",
+            "section" : "management"
+        },
+
+        {
             "id": "entities-rights",
             "lys" : "roles,rights",
             "faicon": "fa-minus-circle",
@@ -318,6 +329,10 @@
             "module" : "comments.js",
             "endpoint" : "comments",
             "support" : ["admin_post", "admin_delete", "livevar", "get"]
+        }, {
+            "module" : "money.js",
+            "endpoint" : "money",
+            "support" : ["livevar"]
         }, {
             "module" : "notifications.js",
             "endpoint" : "notifications",
@@ -488,6 +503,10 @@
             "endpoint" : "entities",
             "support" : ["admin_post", "livevar", "setup", "api_get", "api_post"]
         }, {
+            "module" : "staffing.js",
+            "endpoint" : "staffing",
+            "support" : ["admin_post", "livevar", "admin_delete", "admin_put"]
+        }, {
             "module" : "entityrelationship.js",
             "endpoint" : "entityrelationship",
             "support" : ["admin_post", "livevar", "setup"]
@@ -553,6 +572,10 @@
         }, {
             "module" : "contractorspayments.js",
             "endpoint" : "contractorspayments",
+            "support" : ["admin_post", "livevar"]
+        }, {
+            "module" : "creditcards.js",
+            "endpoint" : "creditcards",
             "support" : ["admin_post", "livevar"]
         }
     ]

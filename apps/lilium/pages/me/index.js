@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
-import { TextField, ButtonWorker } from '../../widgets/form';
+import { TextField, ButtonWorker, SelectField } from '../../widgets/form';
 import { Picker } from '../../layout/picker';
 import { castNotification } from '../../layout/notifications';
 import { Loading } from '../../layout/loading';
