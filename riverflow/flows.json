@@ -501,7 +501,7 @@
         }, {
             "module" : "staffing.js",
             "endpoint" : "staffing",
-            "support" : ["admin_post", "livevar"]
+            "support" : ["admin_post", "livevar", "admin_delete", "admin_put"]
         }, {
             "module" : "entityrelationship.js",
             "endpoint" : "entityrelationship",
