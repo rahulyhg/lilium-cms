@@ -99,7 +99,7 @@ export class TextEditor extends Component {
                 'searchreplace visualblocks code fullscreen hr',
                 'media paste wordcount'
             ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-element insert-carousel insertEmbed link | bullist numlist | fullscreen | code',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-element insert-carousel insertEmbed link unlink | bullist numlist | fullscreen | code',
             content_css: [
                 '/compiled/theme/tinymce.css'
             ],
