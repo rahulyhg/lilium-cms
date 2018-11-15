@@ -8,6 +8,7 @@ const DeepDiff = require('deep-diff');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const diff = DeepDiff.diff;
+const DiffMatchPatch = require('diff-match-patch');
 const { JSDOM } = require('jsdom');
 
 const CONTENT_COLLECTION = 'content';
@@ -394,7 +395,7 @@ class ContentLib {
         });
     }
 
-    pushHistoryEntryFromDiff(_c, postid, actor, diffres, type, done) {
+    pushHistoryEntryFromDiff(_c, postid, actor, diffres, type, done, oldpost, newpost) {
         const diffs = diffres.filter(d => typeof d.rhs != "undefined" || d.kind == "A").map(d => {
             return {
                 field : d.path[0],
@@ -411,6 +412,11 @@ class ContentLib {
             }
     
             hooks.fireSite(_c, 'pushingContentDiff', {postid, actor, diffres, type});
+            const hasContentDiff = !!diffs.find(x => x.field == "content");
+            if (hasContentDiff) {
+                entry.content = newpost.content[0];
+            }
+            
             db.insert(_c, 'contenthistory', entry, (err, r) => done(entry));
         } else {
             done();
@@ -420,8 +426,14 @@ class ContentLib {
     getHistoryList(_c, postid, sendback) {
         db.find(_c, 'contenthistory', { postid : db.mongoID(postid) }, [], (err, cur) => {
             cur.sort({ _id : -1 }).project({ 
-                actor : 1, at : 1, type : 1, diffs : 1
+                actor : 1, at : 1, type : 1, diffs : 1, dmpid : 1
             }).toArray((err, arr) => sendback(arr));
+        });
+    }
+
+    getPatch(_c, patchid, sendback) {
+        db.findUnique(_c, 'contenthistory', { _id : db.mongoID(patchid) }, (err, patch) => {
+            sendback({ patch });
         });
     }
 
@@ -555,6 +567,7 @@ class ContentLib {
                     log('Content', 'Did not update article (no diff) with headline ' + newpost.title[0] + " (" + newpost._id + ")", 'info');
                     callback();
                 } else {
+
                     this.pushHistoryEntryFromDiff(_c, postid, caller, deepdiff, 'update', entry => {
                         if (entry) {
                             this.fetchDeepFieldsFromDiff(_c, newpost, entry, () => {
@@ -577,7 +590,7 @@ class ContentLib {
                             log('Content', 'Did not update article (no diff) with headline ' + newpost.title[0], 'info');
                             callback();
                         }
-                    });
+                    }, oldpost, newpost);
                 }
             });
         });
