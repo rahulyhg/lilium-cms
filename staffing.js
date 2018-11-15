@@ -5,10 +5,11 @@ const BUNCH_PROJECTION = {
     legalname : 1, ssn : 1, startdate : 1,
     enddate : 1, status : 1, position : 1,
     schedule : 1, rate : 1, currency : 1,
-    address : 1,
+    address : 1, phone : 1,
 
     "entity._id" : 1, "entity.displayname" : 1, "entity.avatarURL" : 1,
-    "entity.phone" : 1, "entity.username" : 1, "entity.email" : 1, "entity.revoked" : 1
+    "entity.phone" : 1, "entity.username" : 1, "entity.email" : 1, "entity.revoked" : 1,
+    "entity.stripeuserid" : 1
 };
 
 class Staffing {
