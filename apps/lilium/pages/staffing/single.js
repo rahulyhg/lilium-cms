@@ -3,7 +3,7 @@ import API from "../../data/api";
 import { Link } from '../../routing/link';
 import { BigList, BigListToolBarBuilder } from '../../widgets/biglist';
 import { Spinner } from '../../layout/loading';
-import { ButtonWorker, TextField, SelectField } from '../../widgets/form';
+import { ButtonWorker, TextField, SelectField, DatePicker } from '../../widgets/form';
 import { revokeAccess, enableAccess } from '../../pages/entities/lib';
 
 export default class SingleView extends Component {
@@ -16,7 +16,10 @@ export default class SingleView extends Component {
     }
 
     componentDidMount() {
-        this.loadFromState();
+        API.get('/money/currencies', {}, (err, json, r) => {
+            this.currencies = json.currencies;
+            this.loadFromState();
+        });
     }
 
     componentWillReceiveProps(props) {
@@ -92,7 +95,34 @@ export default class SingleView extends Component {
                 </div>
                 
                 <div class="single-staff-form" style={{ maxWidth: 720, margin: "20px auto" }}>
+                    <h2>Employee information</h2>
                     <TextField placeholder="Legal Full Name" name="legalname" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.legalname} />
+                    <TextField placeholder="Permanent address" name="address" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.address} />
+                    <TextField placeholder="Social Security Number" name="ssn" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.ssn} />
+                    <TextField placeholder="Phone number" name="phone" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.phone || this.state.staff.entity.phone} type="phone" />
+
+                    <h2>Employment</h2>
+                    <TextField placeholder="Position" name="position" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.position} />
+                    <SelectField placeholder="Schedule" name="schedule" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.schedule} options={
+                        [{ value : "parttime", text : "Part time" }, { value : "fulltime", text : "Full time" }, { value : "contractor", text : "Contractor" }]
+                    } />
+                    <div class="single-staff-double-field">
+                        <TextField placeholder="Rate" name="rate" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.rate} />
+                        <SelectField placeholder="Currency" name="currency" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.currency} options={
+                            this.currencies.map(cur => ({ value : cur.code, text : cur.displayname + " (" + cur.code.toUpperCase() + ")" }))
+                       } />
+                    </div>
+                    <DatePicker placeholder="Start date" name="startdate" autosave={true} savemethod="put" endpoint={"/staffing/edit/" + this.state.staffid} initialValue={this.state.staff.startdate} />
+
+                    {
+                        this.state.staff.entity.stripeuserid ? (<div>
+                            <div class="field-wrap">
+                                <h2>Stripe</h2>
+                                <b class="placeholder">Stripe User ID</b>
+                                <div>{ this.state.staff.entity.stripeuserid }</div>
+                            </div>
+                        </div>) : null
+                    }
                 </div>
             </div>
         )

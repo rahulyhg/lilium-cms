@@ -74,6 +74,8 @@
 
         h2 {
             margin: 0px;
+            font-size: 36px;
+            font-weight: normal;
         }
 
         small {
@@ -90,4 +92,22 @@
         text-align: right;
         align-self: center;
     }   
+}
+
+.single-staff-form {
+    h2 {
+        margin-top: 40px;
+    }
+
+    .single-staff-double-field {
+        display: flex;
+        &>:first-child {
+            width: 80px;
+            margin-right: 10px;
+        }
+
+        &>:last-child {
+            flex-grow: 1;
+        }
+    }
 }
