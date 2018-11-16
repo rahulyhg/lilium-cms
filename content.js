@@ -8,7 +8,6 @@ const DeepDiff = require('deep-diff');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const diff = DeepDiff.diff;
-const DiffMatchPatch = require('diff-match-patch');
 const { JSDOM } = require('jsdom');
 
 const CONTENT_COLLECTION = 'content';
@@ -415,6 +414,7 @@ class ContentLib {
             const hasContentDiff = !!diffs.find(x => x.field == "content");
             if (hasContentDiff) {
                 entry.content = newpost.content[0];
+                entry.hasdiff = true;
             }
             
             db.insert(_c, 'contenthistory', entry, (err, r) => done(entry));
@@ -426,7 +426,7 @@ class ContentLib {
     getHistoryList(_c, postid, sendback) {
         db.find(_c, 'contenthistory', { postid : db.mongoID(postid) }, [], (err, cur) => {
             cur.sort({ _id : -1 }).project({ 
-                actor : 1, at : 1, type : 1, diffs : 1, dmpid : 1
+                actor : 1, at : 1, type : 1, diffs : 1, hasdiff : 1
             }).toArray((err, arr) => sendback(arr));
         });
     }
