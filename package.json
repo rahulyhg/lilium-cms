@@ -81,7 +81,8 @@
     "crypto-js": "latest",
     "dateformat": "latest",
     "deep-diff": "latest",
-    "diff": "latest",
+    "diff": "^3.5.0",
+    "diff-match-patch": "^1.0.4",
     "entities": "latest",
     "flatpickr": "^4.5.1",
     "fs": "latest",
@@ -135,8 +136,7 @@
     "util": "latest",
     "validator": "latest",
     "xml2js": "^0.4.19",
-    "xxhashjs": "^0.2.2",
-    "stripe": "^5.4.0"
+    "xxhashjs": "^0.2.2"
   },
   "devDependencies": {
     "babel-cli": "latest",

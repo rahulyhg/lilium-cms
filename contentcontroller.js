@@ -252,6 +252,8 @@ class ContentController {
             contentlib.getLatestAutosave(cli._c, db.mongoID(levels[1]), entry => sendback(entry || { none : true })); 
         } else if (levels[0] == "history") {
             contentlib.getHistoryList(cli._c, levels[1], list => sendback(list));
+        } else if (levels[0] == "patch") {
+            contentlib.getPatch(cli._c, levels[1], patch => sendback(patch));
         } else if (levels[0] == "report") {
             contentlib.generatePublicationReport(cli._c, db.mongoID(levels[1]), report => sendback(report));
         } else if (levels[0] == "bulkstats") {
