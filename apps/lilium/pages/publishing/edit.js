@@ -491,13 +491,11 @@ export default class EditView extends Component {
                         getReportFunction : this.getReport.bind(this)
                     });
                 } else {
-                    r.text().then(message => {
-                        castNotification({
-                            type : "warning",
-                            title : "Could not publish article",
-                            message
-                        });
-                    })
+                    castNotification({
+                        type : "warning",
+                        title : "Could not publish article",
+                        message : r.responseText
+                    });
                 }
     
                 done();
