@@ -78,7 +78,7 @@ export class DevTools extends Component {
     }
 
     componentDidMount() {
-        window.onerror = this.onerror.bind(this);
+        window.addEventListener('error', this.onerror.bind(this));
         addCommand({
             command : "bundlejs,compile,build",
             displayname : "Bundle JS",

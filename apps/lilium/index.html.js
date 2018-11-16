@@ -12,8 +12,10 @@ module.exports = cli => `<!DOCTYPE html>
     </head>
     <body>
         <div id="app"></div>
-        <script src="/tinymce/tinymce.js"></script>
-        <script src="/chartjs/Chart.min.js"></script>
-        <script src="/lmlbackend/app.bundle.js"></script>
+        <script src="${cli._c.server.protocol}${cli._c.server.url}/tinymce/tinymce.js"></script>
+        <script src="${cli._c.server.protocol}${cli._c.server.url}/chartjs/Chart.min.js"></script>
+        <script src="${cli._c.server.protocol}${cli._c.server.url}/lmlbackend/app.bundle.js"></script>
+        <script src="${cli._c.server.protocol}${cli._c.server.url}/lmlbackend/vendors.app.bundle.js"></script>
+        <script src="${cli._c.server.protocol}${cli._c.server.url}/lmlbackend/main.app.bundle.js"></script>
     </body>
-</html>`;
+</html>`.replace(/\n/g, '').replace(/\>\s*\</g, '><');

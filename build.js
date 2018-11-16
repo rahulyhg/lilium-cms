@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const hooks = require('./hooks');
 
 const init_build_tree = [];
+const WEBPACK_CACHE = {};
 
 class Builder {
     static get defaultOptions() {
@@ -83,6 +84,8 @@ class Builder {
             maincontent = maincontent.replace("// LILIUM_IMPORT_TEMPLATE", preactInjectedCode.code);
 
             fs.writeFile(precompfile, maincontent, { encoding : "utf8" }, err => {
+                const MinifyPlugin = require("babel-minify-webpack-plugin");
+
                 const buildconfig = {
                     mode : _c.env == "dev" ? "development" : "production",
                     module : {
@@ -95,10 +98,26 @@ class Builder {
                         ]
                     },
                     entry : precompfile,
+                    plugins: [
+                        new MinifyPlugin({}, {})
+                    ],
                     output : {
                         path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
                         filename : options.bundlename || "app.bundle.js"
-                    }
+                    },
+                    optimization : {
+                        runtimeChunk: 'single',
+                        splitChunks: {
+                            cacheGroups: {
+                                vendor: {
+                                    test: /[\\/]node_modules[\\/]/,
+                                    name: 'vendors',
+                                    chunks: 'all'
+                                }
+                            }
+                        }
+                    },
+                    cache : WEBPACK_CACHE
                 };
 
                 log('Builder', 'Injection phase took ' + (Date.now() - now) + 'ms', 'info');
