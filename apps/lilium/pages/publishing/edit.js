@@ -32,8 +32,6 @@ const styles = {
     }
 }
 
-
-
 class HistoryEntry extends Component {
     constructor(props) {
         super(props);
@@ -64,9 +62,15 @@ class HistoryEntry extends Component {
         }
     }
 
+    clicked(ev) {
+        if (this.props.entry.hasdiff) {
+            this.props.onClick({ entry : this.props.entry });
+        }
+    }
+
     render() {
         return (
-            <div key={this.props.key} class={"history-entry history-entry-" + this.props.entry.type}>
+            <div key={this.props.key} class={"history-entry history-entry-" + this.props.entry.type} style={{ cursor: this.props.entry.hasdiff ? "pointer" : "default" }} onClick={this.clicked.bind(this)}>
                 <div class="history-entry-avatar-wrap">
                     <img class="history-entry-avatar" src={this.actor.avatarURL} />
                 </div>
@@ -75,6 +79,7 @@ class HistoryEntry extends Component {
                     <span> { this.createMessage() } </span>
                     <div class="history-entry-date">{ dateFormat(new Date(this.props.entry.at), 'HH:MM, dddd mmm yyyy') }</div>
                 </div>
+                {this.props.entry.hasdiff ? (<i class="far fa-history history-icon"></i>) : null}
             </div>
         );
     }
@@ -98,13 +103,17 @@ class PublishingHistory extends Component {
         log('History', 'History widget received props, about to set state', 'detail');
         this.setState({ history : props.history });
     }
+
+    entryClicked(entryev) {
+        this.props.entryClicked(entryev);
+    }
     
     render() {
         log('History', 'Rendering history with ' + this.state.history.length + ' entries', 'detail');
         return (
             <div>
                 {
-                    this.state.history.map(entry => (<HistoryEntry key={entry._id} entry={entry} actor={this.cachedUsers[entry.actor]} />))
+                    this.state.history.map(entry => (<HistoryEntry onClick={this.entryClicked.bind(this)} key={entry._id} entry={entry} actor={this.cachedUsers[entry.actor]} />))
                 }
 
                 <HistoryEntry entry={{
@@ -200,6 +209,10 @@ class PublishingSidebar extends Component {
         this.setState(newState);
     }
 
+    entryClicked(entryev) {
+        this.props.historyEntryClicked(entryev);
+    }
+
     render() {
         if (!this.state.post) {
             return null;
@@ -213,7 +226,7 @@ class PublishingSidebar extends Component {
                 </div>
 
                 <b style={styles.sidebarTitle}>Activity</b>
-                <PublishingHistory post={this.state.post} history={this.state.history} />
+                <PublishingHistory post={this.state.post} history={this.state.history} entryClicked={this.entryClicked.bind(this)} />
             </div>
         );
     }
@@ -755,6 +768,19 @@ export default class EditView extends Component {
         }
     }
 
+    historyEntryClicked(entryev) {
+        castOverlay('restore-article', { 
+            historyentry : entryev.entry, 
+            content : this.edits.content || this.state.post.content,
+            overwriteCallback : patch => {
+                const post = this.state.post;
+                post.content[0] = patch;
+                delete this.edits.content;
+                this.setState({ post });
+            }
+        });
+    }
+
     handleDetailsAction(field, value) {
         if (field == "name") {
             API.put("/publishing/slug/" + this.state.post._id, { slug : value }, (err, json, r) => {
@@ -862,7 +888,7 @@ export default class EditView extends Component {
                 </div>
 
                 <div class="publishing-sidebar">
-                    <PublishingSidebar post={this.state.post} actions={this.actions} history={this.state.history} />
+                    <PublishingSidebar post={this.state.post} actions={this.actions} history={this.state.history} historyEntryClicked={this.historyEntryClicked.bind(this)} />
                 </div>
             </div>
         )
