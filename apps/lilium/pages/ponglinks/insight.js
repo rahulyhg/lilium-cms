@@ -2,7 +2,7 @@ import { Component, h } from "preact";
 import { castNotification } from '../../layout/notifications'
 import API from '../../data/api';
 import { ChartGraph } from  '../../widgets/chart';
-import { StatusIndicator, Version, PonglinkActions } from './lib';
+import { Version, PonglinkActions } from './lib';
 import { getSession } from '../../data/cache';
 import dateFormat from 'dateformat';
 

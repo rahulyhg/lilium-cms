@@ -1,6 +1,6 @@
 import { h, Component } from "preact";
 
-export class SingleView extends Component {
+export default class SingleView extends Component {
     constructor(props) {
         super(props);
         this.state = {
