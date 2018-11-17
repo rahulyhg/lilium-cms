@@ -84,7 +84,6 @@ class Builder {
             maincontent = maincontent.replace("// LILIUM_IMPORT_TEMPLATE", preactInjectedCode.code);
 
             fs.writeFile(precompfile, maincontent, { encoding : "utf8" }, err => {
-                const MinifyPlugin = require("babel-minify-webpack-plugin");
                 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
                 const buildconfig = {
@@ -104,7 +103,7 @@ class Builder {
                     },
                     entry : precompfile,
                     plugins: [
-                        new HardSourceWebpackPlugin()
+                        // new HardSourceWebpackPlugin()
                     ],
                     output : {
                         path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
@@ -112,13 +111,11 @@ class Builder {
                     },
                     optimization : {
                         runtimeChunk: 'single',
-                        minimize : true,
                         splitChunks: {
                             cacheGroups: {
                                 vendor: {
                                     test: /[\\/]node_modules[\\/]/,
                                     name: 'vendors',
-                                    reuseExistingChunk: true,
                                     chunks: 'all'
                                 }
                             }
@@ -130,6 +127,7 @@ class Builder {
                 log('Builder', 'Injection phase took ' + (Date.now() - now) + 'ms', 'info');
                 _c && hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig});
                 webpack(buildconfig, (err, result) => {
+                    console.log(result);
                     err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
                         log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
 

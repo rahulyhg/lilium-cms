@@ -23,6 +23,7 @@ var sitemap = require('./sitemap.js');
 var analytics = require('./analytics.js');
 var adslib = require('./ads');
 var roles = require('./role');
+var V4DevServer = require('./v4devserver');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -183,18 +184,8 @@ var SiteInitializer = function (conf, siteobj) {
             dontOverwite : true
         });
 
-        hooks.bindSite(conf, 'preactAppInjectionPhase', pkg => {
-            if (pkg.appname == "lilium") {
-                pkg.code += `// Lilium config
-                    window.liliumcms = {
-                        env : "${conf.env}",
-                        uid : "${conf.uid}",
-                        url : "${conf.server.url}",
-                        sitename : "${conf.website.sitetitle}"
-                    };
-                `;
-            }
-        });
+        this.v4devserver = new V4DevServer(conf);
+        this.v4devserver.start();
 
         hooks.fireSite(conf, 'frontend_will_precompile', {
             config: conf,

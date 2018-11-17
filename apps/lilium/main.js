@@ -17,7 +17,7 @@ import { CakepopWrapper } from './layout/cakepopsmanager';
 
 import API from './data/api';
 
-window.liliumcms = {};
+window.liliumcms = window.liliumcms || {};
 // LILIUM_IMPORT_TEMPLATE
 
 liliumcms.connected = true;

@@ -88,10 +88,15 @@ class API {
 
     static rebuild() {
         log('Lilium', 'Rebuilding Lilium V4 Preact app', 'detail');
-        API.post('/build/lilium', {}, () => { 
-            log('Lilium', 'Finish building Lilium V4', 'success'); 
+
+        if (liliumcms.fulldevenv) {
             document.location.reload();
-        });
+        } else {
+            API.post('/build/lilium', {}, () => { 
+                log('Lilium', 'Finish building Lilium V4', 'success'); 
+                document.location.reload();
+            });
+        }
     }
 
     static upload(file, name, progress, sendback) {
