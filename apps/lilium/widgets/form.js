@@ -403,9 +403,11 @@ export class MediaPickerField extends FormField {
 
     open() {
         Picker.cast({
+            accept : ["uploads"],
             selected : this.state.mediaID || undefined
-        }, image => {
-            if (image) {
+        }, res => {
+            if (res && res.image) {
+                const image = res.image;
                 this.changed(image, this.state.mediaURL);
 
                 this.setState({ mediaURL : this.extractImageFromResponse(image), mediaID : image._id });
