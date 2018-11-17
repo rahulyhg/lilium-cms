@@ -85,21 +85,26 @@ class Builder {
 
             fs.writeFile(precompfile, maincontent, { encoding : "utf8" }, err => {
                 const MinifyPlugin = require("babel-minify-webpack-plugin");
+                const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
                 const buildconfig = {
                     mode : _c.env == "dev" ? "development" : "production",
+                    // externals: [nodeExternals()],
                     module : {
                         rules : [
                             { 
-                                test : /.jsx?$/, 
-                                loader : "babel-loader", 
-                                options : options.babel 
+                                test : /.m?js$/, 
+                                exclude: /(node_modules)/,
+                                use : {
+                                    loader : "babel-loader?cacheDirectory=true", 
+                                    options : options.babel 
+                                }
                             },
                         ]
                     },
                     entry : precompfile,
                     plugins: [
-                        new MinifyPlugin({}, {})
+                        new HardSourceWebpackPlugin()
                     ],
                     output : {
                         path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
@@ -107,11 +112,13 @@ class Builder {
                     },
                     optimization : {
                         runtimeChunk: 'single',
+                        minimize : true,
                         splitChunks: {
                             cacheGroups: {
                                 vendor: {
                                     test: /[\\/]node_modules[\\/]/,
                                     name: 'vendors',
+                                    reuseExistingChunk: true,
                                     chunks: 'all'
                                 }
                             }
