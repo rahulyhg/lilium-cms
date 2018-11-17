@@ -1,9 +1,9 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
-import { TextField, ButtonWorker } from '../../widgets/form';
+import { TextField, ButtonWorker, SelectField } from '../../widgets/form';
 import { Picker } from '../../layout/picker';
 import { castNotification } from '../../layout/notifications';
-import { Loading } from '../../layout/loading';
+import { Spinner } from '../../layout/loading';
 
 const asyncFieldUpdate = (name, value) => {
     API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
@@ -63,7 +63,7 @@ export default class ProfilePage extends Component {
     render() {
         console.log('render', this.state);
         if (this.state.loading) {
-            return (<Loading />);
+            return (<Spinner />);
         }
 
         if (this.state.user) {

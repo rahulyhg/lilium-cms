@@ -20,6 +20,14 @@ module.exports = class Money {
         log('Money', 'Loaded a total of ' + CURRENCIES.length + ' currencies', 'success');
     }
 
+    static livevar(cli, levels, params, sendback) {
+        if (levels[0] == "currencies") {
+            sendback({ currencies : CURRENCIES });
+        } else {
+            sendback([]);
+        }
+    }
+
     getConfig() {
         if (stripeconfig) {
             return stripeconfig;

@@ -6,6 +6,7 @@ import { addAction } from '../../layout/lys'
 import { registerOverlay, castOverlay } from '../../overlay/overlaywrap';
 import { CreateOverlay } from './createoverlay';
 import { PublishingOverlay } from './publishoverlay'; 
+import { RestoreOverlay } from './restoreoverlay';
 
 export default class PublishingTab extends Component {
     constructor(props) {
@@ -35,6 +36,11 @@ export default class PublishingTab extends Component {
 
         registerOverlay('publish-article', PublishingOverlay, {
             title : "Publish article",
+            customlayout : true
+        });
+
+        registerOverlay('restore-article', RestoreOverlay, {
+            title : "Restore article",
             customlayout : true
         });
     }

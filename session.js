@@ -62,6 +62,7 @@ var Sessions = function () {
             admin: cli.session.data.admin,
             god: cli.session.data.god,
             user: cli.session.data.user,
+            username : cli.session.data.user,
             site: cli.routeinfo.configname
         };
     }

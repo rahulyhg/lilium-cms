@@ -55,8 +55,16 @@ export class Picker extends Component {
 
     static Session = PickerSession;
 
+    static get defaultSession() {
+        return {
+            accept : Object.keys(PickerMap).map(x => PickerMap[x])
+        }
+    }
+
     static cast(session, done) {
         if (session) {
+            session = Object.assign(Picker.defaultSession, session);
+
             log('Picker', 'Casting picker singleton', 'detail');
             const tabs = session.accept.map(x => PickerMap[x]);
             if (!session.options) session.options = {};
@@ -122,7 +130,7 @@ export class Picker extends Component {
 
     keydown(ev) {
         ev.keyCode == "27" && Picker.dismiss();
-        ev.keyCode == "13" && Picker.accept();
+        ev.keyCode == "13" && Picker.finish();
     }
 
     render(props, state) {

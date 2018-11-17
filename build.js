@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const hooks = require('./hooks');
 
 const init_build_tree = [];
+const WEBPACK_CACHE = {};
 
 class Builder {
     static get defaultOptions() {
@@ -68,55 +69,52 @@ class Builder {
             } catch (err) { }
         }
 
-        fs.readFile(entryfile, { encoding : "utf8" }, (err, maincontent) => {
-            if (err || !maincontent) {
-                log('Build', 'Missing main.js file in app ' + input, 'err');
-                return done();
+        const buildconfig = {
+            mode : _c.env == "dev" ? "development" : "production",
+            // externals: [nodeExternals()],
+            module : {
+                rules : [
+                    { 
+                        test : /.m?js$/, 
+                        exclude: /(node_modules)/,
+                        use : {
+                            loader : "babel-loader?cacheDirectory=true", 
+                            options : options.babel 
+                        }
+                    },
+                ]
+            },
+            entry : entryfile,
+            plugins: [],
+            output : {
+                path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
+                filename : options.bundlename || "app.bundle.js"
+            },
+            optimization : {
+                runtimeChunk: 'single',
+                splitChunks: {
+                    cacheGroups: {
+                        vendor: {
+                            test: /[\\/]node_modules[\\/]/,
+                            name: 'vendors',
+                            chunks: 'all'
+                        }
+                    }
+                }
+            }
+        };
+
+        webpack(buildconfig, (err, result) => {
+            err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
+                log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
+
+            if (result && result.compilation && result.compilation.errors.length != 0) {
+                log('Builder', 'Errors were found in the code for ' + outputkey, 'err');
+                result.compilation.errors.forEach(console.log);
             }
 
-            const preactInjectedCode = {
-                code : "",
-                appname : input
-            };
-
-            _c && hooks.fireSite(_c, 'preactAppInjectionPhase', preactInjectedCode)
-            maincontent = maincontent.replace("// LILIUM_IMPORT_TEMPLATE", preactInjectedCode.code);
-
-            fs.writeFile(precompfile, maincontent, { encoding : "utf8" }, err => {
-                const buildconfig = {
-                    mode : _c.env == "dev" ? "development" : "production",
-                    module : {
-                        rules : [
-                            { 
-                                test : /.jsx?$/, 
-                                loader : "babel-loader", 
-                                options : options.babel 
-                            },
-                        ]
-                    },
-                    entry : precompfile,
-                    output : {
-                        path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
-                        filename : options.bundlename || "app.bundle.js"
-                    }
-                };
-
-                log('Builder', 'Injection phase took ' + (Date.now() - now) + 'ms', 'info');
-                _c && hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig});
-                webpack(buildconfig, (err, result) => {
-                    err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
-                        log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
-
-                    if (result && result.compilation && result.compilation.errors.length != 0) {
-                        log('Builder', 'Errors were found in the code for ' + outputkey, 'err');
-                        result.compilation.errors.forEach(console.log);
-                    }
-
-                    fs.unlink(precompfile, () => done && done(err, result));
-                });
-
-            });
-        })
+            done && done(err, result);
+        });
     }
 
     getAppScript(key) {

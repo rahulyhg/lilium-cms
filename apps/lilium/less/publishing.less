@@ -40,6 +40,12 @@
     }
 }
 
+#urlrenderer.stretched {
+    .publishing-edit-section, .publishing-sidebar {
+        bottom: 0px;
+    }   
+}
+
 .endpoint-publishing .big-list {
     background: #F6F6F6;
 
@@ -125,50 +131,23 @@
     z-index: 0;
 }
 
-/*
-.article-list-no-image {
-    box-sizing: border-box;
-    width: 320px;
-    height: 200px;
-    text-align: center;
-    padding-top: 80px;
-    font-size: 28px;
-    background: #E9E9E9;
-    color: #777;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-.article-list-status {
-    background: #333;
-    color: white;
-    text-align: center;
-    padding: 3px;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-.article-list-item {
-    width: 300px;
-    background: white;
-    margin: 12px;
-    box-shadow: 0px 0px 3px rgba(0,0,0,0.2);
-}
-
-.article-list-text {
-    padding: 8px 12px;
-}
-
-.article-list-headline {
-    font-size: 16px;
-    line-height: 22px;
-}
-*/
 .history-entry {
     display: flex;
     margin: 5px;
     padding: 5px;
     font-size: 14px;
+    border: 1px solid #EEE;
+    border-radius: 3px;
+    background: #F9F9F9;
+    position: relative;
+
+    .history-icon {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        color: #AAA;
+        font-size: 14px;
+    }
 }
 
 .history-entry-avatar-wrap {
@@ -338,6 +317,65 @@
     .detail-list {
         &>div {
             margin: 0px 10px 10px;
+        }
+    }
+}
+
+.publishing-restore-history-overlay {
+    background-color: #EEE;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .prh-slide-titles {
+        display: flex;
+        background: #333;
+        color: #EEE;
+
+        .prh-slide-title {
+            width: 50%;
+            padding: 8px 20px;
+            font-size: 18px;
+        }
+    }
+
+    .prh-actions {
+        border-top: 1px solid #DDD;
+        text-align: right;
+        padding: 20px;
+        background: #F6F6F6;
+    }
+
+    .prh-header {
+        height: 70px;
+        background: #333;
+
+        h2 {
+            color: white;
+            padding: 20px;
+        }
+    }
+
+    .prh-versions {
+        display: flex;
+        flex-grow: 1;
+        padding: 10px;
+
+        .prh-original-version {
+            flex-grow: 1;
+            padding: 10px;
+        }
+
+        .prh-patch-version {
+            flex-grow: 1;
+            padding: 10px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border: 1px solid #CCC;
         }
     }
 }

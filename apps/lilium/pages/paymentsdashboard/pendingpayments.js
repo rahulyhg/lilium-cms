@@ -9,7 +9,7 @@ const formatDate = date => {
     return date ?  date.substring(0, 10) : '';
 }
 
-const PendingPaymentCard = props => (
+export const PendingPaymentCard = props => (
     <div className={`pending-payment-card ${props.selected ? 'selected': ''}`} onClick={() => { props.onClick(props.contractor._id) }}>
         <SelectionBox onClick={props.toggleSelected.bind(this, props.contractor._id)} />
         <div className='contractor-info'>
@@ -22,17 +22,13 @@ const PendingPaymentCard = props => (
     </div>
 );
 
-module.exports.PendingPaymentCard = PendingPaymentCard;
-
-const SelectionBox = props => (
+export const SelectionBox = props => (
     <div className="selection-box-wrapper">
         <div role='checkbox' className="payment-selection-boc" onClick={e => { e.stopPropagation(); props.onClick && props.onClick(); }}>
             <i className="fa fa-check"></i>
         </div>
     </div>
 )
-
-module.exports.SelectionBox = SelectionBox;
 
 export class PaymentDetails extends Component {
     constructor(props) {

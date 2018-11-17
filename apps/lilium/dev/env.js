@@ -1,6 +1,6 @@
 import API from '../data/api';
 import { h, Component } from 'preact';
-import { Picker } from '../layout/imagepicker';
+import { ImagePicker } from '../layout/imagepicker';
 import { castNotification } from '../layout/notifications';
 import { addCommand } from '../layout/lys.js';
 import { dumpCache } from '../data/cache';
@@ -78,7 +78,7 @@ export class DevTools extends Component {
     }
 
     componentDidMount() {
-        window.onerror = this.onerror.bind(this);
+        window.addEventListener('error', this.onerror.bind(this));
         addCommand({
             command : "bundlejs,compile,build",
             displayname : "Bundle JS",
@@ -118,7 +118,7 @@ export class DevTools extends Component {
 
     pickimage(done) {
         log('Dev', 'Casting image picker from dev tool', 'lilium');
-        Picker.cast({
+        ImagePicker.cast({
 
         }, result => {
             

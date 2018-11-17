@@ -4,7 +4,7 @@ import { castNotification } from '../../layout/notifications'
 import { TextField, ButtonWorker } from "../../widgets/form";
 import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
-import { Picker } from '../../layout/imagepicker';
+import { ImagePicker } from '../../layout/imagepicker';
 
 export class EditContentChain extends Component {
     constructor(props) {
@@ -78,7 +78,7 @@ export class EditContentChain extends Component {
     }
 
     chooseFeaturedImage() {
-        Picker.cast({}, image => {
+        ImagePicker.cast({}, image => {
             console.log('image picked: ', image);
             const chain = this.state.chain;
             chain.media = image;
