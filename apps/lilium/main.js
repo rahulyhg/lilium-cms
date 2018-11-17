@@ -84,8 +84,8 @@ class Lilium extends Component {
             { endpoint : "/adminmenus", params : {} },
             { endpoint : "/entities/simple", params : {} }
         ], (err, resp) => {
-            if (!resp["/me"] || !resp["/me"][0]) {
-                this.setState({ error : "session", loading : false });
+            if (!resp["/me"] || !resp["/me"][0] || Object.keys(err).filter(x => err[x]).length != 0) {
+                this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
                 const currentLanguage = resp['/me'][0].language || 'en-ca';
