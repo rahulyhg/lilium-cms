@@ -201,3 +201,41 @@ table.articles-summary {
         }
     }
 }
+
+#credit-cards-management {
+    display: flex;
+    height: 100%;
+    
+    #credit-card-list {
+        height: 100%;
+        overflow-y: scroll;
+        flex: 0 0 20%;
+    }
+
+    #credit-card-details-pane {
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        background: @liliumBackground;
+        height: 100%;
+        flex-grow: 1;
+
+        #credit-card-edit {
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            border-radius: @ccBorderRadius;
+            /* Force children to obey border radius */
+            overflow: hidden;
+            width: calc(@ccWidth * 1.3);
+
+            .credit-card {
+                width: 100%;
+                margin: 0 auto;
+                border-radius: 0px
+            }
+
+            #credit-card-form {
+                margin: 12px 6px;
+            }
+        }
+    }
+}

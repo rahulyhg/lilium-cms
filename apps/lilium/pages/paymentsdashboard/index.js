@@ -4,29 +4,21 @@ import { ButtonWorker, TextField } from '../../widgets/form';
 import API from '../../data/api';
 import Modal from '../../widgets/modal';
 import { castNotification } from '../../layout/notifications';
-import { BigList } from '../../widgets/biglist';
 import { Link } from '../../routing/link';
-import { SelectionBox, PendingPaymentCard, PaymentDetails, PaymentsBreakdown,  } from './pendingpayments';
-import { CreditCard, AddCreditCard } from './creditcard';
+import { PendingPaymentCard, PaymentDetails, PaymentsBreakdown,  } from './pendingpayments';
+import { CreditCard } from './creditcard';
+import { CreditCardEdit } from './creditcardedit';
 
 export default class PaymentDashboard extends Component {
     constructor(props) {
         super(props);
         this.token2fa;
-        const hardCodedCreditCards = [
-            { number: '1234567843218765', cvc: '213', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvc: '543', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvc: '256', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvc: '783', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvc: '556', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvc: '011', expiryMonth: '1', expiryYear: '2018' },
-            { number: '1234567843218765', cvc: '683', expiryMonth: '1', expiryYear: '2018' },
-        ]
         this.state = {
             pendingPayments: [], selectedPayments: [],
             paymentModalVisible: false,
             totalCAD: 0, totalUSD: 0,
-            creditCards: hardCodedCreditCards
+            creditCards: [],
+            selectedCard: undefined
         }
     }
     
@@ -48,6 +40,12 @@ export default class PaymentDashboard extends Component {
                 this.setState({ pendingPayments, selectedPayments });
             } else {
                 log('PaymentDashboard', 'Error fetching pending payments', 'error');
+            }
+        });
+
+        API.get('/creditcards', {}, (err, data, r) => {
+            if (r.status == 200) {
+                this.setState({ creditCards: data });
             }
         });
     }
@@ -122,6 +120,11 @@ export default class PaymentDashboard extends Component {
         }
     }
 
+    cardSelected(id) {
+        const selectedCard = this.state.creditCards.find(cc => cc._id == id);
+        this.setState({ selectedCard });
+    }
+
     render(props, state) {
         const payout = PaymentDashboard.calculateTotalPayout(state.selectedPayments);
         return (
@@ -168,12 +171,23 @@ export default class PaymentDashboard extends Component {
                     </div>
                 </Tab>
                 <Tab title='Credit Cards Management'>
-                    <div id="credit-card-list">
-                        {
-                            state.creditCards.map(cc => (
-                                <CreditCard {...cc} />
-                            ))
-                        }
+                    <div id="credit-cards-management">
+                        <div id="credit-card-list">
+                            {
+                                state.creditCards.map(cc => (
+                                    <CreditCard {...cc} onClick={this.cardSelected.bind(this)} key={cc._id} />
+                                ))
+                            }
+                        </div>
+                        <div id="credit-card-details-pane">
+                            {
+                                state.selectedCard ? (
+                                    <CreditCardEdit cc={state.selectedCard} />
+                                ) : (
+                                    <h2>Select a credit card to edit it</h2>
+                                )
+                            }
+                        </div>
                     </div>
                     {/* <BigList listitem={CreditCard} addComponent={AddCreditCard} batchsize={50} endpoint='/ponglinks/bunch' liststyle={{ maxWidth: 800, margin: 'auto' }} />                                     */}
                 </Tab>

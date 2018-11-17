@@ -570,7 +570,7 @@
             "endpoint" : "contractorspayments",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "creditcards.js",
+            "module" : "creditcardscontroller.js",
             "endpoint" : "creditcards",
             "support" : ["admin_post", "livevar"]
         }
