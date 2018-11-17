@@ -63,6 +63,7 @@ module.exports = class V4DevServer {
                 colors : true 
             },
             hot : true,
+            overlay : true,
             disableHostCheck : true,
             inline: true
         });
