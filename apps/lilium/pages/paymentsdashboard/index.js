@@ -173,11 +173,14 @@ export default class PaymentDashboard extends Component {
                 <Tab title='Credit Cards Management'>
                     <div id="credit-cards-management">
                         <div id="credit-card-list">
-                            {
-                                state.creditCards.map(cc => (
-                                    <CreditCard {...cc} onClick={this.cardSelected.bind(this)} key={cc._id} />
-                                ))
-                            }
+                        <div id="cc-list-controls">
+                            <ButtonWorker text='New' theme='blue' />
+                        </div>
+                        {
+                            state.creditCards.map(cc => (
+                                <CreditCard {...cc} onClick={this.cardSelected.bind(this)} key={cc._id} />
+                            ))
+                        }
                         </div>
                         <div id="credit-card-details-pane">
                             {

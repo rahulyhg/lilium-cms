@@ -24,6 +24,10 @@ export class CreditCardEdit extends Component {
         this.setState({ cc });
     }
 
+    removeCreditCard() {
+
+    }
+
     render(props, state) {
         if (state.cc) {
             return (
@@ -36,7 +40,8 @@ export class CreditCardEdit extends Component {
                             <TextField value={state.cc.expiryYear} initialValue={state.cc.expiryYear} placeholder='Expiry Year' name='expiryYear' onChange={this.fieldEdited.bind(this)} />
                         </div>
                         <TextField value={state.cc.cvc} initialValue={state.cc.cvc} placeholder='CVC' name='cvc' onChange={this.fieldEdited.bind(this)} />
-                        <ButtonWorker text='Save' theme='purple' work={this.saveCreditCard.bind(this)} />
+                        <ButtonWorker text='Save' theme='purple' type='fill' work={this.saveCreditCard.bind(this)} />
+                        <ButtonWorker text='Delete' theme='red' work={this.removeCreditCard.bind(this)} style={{ float: 'right' }} />
                     </div>
                </div>
             );
