@@ -4,6 +4,7 @@ import Modal from '../../widgets/modal';
 import { ButtonWorker } from '../../widgets/form';
 import { CreditCard } from './creditcard';
 import { CreditCardEdit } from './creditcardedit';
+import { castNotification } from '../../layout/notifications';
 
 export class CreditCardsManagement extends Component {
     constructor(props) {
@@ -28,8 +29,23 @@ export class CreditCardsManagement extends Component {
         this.setState({ selectedCard });
     }
 
-    deleteSelectedCard() {
-        
+    deleteSelectedCard(done) {
+        API.delete('/creditcards/' + this.state.selectedCard._id, {}, (err, data, r) => {
+            if (r.status == 200 && data.ok) {
+                const creditCards = this.state.creditCards;
+                const i = creditCards.findIndex(card => card._id == this.state.selectedCard._id);
+                if (i >= 0) {
+                    creditCards.splice(i, 1);
+                    this.setState({creditCards});
+                }
+                castNotification({
+                    title: 'Credit Card Removed',
+                    type: 'success'
+                });
+            }
+
+            done && done();
+        });
     }
 
     render(props, state) {
@@ -51,7 +67,7 @@ export class CreditCardsManagement extends Component {
                 <div id="credit-card-details-pane">
                     {
                         state.selectedCard ? (
-                            <CreditCardEdit cc={state.selectedCard} />
+                            <CreditCardEdit cc={state.selectedCard} onDelete={this.deleteSelectedCard.bind(this)} />
                         ) : (
                             <h2>Select a credit card to edit it</h2>
                         )
