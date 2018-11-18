@@ -6,7 +6,7 @@ export class CreditCard extends Component {
         super(props);
         this.state = {
             scheme: '',
-            number: props.number || '************',
+            number: props.number || 'XXXXXXXXXXXXXXXX',
             expiryMonth: '',
             expiryYear: '',
             cvc: '',

@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
+import Modal from '../../widgets/modal';
 import { ButtonWorker } from '../../widgets/form';
 import { CreditCard } from './creditcard';
 import { CreditCardEdit } from './creditcardedit';
@@ -8,6 +9,7 @@ export class CreditCardsManagement extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            deleteCardModalVisible: false,
             creditCards: [],
             selectedCard: undefined
         }
@@ -26,9 +28,16 @@ export class CreditCardsManagement extends Component {
         this.setState({ selectedCard });
     }
 
+    deleteSelectedCard() {
+        
+    }
+
     render(props, state) {
         return (
             <div id="credit-cards-management">
+                <Modal visible={state.deleteCardModalVisible} title='Remove Credit Card'>
+
+                </Modal>
                 <div id="credit-card-list">
                     <div id="cc-list-controls">
                         <ButtonWorker text='New' theme='blue' />

@@ -576,7 +576,7 @@
         }, {
             "module" : "creditcardscontroller.js",
             "endpoint" : "creditcards",
-            "support" : ["admin_post", "livevar"]
+            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }
     ]
 }

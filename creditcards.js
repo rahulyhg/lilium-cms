@@ -81,11 +81,11 @@ class CreditCardManager {
     }
 
     updateCreditCard(id, ops, done) {
-        db.update(_c.default(), ccCol, { _id: id }, ops, done);
+        db.update(_c.default(), ccCol, { _id: db.mongoID(id) }, ops, done);
     }
 
     deleteCreditCard(id, done) {
-
+        db.remove(_c.default(), ccCol, { _id: db.mongoID(id) }, done);
     }
 
     /**
