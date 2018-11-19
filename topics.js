@@ -30,15 +30,15 @@ class LMLTopics {
         } else if (levels[0] == "ofcategory") {
             db.findToArray(cli._c, 'topics', { category : levels[1], active : true }, (err, arr) => {
                 send(arr);
-            }, { displayname : 1, slug : 1, description : 1, completeSlug : 1 });
+            }, { displayname : 1, slug : 1, description : 1, completeSlug : 1, directory : 1 });
         } else if (levels[0] == "childof") {
             db.findToArray(cli._c, 'topics', { parent : db.mongoID(levels[1]), active : true }, (err, arr) => {
                 send(arr);
-            }, { displayname : 1, slug : 1, description : 1, completeSlug : 1 });
+            }, { displayname : 1, slug : 1, description : 1, completeSlug : 1, directory : 1 });
         } else if (levels[0] == "simple") {
             db.findToArray(cli._c, 'topics', { active : true }, (err, topics) => {
                 send(topics);
-            }, { _id : 1, displayname : 1, slug : 1, completeSlug : 1, parent : 1, category : 1 });
+            }, { _id : 1, displayname : 1, slug : 1, completeSlug : 1, parent : 1, category : 1, directory : 1 });
         } else if (levels[0] == "category") {
             db.join(cli._c, 'topics', [
                 { $match : { active : true, parent : { $exists : false }, category : { $exists : true } } },

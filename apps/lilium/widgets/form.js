@@ -4,6 +4,7 @@ import slugify from "slugify";
 import API from '../data/api';
 import { Spinner } from '../layout/loading'
 import { Picker } from '../layout/picker';
+import { castNotification } from '../layout/notifications';
 
 class FormField extends Component {
     constructor(props) {
@@ -469,7 +470,8 @@ export class TopicPicker extends FormField {
                 <div class="topic-children-slide">
                     { this.state.topics.map((topic, index) => (
                         <div class={"topic-children-item " + (index == this.state.selectedIndex ? "selected" : "")} onClick={this.selectOne.bind(this, topic, index)}>
-                            {topic.displayname}
+                            <span>{topic.displayname}</span>
+                            { topic.directory && (<i style={{ marginLeft: 6, color: "#999" }} class="fal fa-folder"></i>)} 
                         </div>
                     )) }
 
@@ -513,6 +515,7 @@ export class TopicPicker extends FormField {
                 selectedTopic : topic,
                 stagedtopic : topic
             });
+        
         });
     }
 
@@ -564,9 +567,17 @@ export class TopicPicker extends FormField {
     }
 
     lockin() {
-        this.setState({
-            phase : "lock"
-        })
+        if (this.state.stagedtopic && this.state.stagedtopic.directory) {
+            castNotification({
+                type: "warning",
+                message : "This topic cannot be selected as an end topic because it is a directory.",
+                title : "Directory topic"
+            });
+        } else {
+            this.setState({
+                phase : "lock"
+            })
+        }
     }
 
     addOne(topic) {
@@ -706,8 +717,8 @@ export class CheckboxField extends FormField {
     }
 
     componentWillReceiveProps(props) {
-        if (typeof props.value != "undefined") {
-            this.setState({ checked : props.value || false });
+        if (props.hasOwnProperty("value")) {
+            this.setState({ checked : !!props.value });
         }
     }
 
