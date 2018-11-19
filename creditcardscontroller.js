@@ -19,7 +19,17 @@ class CreditCardController {
     }
 
     adminPUT(cli) {
-        
+        if (cli.hasRightOrRefuse('manage-cc')) {
+            if (cli.routeinfo.path[2]) {
+                cli.readPostData(data => {
+                    this.ccManager.updateCreditCard(cli.routeinfo.path[2], data, (err, r) => {
+                        cli.sendJSON({ ok: !err, err });                        
+                    });
+                });
+            } else {
+                cli.throwHTTP(400, "Must provide an id as url param", true);
+            }
+        }
     }
 
     adminPOST(cli) {
