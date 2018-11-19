@@ -72,10 +72,16 @@ export default class PluginList extends Component {
 
     render() {
         return (
-            <div class="plugins-page" style={{ maxWidth : 720, margin: "20px auto" }}>
-                <h1>Plugins</h1>
-
-                <BigList endpoint="/plugins/bunch" listitem={PluginItem} />
+            <div>
+                <div class="leader-title">
+                    <div class="leader-title-responsive">
+                        <h1>Lilium plugins</h1>
+                        <p>Plugins are little pieces of software extending core features of Lilium. Plugins have access to all Lilium's libraries, can listen to / trigger events, override basic logic, and modify the interface of the CMS.</p>
+                    </div>
+                </div>
+                <div class="leader-content">
+                    <BigList endpoint="/plugins/bunch" listitem={PluginItem} />
+                </div>
             </div>
         )
     }

@@ -19,7 +19,8 @@ const styles = {
     },
     wrap800 : {
         maxWidth: 800, 
-        margin: "auto"
+        marginLeft: 'auto',
+        marginRight:'auto'
     }
 }
 
@@ -57,10 +58,14 @@ const SELECTBOX_OPTIONS = MULTISELECTBOX_OPTIONS.map(x => ({ displayname : x.dis
 export default class CommentDevTool extends Component {
     render() {
         return (
-            <div class="graph-paper" style={{ paddingTop: 30, paddingBottom: 80 }}>
-                <div style={styles.wrap800}>
-                    <h2>Flex Cards</h2>
-                    
+            <div class="graph-paper" style={{ paddingBottom: 80 }}>
+                <div class="leader-title">
+                    <div class="leader-title-responsive">
+                        <h1>Lilium CMS Leader Design</h1>
+                        <p>At some point, all products need a fresh skin crafted using a modern palette. The version 4 is dressed with a kitsch and edgy yet avant-garde stylesheet of various containers. On this page stars a nonexhaustive enumeration of multiple wrappers, fields, and colors.</p>
+                    </div>
+                </div>
+                <div style={styles.wrap800} class="leader-content">
                     <div style={{ display: 'flex', flexWrap : 'wrap' }}>
                         {
                             new Array(6).fill(true).map(x => (

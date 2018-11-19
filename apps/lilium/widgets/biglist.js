@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../data/api'
+import { Spinner } from '../layout/loading';
 import { storeLocal, getLocal } from '../data/cache';
 
 const LOCALSTORAGE_PREFIX = "LF_";
@@ -35,7 +36,8 @@ export class BigList extends Component {
         super(props);
         this.state = {
             items : props.items || [],
-            ready : false
+            ready : false,
+            loading: true
         };
 
         this.coldState = {
@@ -64,28 +66,32 @@ export class BigList extends Component {
             this.coldState.index = 0;
         }
 
-        API.get(this.coldState.endpoint, {
-            limit : this.coldState.batchsize,
-            skip : this.coldState.index * this.coldState.batchsize,
-            filters : this.coldState.filters
-        }, (err, list) => {
-            if (err) {
-                log('BigList', "Could not add items in big list because of response error : " + err, "warning")
-            } else {
-                if (overwrite) {      
-                    log("BigList", "Overwritten items of a big list from live variable endpoint", "success");
-                    const items = [...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list)];
-                    this.coldState.index = 1;
-                    this.setState({ items, ready : true });
-                } else {                
-                    log("BigList", "Added values in a big list from live variable endpoint", "success");
-                    const items = [...this.state.items];
-                    items[this.coldState.prepend ? "unshift" : "push"](...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list));
+        this.setState({ loading : !!overwrite }, () => {
+            API.get(this.coldState.endpoint, {
+                limit : this.coldState.batchsize,
+                skip : this.coldState.index * this.coldState.batchsize,
+                filters : this.coldState.filters
+            }, (err, list) => {
+                if (err) {
+                    log('BigList', "Could not add items in big list because of response error : " + err, "warning")
+                    this.setState({ loading: false });
+                } else {
+                    if (overwrite) {      
+                        log("BigList", "Overwritten items of a big list from live variable endpoint", "success");
+                        const items = [...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list)];
+                        this.coldState.index = 1;
+                        this.setState({ items, ready : true, loading : false });
+                    } else {                
+                        log("BigList", "Added values in a big list from live variable endpoint", "success");
+                        const items = [...this.state.items];
+                        items[this.coldState.prepend ? "unshift" : "push"](...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list));
 
-                    this.coldState.index++;
-                    this.setState({ items, ready : true });
+                        this.coldState.index++;
+                        this.setState({ items, ready : true, loading : false });
+                    }
                 }
-            }
+            });
+       
         });
     }
 
@@ -118,10 +124,6 @@ export class BigList extends Component {
     }
 
     render() {
-        if (!this.state.ready) {
-            return null;
-        }
-
         log('BigList', 'Rendering a big list with ' + this.state.items.length + ' items', 'detail');
         return (
             <div class="big-list">
@@ -135,17 +137,23 @@ export class BigList extends Component {
                     ) : null
                 }
 
-                <div class="big-list-items" style={this.props.liststyle || {}}>
-                    { this.coldState.topElement ? <this.coldState.topElement /> : null }
+                { this.state.loading ? (
+                    <div class="big-list-loading">
+                        <Spinner />
+                    </div>
+                ) : (
+                    <div class="big-list-items" style={this.props.liststyle || {}}>
+                        { this.coldState.topElement ? <this.coldState.topElement /> : null }
 
-                    {
-                        this.state.items.length == 0 ? (
-                            <this.coldState.emptyComponent />
-                        ) : [(<this.coldState.addComponent />), ...this.state.items.map(x => (
-                            <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
-                        ))]
-                    }
-                </div>
+                        {
+                            this.state.items.length == 0 ? (
+                                <this.coldState.emptyComponent />
+                            ) : [(<this.coldState.addComponent />), ...this.state.items.map(x => (
+                                <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
+                            ))]
+                        }
+                    </div>
+                ) }
 
                 {
                     this.coldState.loadmoreButton && this.state.items.length >= this.coldState.batchsize ? (

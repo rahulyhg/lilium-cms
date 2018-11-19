@@ -55,7 +55,7 @@ var Role = function () {
         db.update(config.default(), 'roles', { _id }, cli.postdata.data, () => {
             cli.sendJSON({ ok : 1 })
             db.findUnique(config.default(), 'roles', { _id }, (err, role) => {
-                role && sharedcache.setRole(role);
+                // role && sharedcache.setRole(role);
             });
         });
     };

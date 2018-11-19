@@ -3,7 +3,11 @@ import { Component, h } from "preact";
 export default class Modal extends Component {
     constructor(props) {
         super(props);
-        this.state = { visible: this.props.visible || false };
+        this.state = { visible: false };
+    }
+
+    componentDidMount() {
+        this.props.visible && this.show();
     }
 
     fireClose() {
@@ -11,11 +15,14 @@ export default class Modal extends Component {
     }
 
     close() {
-        this.setState({ visible: false });
+        this.bodyEl.classList.remove("shown");
+        setTimeout(() => this.setState({ visible: false }), 200);
     }
 
     show() {
-        this.setState({ visible: true });
+        this.setState({ visible: true }, () => {
+            setTimeout(() => this.bodyEl.classList.add("shown"), 200);
+        });
     }
 
     componentWillReceiveProps(props) {
@@ -38,7 +45,7 @@ export default class Modal extends Component {
         } else {
             return (
                 <div className="modal-bg" onKeyUp={this.handleKeyUp.bind(this)}>
-                    <div className="modal-body">
+                    <div className="modal-body" ref={x => (this.bodyEl = x)}>
                         <div className="modal-header">
                             <h3 className="modal-title">{this.props.title}</h3>
                             { this.props.onClose ? (

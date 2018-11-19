@@ -42,13 +42,19 @@ export default class SettingsPage extends Component {
 
         return (
             <div id="settings-page">
-                <h1>Lilium CMS administrative settings</h1>
-                <p class="page-tutorial-strip">
-                    The fields will save automatically. Lilium will need to be restarted for changes to take effect.
-                </p>
+                <div class="leader-title">
+                    <div class="leader-title-responsive">
+                        <h1>Administrative settings</h1>
+                        <p>
+                            It is possible to edit this website's settings using the following fields.
+                            This is a simple interface to quickly modify the JSON settings file. 
+                            The fields will save automatically. 
+                            Lilium will need to be restarted for changes to take effect.
+                        </p>
+                    </div>
+                </div>
 
-                <div style={{ maxWidth: 720, margin: "15px auto" }}>
-                    <h2 style={styles.h2}>This website</h2>
+                <div class="leader-content solid" style={{ maxWidth: 720, padding: 20  }}>
                     <div style={{ padding : 15 }}>
                         <TextField onChange={this.fieldChanged.bind(this)} name="website.sitetitle" placeholder="Website title" initialValue={this.values.website.sitetitle} />
                         <TextField onChange={this.fieldChanged.bind(this)} name="website.catchline" placeholder="Website catchline" initialValue={this.values.website.catchline} />
