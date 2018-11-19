@@ -15,13 +15,13 @@ export default class Modal extends Component {
     }
 
     close() {
-        this.bodyEl.classList.remove("shown");
+        this.bodyEl && this.bodyEl.classList.remove("shown");
         setTimeout(() => this.setState({ visible: false }), 200);
     }
 
     show() {
         this.setState({ visible: true }, () => {
-            setTimeout(() => this.bodyEl.classList.add("shown"), 200);
+            this.bodyEl && setTimeout(() => this.bodyEl.classList.add("shown"), 200);
         });
     }
 
