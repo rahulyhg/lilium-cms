@@ -114,6 +114,8 @@ export class SingleTopic extends Component {
                         <SelectField initialValue={this.state.topic.articletemplate} value={ this.state.topic.articletemplate } 
                             name="articletemplate" placeholder="Article Template" onChange={this.onChange.bind(this)} 
                             options={ this.state.articletemplates.map(x => ({ displayname : x.displayname, value : x.file })) }  />
+                        <CheckboxField value={this.state.topic.directory} initialValue={this.state.topic.directory} onChange={this.onChange.bind(this)}
+                            name="directory" placeholder="Directory mode" />
                     </div>
                 </div>
                 <div class="theme-override-form">
