@@ -154,7 +154,7 @@ export class TextField extends FormField {
     }
 
     componentDidMount() {
-        this.inputbox.value = this.value;
+        this.inputbox.value = this.value || "";
     }
 
     shouldComponentUpdate(nextProps) {
