@@ -11,18 +11,15 @@ The platform has its own framework and unique API. Lilium makes it easy to creat
 
 All NodeJS packages are to be installed, and are documented in the package file so you can simply run *npm install* in the root folder where you setup Lilium.
 
+## Web panel
+The CMS frontend is located under `/apps/lilium` and is transpiled using Webpack and Babel. 
+
 ### Required dependencies
 **MAC:** 
 `brew install pkg-config cairo libpng jpeg giflib imagemagick`
 
 **UBUNTU:**
 `sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick`
-
-### Language detection
-Lilium uses *franc* to detect languages and currently supports English and French.
-
-### On-site article editing
-ContentTools is part of the dependencies so that on-site editing is possible directly from the theme.
 
 ## I want to code, too
 See the [Lilium CMS Wiki](https://github.com/narcitymedia/lilium-cms/wiki) and get started!
