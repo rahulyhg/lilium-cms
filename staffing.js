@@ -72,7 +72,7 @@ class Staffing {
                 status : 'active'
             };
 
-            if (params.filters) {
+            if (params.filters && params.filters.status) {
                 switch (params.filters.status) {
                     case "everyone":
                         delete $match.status; break;
