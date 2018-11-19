@@ -18,8 +18,10 @@ export class PaymentsManagement extends Component {
     }
     
     static calculateTotalPayout(payments) {
+        console.log('calculate payout:', payments);
+        
         const payout = { totalCAD: 0, totalUSD: 0 };
-        if (!payments) return payout;
+        if (!payments || payments.length == 0) return payout;
 
         payout.totalCAD = payments.filter(c => c.currency && c.currency.toUpperCase() == 'CAD').reduce((a, b) => a + parseInt(b.owed), 0);
         payout.totalUSD = payments.filter(c => c.currency && c.currency.toUpperCase() == 'USD').reduce((a, b) => a + parseInt(b.owed), 0);
@@ -31,8 +33,10 @@ export class PaymentsManagement extends Component {
         API.get('/contractorspayments/management/pending', {}, (err, data, r) => {
             if (r.status == 200) {
                 const pendingPayments = data.contractors.filter(x => !x.beingPaid && x.stripeuserid);
-                const selectedPayments = [pendingPayments[0] || undefined];
-                this.setState({ pendingPayments, selectedPayments });
+                if (pendingPayments.length) {
+                    const selectedPayments = [pendingPayments[0]];
+                    this.setState({ pendingPayments, selectedPayments });
+                }
             } else {
                 log('PaymentDashboard', 'Error fetching pending payments', 'error');
             }

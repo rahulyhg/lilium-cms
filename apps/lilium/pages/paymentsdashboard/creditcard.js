@@ -37,10 +37,10 @@ export class CreditCard extends Component {
         return (
             <div className="credit-card monospace-font" onClick={props.onClick && props.onClick.bind(this, props._id)}>
                 {
-                    state.scheme ? (<i className={`scheme-logo fa-3x fab fa-cc-${state.scheme}`}></i>) : null
+                    state.bank ? (<p className='card-bank-name'>{state.bank.toLowerCase()}</p>) : null
                 }
                 {
-                    state.bank ? (<p className='card-bank-name'>{state.bank.toLowerCase()}</p>) : null
+                    state.scheme ? (<i className={`scheme-logo fa-3x fab fa-cc-${state.scheme}`}></i>) : null
                 }
                 <div className="card-data">
                     <p className="card-number">
@@ -65,6 +65,7 @@ export class CreditCard extends Component {
                         </p>
                     </div>
                 </div>
+                <span className="card-currency">{props.currency}</span>
             </div>
         );
     }

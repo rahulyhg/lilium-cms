@@ -8,14 +8,15 @@
     border: 1px solid darken(@cardBg, 5%);
     color: white;
     border-radius: 10px;
-    width: ccWidth;
+    width: @ccWidth;
     height: 53mm;
     margin: 8px;
     position: relative;
     box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.2);
     text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.2);
     font-family: monospace;
-    
+    transition: all 0.2s ease-out;
+
     .scheme-logo {
         position: absolute;
         top: 12px;
@@ -45,6 +46,12 @@
             display: flex;
             justify-content: space-between;
         }
+    }
+
+    .card-currency {
+        position: absolute;
+        right: 6px;
+        bottom: 6px;
     }
 }
 

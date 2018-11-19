@@ -210,6 +210,18 @@ table.articles-summary {
         height: 100%;
         overflow-y: scroll;
         flex: 0 0 25%;
+
+        & > * {
+            .credit-card {
+                margin: 8px auto;
+            }
+
+            &.selected .credit-card {
+                transform: scale(1.1);
+                margin-bottom: 16px;
+                margin-top: 16px;
+            }
+        }
     }
 
     #credit-card-details-pane {
@@ -235,10 +247,6 @@ table.articles-summary {
 
             #credit-card-form {
                 margin: 12px 6px;
-
-                #expiry-date-edit {
-                    display: flex;
-                }
             }
         }
     }
