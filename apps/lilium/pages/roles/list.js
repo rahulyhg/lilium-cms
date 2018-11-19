@@ -28,12 +28,18 @@ class Role extends Component {
     render() {
         return (
             <div class="role-card card flex">
-                <div className="role" style={{ padding: '4px 12px' }}>
-                    <EditableText initialValue={this.state.role.displayname} name='displayname'onChange={this.editField.bind(this)} />
-                    <EditableText initialValue={this.state.role.name} name='name' onChange={this.editField.bind(this)} />
+                <div className="role">
+                    <div class="role-title">
+                        <EditableText initialValue={this.state.role.displayname} name='displayname'onChange={this.editField.bind(this)} />
+                    </div>
+                    <div class="role-desc">
+                        <EditableText multiline initialValue={this.state.role.name} name='name' onChange={this.editField.bind(this)} />
+                    </div>
                 </div>
     
-                <MultitagBox initialValue={this.state.role.rights} name='rights' onChange={this.editField.bind(this)} />
+                <div class="role-rights">
+                    <MultitagBox initialValue={this.state.role.rights} name='rights' onChange={this.editField.bind(this)} />
+                </div>
             </div>
         );
     }
@@ -65,6 +71,13 @@ export class RolesList extends Component {
     render() {
         return (
             <div id="roles-management">
+                <div class="leader-title">
+                    <div class="leader-title-responsive">
+                        <h1>Role management</h1>
+                        <p>Roles are combinations of several rights given to the entities. Entities can have multiple roles, and roles have multiple rights.</p>
+                        <ButtonWorker text='Create Role' style={{ float: 'right', margin: '16px' }} work={done => { this.setState({ createModalVisible: true }); done && done(); } } />
+                    </div>
+                </div>
                 <Modal visible={this.state.createModalVisible} title='Create a role'>
                     <TextField name='displayname' placeholder='Display Name' onChange={(name, val) => { this.values[name] = val; }} />
                     <TextField name='name' placeholder='Name' onChange={(name, val) => { this.values[name] = val; }} />
@@ -72,10 +85,7 @@ export class RolesList extends Component {
                     <hr />
                     <ButtonWorker text='Create Role' work={() => {this.createRole(); this.setState({ createModalVisible: false })} } />
                 </Modal>
-                <div id="roles-management-header">
-                    <ButtonWorker text='Create Role' style={{ float: 'right', margin: '16px' }} work={done => { this.setState({ createModalVisible: true }); done && done(); } } />
-                </div>
-                <div id="roles">
+                <div id="roles" class="leader-content">
                     <BigList endpoint="/role/bunch" listitem={Role}  />
                 </div>
             </div>
