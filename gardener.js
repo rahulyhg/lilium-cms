@@ -107,6 +107,8 @@ class Gardener {
     }
 
     spawnDataServer() {
+        return;
+
         log('Network', 'Spawning dataserver', 'lilium');
         if (dataServerProcess) {
             dataServerProcess.kill("SIGHUP");

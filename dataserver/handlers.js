@@ -3,7 +3,7 @@ const FACEBOOK_API = "https://graph.facebook.com/v";
 
 // Libraries
 const request = require('request');
-const { presentableFacebookUser, presentableGoogleUser, makeToken, mongoID, readPostData } = require('./formatters');
+const { presentableFacebookUser, presentableGoogleUser, makeToken, mongoID, readPostData, presentableFacebookKitUser } = require('./formatters');
 const Projections = require('./projection');
 const fs = require('fs');
 
@@ -55,6 +55,38 @@ const endpoints = {
         }
     },
 
+    "POST/akitintroduce" : cli => {
+        const token = cli.request.headers.t;
+        const tokenurl = "https://graph.accountkit.com/v1.3/me/?access_token="+token;
+        
+        request(tokenurl, {json : true}, (err, resp, r) => {
+            if (!err && r && r.id) {
+                const fbid = r.id;
+                const _id = require('crypto').createHash('sha256').update(fbid).digest("hex");
+
+                cli._c.db.collection('fbusers').find({ _id }).next((err, maybeuser) => {  
+                    if (maybeuser) {
+                        sessions[maybeuser.lmltk] = maybeuser;
+                        cli.sendJSON(maybeuser);
+                    } else {
+                        const lmltk = makeToken(_id);
+                        cli._c.db.collection('fbsessions').insertOne({ _id : lmltk, userid : _id, at : Date.now() });
+
+                        const user = presentableFacebookKitUser(_id, lmltk);
+                        cli._c.db.collection('fbusers').insertOne(user, (err, r) => {
+                            user.lmltk = lmltk;
+                            sessions[lmltk] = user;
+                            cli.sendJSON(user);
+                        });
+                    }
+                })
+
+            } else {
+                r.throwHTTP(403);
+            }
+        });
+    },
+
     "POST/introduce" : cli => {
         const token = cli.request.headers.t;
         const gurl = FACEBOOK_API + cli._c.dataserver.facebook.v + "/debug_token?access_token=" + cli._c.dataserver.facebook.token + "&input_token=" + token;
@@ -92,8 +124,10 @@ const endpoints = {
         const token = cli.request.headers.t;
         const gurl = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + token;
 
+        console.log(token);
         request(gurl, {json : true}, (err, resp, r) => {
             if (r && r.user_id) {        
+                console.log(r);
                 const gid = r.user_id;
                 const _id = require('crypto').createHash('sha256').update(gid).digest("hex"); 
                 
@@ -105,7 +139,9 @@ const endpoints = {
                         const lmltk = makeToken(_id);
                         cli._c.db.collection('fbsessions').insertOne({ _id : lmltk, userid : _id, at : Date.now() });
 
+                        console.log(lmltk);
                         readPostData(cli, u => {
+                            console.log(u);
                             try {
                                 u = JSON.parse(u);
                                 const user = presentableGoogleUser(u, lmltk);
@@ -121,7 +157,8 @@ const endpoints = {
                                     cli.throwHTTP(401);
                                 }
                             } catch (err) {
-                                cli.throwHTTP(500);
+                                console.log(err);
+                                cli.throwHTTP(500, err && err.toString && err.toString(), true);
                             }
                         });
                     }
