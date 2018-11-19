@@ -370,8 +370,8 @@ export class EditableText extends FormField {
                             ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""}
                                     class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
                                     onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)} />))
-                        : ( <p onClick={() => { this.setState({ editing: true }, () => { this.textInput.focus(); }); }}
-                                title='Click to edit' style={{ cursor: 'text', hover: { border:'1px solid #333' } }}>{this.value}</p> )
+                        : ( <span onClick={() => { this.setState({ editing: true }, () => { this.textInput.focus(); }); }}
+                                title='Click to edit' style={{ cursor: 'text', hover: { border:'1px solid #333' } }}>{this.value}</span> )
                 }
             </div>
         )
