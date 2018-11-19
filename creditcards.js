@@ -12,7 +12,7 @@ class CreditCardManager {
         this.INPUTENCODING = 'utf8';
         this.OUTPUTENCODING = 'hex';
         this.KEY = _c.default().signature.privatehash.substring(0, 32);
-        this.ENCRYPTEDFIELDS = ['number'];
+        this.ENCRYPTEDFIELDS = ['number', 'cvc'];
     }
 
     /**
@@ -27,7 +27,7 @@ class CreditCardManager {
         this.ENCRYPTEDFIELDS.forEach(fieldName => {
             const cipher = crypto.createCipheriv(this.ALGORITHM, this.KEY, iv);
             let crypted = cipher.update(card[fieldName], this.INPUTENCODING, this.OUTPUTENCODING);
-            crypted = cipher.final(this.OUTPUTENCODING);
+            crypted += cipher.final(this.OUTPUTENCODING);
 
             card[fieldName] = crypted;
         });
@@ -62,22 +62,22 @@ class CreditCardManager {
 
     getCreditCards(done) {
         db.findToArray(_c.default(), ccCol, {}, (err, data) => {
-            // const deciphered = [];
-            // data.forEach(card => {
-            //     deciphered.push(this.decryptAES(card));
-            // })
+            const deciphered = [];
+            data.forEach(card => {
+                deciphered.push(this.decryptAES(card));
+            })
             done && done(err, data);
         });
     }
 
     createCreditCard(number, expiryMonth, expiryYear, cvc, done) {
         const newCC = { number, expiryMonth, expiryYear, cvc };
-        // console.log(newCC);
-        // const ciphered = this.encryptAES(newCC);
-        // console.log(ciphered);
+        console.log(newCC);
+        const ciphered = this.encryptAES(newCC);
+        console.log(ciphered);
 
-        // db.insert(_c.default(), ccCol, ciphered, done);
-        db.insert(_c.default(), ccCol, newCC, done);
+        db.insert(_c.default(), ccCol, ciphered, done);
+        // db.insert(_c.default(), ccCol, newCC, done);
     }
 
     updateCreditCard(id, ops, done) {
