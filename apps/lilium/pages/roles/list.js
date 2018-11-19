@@ -1,8 +1,8 @@
 import { Component, h } from "preact";
-import API from '../../data/api';
 import { MultitagBox, EditableText, TextField, ButtonWorker } from '../../widgets/form';
-import Modal from '../../widgets/modal';
 import { BigList } from '../../widgets/biglist';
+import Modal from '../../widgets/modal';
+import API from '../../data/api';
 
 class Role extends Component {
     constructor(props) {
@@ -27,7 +27,7 @@ class Role extends Component {
 
     render() {
         return (
-            <div class="card flex">
+            <div class="role-card card flex">
                 <div className="role" style={{ padding: '4px 12px' }}>
                     <EditableText initialValue={this.state.role.displayname} name='displayname'onChange={this.editField.bind(this)} />
                     <EditableText initialValue={this.state.role.name} name='name' onChange={this.editField.bind(this)} />
@@ -73,7 +73,6 @@ export class RolesList extends Component {
                     <ButtonWorker text='Create Role' work={() => {this.createRole(); this.setState({ createModalVisible: false })} } />
                 </Modal>
                 <div id="roles-management-header">
-                    <h1 style={{ display: 'inline-block' }}>Roles Management</h1>
                     <ButtonWorker text='Create Role' style={{ float: 'right', margin: '16px' }} work={done => { this.setState({ createModalVisible: true }); done && done(); } } />
                 </div>
                 <div id="roles">
