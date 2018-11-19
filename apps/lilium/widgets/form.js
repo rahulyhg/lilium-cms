@@ -809,7 +809,7 @@ export class MultitagBox extends FormField {
                     {
                         this.state.tags.map(tag => {
                             return (
-                                <Tag text={tag} key={tag} remove={this.removeTag.bind(this)} />
+                                <Tag text={tag} key={tag} tagId={tag} remove={this.removeTag.bind(this)} />
                             );
                         })
                     }
