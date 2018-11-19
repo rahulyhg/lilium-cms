@@ -1,4 +1,6 @@
-/* 
+/*  ------------------------------------------------------------------------------------------------
+ *
+ *
  *  ░░      ░░ ░░      ░░ ░░    ░░ ░░░    ░░░     ░░░░░░ ░░░    ░░░ ░░░░░░░    ░░░     ░░░     ░░   
  *  ░░      ░░ ░░      ░░ ░░    ░░ ░░░░  ░░░░    ░░      ░░░░  ░░░░ ░░          ░░░   ░░░   ░░ ░░   
  *  ░░      ░░ ░░      ░░ ░░    ░░ ░░ ░░░░ ░░    ░░      ░░ ░░░░ ░░ ░░░░░░░      ░░░ ░░░   ░░  ░░   
@@ -14,6 +16,9 @@
  *  same directory as the entry point, and is names "index.html.js". Custom logic can be
  *  inserted directly in the index file, making is possible for plugin to require their 
  *  own extension of Lilium. 
+ *
+ *  Webpack and Babel are used to transpile the app for frontend use. A custom implementation of
+ *  the Webpack dev server is available for quicker compilation and "hot reload". 
  *
  *  ------------------------------------------------------------------------------------------------
  *
@@ -65,6 +70,7 @@
  *      timeago.js          Utility functions to convert timespans into the "ago" format
  *      treeview.js         Representation of data in the form of a tree (directory, files)
  *
+ *  ------------------------------------------------------------------------------------------------
  */
 import { Component, h, render } from 'preact';
 import { makeGlobalLogger } from './data/logger';
