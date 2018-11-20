@@ -77,14 +77,6 @@ class PaymentArticlesSummary extends Component {
             
         }
     }
-    
-    componentDidMount() {
-        
-    }
-    
-    remove(done) {
-
-    }
 
     render(props, state) {
         return (

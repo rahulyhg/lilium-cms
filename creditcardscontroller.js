@@ -24,7 +24,7 @@ class CreditCardController {
                 cli.readPostData(data => {
                     this.ccManager.updateCreditCard(cli.routeinfo.path[2], data, (err, r) => {                        
                         log('CreditCardController', `User ${cli.userinfo.user} modified a credit card with _id ${cli.routeinfo.path[2]}`, 'warn');
-                        cli.sendJSON({ ok: !err, inserted: r.ops[0], err });                        
+                        cli.sendJSON({ ok: !err, err });                        
                     });
                 });
             } else {
@@ -38,8 +38,6 @@ class CreditCardController {
             const data = cli.postdata.data;
             if (data.number && data.expiryMonth && data.expiryYear && data.cvc && data.currency) {
                 this.ccManager.createCreditCard(data.number, data.expiryMonth, data.expiryYear, data.cvc, data.currency, (err, r) => {
-                    console.log(r.insertedId);
-
                     log('CreditCardController', `User ${cli.userinfo.user} added a credit card`, 'info');
                     cli.sendJSON({ ok: !err, err, insertedId: r.insertedId });
                 });

@@ -51,16 +51,11 @@ class CreditCardManager {
         const toCipher = Object.keys(ops).filter(key => this.ENCRYPTEDFIELDS.includes(key));
         // Only make DB request if card iv is necessary to cipher fields
         if (toCipher.length) {
-            console.log(toCipher);
-            
             db.findUnique(_c.default(), ccCol, { _id: db.mongoID(id) }, (err, card) => {
-                console.log(err, card);
-                
                 if (!err && card) {
                     toCipher.forEach(fieldName => {
                         ops[fieldName] = this.aesEncryptor.encryptAES(ops[fieldName], card.iv.buffer);
                     });
-                    console.log(ops);
                     
                     db.update(_c.default(), ccCol, { _id: db.mongoID(id) }, ops, done);
                 } else {

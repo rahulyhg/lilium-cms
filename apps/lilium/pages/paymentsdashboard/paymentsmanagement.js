@@ -18,8 +18,6 @@ export class PaymentsManagement extends Component {
     }
     
     static calculateTotalPayout(payments) {
-        console.log('calculate payout:', payments);
-        
         const payout = { totalCAD: 0, totalUSD: 0 };
         if (!payments || payments.length == 0) return payout;
 
