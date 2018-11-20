@@ -1,6 +1,5 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
-import Modal from '../../widgets/modal';
 import { ButtonWorker } from '../../widgets/form';
 import { CreditCard } from './creditcard';
 import { CreditCardEdit } from './creditcardedit';
@@ -10,9 +9,8 @@ export class CreditCardsManagement extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            deleteCardModalVisible: false,
             creditCards: [],
-            selectedCard: undefined,
+            selectedCard: {},
             inserting: false
         }
     }
@@ -20,7 +18,14 @@ export class CreditCardsManagement extends Component {
     componentDidMount() {
         API.get('/creditcards', {}, (err, data, r) => {
             if (r.status == 200) {
-                this.setState({ creditCards: data });
+                const creditCards = data;
+                const selectedCard = creditCards[0];
+                this.setState({ creditCards, selectedCard });
+            } else {
+                castNotification({
+                    title: 'Could not fetch credit cards',
+                    type: 'error'
+                })
             }
         });
     }
@@ -35,16 +40,17 @@ export class CreditCardsManagement extends Component {
             if (r.status == 200 && data.ok) {
                 const creditCards = this.state.creditCards;
                 const i = creditCards.findIndex(card => card._id == this.state.selectedCard._id);
-                if (i >= 0) {
-                    creditCards.splice(i, 1);
-                    let newSelected;
-                    if (i == creditCards.length - 1) {
-                        newSelected = creditCards[i - 1];
-                    } else {
-                        newSelected = creditCards[i];
-                    }
-                    this.setState({creditCards, selectedCard: newSelected});
+                
+                let newSelected;
+                if (i == creditCards.length - 1) {
+                    newSelected = creditCards[i - 1];
+                } else {
+                    newSelected = creditCards[i];
                 }
+
+                creditCards.splice(i, 1);
+                this.setState({ creditCards, selectedCard: newSelected });
+
                 castNotification({
                     title: 'Credit Card Removed',
                     type: 'success'
@@ -57,8 +63,10 @@ export class CreditCardsManagement extends Component {
 
     editSelectedCard(creditCard, done) {
         API.put('/creditcards/' + this.state.selectedCard._id, { ...creditCard }, (err, data, r) => {
-            if (r.status == 200) {
-                this.setState({ selectedCard: creditCard });
+            if (r.status == 200 && data.ok) {
+                const selectedCard = this.state.selectedCard;
+                Object.assign(selectedCard, creditCard);
+                this.setState({ selectedCard });
                 castNotification({
                     title: 'Credit Card Modified',
                     type: 'success'
@@ -76,10 +84,10 @@ export class CreditCardsManagement extends Component {
 
     createCreditCard(creditCard, done) {
         API.post('/creditcards', {...creditCard}, (err, data, r) => {
-            if (r.status == 200) {
+            if (r.status == 200 && data.ok) {
                 const creditCards = this.state.creditCards;
-                creditCards.unshift(creditCard);
-                this.setState({ creditCards, selectedCard: creditCards[0] });
+                creditCards.push({ _id: data.insertedId, ...creditCard });
+                this.setState({ creditCards, selectedCard: creditCards[creditCards.length - 1], inserting: false });
                 castNotification({
                     title: 'Credit Card Created',
                     type: 'success'

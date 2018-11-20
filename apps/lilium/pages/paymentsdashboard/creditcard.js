@@ -5,25 +5,23 @@ export class CreditCard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            scheme: '',
-            number: props.number || 'XXXXXXXXXXXXXXXX',
-            expiryMonth: '',
-            expiryYear: '',
-            cvc: '',
-            currency: ''
+            scheme: props.scheme,
+            bank: props.bank,
+            number: props.number,
+            expiryMonth: props.expiryMonth,
+            expiryYear: props.expiryYear,
+            cvc: props.cvc,
+            currency: props.currency
         }
     }
 
-    componentDidMount() {
-        API.get('/creditcards/identifycc', { digits: this.props.number.substring(0, 6) }, (err, data, r) => {
-            if (r.status == 200) {
-                this.setState({ scheme: data.scheme, bank: data.bank_name });
-            }
-        });
-    }
-
     componentWillReceiveProps(props) {
-        this.setState(props);
+        const newState = props;
+
+        if (!props.scheme) newState.scheme = '';
+        if (!props.bank) newState.bank = '';
+
+        this.setState(newState);
     }
 
     render(props, state) {
