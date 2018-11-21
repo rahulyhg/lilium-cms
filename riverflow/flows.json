@@ -578,8 +578,8 @@
             "endpoint" : "creditcards",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
-            "module" : "reportgenerator.js",
-            "endpoint" : "creditcards",
+            "module" : "contractorsreports.js",
+            "endpoint" : "contractorsreports",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }
     ]
