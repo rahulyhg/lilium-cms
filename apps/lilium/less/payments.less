@@ -256,3 +256,42 @@ table.articles-summary {
         }
     }
 }
+
+#invoices-history {
+    height: 100%;
+    
+    .invoice {
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+        margin: 3px 12px;
+
+        & > * {
+            flex-basis: 0;
+            flex-grow: 1;
+        }
+
+        .invoice-number {
+            flex: 0 0 100px;
+        }
+
+        .invoice-contractor {
+            display: flex;
+            align-content: center;
+
+            img {
+                height: 40px;
+                width: auto;
+                border-radius: 50%;
+            }
+        }
+
+        .invoice-status {
+            color: #ff2634;
+
+            &.valid {
+                color: rgb(16, 111, 16);
+            }
+        }
+    }
+}
