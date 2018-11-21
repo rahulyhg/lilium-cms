@@ -155,6 +155,15 @@ class Lilium extends Component {
             });
         });
 
+        bindRealtimeEvent('managecontractors', ev => {
+            castNotification({
+                title: 'Stripe has processed the payment successfully',
+                message: 'Stripe has processed the payment(s) successfully.'
+                        + 'Note that it may take a couple of business days for the contrctor to recieve it in their personnal bank account.',
+                type: 'success'
+            })
+        });
+
         // Any component can cast the exit screen using an event
         document.addEventListener('castexitscreen', () => {
             this.setState({ loading : true });

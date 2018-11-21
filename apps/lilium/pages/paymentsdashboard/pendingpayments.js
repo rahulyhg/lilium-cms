@@ -59,7 +59,7 @@ export class PaymentDetails extends Component {
                         <p id="payment-period">{paymentPeriod}</p>
                     </div>
                     <div id="pay-individual">
-                        <ButtonWorker text={`Pay ${props.contractorPayment.owed} ${props.contractorPayment.currency}`} theme='purple' type='fill'
+                        <ButtonWorker text={`Pay ${props.contractorPayment.owed} ${props.contractorPayment.currency || ''}`} theme='purple' type='fill'
                                         work={props.payContractors.bind(this)} sync={true} />
                     </div>
                 </div>
@@ -76,14 +76,6 @@ class PaymentArticlesSummary extends Component {
         this.state = {
             
         }
-    }
-    
-    componentDidMount() {
-        
-    }
-    
-    remove(done) {
-
     }
 
     render(props, state) {

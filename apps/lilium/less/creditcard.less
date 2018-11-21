@@ -1,4 +1,6 @@
 @cardBg: @liliumPurple;
+@ccWidth: 85mm;
+@ccBorderRadius: 10px;
 
 .credit-card {
     background-color: @cardBg;
@@ -6,13 +8,51 @@
     border: 1px solid darken(@cardBg, 5%);
     color: white;
     border-radius: 10px;
-    width: 85mm;
+    width: @ccWidth;
     height: 53mm;
     margin: 8px;
     position: relative;
     box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.2);
     text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.2);
     font-family: monospace;
+    transition: all 0.2s ease-out;
+
+    .scheme-logo {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+
+    .card-bank-name {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        margin: 0px;
+        font-family: @mainFont;
+        text-transform: capitalize;
+    }
+
+    .card-data {
+        font-size: 16px;
+        margin: 30% 30px 12px 30px;
+
+        p.card-number {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .secondary-info {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+
+    .card-currency {
+        position: absolute;
+        right: 6px;
+        bottom: 6px;
+    }
 }
 
 #credit-card-list {

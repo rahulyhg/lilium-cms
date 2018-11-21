@@ -201,3 +201,97 @@ table.articles-summary {
         }
     }
 }
+
+#credit-cards-management {
+    display: flex;
+    height: 100%;
+    
+    #credit-card-list {
+        height: 100%;
+        overflow-y: scroll;
+        flex: 0 0 25%;
+
+        & > * {
+            .credit-card {
+                margin: 8px auto;
+            }
+
+            &.selected .credit-card {
+                transform: scale(1.1);
+                margin-bottom: 16px;
+                margin-top: 16px;
+            }
+        }
+    }
+
+    #credit-card-details-pane {
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        background: @liliumBackground;
+        height: 100%;
+        flex-grow: 1;
+
+        #credit-card-edit {
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            border-radius: @ccBorderRadius;
+            /* Force children to obey border radius */
+            overflow: hidden;
+            width: calc(@ccWidth * 1.3);
+
+            .credit-card {
+                width: 100%;
+                height: auto;
+                margin: 0 auto;
+                border-radius: 0px
+            }
+
+            #credit-card-form {
+                margin: 12px 6px;
+
+                #bottom-line > * {
+                    width: 50%;
+                }
+            }
+        }
+    }
+}
+
+#invoices-history {
+    height: 100%;
+    
+    .invoice {
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+        margin: 3px 12px;
+
+        & > * {
+            flex-basis: 0;
+            flex-grow: 1;
+        }
+
+        .invoice-number {
+            flex: 0 0 100px;
+        }
+
+        .invoice-contractor {
+            display: flex;
+            align-content: center;
+
+            img {
+                height: 40px;
+                width: auto;
+                border-radius: 50%;
+            }
+        }
+
+        .invoice-status {
+            color: #ff2634;
+
+            &.valid {
+                color: rgb(16, 111, 16);
+            }
+        }
+    }
+}
