@@ -18,7 +18,7 @@ export default class ReportGenerator extends Component {
     
     render() {
         return (
-            <div></div>
+            <div>Payments report</div>
         );
     }
 }

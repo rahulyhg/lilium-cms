@@ -58,10 +58,10 @@
             "id": "paymenthistory",
             "lys" : "payments,history,contractors",
             "faicon": "fa-history",
-            "displayname": "Payments history",
+            "displayname": "Payments Reports",
             "priority": 3000,
             "rights": ["hr"],
-            "absURL": "/paymentshistory",
+            "absURL": "/paymentreports",
             "section" : "home"            
         },
         {
