@@ -4,7 +4,7 @@ import { Link } from '../../routing/link';
 import { BigList, BigListToolBarBuilder } from '../../widgets/biglist';
 import { Spinner } from '../../layout/loading';
 import { ButtonWorker, TextField, SelectField, DatePicker } from '../../widgets/form';
-import { revokeAccess, enableAccess } from '../../pages/entities/lib';
+import { revokeAccess, enableAccess } from '../../lib/entities';
 
 export default class SingleView extends Component {
     constructor(props) {

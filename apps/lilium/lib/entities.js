@@ -1,4 +1,4 @@
-import API from '../../data/api';
+import API from '../data/api';
 
 export function revokeAccess(user, callback) {
     API.post('/entities/revoke/' + user._id, {}, (err, data, r) => {

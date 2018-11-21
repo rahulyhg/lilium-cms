@@ -3,7 +3,7 @@ import { castNotification } from '../../layout/notifications';
 import { BigList } from '../../widgets/biglist';
 import { navigateTo } from '../../routing/link';
 import { castOverlay } from '../../overlay/overlaywrap';
-import * as entityLib from './lib'; 
+import * as entityLib from '../../lib/entities'; 
 
 class EntityListItemAdd extends Component {
     onClick() {

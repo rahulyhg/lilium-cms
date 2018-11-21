@@ -3,7 +3,7 @@ import API from '../../data/api';
 import { Spinner } from '../../layout/loading'
 import { TextField, MultiSelectBox } from '../../widgets/form'
 import { castNotification } from '../../layout/notifications';
-import * as entityLib from './lib'
+import * as entityLib from '../../lib/entities'
 
 export default class Entity extends Component {
     constructor(props) {
