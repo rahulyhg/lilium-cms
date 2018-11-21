@@ -196,7 +196,28 @@ class ContractorHandler {
                 }, { displayname : 1, avatarURL : 1, stripeuserid : 1, currency: 1, isBeingPaid: 1 });
             });
         } else if (levelone == "invoices") {
-            sendback({ invoices : [] })
+            if (cli.hasRightOrRefuse('manage-contractors')) {
+                const conds = [
+                    {$sort: {number: -1}},
+                    {$skip: params.filters.skip || 0},
+                    {$limit: params.filters.limit || 30}
+                ];
+                
+                if (params.filters.number) {
+                    const number = parseInt(params.filters.number);
+                    
+                    conds.push({$match: {
+                        $or: [
+                            { number: number },
+                            { total: number }
+                        ]
+                    }});
+                }
+
+                db.join(_c.default(), 'contractorinvoices', conds, (items) => {
+                    sendback({ items: items });
+                });
+            }
         }
     }
 
@@ -279,16 +300,16 @@ class ContractorHandler {
                     } 
                 }], items => sendback(items));
         } else if (levelone == "invoices") {
-            db.join(require(liliumroot + "/config").default(), 'contractorinvoices', [
+            db.join(_c.default(), 'contractorinvoices', [
                 { $match : { to : db.mongoID(cli.userinfo.userid) }},
                 { $sort : { _id : -1 } }, {
                     $project : {
                         total : 1, at : 1, currency : 1, transactionid : 1, number : 1, items : {
                             $size : "$products"
-                        } 
-                    } 
+                        }
+                    }
                 }
-            ], items => sendback(items)); 
+            ], items => sendback(items));
         } else if (levelone == "code") {
             db.findUnique(require(liliumroot + "/config").default(), 'entities', { 
                 _id : db.mongoID(cli.userinfo.userid) 
@@ -303,6 +324,8 @@ class ContractorHandler {
                 stripeauthfrom : 1,
                 stripecodeat : 1
             });
+        } else {
+            cli.throwHTTP(404, 'Not Found', true);
         }
     }
 }
