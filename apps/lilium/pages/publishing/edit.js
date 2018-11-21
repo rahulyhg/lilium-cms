@@ -13,7 +13,8 @@ import Modal from '../../widgets/modal';
 import dateFormat from 'dateformat';
 import { getTimeAgo } from '../../widgets/timeago';
 
-import API from "../../data/api";
+import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink } from '../../lib/publishing';
+
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
@@ -463,8 +464,8 @@ export default class EditView extends Component {
         } else {
             log('Publishing', 'Saving current post with id ' + this.props.postid, 'detail');
 
-            API.put('/publishing/save/' + this.coldState.post._id, this.edits, (err, json, r) => {
-                if (json && json.historyentry) {            
+            savePost(this.coldState.post._id, this.edits, (err, { historyentry }, r) => {
+                if (historyentry) {            
                     log('Publishing', 'Article saved!', 'success');
 
                     castNotification({
@@ -474,7 +475,7 @@ export default class EditView extends Component {
                     })
 
                     this.setState({
-                        history : [json.historyentry, ...this.state.history],
+                        history : [historyentry, ...this.state.history],
                         post : {...this.state.post, ...this.edits}
                     }, () => {
                         this.edits = {};
@@ -497,8 +498,8 @@ export default class EditView extends Component {
 
     validate(done) {
         this.save(() => {
-            API.put('/publishing/validate/' + this.coldState.post._id, {}, (err, json, r) => {
-                if (r.status == 200) {
+            validatePost(this.coldState.post._id, (err, { valid }) => {
+                if (!err && valid) {
                     castOverlay('publish-article', {
                         publishFunction : this.publish.bind(this),
                         getReportFunction : this.getReport.bind(this)
@@ -507,7 +508,7 @@ export default class EditView extends Component {
                     castNotification({
                         type : "warning",
                         title : "Could not publish article",
-                        message : r.responseText
+                        message : err
                     });
                 }
     
@@ -517,21 +518,19 @@ export default class EditView extends Component {
     }
 
     getReport(sendback) {
-        API.get('/publishing/report/' + this.coldState.post._id, {}, (err, json, r) => {
-            sendback(err, json);
-        });
+        getPublicationReport(this.coldState.post._id, (err, report) => sendback(err, report));
     }
 
     publish(done) {
-        API.put('/publishing/publish/' + this.coldState.post._id, {}, (err, json, r) => {
-            if (r.status == 200) {
+        publishPost(this.coldState.post._id, (err, { historyentry, newstate }, r) => {
+            if (!err) {
                 hit();
                 this.setState({
-                    history : [json.historyentry, ...this.state.history],
+                    history : [historyentry, ...this.state.history],
                     post : {...this.state.post, ...{
-                        status : json.newstate.status,
-                        date : json.newstate.date,
-                        name : json.newstate.name,
+                        status : newstate.status,
+                        date : newstate.date,
+                        name : newstate.name,
                         publishedAt : Date.now()
                     }}
                 }, () => {
@@ -540,41 +539,39 @@ export default class EditView extends Component {
                     done(r.status);    
                 });
             } else {
-                r.text().then(message => {
-                    castNotification({
-                        type : "warning",
-                        title : "Could not publish article",
-                        message
-                    });
+                const message = r.responseText;
+                castNotification({
+                    type : "warning",
+                    title : "Could not publish article",
+                    message
+                });
 
-                    done(r.status, message);
-                })
+                done(r.status, message);
             }
         });
     }
 
     unpublish(done) {
-        API.delete('/publishing/unpublish/' + this.coldState.post._id, {}, (err, json, r) => {
-            if (r.status == 200) {
+        unpublishPost(this.coldState.post._id, (err, { historyentry, newstate }, r) => {
+            if (!err) {
                 this.setState({
-                    history : [json.historyentry, ...this.state.history],
+                    history : [historyentry, ...this.state.history],
                     post : {...this.state.post, ...{
-                        status : json.newstate.status,
-                        date : json.newstate.date,
-                        name : json.newstate.name,
+                        status : newstate.status,
+                        date : newstate.date,
+                        name : newstate.name,
                         publishedAt : Date.now()
                     }}
                 }, () => {
                     this.coldState.post = this.state.post; 
                 });
             } else {
-                r.text().then(message => {
-                    castNotification({
-                        type : "warning",
-                        title : "Could not unpublish article",
-                        message
-                    });
-                })
+                const message = r.responseText;
+                castNotification({
+                    type : "warning",
+                    title : "Could not unpublish article",
+                    message
+                });
             }
 
             done();
@@ -601,10 +598,10 @@ export default class EditView extends Component {
 
     submitForApproval(done) {
         this.save(() => {
-            API.put('/publishing/validate/' + this.coldState.post._id, {}, (err, json, r) => {
-                if (r.status == 200) {  
-                    API.put('/publishing/submit/' + this.coldState.post._id, {}, (err, json, r) => {
-                        if (json && !json.error) {
+            validatePost(this.coldState.post._id, (err, { valid }, r) => {
+                if (!err && valid) {  
+                    submitPostForApproval(this.coldState.post._id, (err, json, r) => {
+                        if (!err) {
                             castNotification({
                                 type : "success",
                                 title : "Article sent",
@@ -615,20 +612,18 @@ export default class EditView extends Component {
                             castNotification({
                                 type : "warning",
                                 title : "Could not send article for approval",
-                                message : json.error
+                                message : err
                             });
                         }
 
                         done();
                     });
                 } else {
-                    r.text().then(message => {
-                        castNotification({
-                            type : "warning",
-                            title : "Could not send article for approval",
-                            message
-                        });
-                    })
+                    castNotification({
+                        type : "warning",
+                        title : "Could not send article for approval",
+                        message : err
+                    });
                     done();
                 }
 
@@ -637,8 +632,8 @@ export default class EditView extends Component {
     }
 
     refuse() {
-        API.put('/publishing/refuse/' + this.coldState.post._id, {}, (err, json, r) => {
-            if (json && !json.error) {
+        refusePost(this.coldState.post._id, (err, json, r) => {
+            if (!err) {
                 castNotification({
                     type : "success",
                     title : "Article refused",
@@ -650,7 +645,7 @@ export default class EditView extends Component {
                 castNotification({
                     type : "warning",
                     title : "Could not refuse submission",
-                    message : json.error
+                    message : err
                 });
             }
 
@@ -659,8 +654,8 @@ export default class EditView extends Component {
     }
 
     destroy() {
-        API.delete('/publishing/destroy/' + this.coldState.post._id, {}, (err, json, r) => {
-            if (json && !json.error) {
+        destroyPost(this.coldState.post._id, (err, json, r) => {
+            if (err) {
                 castNotification({
                     type : "success",
                     title : "Article destroyed",
@@ -672,7 +667,7 @@ export default class EditView extends Component {
                 castNotification({
                     type : "warning",
                     title : "Could not destroy article",
-                    message : json.error
+                    message : err
                 });
             }
 
@@ -682,8 +677,8 @@ export default class EditView extends Component {
 
     commitchanges(done) {
         this.save(() => {
-            API.put('/publishing/refresh/' + this.coldState.post._id, {}, (err, json, r) => {
-                if (json && json.ok) {
+            refreshPost(this.coldState.post._id, (err, json, r) => {
+                if (!err) {
                     castNotification({
                         type : "success",
                         title : "Article refreshed",
@@ -693,7 +688,7 @@ export default class EditView extends Component {
                     castNotification({
                         type : "error",
                         title : "Could not commit changes",
-                        message : "Error " + r.status
+                        message : err
                     });
                 }
 
@@ -710,19 +705,13 @@ export default class EditView extends Component {
             execute : this.save.bind(this)
         }]);
 
-        const endpoints = {
-            post : { endpoint : "/publishing/write/" + postid, params : {} },
-            history : { endpoint : "/publishing/history/" + postid, params : {} }
-        };
-
-        API.getMany(Object.keys(endpoints).map(key => endpoints[key]), (err, resp) => {
-            const post = resp[endpoints.post.endpoint];
+        getPostForEdit(postid, ({ post, history }) => {
             post ?
                 log('Publishing', 'About to display : ' + post.headline, 'detail') :
                 log('Publishing', 'Article not found : ' + postid, 'warn');
             
             this.coldState.post = post;
-            this.setState(post ? { post, loading: false, history : resp[endpoints.history.endpoint] } : { error : "Article not Found", loading : false }, () => {
+            this.setState(post ? { loading: false, post, history } : { error : "Article not Found", loading : false }, () => {
                 done && done();
             });
         });
@@ -783,12 +772,12 @@ export default class EditView extends Component {
 
     handleDetailsAction(field, value) {
         if (field == "name") {
-            API.put("/publishing/slug/" + this.state.post._id, { slug : value }, (err, json, r) => {
-                if (json.err) {
+            updatePostSlug(this.state.post._id, value, (err, json, r) => {
+                if (err) {
                     castNotification({
                         type : "warning",
                         title : "Could not edit URL slug",
-                        message : json.err
+                        message : err
                     })
                 } else {
                     castNotification({
@@ -814,10 +803,10 @@ export default class EditView extends Component {
             this.edits.author = value;
             this.save();
         } else if (field == "previewkey") {
-            API.delete('/publishing/previewlink/' + this.state.post._id, {}, (err, json, r) => {
-                if (r.status == 200) {
+            getNewPreviewLink(this.state.post._id, (err, { previewkey }, r) => {
+                if (!err) {
                     const post = this.state.post;
-                    post.previewkey = json.previewkey;
+                    post.previewkey = previewkey;
 
                     this.setState({ post })
 
