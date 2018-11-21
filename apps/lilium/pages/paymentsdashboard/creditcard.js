@@ -15,8 +15,6 @@ export class CreditCard extends Component {
         }
     }
 
-    static numberReplaceRegEx = new RegExp('([^0-9]+)', 'g');
-
     componentWillReceiveProps(props) {
         const newState = props;
 
@@ -29,9 +27,8 @@ export class CreditCard extends Component {
     render(props, state) {
         const numberGroups = [];
         if (props.number) {
-            const formatted = props.number.replace(CreditCard.numberReplaceRegEx, '');
             for (let i = 0; i < 4; i++) {
-                const group = formatted.substring(i * 4, i * 4 + 4);
+                const group = props.number.substring(i * 4, i * 4 + 4);
                 numberGroups.push(group);
             }
         }

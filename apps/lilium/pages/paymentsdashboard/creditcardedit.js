@@ -15,6 +15,7 @@ export class CreditCardEdit extends Component {
         this.dateSegmentRegEx = new RegExp('(^[0-9]{1,2}$)');
         this.cardNumberRegEx = new RegExp('(^[0-9]{16})$');
         this.cvcRegEx = new RegExp('^[0-9]{3}$');
+        this.numberReplaceRegEx = new RegExp('([^0-9]+)', 'g');
 
         this.errors = [];
     }
@@ -48,15 +49,11 @@ export class CreditCardEdit extends Component {
     fieldEdited(name, val, old, valid) {
         this.modified[name] = val;
 
-        console.log(name);
-        
         if (valid) {
             if (this.errors.length) {
                 const i = this.errors.indexOf(name);
-                console.log(i);
                 
                 if (i >= 0) {
-                    console.log('removing');
                     this.errors.splice(i, 1);
                 }
             }
@@ -66,8 +63,6 @@ export class CreditCardEdit extends Component {
             }
         }
         
-        console.log(valid);
-        console.log(this.errors);
         const cc = this.state.cc;
         cc[name] = val;
         this.setState({ cc });
@@ -80,7 +75,7 @@ export class CreditCardEdit extends Component {
                     <CreditCard {...state.cc} />
                     <div id="credit-card-form">
                         <TextField value={state.cc.number} initialValue={state.cc.number} placeholder='Credit Card Number' name='number' onChange={this.fieldEdited.bind(this)}
-                                    validate={value => this.cardNumberRegEx.test(value)} />
+                                    validate={value => this.cardNumberRegEx.test(value)} format={value => value.replace(this.numberReplaceRegEx, '')} />
                         <div className='flex'>
                             <TextField value={state.cc.expiryMonth} initialValue={state.cc.expiryMonth} placeholder='Expiry Month' name='expiryMonth' onChange={this.fieldEdited.bind(this)}
                                         validate={value => this.dateSegmentRegEx.test(value) && parseInt(value) <= 12 } />
