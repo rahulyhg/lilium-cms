@@ -57,6 +57,7 @@ class CreditCardManager {
                         ops[fieldName] = this.aesEncryptor.encryptAES(ops[fieldName], card.iv.buffer);
                     });
                     
+                    delete ops._id;
                     db.update(_c.default(), ccCol, { _id: db.mongoID(id) }, ops, done);
                 } else {
                     done && done(err);
