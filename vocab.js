@@ -19,6 +19,7 @@ class Vocab {
         const pages = this.getPages();
 
         readdirSync(path.join(liliumroot, 'vocab')).forEach(langDirItem => {
+            log('Vocab', 'Reading vocab file ' + langDirItem, 'info');
             if (langDirItem.endsWith('.json')) {
                 try {
                     const langData = require(path.join(liliumroot, 'vocab', langDirItem)) || {};
@@ -35,6 +36,7 @@ class Vocab {
                     writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem),
                                     JSON.stringify(this.compileLanguageData(langData.__.languageName)));
                 } catch (e) {
+                    console.log(e);
                     log('Vocab', `Error opening language file ` + e.message, 'err');
                 }
             }
@@ -87,8 +89,8 @@ class Vocab {
      * @param {string} lang The language code of the language file to compile
      */
     compileLanguageData(lang) {
-        const compiled = this.languagesData[this.defaultLanguage];
-        const fallbackLangData = this.languagesData[this.languagesData[lang].__.fallback] || this.languagesData[lang];
+        const compiled = {...this.languagesData[this.defaultLanguage]};
+        const fallbackLangData = this.languagesData[lang] || this.languagesData[this.languagesData[lang].__.fallback];
         this.getPages().forEach(page => {
             Object.keys(fallbackLangData[page]).filter(slug => fallbackLangData[page][slug]).forEach(slug => {
                 compiled[page][slug] = fallbackLangData[page][slug];
@@ -100,6 +102,8 @@ class Vocab {
 
         log('Vocab', 'Compiled language resource file for language ' + lang, 'info');
         compiled.__ = this.languagesData[lang].__;
+
+        console.log(compiled);
 
         return compiled;
     }
