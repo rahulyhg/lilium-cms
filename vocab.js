@@ -78,6 +78,16 @@ class Vocab {
     getSupportedLanguages() {
         return this.getSupportedLanguages;
     }
+
+    adminPOST(cli) {
+        if (cli.routeinfo.path[2] == "builddico" && cli.hasRight('admin')) {
+            this.preloadDicos(err => {
+                cli.sendJSON({ err, success : !err })
+            });
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
+    }
 };
 
 module.exports = new Vocab();

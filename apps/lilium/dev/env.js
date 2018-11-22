@@ -91,6 +91,12 @@ export class DevTools extends Component {
             execute : this.bundleCSS.bind(this)
         });
 
+        addCommand({
+            command : "vocab,translations,dico,dict",
+            displayname : "Build Dicos",
+            execute : this.bundleDicos.bind(this)
+        });
+
         window.addEventListener('keydown', ev => ev.key == "b" && ev.ctrlKey && this.bundleJS());
     }
 
@@ -104,6 +110,16 @@ export class DevTools extends Component {
         document.dispatchEvent(event);
 
         API.post('/buildcss/lilium', {}, () => {
+            document.location.reload();
+        });
+    }
+
+    bundleDicos() {
+        log('Dev', 'Sent request to bundle dicos... The browser will refresh shortly', 'lilium');
+        const event = new CustomEvent("castexitscreen");
+        document.dispatchEvent(event);
+
+        API.post('/vocab/builddico', {}, () => {
             document.location.reload();
         });
     }
