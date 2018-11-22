@@ -95,6 +95,7 @@
     "image-size": "latest",
     "instagram-node": "latest",
     "jsdom": "latest",
+    "json2csv": "^4.3.1",
     "jws": "^3.1.5",
     "less": "^3.8.1",
     "lorem-ipsum": "^1.0.5",
