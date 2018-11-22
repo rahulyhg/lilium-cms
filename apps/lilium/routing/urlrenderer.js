@@ -32,7 +32,7 @@ import FlaggingMan      from '../pages/flagging/index';
 import StaffingPage     from '../pages/staffing/index';
 import PwManager        from '../pages/pwmanager/index';
 import PaymentDashboard from '../pages/paymentsdashboard/index';
-import PaymentsReport  from '../pages/reportgenerator/index';
+import PaymentsReport   from '../pages/reportgenerator/index';
 import e404             from '../pages/errors/404';
 import e403             from '../pages/errors/403';
 
@@ -96,7 +96,7 @@ EndpointStore.registerEndpoint('flagging', FlaggingMan);
 EndpointStore.registerEndpoint('staffing', StaffingPage);
 EndpointStore.registerEndpoint('pwmanager', PwManager);
 EndpointStore.registerEndpoint('paymentdashboard', PaymentDashboard);
-EndpointStore.registerEndpoint('paymentreports', PaymentsReport);
+EndpointStore.registerEndpoint('paymentshistory', PaymentsReport);
 EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('_e403', e403);
 
