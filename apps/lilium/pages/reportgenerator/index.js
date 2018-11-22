@@ -5,6 +5,8 @@ import { SelectField, ButtonWorker, CheckboxField, DatePicker } from "../../widg
 import API from "../../data/api";
 import Modal from "../../widgets/modal";
 
+import { ContractorReport } from './contractorreport';
+
 const now = new Date();
 
 class ReportFieldWrapper extends Component {
@@ -108,6 +110,10 @@ class ReportFieldWrapper extends Component {
 };
 
 class ReportView extends Component {
+    componentWillReceiveProps(props) {
+        this.setState({ report : props.report, reporttype : props.reporttype })
+    }
+
     render() {
         if (!this.state.report) {
             return (
@@ -121,9 +127,20 @@ class ReportView extends Component {
             )
         }
 
+        let ReportClass; 
+        
+        switch (this.state.reporttype) {
+            case "contractors": ReportClass = ContractorReport; break;
+        }
+
         return (
             <div class="report-viewer">
+                <div class="report-header">
 
+                </div>
+                <div class="report-class-wrap">
+                    <ReportClass report={this.state.report} />
+                </div>
             </div>
         )
     }
@@ -143,7 +160,9 @@ export default class ReportGenerator extends Component {
 
     onFormSubmit({ filters, reporttype }, done) {
         API.get('/contractorsreports/generate/' + reporttype, { filters }, (err, resp, r) => {
-            done();
+            this.setState({ report : resp.report, reporttype }, () => {
+                done();
+            });
         });
     }
     
@@ -154,7 +173,7 @@ export default class ReportGenerator extends Component {
                     <ReportFieldWrapper onSubmit={this.onFormSubmit.bind(this)} />
                 </div>
                 <div class="report-viewer-side">
-                    <ReportView report={this.state.report} />
+                    <ReportView report={this.state.report} reporttype={this.state.reporttype} />
                 </div>
             </div>
         );
