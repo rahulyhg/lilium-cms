@@ -32,15 +32,22 @@ class Vocab {
                         }
                     });
 
+
                     this.languagesData[langData.__.languageName] = langData;
+                    console.log('BEFORE WRITE: ', this.languagesData);
+                    
                     writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem),
-                                    JSON.stringify(this.compileLanguageData(langData.__.languageName)));
+                                    JSON.stringify(this.compileLanguageData(langData.__.languageName)));              
+                    console.log('AFTER WRITE: ', this.languagesData);
+                          
                 } catch (e) {
                     console.log(e);
                     log('Vocab', `Error opening language file ` + e.message, 'err');
                 }
             }
         });
+
+        console.log('FINAL LANGUAGES DATA: ', this.languagesData);
 
         log('Vocab', `Detected supported languages ${this.supportedLanguages}`, 'success');
         done && done();
@@ -49,7 +56,7 @@ class Vocab {
     /**
      * Returns an array containing the information for all supported languages
      */
-    getSUpportedLanguages() { return this.supportedLanguages; };
+    getSUpportedLanguages() { return this.supportedLanguages; }
 
     /**
      * Returns an array containing the language codes of the supported languages
@@ -89,15 +96,19 @@ class Vocab {
      * @param {string} lang The language code of the language file to compile
      */
     compileLanguageData(lang) {
+        console.log('============================');
+        console.log('COMPILING LANGUAGE DATA FOR LANGUAGE : ',lang);
+        
         const compiled = {...this.languagesData[this.defaultLanguage]};
-        const fallbackLangData = this.languagesData[lang] || this.languagesData[this.languagesData[lang].__.fallback];
+        const fallbackLangData = this.languagesData[this.languagesData[lang].__.fallback] || this.languagesData[lang];
+        
         this.getPages().forEach(page => {
             Object.keys(fallbackLangData[page]).filter(slug => fallbackLangData[page][slug]).forEach(slug => {
                 compiled[page][slug] = fallbackLangData[page][slug];
             });
             Object.keys(this.languagesData[lang][page]).filter(slug => this.languagesData[lang][page][slug]).forEach(slug => {
                 compiled[page][slug] = this.languagesData[lang][page][slug];
-            });
+            }); 
         });
 
         log('Vocab', 'Compiled language resource file for language ' + lang, 'info');
