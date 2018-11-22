@@ -61,7 +61,7 @@
             "displayname": "Payments Reports",
             "priority": 3000,
             "rights": ["hr"],
-            "absURL": "/paymentreports",
+            "absURL": "/paymentshistory",
             "section" : "home"            
         },
         {
