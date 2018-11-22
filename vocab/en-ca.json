@@ -6,7 +6,8 @@
     },
     "dashboard": {
         "subtitle": "",
-        "title": ""
+        "title": "",
+        "greeting": "<div"
     },
     "devtools": {
         "subtitle": "",

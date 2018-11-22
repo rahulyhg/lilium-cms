@@ -12,7 +12,7 @@ const PaymentDashboard = props => (
         <Tab title='Invoice History'>
             <InvoicesHistory />
         </Tab>
-        <Tab title='Credit Cards Management'>
+        <Tab title={}>
             <CreditCardsManagement />
         </Tab>
     </TabView>

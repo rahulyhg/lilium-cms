@@ -295,7 +295,9 @@
             "rights": ["manage-plugins"],
             "absURL": "/plugins",
             "section" : "lilium"
-        }, 
+        }
+    ],
+    "neutralized": [
         {    
             "id": "translations",
             "lys" : "translations,languages",
@@ -307,7 +309,6 @@
             "section" : "lilium"            
         }
     ],
-
     "rivers" : [
         {
             "module" : "backend/login.js",
