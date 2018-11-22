@@ -103,8 +103,6 @@ class Vocab {
         log('Vocab', 'Compiled language resource file for language ' + lang, 'info');
         compiled.__ = this.languagesData[lang].__;
 
-        console.log(compiled);
-
         return compiled;
     }
 
@@ -155,11 +153,7 @@ class Vocab {
     }
 
     removeField(pageName, slug, done) {
-        console.log(pageName, slug);
-        
         this.supportedLanguages.forEach(lang => {
-            console.log(lang);
-            
             delete this.languagesData[lang][pageName][slug];
         });
 
