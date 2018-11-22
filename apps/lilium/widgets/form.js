@@ -35,7 +35,7 @@ class FormField extends Component {
     changed(value, oValue) {
         const oldValue = typeof oValue != "undefined" ? oValue : this.value;
         this.value = this.props.format ? this.props.format(value) : value;
-        this.valid = this.props.validate ? this.props.validate(value) : true;
+        this.valid = this.props.validate ? this.props.validate(this.value) : true;
         this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
 
         if (this.autosave) {
