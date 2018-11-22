@@ -30,8 +30,12 @@ export class ChartGraph extends Component {
     }
 
     componentWillReceiveProps(props) {
-        if (props.datasets) {
+        if (props.chart && this.chart) {
+            this.chart.data = props.chart.data;
+            this.chart.type = props.chart.type;
+            this.chart.options = props.chart.options;
 
+            this.chart.update();
         }
     }
 
