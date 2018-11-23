@@ -21,6 +21,9 @@ const defaultDictionary = {
     edit: 'edit',
     dashboard: 'Dashboard',
 
+    // Preferences
+    preferencesTitle: 'Preferences',
+    
 }
 
 export class DefaultDictionary extends LangDico {

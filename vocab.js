@@ -51,7 +51,7 @@ class Vocab {
 
     preloadDicos(done) {
         const languagesToCompile = readdirSync('./vocab').filter(x => x.endsWith('.lang.js'));
-        this.supportedLanguages =languagesToCompile;
+        this.supportedLanguages =languagesToCompile.map(l => l.split('.lang.js')[0]);
 
         let langIndex = -1;
 

@@ -31,7 +31,9 @@ export default class Preferences extends Component {
         ], (err, data) => {
             if (data['/preferences'] && data['/translations/getSupportedLanguages']) {
                 this.values = data['/preferences'];
-                this.supportedLanguages = data['/translations/getSupportedLanguages'];
+                this.supportedLanguages = data['/translations/getSupportedLanguages'].map(l => ({ text: l }));
+                console.log(this.supportedLanguages);
+                
                 this.setState({ ready: true, values : this.values });
 
                 log('Preferences', 'Fetched user preferences', 'success');
@@ -99,8 +101,7 @@ export default class Preferences extends Component {
                     <h1 style={{ margin: "15px 0 20px" }}>Preferences</h1>
                     <div id="preferences-edit">
                         <SelectField name='uiLanguage' placeholder='User Interface Language' initialValue={this.state.values.uiLanguage || 'en-ca'}
-                            options={this.supportedLanguages.map(l => ( { displayname: l.displayName, value: l.languageName } ))}
-                            onChange={this.valueChanged.bind(this)} />
+                            options={this.supportedLanguages} onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='menuLocked' placeholder='Lock Left Menu' initialValue={this.state.values['menuLocked']}
                             onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='activeReadersHeader' placeholder='Display active readers in header' initialValue={this.state.values['activeReadersHeader']}
