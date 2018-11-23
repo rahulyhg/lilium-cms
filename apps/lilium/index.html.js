@@ -36,9 +36,17 @@ module.exports = cli => {
                 
                 <script src="${origin}/tinymce/tinymce.js"></script>
                 <script src="${origin}/chartjs/Chart.min.js"></script>
-                <script src="${buildLocation}/app.bundle.js"></script>
-                <script src="${buildLocation}/vendors.app.bundle.js"></script>
-                <script src="${buildLocation}/main.app.bundle.js"></script>
-            </body>
+
+                ${
+                    fulldevenv ? `
+                        <script src="${buildLocation}/app.bundle.js"></script>
+                        <script src="${buildLocation}/vendors.app.bundle.js"></script>
+                        <script src="${buildLocation}/main.app.bundle.js"></script>
+                    ` : `
+                        <script src="${buildLocation}/main.bundle.js"></script>
+                        <script src="${buildLocation}/preact.bundle.js"></script>
+                        <script src="${buildLocation}/runtime.bundle.js"></script>
+                    `
+                }
         </html>`.replace(/\n/g, '').replace(/\>\s*\</g, '><').replace(/\s\s+/g, ' ');
 };

@@ -104,7 +104,7 @@ if (liliumcms.env == "dev") {
 }
 
 // Main app component
-class Lilium extends Component {
+export class Lilium extends Component {
     constructor(props) {
         super(props);        
         this.state = {

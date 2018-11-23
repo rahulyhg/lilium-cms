@@ -76,6 +76,9 @@ const getCache = keys => {
 };
 
 const updateRightsInCachedSessions = name => {
+    return;
+
+    // Neutralized until fixed
     Object.keys(mem.sessions).forEach(token => {
         const sesh = mem.sessions[token];
         if (sesh &&sesh.data.roles.includes(name)) {

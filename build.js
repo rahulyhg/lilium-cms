@@ -69,6 +69,8 @@ class Builder {
             } catch (err) { }
         }
 
+        const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
         const buildconfig = {
             mode : _c.env == "dev" ? "development" : "production",
             // externals: [nodeExternals()],
@@ -88,19 +90,36 @@ class Builder {
             plugins: [],
             output : {
                 path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
-                filename : options.bundlename || "app.bundle.js"
+                filename : options.bundlename || "[name].bundle.js"
             },
             optimization : {
                 runtimeChunk: 'single',
                 splitChunks: {
                     cacheGroups: {
-                        vendor: {
-                            test: /[\\/]node_modules[\\/]/,
-                            name: 'vendors',
-                            chunks: 'all'
-                        }
+                        preact: {
+                            name: 'preact',
+                            chunks: 'all',
+                            minSize: 0,
+                            test: /[\\/]preact[\\/]/,
+                            priority: 99,
+                        },
                     }
-                }
+                },
+                minimizer: [
+                    new UglifyJsPlugin({
+                        include: /preact\.js$/,
+                        uglifyOptions: {
+                            compress: {
+                                reduce_funcs: false,
+                            },
+                        },
+                    }),
+                    new UglifyJsPlugin({
+                        exclude: /preact\.js$/,
+                        cache: true,
+                        parallel: true,
+                    })
+                ],
             }
         };
 
