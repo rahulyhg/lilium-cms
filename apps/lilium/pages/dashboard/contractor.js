@@ -97,7 +97,7 @@ class ContractorHistorical extends Component {
 export class ContractorTab extends Component {
     static get tabprops() {
         return {
-            text : "Payments",
+            text : _v("payments"),
             right : "contractor",
             id : "contractor-payment"
         }

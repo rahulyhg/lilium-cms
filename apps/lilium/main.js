@@ -181,7 +181,7 @@ class Lilium extends Component {
                 this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
-                const currentLanguage = resp['/me'][0].language || 'english';
+                const currentLanguage = resp['/me'][0].preferences && resp['/me'][0].preferences.uiLanguage || 'english';
 
                 // Set user language before rendering the UI
                 setLanguage(currentLanguage, () => {

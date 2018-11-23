@@ -1,3 +1,5 @@
+import dateformat from 'dateformat';
+
 /**
  * Fetches the language data of the specified code and sets it as current language data
  * @param {string} lang Languagecode of the language to display
@@ -14,6 +16,10 @@ export const setLanguage = (lang, done) => {
         const langInstance = new LiliumLanguage[Object.keys(LiliumLanguage)[0]]();
         global._v = langInstance._v.bind(langInstance);
         global._ev = langInstance._ev.bind(langInstance);
+
+        if (langInstance.datetime) {
+            dateformat.i18n = langInstance.datetime;
+        }
 
         // Create new execution context because Prmises are ridiculous
         setTimeout(() => done && done(), 0);

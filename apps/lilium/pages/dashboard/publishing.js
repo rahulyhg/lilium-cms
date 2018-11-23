@@ -72,7 +72,7 @@ class HistoricalChartWrapper extends Component {
                         labels : pages.map(x => x.page),
                         datasets : [{
                             data : pages.map(x => x.views),
-                            label : "Hits by URL",
+                            label : _v("hitsbyurl"),
                             backgroundColor : [
                                 "#b48efb", "#ba8bf8", "#c189f5", "#c887f3", "#ce84f0",
                                 "#d582ee", "#dc80eb", "#e27de8", "#e97be6", "#f777e1"
@@ -107,8 +107,8 @@ class LastWeekPublishedHistory extends Component {
                     data : {
                         labels : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
                         datasets : [
-                            { data : this.props.lastweek.daily.map(x => x.sessions), label : "Last week", backgroundColor : "#b48efb77" },
-                            { data : this.props.weekbefore.daily.map(x => x.sessions), label : "Week before", backgroundColor : "#f777e177" }
+                            { data : this.props.lastweek.daily.map(x => x.sessions), label : _v("lastweek"), backgroundColor : "#b48efb77" },
+                            { data : this.props.weekbefore.daily.map(x => x.sessions), label : _v("weekbefore"), backgroundColor : "#f777e177" }
                         ]
                     },
                     options : {
@@ -133,8 +133,8 @@ class LastMonthPublishedHistory extends Component {
                     data : {
                         labels : (this.props.lastmonth.daily.length > this.props.monthbefore.daily.length ? this.props.lastmonth.daily : this.props.monthbefore.daily).map((x, i) => "Day #" + (i + 1)),
                         datasets : [
-                            { data : this.props.lastmonth.daily.map(x => x.sessions),   label : "Last month", backgroundColor : "#b48efb77" },
-                            { data : this.props.monthbefore.daily.map(x => x.sessions), label : "Month before", backgroundColor : "#f777e177" }
+                            { data : this.props.lastmonth.daily.map(x => x.sessions),   label : _v("lastmonth"), backgroundColor : "#b48efb77" },
+                            { data : this.props.monthbefore.daily.map(x => x.sessions), label : _v("monthbefore"), backgroundColor : "#f777e177" }
                         ]
                     },
                     options : {
@@ -197,10 +197,10 @@ class BigSideTabRealtime extends Component {
         return (
             <div class="dashboard-publishing-board">
                 <div class="dashboard-side-tabs">
-                    <BigSideTab selected={this.state.tabIndex == 0} index={0} onClick={this.switchTab.bind(this)} text="Active readers" value={this.state.realtimeTotal ? this.state.realtimeTotal : 0} />
-                    <BigSideTab selected={this.state.tabIndex == 1} index={1} onClick={this.switchTab.bind(this)} text="Yesterday" ordinal={true} value={this.state.yesterday ? this.state.yesterday.metrics.sessions : 0} diff={this.state.sameday && (this.state.yesterday.metrics.sessions - this.state.sameday.sessions)} />
-                    <BigSideTab selected={this.state.tabIndex == 2} index={2} onClick={this.switchTab.bind(this)} text="Last week" ordinal={true} value={this.state.lastweek ? this.state.lastweek.sessions : 0} diff={this.state.lastweek && (this.state.weekbefore.sessions - this.state.lastweek.sessions)} />
-                    <BigSideTab selected={this.state.tabIndex == 3} index={3} onClick={this.switchTab.bind(this)} text="Last month" ordinal={true} value={this.state.lastmonth ? this.state.lastmonth.lastmonth.sessions : 0} diff={this.state.lastmonth && (this.state.lastmonth.lastmonth.sessions - this.state.lastmonth.monthbefore.sessions)} />
+                    <BigSideTab selected={this.state.tabIndex == 0} index={0} onClick={this.switchTab.bind(this)} text={_v("activereaders")} value={this.state.realtimeTotal ? this.state.realtimeTotal : 0} />
+                    <BigSideTab selected={this.state.tabIndex == 1} index={1} onClick={this.switchTab.bind(this)} text={_v("yesterday")} ordinal={true} value={this.state.yesterday ? this.state.yesterday.metrics.sessions : 0} diff={this.state.sameday && (this.state.yesterday.metrics.sessions - this.state.sameday.sessions)} />
+                    <BigSideTab selected={this.state.tabIndex == 2} index={2} onClick={this.switchTab.bind(this)} text={_v("lastweek")} ordinal={true} value={this.state.lastweek ? this.state.lastweek.sessions : 0} diff={this.state.lastweek && (this.state.weekbefore.sessions - this.state.lastweek.sessions)} />
+                    <BigSideTab selected={this.state.tabIndex == 3} index={3} onClick={this.switchTab.bind(this)} text={_v("lastmonth")} ordinal={true} value={this.state.lastmonth ? this.state.lastmonth.lastmonth.sessions : 0} diff={this.state.lastmonth && (this.state.lastmonth.lastmonth.sessions - this.state.lastmonth.monthbefore.sessions)} />
                 </div>
                 <div class="dashboard-selected-expand-tab">
                     { this.getSelectedExpandFromIndex() }
@@ -240,8 +240,8 @@ class YesterdayTopPost extends Component {
 
                     <div class="dashboard-top-post-badge">
                         <span>
-                            <b>Yesterday's top post</b>
-                            <div>{ordinal(this.state.toppost.hits)} hits</div>
+                            <b>{_v("yesterdaytoppost")}</b>
+                            <div>{ordinal(this.state.toppost.hits)} {_v("hits")}</div>
                         </span>
                     </div>
 
@@ -254,7 +254,7 @@ class YesterdayTopPost extends Component {
                         <img src={this.state.toppost.article.author.avatarURL} class="top-post-author-image" />
                         <b class="top-post-author-name">{this.state.toppost.article.author.displayname}</b>
                         <span> - </span>
-                        <span>Published on {dateformat(new Date(this.state.toppost.article.date), 'dddd, mmmm dd')}</span>
+                        <span>{_v("publishedon")} {dateformat(new Date(this.state.toppost.article.date), 'dddd, mmmm dd')}</span>
                     </div>
                 </div>
             </div>
@@ -285,8 +285,8 @@ class PopularTopics extends Component {
     
         return (
             <div class="dashboard-graph-wrap">
-                <h2>Popular topics</h2>
-                <h3>From articles published in the last 30 days</h3>
+                <h2>{_v("populartopics")}</h2>
+                <h3>{_v("populartopicssub")}</h3>
                 <div class="popular-topics-pie" style={{ position: 'relative', height: 420 }}>
                     <ChartGraph nowrap={true} chart={{
                         type : 'pie',
@@ -357,7 +357,7 @@ class BigSideTab extends Component {
 export class PublishingTab extends Component {
     static get tabprops() {
         return {
-            text : "Publishing",
+            text : _v("publishing"),
             right : "dashboard",
             id : "publishing"
         }

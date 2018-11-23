@@ -155,7 +155,7 @@ class PublishingActivity extends Component {
 export class PerformanceTab extends Component {
     static get tabprops() {
         return {
-            text : "My performance",
+            text : _v("myperformance"),
             right : "create-articles",
             id : "performance"
         }

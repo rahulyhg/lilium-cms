@@ -1,7 +1,8 @@
 class LangDico {
-    constructor(dictionary, extendedDictionary) {
+    constructor(dictionary, extendedDictionary, datetime) {
         this.dictionary = Object.assign(defaultDictionary, dictionary);
-        this.extendedDictionary = extendedDictionary;        
+        this.extendedDictionary = extendedDictionary;   
+        this.datetime = datetime;
     }
 
     _v(str) {
@@ -27,7 +28,7 @@ const defaultDictionary = {
 }
 
 export class DefaultDictionary extends LangDico {
-    constructor(dictionary, extendedDictionary) {
-        super(dictionary, extendedDictionary);
+    constructor(dictionary, extendedDictionary, datetime) {
+        super(dictionary, extendedDictionary, datetime);
     }
 }
