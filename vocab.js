@@ -46,12 +46,12 @@ function compileVocabFile(lang, done) {
 
 class Vocab {
     constructor() {
-        this.getSupportedLanguages = [];
+        this.supportedLanguages = [];
     }
 
     preloadDicos(done) {
         const languagesToCompile = readdirSync('./vocab').filter(x => x.endsWith('.lang.js'));
-        this.getSupportedLanguages =languagesToCompile;
+        this.supportedLanguages =languagesToCompile;
 
         let langIndex = -1;
 
@@ -76,7 +76,7 @@ class Vocab {
     }
 
     getSupportedLanguages() {
-        return this.getSupportedLanguages;
+        return this.supportedLanguages;
     }
 
     adminPOST(cli) {

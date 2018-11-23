@@ -4,7 +4,7 @@ class Translations {
 
     livevar(cli, levels, params, sendback) {
         if (levels[0] == 'getSupportedLanguages') {
-            sendback(vocab.getSUpportedLanguages());
+            sendback(vocab.getSupportedLanguages());
         } else if (levels[0] == 'getSupportedLanguageCodes') {
             sendback(vocab.getSupportedLanguageCodes());
         } else if (levels[0] == 'getLanguageResource') {
