@@ -22,20 +22,23 @@ module.exports = cli => {
             </head>
             <body>
                 <div id="app"></div>
+
                 <script>
                     window.liliumcms = {
                         env : "${cli._c.env}",
                         uid : "${cli._c.uid}",
                         url : "${origin}",
+                        domain : "${cli._c.server.url.substring(2)}",
                         sitename : "${cli._c.website.sitetitle}",
-                        fulldevenv : ${fulldevenv}
+                        fulldevenv : ${!!fulldevenv}
                     };
                 </script>
+                
                 <script src="${origin}/tinymce/tinymce.js"></script>
                 <script src="${origin}/chartjs/Chart.min.js"></script>
                 <script src="${buildLocation}/app.bundle.js"></script>
                 <script src="${buildLocation}/vendors.app.bundle.js"></script>
                 <script src="${buildLocation}/main.app.bundle.js"></script>
             </body>
-        </html>`.replace(/\n/g, '').replace(/\>\s*\</g, '><');
+        </html>`.replace(/\n/g, '').replace(/\>\s*\</g, '><').replace(/\s\s+/g, ' ');
 };
