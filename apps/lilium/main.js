@@ -86,7 +86,7 @@ import { initiateConnection, bindRealtimeEvent } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
 import { initLocal, setSession, mapUsers } from './data/cache';
 import { NotificationWrapper, castNotification } from './layout/notifications';
-import { makeGLobalLang, setLanguage } from './data/vocab';
+import { setLanguage } from './data/vocab';
 import { CakepopWrapper } from './layout/cakepopsmanager';
 
 import API from './data/api';
@@ -97,9 +97,6 @@ liliumcms.connected = true;
 
 // Create `log` function
 makeGlobalLogger();
-
-// Create `_v` language function
-makeGLobalLang();
 
 // If in dev mode, initialize dev functions
 if (liliumcms.env == "dev") {
@@ -184,7 +181,7 @@ class Lilium extends Component {
                 this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
-                const currentLanguage = resp['/me'][0].language || 'en-ca';
+                const currentLanguage = resp['/me'][0].language || 'english';
 
                 // Set user language before rendering the UI
                 setLanguage(currentLanguage, () => {

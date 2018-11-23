@@ -1,0 +1,147 @@
+.report-fields-side {
+    width: 300px;
+    background-color: #F7F7F7;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    overflow: auto;
+}
+
+.report-fields-form {
+    padding: 20px;
+
+    hr {
+        border: none;
+        height: 1px;
+        background: #CCC;
+        margin: 15px 0px;
+    }
+
+    .report-date-fields {
+        display: flex;
+        margin-bottom: 12px;
+
+        &>* {
+            width: 50%;
+
+            &:first-child { margin-right: 5px; }
+            &:last-child  { margin-left: 5px; }
+        }
+    }
+}
+
+.report-viewer-side {
+    position: absolute;
+    right: 0;
+    left: 300px;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+
+    background-color: #EAEAEA;
+    box-shadow: -1px 0px 2px rgba(0,0,0,0.2);
+}
+
+.report-full-page {
+    width: 100%;
+    height: 100%;
+
+    position: relative;
+}
+
+.report-viewer {
+    &.template-viewer {
+        text-align: center;
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+
+        .template-message {
+            justify-self : center;
+            width: 100%;
+
+            .money-svg {
+                color: #eaeaea;
+                font-size: 52px;
+                width: 100px;
+                height: 100px;
+                box-sizing: border-box;
+                background: #BBB;
+                padding-top: 24px;
+                border-radius: 50%;
+                box-shadow: 0px 2px 0px rgba(0,0,0,0.4);
+                text-shadow: 0px 3px 0px rgba(0,0,0,0.2);
+            }
+
+            h3, p {
+                color: #9e9e9e
+            }
+        }
+    }
+}
+
+.report-class-wrap {
+    padding: 20px;
+
+    h1 {
+        padding: 0px;
+        margin: 0px 0px 20px;
+    }
+}
+
+.contractor-report-graph-card {
+    padding: 20px;
+    background: white;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+}
+
+.contractor-report-table {
+    th {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid #DDD;
+        font-size: 18px;
+        font-weight: normal;
+        cursor: pointer;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #CCC;
+    }
+
+    tfoot {
+        font-size: 18px;
+    }
+
+    .contractor-props-avatar-col {
+        img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        span {
+            vertical-align: middle;
+            display: inline-block;
+        }
+    }
+}
+
+.contractor-report-download {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    background: #F6F6F6;
+    color: #333;
+    text-decoration: none;
+}

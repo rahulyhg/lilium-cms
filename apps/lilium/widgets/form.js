@@ -35,7 +35,7 @@ class FormField extends Component {
     changed(value, oValue) {
         const oldValue = typeof oValue != "undefined" ? oValue : this.value;
         this.value = this.props.format ? this.props.format(value) : value;
-        this.valid = this.props.validate ? this.props.validate(value) : true;
+        this.valid = this.props.validate ? this.props.validate(this.value) : true;
         this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
 
         if (this.autosave) {
@@ -110,6 +110,13 @@ export class ButtonWorker extends Component {
 }
 
 export class SelectField extends FormField {
+    constructor(props) {
+        super(props);
+        this.state = {
+            options : this.props.options
+        }
+    }
+
     componentDidMount() {
         this.ref.value = this.value;
     }
@@ -118,6 +125,10 @@ export class SelectField extends FormField {
         if (props.value) {
             this.ref.value = props.value;
         }
+
+        if (props.options) {
+            this.setState({ options : props.options });
+        }
     }
 
     render() {
@@ -125,7 +136,7 @@ export class SelectField extends FormField {
             <div class="field-wrap">
                 { this.props.placeholder ? <b class="placeholder">{this.props.placeholder}</b> : null }
                 <select ref={x => (this.ref = x)} class="classic-field" onChange={ev => this.changed(ev.target.value)}>
-                    { this.props.options.map(opt => (
+                    { this.state.options.map(opt => (
                         <option value={opt.value} key={opt.value}>{opt.text || opt.displayname || opt.value}</option>
                     )) }
                 </select>
@@ -682,7 +693,7 @@ export class DatePicker extends FormField {
         this.picker = flatpickr(this.input, this.props.flatpickr || {
             enableTime : typeof this.props.enabletime == "undefined" ? true : this.props.enabletime,
             dateFormat : this.props.dateformat || "Y-m-d H:i",
-            defaultDate : new Date(this.value) || new Date(),
+            defaultDate : this.props.defaultDate || (this.value ? new Date(this.value) : new Date()),
             onChange : dateArr => {
                 const [value] = dateArr;
 

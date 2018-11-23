@@ -58,7 +58,7 @@
             "id": "paymenthistory",
             "lys" : "payments,history,contractors",
             "faicon": "fa-history",
-            "displayname": "Payments history",
+            "displayname": "Payments Reports",
             "priority": 3000,
             "rights": ["hr"],
             "absURL": "/paymentshistory",
@@ -295,16 +295,6 @@
             "rights": ["manage-plugins"],
             "absURL": "/plugins",
             "section" : "lilium"
-        }, 
-        {    
-            "id": "translations",
-            "lys" : "translations,languages",
-            "faicon": "fa-globe",
-            "displayname": "Translations",
-            "priority": 3000,
-            "rights": ["admin"],
-            "absURL": "/translations",
-            "section" : "lilium"            
         }
     ],
 
@@ -576,6 +566,14 @@
         }, {
             "module" : "creditcardscontroller.js",
             "endpoint" : "creditcards",
+            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
+        }, {
+            "module" : "vocab.js",
+            "endpoint" : "vocab",
+            "support" : ["admin_post"]
+        }, {
+            "module" : "contractorsreports.js",
+            "endpoint" : "contractorsreports",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }
     ]

@@ -131,6 +131,10 @@ class ProfileHeader extends Component {
                     <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.user.username}`}</h3>
                 </div>
 
+                <div>
+                    {_ev("police")}
+                </div>
+
                 <div id="me-badge-wrapper">
                     {
                         this.props.user.badges.map(badge => (
