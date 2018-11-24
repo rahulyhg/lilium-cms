@@ -15,7 +15,7 @@
         &.white {
             background: @whitebg;
             border-color: @grayBorderColor;
-            color: @navDarkGray;
+            color: @blackish;
 
             &:hover {
                 background-color: @whiteish;
@@ -67,7 +67,7 @@
         &.white {
             background: @whiteish;
             border-color: @grayBorderColor;
-            color: @navDarkGray;
+            color: @blackish;
 
             &:hover {
                 background-color: @whiteish;
@@ -166,7 +166,7 @@
     top: 41px;
     left: 0px;
     right: 0px;
-    background-color: @grayish;
+    background-color: @lesswhiteish;
     border: 1px solid @grayBorderColor;
     border-bottom-width: 0px;
     padding: 12px;
@@ -179,7 +179,7 @@
     cursor: pointer;
 }
 .autocomplete-choices > *:hover {
-    background-color: @grayish;
+    background-color: @lesswhiteish;
 }
 
 .autocomplete-choice.selected {
@@ -196,8 +196,8 @@
 
 .tag {
     cursor: default;
-    background-color: @grayish;
-    color: lighten(@navDarkGray, 30%);
+    background-color: @lesswhiteish;
+    color: lighten(@blackish, 30%);
     margin: 4px 2px 6px 2px;
     padding: 2px 6px;
     display: flex;
@@ -213,7 +213,7 @@
         display: inline-block;
         vertical-align: middle;
         font-size: 14px;
-        color: @lightGray;
+        color: @middleGray;
 
         &:hover {
             color: lighten(@red, 30%);
@@ -223,16 +223,16 @@
 
 .list-item {
     border-radius: 3px;
-    color: @navDarkGray;
+    color: @blackish;
     padding: 2px 4px;
     cursor: pointer;
 
     &:hover {
-        background: @grayish;
+        background: @lesswhiteish;
     }
 
     &.selected {
-        background: darken(@lightGray, 5%);
+        background: darken(@middleGray, 5%);
         font-weight: bold;
         color: @whiteish;
     }
@@ -244,10 +244,10 @@
     width : 100%;
     padding: 10px;
     font-size : 18px;
-    background : @fieldBackgroundColor;
+    background : @whiteish;
     border : 1px solid @grayBorderColor;
     border-bottom-width : 2;
-    color: @navDarkGray;
+    color: @blackish;
     outline-color: @liliumPurple;
 
     &.faux {
@@ -398,7 +398,7 @@ textarea {
         cursor: pointer;
         box-sizing: border-box;
         border: 5px dashed @grayBorderColor;
-        color: @lightGray;
+        color: @middleGray;
         text-align: center;
         margin-bottom: 0px;
         font-size: 32px;
@@ -439,7 +439,7 @@ textarea {
             display: block;
             padding: 30px 0px;
             font-size: 32px;
-            color: @lightGray;
+            color: @middleGray;
             text-align: center;
         }
 
@@ -450,8 +450,8 @@ textarea {
             margin-bottom: 50px;
 
             .category-bubble {
-                background-color: @grayish;
-                color: @navDarkGray;
+                background-color: @lesswhiteish;
+                color: @blackish;
                 padding: 8px 12px;
                 border-radius: 4px;
                 text-transform: uppercase;
@@ -467,7 +467,7 @@ textarea {
         border-top: 1px dashed @grayBorderColor;
 
         i {
-            color: @lightGray;
+            color: @middleGray;
         }
     }
 
@@ -488,7 +488,7 @@ textarea {
                 border-bottom: 1px solid @grayBorderColor;
 
                 &.selected {
-                    background-color: @bodyBackgroundGray;
+                    background-color: @liliumBackground;
                 }
             }
         }

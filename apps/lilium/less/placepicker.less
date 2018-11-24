@@ -15,7 +15,7 @@
             
             #search-results {
                 height: 205px;
-                background: @fieldBackgroundColor;
+                background: @whiteish;
 
                 .place {
                     cursor: pointer;
@@ -23,17 +23,17 @@
                     box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
                     
                     &:hover {
-                        background-color: @grayish;
+                        background-color: @lesswhiteish;
                     }
                     
                     h2.place-name {
-                        color: @lightGray;
+                        color: @middleGray;
                         font-weight: initial;
                     }
             
                     &.selected h2.place-name {
                         font-weight: bolder;
-                        color: @navDarkGray;
+                        color: @blackish;
                     }
                 }
             }
