@@ -3,21 +3,28 @@
  */
 
 // Colors
-@interfacebg        : #333;
-@interfacetext      : #111;
-@whitebg            : #FFFFFF;
-@liliumPurple       : #af57e4;
-@bodyBackgroundGray : #f3f3f3;
-@navDarkGray        : #221;
-@lightGray          : #999;
-@grayBorderColor    : #DDD;
-@whiteish           : #F9F9F9;
-@grayish            : #E6E6E6;
-@grayishText        : #BBB;
-@leftNavBackgroud   : lighten(@liliumPurple, 20%);
-@liliumBackground   : #f2eef3;
+@liliumPurple         : #af57e4;
+
+@interfacebg          : #333;
+@interfacetext        : #111;
+@whitebg              : #FFFFFF;
+@bodyBackgroundGray   : #f3f3f3;
+@navDarkGray          : #222;
+@lightGray            : #999;
+@grayBorderColor      : #DDD;
+@whiteish             : #F9F9F9;
+@grayish              : #E6E6E6;
+@grayishText          : #BBB;
+@liliumBackground     : #f2eef3;
 @fieldBackgroundColor : #F9F9F9;
-@darkPurple         : #393351;
+@darkPurple           : #393351;
+
+@green   : #13ad21;
+@yellow  : #ceab5d;
+@red     : #d80328;
+@blue    : #3b86fb;
+@purple  : #e522e6;
+@orange  : #e69922;
 
 // Fonts
 @mainFont       : "Nunito Sans", sans-serif;
@@ -48,21 +55,11 @@
 .monospace-font { font-family: @monospaceFont; }
 .serif-font     { font-family: @serifFont;     }
 
-// Buttons
-@green  : #13ad21;
-@yellow : #ceab5d;
-@red    : #d01d3a;
-@blue   : #3b86fb;
-@purple : #e522e6;
-@orange : #e69922;
-
-@buttonDarken: 8%;
-@buttonBorderDarken : 15%;
-
 // Global helpers 
 .scroll-lock { overflow: hidden; }
 
-// Reusable colors
+// Shadows and shades
 @softshadow: 0px 1px 2px rgba(0,0,0,0.2);
 
-
+@buttonDarken: 8%;
+@buttonBorderDarken : 15%;
