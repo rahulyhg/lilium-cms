@@ -7,7 +7,7 @@
     width: 280px;
     text-align: center;
     cursor: pointer;
-    color: #CCC;
+    color: @grayBorderColor;
     line-height: 40px;
     padding: 180px 0px;
     transition: color 0.1s;
@@ -21,7 +21,7 @@
     }
 
     &:hover {    
-        color: #777;
+        color: @lightGray;
     }
 }
 
@@ -35,7 +35,7 @@
 
         width: 280px;
         height: 280px;
-        background-color: #333;
+        background-color: @navDarkGray;
         text-align: center;
     }
 
@@ -44,15 +44,8 @@
         height: 280px;
         object-fit: cover;
         display: block;
-        background-color: white;
-        color: #333;
-    }
-
-    &> .displayname {
-        padding: 6px 0px;
-        margin: 0px;
-        text-align: center;
-        background-color: #674a82;;
+        background-color: @whiteish;
+        color: @navDarkGray;
     }
 
     .action-separator {

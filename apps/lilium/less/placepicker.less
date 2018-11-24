@@ -23,17 +23,17 @@
                     box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
                     
                     &:hover {
-                        background-color: rgb(241, 241, 241);
+                        background-color: @grayish;
                     }
                     
                     h2.place-name {
-                        color: #777;
+                        color: @lightGray;
                         font-weight: initial;
                     }
             
                     &.selected h2.place-name {
                         font-weight: bolder;
-                        color: #222
+                        color: @navDarkGray;
                     }
                 }
             }
@@ -48,7 +48,7 @@
         }
 
         #place-picker-actions-bar {
-            background-color: #F6F6F6;
+            background-color: @whiteish;
             align-self: flex-end;
             padding: 6px;
         }

@@ -3,10 +3,11 @@
 .tabview:extend(.card) {
     box-shadow: none;
     height: 100%;
+    background: @whiteish;
 
     .tabs-bar {
         height: @tabBarHeight;
-        background: #F6F6F6;
+        background: @whiteish;
 
         .tab-name {
             margin: 0px;
@@ -17,8 +18,8 @@
             &.active {
                 padding-top: 3px;
                 font-size: 19px;
-                background: #FCFCFC;
-                border-top: 2px solid #af57e4;
+                background: @whiteish;
+                border-top: 2px solid @liliumPurple;
                 box-shadow: 0px -4px 0px 3px rgba(0, 0, 0, 0.1);
             }
         }

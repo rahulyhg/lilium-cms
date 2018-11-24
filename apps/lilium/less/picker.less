@@ -18,7 +18,7 @@
     width: 94vw;
     margin: 0 auto;
     margin-top: 20px;
-    background: white;
+    background: @whiteish;
 
     & > #picker {
         height: 100%;
@@ -45,7 +45,7 @@
                         border: 3px solid @liliumPurple;
                         border-radius: 2px;
                         background: lighten(@liliumPurple, 15%);
-                        color: white;
+                        color: @whiteish;
                         width: @carouselPreviewCardWidth;
                         margin: 0px 8px;
                         position: relative;
@@ -73,13 +73,13 @@
                             
                             i.map-marker-icon {
                                 padding-top: 12px;
-                                color: #ff5624;
+                                color: lighten(@red, 10%);
                                 display: block;
                                 text-align: center;
                             }
 
                             p.place-name {
-                                color: white;
+                                color: @whiteish;
                                 text-align: center;
                             }
                         }

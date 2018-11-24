@@ -27,7 +27,7 @@
 .create-new-cakepop-card {
     text-align: center;
     cursor: pointer;
-    color: #CCC;
+    color: @grayishText;
     line-height: 40px;
     padding: 30px 0px;
     transition: color 0.1s;
@@ -44,7 +44,7 @@
     }
 
     &:hover {    
-        color: #777;
+        color: @lightGray;
     }
 }
 
@@ -58,7 +58,7 @@
 .cakepop-list-item {
     width : 100%;
     border-radius: 3px;
-    background : #F6F6F6;
+    background : @whiteish;
     box-shadow: 0px 2px 1px rgba(0,0,0,0.2);
     position: relative;
     overflow: hidden;
@@ -87,8 +87,8 @@
 }
 
 .cakepop-list-item-container b span.cakepop-status {
-    background: #333;
-    color: #F6F6F6;
+    background: @navDarkGray;
+    color: @whiteish;
     font-size: 14px;
     margin-left: 8px;
     border-radius: 3px;

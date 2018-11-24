@@ -1,7 +1,7 @@
 .card {
     width : 100%;
     margin-bottom: 12px;
-    background : #FCFCFC;
+    background : @whitebg;
     box-shadow: 0px 2px 1px 1px rgba(0, 0, 0, 0.1);
     border-radius : 3px;
     overflow: hidden;
@@ -33,14 +33,14 @@
         .no-image {
             width: 100%;
             height: 200px;
-            background: #ccc;
-            color: #555;
+            background: @grayish;
+            color: @grayishText;
         }
     }
 
     .big-title {
         font-size: 28px;
-        color: #333;
+        color: @navDarkGray;
         font-family: Oswald;
         line-height: 34px;
         margin-bottom: 10px;
@@ -48,7 +48,7 @@
 
     .subtitle {
         font-size: 14px;
-        color: #777;
+        color: @lightGray;
         margin-bottom: 10px;
     }
 
@@ -75,10 +75,10 @@
 
     .detail-head {
         font-size: 14px;
-        color: #777;
+        color: @lightGray;
         margin: 10px;
         padding-bottom: 10px;
-        border-bottom: 1px dashed #DDD;
+        border-bottom: 1px dashed @grayBorderColor;
 
         .small {
             font-size: 12px;
@@ -86,7 +86,7 @@
 
         .big {
             font-size: 18px;
-            color: #333;
+            color: @navDarkGray;
         }
     
         .bubble-wrap {
@@ -100,15 +100,15 @@
         .right {
             float: right;
             font-size: 18px;
-            color: #333;
+            color: @navDarkGray;
         }
     }
     
     .bubble {
         display: inline-block;
         vertical-align: middle;
-        color: white;
-        background: #333;
+        color: @whiteish;
+        background: @navDarkGray;
 
         margin-right: 10px;
     
@@ -120,10 +120,10 @@
         font-weight: bold;
         box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
 
-        &.blue   { background : #2f647d; }
-        &.green  { background : #16b966; }
-        &.purple { background : #e522e6; }
-        &.orange { background : #e69922; }
+        &.blue   { background : @blue; }
+        &.green  { background : @green; }
+        &.purple { background : @purple; }
+        &.orange { background : @orange; }
     }
 
     p {
@@ -139,20 +139,20 @@
     footer {
         font-size: 14px;
         text-align: right;
-        color: #333;
+        color: @navDarkGray;
         padding: 10px;
 
-        background: #F6F6F6;
-        border-top: 1px solid #DDD;
+        background: @whiteish;
+        border-top: 1px solid @grayBorderColor;
 
         span {
             margin-left: 12px;
             display: inline-block;
             vertical-align: middle;
-            color: #333;
+            color: @navDarkGray;
 
             &.red {
-                color: #fb3e3b;
+                color: @red;
             }
 
             &.card-action {

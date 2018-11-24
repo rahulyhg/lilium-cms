@@ -10,8 +10,8 @@
         top: 0;
         bottom: 0;
         width: @topicManagerSidebarWidth;
-        background: #444;
-        color: white;
+        background: lighten(@interfacebg, 5%);
+        color: @whiteish;
 
         overflow: auto;
         padding: 12px;
@@ -27,7 +27,7 @@
         left: @topicManagerSidebarWidth;
         overflow: auto;
 
-        color: #333;
+        color: @navDarkGray;
         box-sizing: border-box;
     }
 
@@ -39,12 +39,12 @@
     h2 {
         margin-bottom: 12px;
         padding-bottom: 12px;
-        border-bottom: 1px solid #DDD;
+        border-bottom: 1px solid @grayBorderColor;
         font-size: 26px;
 
         small {
             font-weight: normal;
-            color: #777;
+            color: @lightGray;
             margin-left: 6px;
             font-size: 18px;
         }

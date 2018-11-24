@@ -1,6 +1,6 @@
 .content-chain {
-    background-color: white;
-    box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.1);
+    background-color: @whitebg;
+    box-shadow: @softshadow; 
     /* Featured image square width */
     width: 100%;
     margin: 20px;
@@ -13,7 +13,7 @@
     .content-chain-no-image {
         width: 320px;
         height: 320px;
-        background-color: #eee;
+        background-color: @grayish;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -29,7 +29,7 @@
     margin: auto;
     
     .content-chain-featured-image-picker {
-        background-color: #eee;
+        background-color: @grayish;
         min-height: 50px;
         cursor: pointer;
     }
@@ -50,7 +50,7 @@
     margin-left: 4px;
     overflow-y: auto;
     max-height: 120px;
-    border: 1px solid #aaa;
+    border: 1px solid @grayBorderColor;
 }
 
 .content-chain-list-articles-list h4.content-chain-list-article-title {
@@ -78,7 +78,7 @@
     .create-new-chain-card {
         text-align: center;
         cursor: pointer;
-        color: #CCC;
+        color: @grayishText;
         line-height: 40px;
         padding-top: 180px;
         transition: color 0.1s;
@@ -89,10 +89,6 @@
     
         b {
             font-size: 32px;
-        }
-    
-        &:hover {    
-            color: #777;
         }
     }
 }

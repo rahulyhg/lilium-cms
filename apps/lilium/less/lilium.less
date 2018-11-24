@@ -1,10 +1,10 @@
 body, html {
     background: @liliumBackground;
-    color: #000;
+    color: @interfacetext;
     margin: 0;
     padding: 0;
     font-family: @mainFont;
-    background: #333; 
+    background: @interfacebg; 
 }
 
 .main-font {
@@ -32,16 +32,12 @@ body, html {
     vertical-align: middle;
 }
 
-.pink-placeholder::placeholder {
-    color : rgb(165, 117, 177);
-}
-
 .delete-color {
-    color: #fb3e3b;
+    color: @red;
 }
 
 .delete-color.pale {
-    color : #e07b7b
+    color : lighten(@red, 10%);
 }
 
 .clickable {
@@ -54,19 +50,19 @@ body, html {
 }
 
 tbody tr:hover {
-    background-color: #f6f2f8;
+    background-color: darken(@whiteish, 2%);
 }
 
 .page-tutorial-strip {
     padding: 5px 15px;
     background: #6b325f;
-    color: white;
+    color: @whiteish;
     margin: 0;
 }
 
 h1 {
-    border-bottom: 1px solid #DDD;
-    color: #333;
+    border-bottom: 1px solid @grayBorderColor;
+    color: @navDarkGray;
     margin: 15px;
     padding: 0px;
 }
@@ -74,7 +70,7 @@ h1 {
 h2 {
     padding: 0;
     margin: 0 0 10px;
-    color: #333;
+    color: @navDarkGray;
     font-weight: 600;
 }
 
@@ -121,14 +117,14 @@ a {
 }
 
 .change-placeholder::-webkit-input-placeholder {
-    color: #ddd;
+    color: @grayBorderColor;
 }
 
 .actions {
     display: flex;
     flex-direction: row;
     flex-flow: nowrap;
-    color: white;
+    color: @whiteish;
 }
 
 .action {
@@ -138,13 +134,13 @@ a {
     flex-grow: 1;
 }
 .action.danger {
-    color: #ec0b40;
+    color: @red;
 }
 .action.success {
-    color: #9dfb46;
+    color: @green;
 }
 .action:hover {
-    background-color: #9c80b4;
+    background-color: darken(@liliumPurple, 10%);
 }
 .action span {
     font-weight: bold;

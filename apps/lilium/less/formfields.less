@@ -5,7 +5,7 @@
     padding: 8px 12px;
     background: transparent;
     box-shadow: 0px 1px 2px rgba(175, 87, 228, 0.28);
-    color: white;
+    color: @whiteish;
     border: 1px solid #DDD;
     margin-right: 12px;
     cursor: pointer;
@@ -13,12 +13,12 @@
 
     &.outline {
         &.white {
-            background: white;
-            border-color: #DDD;
-            color: #333;
+            background: @whitebg;
+            border-color: @grayBorderColor;
+            color: @navDarkGray;
 
             &:hover {
-                background-color: #F6F6F6;
+                background-color: @whiteish;
             }
         }
 
@@ -28,7 +28,7 @@
 
             &:hover {
                 background-color: @blue;
-                color: white;
+                color: @whiteish;
             }
         }
 
@@ -38,7 +38,7 @@
 
             &:hover {
                 background-color: @red;
-                color: white;
+                color: @whiteish;
             }
         }
 
@@ -48,7 +48,7 @@
 
             &:hover {
                 background-color: @green;
-                color: white;
+                color: @whiteish;
             }
         }
 
@@ -58,19 +58,19 @@
 
             &:hover {
                 background-color: @liliumPurple;
-                color: white;
+                color: @whiteish;
             }
         }
     }
 
     &.fill {
         &.white {
-            background: white;
-            border-color: #DDD;
-            color: #333;
+            background: @whiteish;
+            border-color: @grayBorderColor;
+            color: @navDarkGray;
 
             &:hover {
-                background-color: #F6F6F6;
+                background-color: @whiteish;
             }
         }
 
@@ -80,7 +80,7 @@
 
             &:hover {
                 background-color: darken(@blue, @buttonDarken);
-                color: white;
+                color: @whiteish;
             }
         }
 
@@ -90,7 +90,7 @@
 
             &:hover {
                 background-color: darken(@red, @buttonDarken);
-                color: white;
+                color: @whiteish;
             }
         }
 
@@ -100,7 +100,7 @@
 
             &:hover {
                 background-color: darken(@green, @buttonDarken);
-                color: white;
+                color: @whiteish;
             }
         }
 
@@ -110,7 +110,7 @@
 
             &:hover {
                 background-color: darken(@liliumPurple, @buttonDarken);
-                color: white;
+                color: @whiteish;
             }
         }
     }
@@ -166,8 +166,8 @@
     top: 41px;
     left: 0px;
     right: 0px;
-    background-color: rgb(249, 249, 249);
-    border: 1px solid rgb(204, 204, 204);
+    background-color: @grayish;
+    border: 1px solid @grayBorderColor;
     border-bottom-width: 0px;
     padding: 12px;
     overflow-y: auto;
@@ -179,12 +179,12 @@
     cursor: pointer;
 }
 .autocomplete-choices > *:hover {
-    background-color: #e7e2e2;
+    background-color: @grayish;
 }
 
 .autocomplete-choice.selected {
-    color: white;
-    background-color: #674a82;
+    color: @whiteish;
+    background-color: @liliumPurple;
 }
 
 #lilium div.mce-fullscreen {
@@ -196,8 +196,8 @@
 
 .tag {
     cursor: default;
-    background-color: #E9E9E9;
-    color: #555;
+    background-color: @grayish;
+    color: lighten(@navDarkGray, 30%);
     margin: 4px 2px 6px 2px;
     padding: 2px 6px;
     display: flex;
@@ -213,28 +213,28 @@
         display: inline-block;
         vertical-align: middle;
         font-size: 14px;
-        color: #999;
+        color: @lightGray;
 
         &:hover {
-            color: #FF3333;
+            color: lighten(@red, 30%);
         }
     }
 }
 
 .list-item {
     border-radius: 3px;
-    color: #333;
+    color: @navDarkGray;
     padding: 2px 4px;
     cursor: pointer;
 
     &:hover {
-        background: #FEF;
+        background: @grayish;
     }
 
     &.selected {
-        background: #FCF;
+        background: darken(@lightGray, 5%);
         font-weight: bold;
-        color: #737;
+        color: @whiteish;
     }
 }
 
@@ -245,10 +245,10 @@
     padding: 10px;
     font-size : 18px;
     background : @fieldBackgroundColor;
-    border : 1px solid #CCC;
+    border : 1px solid @grayBorderColor;
     border-bottom-width : 2;
-    color: #333;
-    outline-color: #c47ed4;
+    color: @navDarkGray;
+    outline-color: @liliumPurple;
 
     &.faux {
         cursor: text;
@@ -272,7 +272,7 @@
         position: absolute;
         right: 12px;
         top: 36px;
-        color: #33ce50;
+        color: @green;
         animation: fieldCheckAnimation 0.5s;
     }
 
@@ -280,7 +280,7 @@
 
     .text-field {
         &.saving {
-            background: #DDD;
+            background: @grayBorderColor;
         }
     }
 }
@@ -316,7 +316,7 @@ textarea {
     hr {
         background: transparent;
         border: none;
-        border-top: 1px dashed #BBB;
+        border-top: 1px dashed @grayBorderColor;
         margin: 0px 20px 3px;
         flex : 1;
     }
@@ -335,7 +335,7 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: @whiteish;
     margin-left: auto;
 
     &.checked {
@@ -345,7 +345,7 @@ textarea {
 }
 
 .checkmark {
-    color: white;
+    color: @whiteish;
     padding: 0;
     margin: 0;
 }
@@ -363,8 +363,8 @@ textarea {
 .stackboxex {
     width: 40px;
     height: 40px;
-    background: #f5b1b1;
-    color: white;
+    background: @red;
+    color: @whiteish;
     box-sizing: border-box;
     font-size: 32px;
     text-align: center;
@@ -374,16 +374,16 @@ textarea {
 .multiselectbox-options-list {
     max-height: 200px;
     overflow: auto;
-    background: white;
+    background: @whiteish;
     padding: 8px;
     border-width: 1px 1px 1px 2px;
     border-style: solid;
-    border-color: rgb(204, 204, 204);
+    border-color: @grayBorderColor;
 }
 
 .selectedoptions-wrapper {
     display: flex;
-    background-color: white;
+    background-color: @whiteish;
 }
 
 .image-field-wrap {
@@ -397,8 +397,8 @@ textarea {
         min-height: 240px;
         cursor: pointer;
         box-sizing: border-box;
-        border: 5px dashed #DDD;
-        color: #AAA;
+        border: 5px dashed @grayBorderColor;
+        color: @lightGray;
         text-align: center;
         margin-bottom: 0px;
         font-size: 32px;
@@ -439,7 +439,7 @@ textarea {
             display: block;
             padding: 30px 0px;
             font-size: 32px;
-            color: #999;
+            color: @lightGray;
             text-align: center;
         }
 
@@ -450,8 +450,8 @@ textarea {
             margin-bottom: 50px;
 
             .category-bubble {
-                background-color: #EEE;
-                color: #333;
+                background-color: @grayish;
+                color: @navDarkGray;
                 padding: 8px 12px;
                 border-radius: 4px;
                 text-transform: uppercase;
@@ -464,10 +464,10 @@ textarea {
 
     .topic-picker-current {
         padding: 4px 6px;
-        border-top: 1px dashed #DDD;
+        border-top: 1px dashed @grayBorderColor;
 
         i {
-            color: #999;
+            color: @lightGray;
         }
     }
 
@@ -480,32 +480,15 @@ textarea {
             height: 100%;
             overflow-y: auto;
             min-width: 200px;
-            border-right: 1px solid #DDD;
+            border-right: 1px solid @grayBorderColor;
 
             .topic-children-item {
                 padding: 4px 6px;
                 cursor: pointer;
-                border-bottom: 1px solid #DDD;
+                border-bottom: 1px solid @grayBorderColor;
 
                 &.selected {
-                    background-color: #F3F3F3;
-                }
-
-                &.add-new {
-                    font-weight: bold;
-                    background: #c47ed4;
-                    color: #FFF;
-                    font-size: 18px;
-                    text-align: center;
-                    border-bottom: 0;
-                    margin: 10px auto;
-                    width: 40px;
-                    height: 40px;
-                    box-sizing: border-box;
-                    padding-top: 8px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    border-bottom: 2px solid #884b96;
+                    background-color: @bodyBackgroundGray;
                 }
             }
         }
@@ -515,7 +498,7 @@ textarea {
         height: 320px;
         display: block;
         text-align: center;
-        background: #F6F6F6;
+        background: @whiteish;
         box-sizing: border-box;
         padding-top: 120px;
 

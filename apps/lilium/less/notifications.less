@@ -1,20 +1,16 @@
 .notification-page-strip {
     display: block;
     width: 100%;
-    border: 1px solid #CCC;
-    border-left: 3px solid #333;
-    background : #fefaff;
-    color : #333;
+    border: 1px solid @grayBorderColor;
+    border-left: 3px solid @navDarkGray;
+    background : @whiteish;
+    color : @navDarkGray;
     padding: 5px 8px;
     margin-bottom: 10px;
 }
 
 .notification-page-strip.unread {
-    background: #fdf1ff;
-    color: #934da5;
-    border: 1px solid #efbffb;
-    border-left-width: 3px;
-    box-shadow: 0px 0px 1px 1px rgba(177, 117, 191, 0.2);
+    border-left-width: 6px;
 }
 
 .notification-page-strip .title {
@@ -30,9 +26,9 @@
 
 
 .notification-strip {
-    background: white;
-    border : 1px solid #DDD;
-    box-shadow: 0px 0px 3px rgba(0,0,0,0.1);
+    background: @whiteish;
+    border : 1px solid @grayBorderColor;
+    box-shadow: @softshadow;
     padding: 9px 12px;
     width: 350px;
     margin-bottom: 10px;
@@ -56,7 +52,7 @@
     display: block;
     margin-top: 5px;
     line-height: 18px;
-    color: #333;
+    color: @navDarkGray;
 }
 
 .notification-strip.notif-style-success { background: #ddfbca; color: #32731f; border-color : #32731f; } .notification-strip.notif-style-success > span { color: #32731f; }
@@ -68,7 +64,7 @@
 .notification-dropdown-list.loading i {
     font-size: 48px;
     margin-top: 100px;
-    color: #999;
+    color: @lightGray;
 }
 
 .notification-dropdown-list.loading {
@@ -77,9 +73,9 @@
 }
 
 .notification-dropdown-sections-select {
-    background: #ffffff;
+    background: @whiteish;
     padding: 10px 12px;
-    border-bottom: 1px solid #DDD;
+    border-bottom: 1px solid @grayBorderColor;
 }
 
 .notification-dropdown-sections-select b {
@@ -97,7 +93,7 @@
     top: @headerHeight;
     right: @headerHeight;
     width: 350px;
-    background: #F6F6F6;
+    background: @whiteish;
     box-shadow: 0px 0px 15px 1px rgba(0,0,0,0.1);
 }
 
@@ -110,7 +106,7 @@
 .header-notification {
     margin-bottom: 8px;
     padding: 6px 8px;
-    background: #FFF;
+    background: @whiteish;
     box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.1);
 }
 
@@ -118,12 +114,12 @@
     cursor : pointer;
 }
 
-.notification-page-strip-success, .header-notification-success { border-left: 3px solid #20bd1d; }
-.notification-page-strip-warning, .header-notification-warning { border-left: 3px solid #ceab5d; }
+.notification-page-strip-success, .header-notification-success { border-left: 3px solid @green; }
+.notification-page-strip-warning, .header-notification-warning { border-left: 3px solid @yellow; }
 .notification-page-strip-info,    .header-notification-info,
-.notification-page-strip-log,     .header-notification-log     { border-left: 3px solid #607ada; }
+.notification-page-strip-log,     .header-notification-log     { border-left: 3px solid @blue; }
 .notification-page-strip-danger,  .header-notification-danger,
-.notification-page-strip-error,   .header-notification-error   { border-left: 3px solid #da6060; }
+.notification-page-strip-error,   .header-notification-error   { border-left: 3px solid @red; }
 
 .header-notification-title {
     font-size: 14px;
@@ -131,22 +127,22 @@
 
 .header-notification-message {
     margin: 2px 0px 10px 0px;
-    color: #333;
+    color: @navDarkGray;
 }
 
 .header-notification-date {
     display: block;
     text-align: right;
     font-size: 12px;
-    color: #999;
+    color: @lightGray;
 }
 
 .header-notification-number {
     position: absolute;
     display: block;
     font-size: 14px;
-    background: #e47f28;
-    color: white;
+    background: @orange;
+    color: @whiteish;
     font-weight: bold;
     padding: 2px 4px;
     border-radius: 30px;
@@ -164,7 +160,7 @@
     display: block;
     padding-top: 100px;
     text-align: center;
-    color: #999;
+    color: @lightGray;
 }
 
 .notification-dropdown-empty i {
@@ -177,10 +173,10 @@
     display: block;
     padding: 10px;
     text-align: center;
-    border-top: 1px solid #DDD;
+    border-top: 1px solid @grayBorderColor;
     cursor: pointer;
-    background: #333333;
-    color: white;
+    background: @navDarkGray;
+    color: @whiteish;
 }
 
 #notification-wrapper {

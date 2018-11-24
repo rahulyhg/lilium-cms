@@ -1,7 +1,7 @@
 .tree-view {
     .tree-node-collection {
         padding-left: 20px;
-        border-left: 1px solid #AAA;
+        border-left: 1px solid @lightGray;
     }
 
     .tree-node-display-text {
@@ -12,11 +12,11 @@
 
         span {
             cursor: pointer;
-            color: #EEE;
+            color: @grayish;
 
             &.bold {
                 font-weight: bold;
-                color: white;
+                color: @whiteish;
             }
         }
     }
@@ -24,7 +24,7 @@
     .tree-node-add-child {
         display: inline-block;
         padding: 2px 6px;
-        background: #292929;
+        background: @navDarkGray;
         margin: 2px 0px;
         border-radius: 4px;
         cursor: pointer;
@@ -35,7 +35,7 @@
             padding: 2px;
             font-size: 14px;
             width: 200px;
-            color: white;
+            color: @whiteish;
             outline : none;
             -webkit-outline : none;
         }

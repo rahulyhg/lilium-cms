@@ -26,7 +26,7 @@ header {
     width: @headerHeight;
     height: 100%;
     display: block;
-    color: #CCC;
+    color: darken(@grayBorderColor, 5%);
     font-size: 20px;
     text-align: center;
     box-sizing: border-box;
@@ -37,20 +37,20 @@ header {
 .header-bar-avatar {
     width: 38px;
     height: 38px;
-    border: 3px solid #4e4e4e;
+    border: 3px solid @navDarkGray;
     margin: 6px 10px;
     border-radius: 50%;
     cursor: pointer;
 
     &:hover {
-        border-color: #777;
+        border-color: lighten(@navDarkGray, 10%);
     }
 }
 
 #lilium-logo-wrapper {
     display: block;
     cursor: pointer;
-    background: #2A2A2A;
+    background: darken(@interfacebg, 5%);
     padding: 7px 17px;
     border-radius: 50px;
     margin: 8px;
@@ -62,7 +62,7 @@ header {
     transition: all 0.2s;
 
     &:hover {
-        background: #161616;
+        background: darken(@interfacebg, 10%);
         box-shadow: 0px 1px 10px 1px rgba(0,0,0,0.6);
     }
 }
@@ -79,7 +79,7 @@ header {
 
 
 #headerRtCounter {
-    color: #af57e4;
+    color: @liliumPurple;
     font-weight: bold;
     font-size: 20px;
     padding: 16px;

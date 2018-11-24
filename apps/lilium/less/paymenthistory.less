@@ -1,6 +1,6 @@
 .report-fields-side {
     width: 300px;
-    background-color: #F7F7F7;
+    background-color: @whiteish;
 
     position: absolute;
     top: 0;
@@ -16,7 +16,7 @@
     hr {
         border: none;
         height: 1px;
-        background: #CCC;
+        background: @grayBorderColor;
         margin: 15px 0px;
     }
 
@@ -41,7 +41,7 @@
     bottom: 0;
     overflow: auto;
 
-    background-color: #EAEAEA;
+    background-color: @grayish;
     box-shadow: -1px 0px 2px rgba(0,0,0,0.2);
 }
 
@@ -65,12 +65,12 @@
             width: 100%;
 
             .money-svg {
-                color: #eaeaea;
+                color: @grayish;
                 font-size: 52px;
                 width: 100px;
                 height: 100px;
                 box-sizing: border-box;
-                background: #BBB;
+                background: @grayishText;
                 padding-top: 24px;
                 border-radius: 50%;
                 box-shadow: 0px 2px 0px rgba(0,0,0,0.4);
@@ -78,7 +78,7 @@
             }
 
             h3, p {
-                color: #9e9e9e
+                color: @lightGray;
             }
         }
     }
@@ -95,7 +95,7 @@
 
 .contractor-report-graph-card {
     padding: 20px;
-    background: white;
+    background: @whiteish;
     box-sizing: border-box;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
     margin-bottom: 20px;
@@ -105,7 +105,7 @@
     th {
         text-align: left;
         padding: 10px;
-        border-bottom: 1px solid #DDD;
+        border-bottom: 1px solid @grayBorderColor;
         font-size: 18px;
         font-weight: normal;
         cursor: pointer;
@@ -113,7 +113,7 @@
 
     td {
         padding: 10px;
-        border-bottom: 1px solid #CCC;
+        border-bottom: 1px solid @grayBorderColor;
     }
 
     tfoot {
@@ -141,7 +141,7 @@
     position: absolute;
     top: 20px;
     right: 10px;
-    background: #F6F6F6;
-    color: #333;
+    background: @whiteish;
+    color: @navDarkGray;
     text-decoration: none;
 }

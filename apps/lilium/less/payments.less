@@ -63,14 +63,14 @@
             &.selected {
                 background: @liliumPurple;
                 background: -webkit-linear-gradient(35deg, #b48efb 0%, #f777e1 100%);
-                color: white;
+                color: @whiteish;
                 .selection-box-wrapper {
                     .payment-selection-boc {
-                        background-color: white;
+                        background-color: @whiteish;
 
                         i.fa {
                             display: initial;
-                            color: #333;
+                            color: @navDarkGray;
                             margin-left: 2px;
                         }
                     }
@@ -104,7 +104,7 @@
 
         #payment-details-header {
             display: flex;
-            background: white;
+            background: @whiteish;
             padding: 8px;
             box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 4px;
@@ -144,7 +144,7 @@
             #breakdown-header {
                 display: flex;
                 justify-content: space-around;
-                background: white;
+                background: @whiteish;
                 max-height: @headerHeight;
                 margin-bottom: 4px;
                 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
@@ -231,7 +231,7 @@ table.articles-summary {
         flex-grow: 1;
 
         #credit-card-edit {
-            background: white;
+            background: @whiteish;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             margin: 20px auto;
             border-radius: @ccBorderRadius;
@@ -288,10 +288,10 @@ table.articles-summary {
         }
 
         .invoice-status {
-            color: #ff2634;
+            color: @red;
 
             &.valid {
-                color: rgb(16, 111, 16);
+                color: @green;
             }
         }
     }
