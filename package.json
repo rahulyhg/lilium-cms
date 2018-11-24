@@ -72,6 +72,7 @@
     "@google/maps": "^0.5.5",
     "@sendgrid/mail": "^6.3.1",
     "animejs": "^2.2.0",
+    "apple-news": "^2.1.0",
     "base32-encode": "^1.1.0",
     "busboy": "latest",
     "canvas": "^2.0.0-alpha.12",
