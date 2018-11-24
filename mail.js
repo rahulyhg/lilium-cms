@@ -89,14 +89,21 @@ class MailController {
                 }
 
                 if (params.filters.hook) {
-                    $match.hooks = params.filter.hook;
+                    $match.hooks = params.filters.hook;
                 }
 
                 db.join(cli._c, 'mailtemplates', [
                     {$match},
                     {$sort : {_id : -1}},
                     {$skip : params.skip || 0},
-                    {$limit : params.limit || 30}
+                    {$limit : params.limit || 30},
+                    {$project : {
+                        active: 1, 
+                        description: 1,
+                        displayname: 1,
+                        hooks: 1,
+                        subject: 1
+                    }}
                 ], (items) => {
                     sendback({ items });
                 });
@@ -126,7 +133,7 @@ class MailController {
     }
 
     adminDELETE(cli) {
-        db.update(cli._c, 'mailtemplates', { _id: db.mongoID(cli.routeinfo.path[2]) }, { hooks: '', deleted: true }, (err, r) => {
+        db.update(cli._c, 'mailtemplates', { _id: db.mongoID(cli.routeinfo.path[2]) }, { hooks: '', deleted: true, active : false }, (err, r) => {
             cli.sendJSON({ updated: !!r.nModified });
         });
     }
