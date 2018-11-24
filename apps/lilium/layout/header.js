@@ -3,6 +3,7 @@ import { Link } from '../routing/link';
 import { LILIUM } from '../data/const';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../realtime/connection';
 import { AnimeNumber } from '../widgets/animenumber';
+import { Spinner } from '../layout/loading';
 import dateformat from 'dateformat';
 import API from '../data/api';
 
@@ -164,7 +165,7 @@ class NotificationLists extends Component {
         if (this.state.loading) {
             return (
                 <div class="notification-dropdown-list loading">
-                    <i class="far fa-spinner-third fa-spin-fast"></i>
+                    <Spinner centered={true} />
                 </div>
             );
         }

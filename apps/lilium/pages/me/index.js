@@ -63,7 +63,7 @@ export default class ProfilePage extends Component {
     render() {
         console.log('render', this.state);
         if (this.state.loading) {
-            return (<Spinner />);
+            return (<Spinner centered={true} />);
         }
 
         if (this.state.user) {

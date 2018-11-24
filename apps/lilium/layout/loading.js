@@ -30,13 +30,13 @@ export class Spinner extends Component {
         if (this.props.centered) {
             return (
                 <center>
-                    <i class="far fa-spinner-third fa-spin-fast"></i>
+                    <img src="/static/media/lmllogo.png" class="loading-logo" />
                 </center>
             );
         } 
 
         return (
-            <i class="far fa-spinner-third fa-spin-fast"></i>
+            <img src="/static/media/lmllogo.png" class="loading-logo" />
         );
     }
 }
