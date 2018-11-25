@@ -1,12 +1,13 @@
 import { h, Component } from 'preact'
 import { ButtonWorker } from '../../widgets/form';
+import dateformat from 'dateformat';
 
 /**
  * Extracts the date part of an ISO datetime string
  * @param {string} date ISO date string to format
  */
 const formatDate = date => {
-    return date ?  date.substring(0, 10) : '';
+    return date ? dateformat(new Date(date), 'yyyy-mm-dd') : '';
 }
 
 export const PendingPaymentCard = props => (
@@ -16,7 +17,7 @@ export const PendingPaymentCard = props => (
             <img src={props.contractor.avatarURL} alt="" className='contractor-avatar' />
             <div>
                 <h4 className='contractor-name'>{props.contractor.displayname}</h4>
-                <p className='payment-text-detail'>{`Owed ${props.contractor.owed} ${props.contractor.currency} for ${props.contractor.articles.length} articles`}</p>
+                <p className='payment-text-detail'>{props.contractor.owed} {props.contractor.currency.toUpperCase()} for {props.contractor.articles.length} articles</p>
             </div>
         </div>
     </div>
@@ -30,6 +31,16 @@ export const SelectionBox = props => (
     </div>
 )
 
+export const PaymentNothingSelected = props => (
+    <div class="payment-nothing-selected report-viewer template-viewer">
+        <div class="template-message">
+            <i class="fal fa-money-check money-svg"></i>
+            <h3>Contractor payment management</h3>
+            <p>Select one or multiple contractors in the sidebar.</p>
+        </div>
+    </div>
+);
+
 export class PaymentDetails extends Component {
     constructor(props) {
         super(props);
@@ -41,14 +52,17 @@ export class PaymentDetails extends Component {
     }
 
     componentWillReceiveProps(props) {
-        if (props.payment) {
-            this.setState({ payment: props.contractorPayment });
+        if (props.contractorPayment) {
+            this.setState({ contractorPayment: props.contractorPayment });
         }
     }
 
     render(props, state) {
         const paymentTextDetail = `Owed ${props.contractorPayment.owed} ${props.contractorPayment.currency} for ${props.contractorPayment.articles.length} articles`;
-        const paymentPeriod = `From ${formatDate(state.contractorPayment.articles[0].date)} to ${formatDate(state.contractorPayment.articles[state.contractorPayment.articles.length - 1].date)}`;
+        const paymentPeriod = state.contractorPayment.articles.length > 1 ? 
+            `From ${formatDate(state.contractorPayment.articles[0].date)} to ${formatDate(state.contractorPayment.articles[state.contractorPayment.articles.length - 1].date)}` : 
+            `For ${formatDate(state.contractorPayment.articles[0].date)}`;
+
         return (
             <div id="payment-details">
                 <div id="payment-details-header">
@@ -59,7 +73,7 @@ export class PaymentDetails extends Component {
                         <p id="payment-period">{paymentPeriod}</p>
                     </div>
                     <div id="pay-individual">
-                        <ButtonWorker text={`Pay ${props.contractorPayment.owed} ${props.contractorPayment.currency || ''}`} theme='purple' type='fill'
+                        <ButtonWorker text={`Pay ${props.contractorPayment.owed} ${props.contractorPayment.currency.toUpperCase()}`} theme='purple' type='fill'
                                         work={props.payContractors.bind(this)} sync={true} />
                     </div>
                 </div>
@@ -80,35 +94,47 @@ class PaymentArticlesSummary extends Component {
 
     render(props, state) {
         return (
-            <div className="card payment-summary">
-                {
-                    props.displayContractorInfo ? (
-                        <div className='contractor-info small'>
-                            <img src={props.contractor.avatarURL} alt="" className='contractor-avatar' />
-                            <h2 className='contractor-name'>{props.contractor.displayname}</h2>
-                        </div>
-                    ) : null
-                }
-                <table className="articles-summary">
-                    <tr>
-                        <th>Headline</th>
-                        <th>Pages</th>
-                        <th>Date</th>
-                        <th>{`Value (${props.contractor.currency})`}</th>
-                    </tr>
+            <div class="pad10">
+                <div className="card payment-summary">
                     {
-                        props.contractor.articles.map(article => (
-                            <tr>
-                                <td title={article.title}>{article.title}</td>
-                                <td>{article.pages}</td>
-                                <td>{formatDate(article.date)}</td>
-                                <td>{article.worth}</td>
-                            </tr>
-                        ))
+                        props.displayContractorInfo ? (
+                            <div className='contractor-info-multi-item'>
+                                <img src={props.contractor.avatarURL} />
+                                <h2 className='contractor-name'>{props.contractor.displayname}</h2>
+                            </div>
+                        ) : null
                     }
-                </table>
+                    <table className="articles-summary">
+                        <tr>
+                            <th>Headline</th>
+                            <th>Pages</th>
+                            <th>Date</th>
+                            <th>{`Value (${props.contractor.currency})`}</th>
+                        </tr>
+                        {
+                            props.contractor.articles.map(article => (
+                                <tr>
+                                    <td title={article.title}>{article.title}</td>
+                                    <td>{article.pages}</td>
+                                    <td>{formatDate(article.date)}</td>
+                                    <td>{article.worth}</td>
+                                </tr>
+                            ))
+                        }
+                    </table>
+                </div>
             </div>
         );
+    }
+}
+
+class PaymentTotal extends Component {
+    render(props) {
+        return props.total ? (
+            <div class="payment-total">
+                {props.total} {props.currency.toUpperCase()}
+            </div>
+        ) : null;
     }
 }
 
@@ -130,16 +156,22 @@ export class PaymentsBreakdown extends Component {
         return (
             <div className="payments-breakdown">
                 <div id="breakdown-header">
-                    <div>
-                        <h1>Total Payout:</h1>
+                    <h1>{props.contractorPayments.length} contractors selected</h1>
+
+                    <div class="payment-totals">
+                        <PaymentTotal total={props.totalCAD} currency="CAD" />
+                        <PaymentTotal total={props.totalUSD} currency="USD" />
                     </div>
-                    <div id="total-cad">
-                        <h1>{`${props.totalCAD} CAD`}</h1>
+
+                    <div class="payment-avatar-list">
+                        {
+                            props.contractorPayments.map(x => (
+                                <img src={x.avatarURL} title={x.displayname + ", paid in " + (x.currency.toUpperCase())} class="payment-multi-thumbnail" />
+                            ))
+                        }
                     </div>
-                    <div id="total-usd">
-                        <h1>{`${props.totalUSD} USD`}</h1>      
-                    </div>
-                    <ButtonWorker text='Pay All' theme='purple' type='fill' work={props.payContractors.bind(this)} sync={true} />                    
+
+                    <ButtonWorker text={`Pay ${props.contractorPayments.length} contractors`} theme='purple' type='fill' work={props.payContractors.bind(this)} sync={true} />                    
                 </div>
                 <div id="payment-breakdown-list">
                     {

@@ -2,7 +2,7 @@ import { h, Component } from 'preact'
 import { ButtonWorker, TextField } from '../../widgets/form';
 import Modal from '../../widgets/modal';
 import { Link } from '../../routing/link';
-import { PendingPaymentCard, PaymentDetails, PaymentsBreakdown,  } from './pendingpayments';
+import { PendingPaymentCard, PaymentDetails, PaymentsBreakdown, PaymentNothingSelected } from './pendingpayments';
 import API from '../../data/api';
 import { castNotification } from '../../layout/notifications';
 
@@ -31,6 +31,7 @@ export class PaymentsManagement extends Component {
         API.get('/contractorspayments/management/pending', {}, (err, data, r) => {
             if (r.status == 200) {
                 const pendingPayments = data.contractors.filter(x => !x.beingPaid && x.stripeuserid);
+                pendingPayments.forEach(x => { x.currency = x.currency || "cad" });
                 if (pendingPayments.length) {
                     const selectedPayments = [pendingPayments[0]];
                     this.setState({ pendingPayments, selectedPayments });
@@ -147,7 +148,7 @@ export class PaymentsManagement extends Component {
                             state.selectedPayments.length != 0 ? (
                                 <PaymentDetails contractorPayment={state.selectedPayments[0]} payContractors={this.castPaymentModal.bind(this)} />
                             ) : (
-                                <h4 id='no-selected-payment' className='card'>No selected payment</h4>
+                                <PaymentNothingSelected />
                             )
                         )
                     }
