@@ -54,7 +54,6 @@ class Builder {
     }
 
     build(_c, input, outputkey, options, done) {
-        log('Builder', 'Compiling ES6 project from dir ' + input, 'info');
         const now = Date.now();
         options = options || Builder.defaultOptions;
 
@@ -64,10 +63,12 @@ class Builder {
         if (options.dontOverwite) {
             try {
                 fs.statSync(path.join(options.outputpath || (_c.server.html + "/apps/" + outputkey), options.bundlename || "app.bundle.js"));
-                log('Build', 'Will not build Preact project ' + input + ' because it already exists', 'info');
+                log('Builder', 'Will not build Preact project ' + input + ' because it already exists', 'info');
                 return done && done();
             } catch (err) { }
         }
+
+        log('Builder', 'Compiling ES6 project from dir ' + input, 'info');
 
         const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
