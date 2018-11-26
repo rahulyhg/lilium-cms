@@ -195,7 +195,7 @@ export class Lilium extends Component {
 
                     // Set allowed endpoints according to admin menus, plus hardcoded ones
                     liliumcms.session.setAllowedEndpoints([
-                        "me", "preferences", "logout", "notifications", 
+                        "me", "preferences", "logout", "notifications", "onboarding", 
                         ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
                     ]);
 
