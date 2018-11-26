@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
@@ -130,7 +129,8 @@ class PublishingActions extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            post : props.post
+            post: props.post,
+            destroyModalVisible: false
         }
     }
 
@@ -151,14 +151,14 @@ class PublishingActions extends Component {
                 acts.push(
                     <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
                     <ButtonWorker type="fill" theme="blue" text="Submit for approval" work={this.props.actions.submitForApproval.bind(this)} />,
-                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.props.actions.destroy.bind(this)} />
+                    <ButtonWorker theme="red"  type="outline" text="Destroy" sync={true} work={() => { this.setState({ destroyModalVisible: true }) }} />
                 );
             } 
         } else {
             if (status == "draft" || status == "deleted") {
                 acts.push(
                     <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
-                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.props.actions.destroy.bind(this)} />,
+                    <ButtonWorker theme="red"  type="outline" text="Destroy" sync={true} work={() => { this.setState({ destroyModalVisible: true }) }} />,
                     <ButtonWorker type="fill" theme="blue" text="Publish" work={this.props.actions.validate.bind(this)} />
                 );
             } else if (status == "published") {
@@ -178,9 +178,19 @@ class PublishingActions extends Component {
         return acts;
     }
 
+    destroyArticle(done) {
+        this.props.actions.destroy(done);
+        this.setState({ destroyModalVisible: false });
+    }
+
     render() {
         return (
             <div>
+                <Modal title='Destroy this article?' visible={this.state.destroyModalVisible} onClose={() => { this.setState({ destroyModalVisible: false }) }}>
+                    <p>Are you sure you want to <b>destroy</b> this article permanently?</p>
+                    <ButtonWorker theme="red"  type="fill" text="Yes, destroy" work={this.destroyArticle.bind(this)} />
+                    <ButtonWorker theme="blue"  type="outline" text="No, I want to keep it" sync={true} work={() => { this.setState({ destroyModalVisible: false }) }} />
+                </Modal>
                 <div>
                     <ButtonWorker theme="white" text="Preview" work={this.props.actions.preview.bind(this)} />
                 </div>
@@ -653,9 +663,12 @@ export default class EditView extends Component {
         });
     }
 
-    destroy() {
+    destroy(done) {        
         destroyPost(this.coldState.post._id, (err, json, r) => {
-            if (err) {
+            if (!err) {
+                const post = this.state.post;
+                post.status = 'deleted';
+                this.setState({ post });
                 castNotification({
                     type : "success",
                     title : "Article destroyed",
