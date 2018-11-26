@@ -146,7 +146,7 @@ export default class PonglinkInsight extends Component {
                 <div id="insights">
                     <div id="general-info" style={styles.generalInfo}>
                         <h2 style={styles.identifier}>{this.state.link.identifier}</h2>
-                        <StatusIndicator status={this.state.link.status} />
+                        {this.state.link.status} 
                         <div className="clickCounter" style={{ display: 'inline-block', float: 'right' }}>
                             <span>{`${this.state.link.clicks} clicks`}</span>
                         </div>
