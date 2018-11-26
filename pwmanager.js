@@ -62,6 +62,10 @@ class PwManager {
             }}
         ];
 
+        if (userRights == '*') {
+            delete pipeline[0].$match.right;
+        }
+
         db.join(_c.default(), 'pwmanagercategories', pipeline, categories => {
             const allCategories = categories.map(category => new Category(category.name, category.right, category.passwords, category._id));
             allCategories.forEach(category => { 
@@ -80,8 +84,11 @@ class PwManager {
      */
     createCategory(name, right, done) {
         const newCategory = new Category(name, right);
-
+        console.log(newCategory);
+        
         db.insert(_c.default(), 'pwmanagercategories', newCategory, (err, r) => {
+            console.log(err, r);
+            
             done && done(err, newCategory);
         });
     }
@@ -100,7 +107,6 @@ class PwManager {
             }
         }, true);
     }
-
 
     /* Passwords */
 
@@ -295,7 +301,7 @@ class PwManagerController {
 
     livevar(cli, levels, params, sendback) {
         if (levels[0] == 'categories') {
-            this.PwManager.getCategories(cli.userinfo.rights, categories => {
+            this.PwManager.getCategories(cli.hasRight('admiin') ? '*' : cli.userinfo.rights, categories => {
                 categories.forEach(category => {
                     category.passwords = category.passwords.map(password => { return { name: password.name, plaintext: password.plaintext, _id: password._id }; });
                 });
