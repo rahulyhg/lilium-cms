@@ -1,6 +1,8 @@
 .endpoint-paymentdashboard {
     .tabview {
         margin: 0;
+        height: 100%;
+        overflow-y: auto;
     }
 
     .tabview .tab-content {
@@ -271,15 +273,17 @@ table.articles-summary {
     #credit-card-list {
         height: 100%;
         overflow-y: scroll;
-        flex: 0 0 25%;
+        width: 350px;
+        padding: 25px;
 
         & > * {
             .credit-card {
                 margin: 8px auto;
+                cursor: pointer;
             }
 
             &.selected .credit-card {
-                transform: scale(1.1);
+                transform: scale(1.1) rotateZ(-3deg);
                 margin-bottom: 16px;
                 margin-top: 16px;
             }
@@ -287,8 +291,6 @@ table.articles-summary {
     }
 
     #credit-card-details-pane {
-        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-        background: @liliumBackground;
         height: 100%;
         flex-grow: 1;
 
