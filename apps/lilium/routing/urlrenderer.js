@@ -6,6 +6,7 @@ import { hit } from '../realtime/connection';
 
 // Import default pages from route
 import InitPage         from '../pages/default';
+import Onboarding       from '../pages/onboarding/index';
 import Dashboard        from '../pages/dashboard/index';
 import Publishing       from '../pages/publishing/index';
 import ProfilePage      from '../pages/me/index.js';
@@ -70,6 +71,7 @@ export class EndpointStore {
 
 // Define default Lilium's endpoints
 EndpointStore.registerEndpoint("_init", InitPage);
+EndpointStore.registerEndpoint("onboarding", Onboarding);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
 EndpointStore.registerEndpoint('me', ProfilePage);
