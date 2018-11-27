@@ -27,10 +27,12 @@ const styles = {
 }
 
 export function Version(props) {
+    console.log(props);
+    
     return (       
         <tr>
             <td title={props.medium}>{props.medium}</td>
-            <td><a href={props.redir} target='_blank'>{props.redir}</a></td>
+            <td><a href={props.dest} target='_blank'>{props.dest}</a></td>
             <td style={styles.copyColumn}><i className="fal fa-copy" onClick={copy.bind(this, props.dest)} style={styles.copyIcon}></i></td>
         </tr>
     )
