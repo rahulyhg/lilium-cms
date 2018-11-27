@@ -13,7 +13,7 @@ class CSSBuilder {
                 log('Less', 'Failed to compile Less, missing directory : ' + inputdir, 'err');
                 done && done(err);
             } else {
-                const filestring = files.filter(x => x.endsWith('.less') || !x.startsWith('_')).map(x => `@import "${pathLib.join(inputdir, x)}";`).join('\n');
+                const filestring = files.filter(x => x.endsWith('.less')).map(x => `@import "${pathLib.join(inputdir, x)}";`).join('\n');
 
                 lessLib.render(filestring, { compress : options.compress || false }, (err, result) => {
                     if (err) {
