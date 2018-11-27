@@ -178,7 +178,7 @@
 .history-entry.history-entry-published {
     border-top: 1px solid darken(@green, 10%);
     border-bottom: 1px solid darken(@green, 10%);
-    background-color: darken(@green, 5%);
+    background-color: desaturate(@green, 10%);
     color: @whiteish;
     margin: 10px 0px;
     padding: 10px;
@@ -187,7 +187,7 @@
 .history-entry.history-entry-created {
     border-top: 1px solid darken(@blue, 5%);
     border-bottom: 1px solid darken(@blue, 5%);
-    background-color: lighten(@blue, 10%);
+    background-color: desaturate(@blue, 10%);
     color: @whiteish;
     margin: 10px 0px;
     padding: 10px;
@@ -205,7 +205,7 @@
 .history-entry.history-entry-unpublished {
     border-top: 1px solid @red;
     border-bottom: 1px solid @red;
-    background-color: lighten(@red, 10%);
+    background-color: desaturate(@red, 10%);
     color: @whiteish;
     margin: 10px 0px;
     padding: 10px;
@@ -403,6 +403,15 @@
                 width: 250px;
                 margin: 10px;
                 text-align: center;
+
+                &.publishing-overlay-dismiss {
+                    color: @whiteish;
+                    padding: 30px;
+                    font-size: 32px;
+                    cursor: pointer;
+                    box-sizing: border-box;
+                    background-color: @purple;
+                }
 
                 &.full {
                     display: block;
