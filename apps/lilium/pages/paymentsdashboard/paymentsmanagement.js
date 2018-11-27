@@ -116,7 +116,7 @@ export class PaymentsManagement extends Component {
         const payout = PaymentsManagement.calculateTotalPayout(state.selectedPayments);
         return (
             <div id="pending-payment-overviews">
-                <Modal visible={state.paymentModalVisible} title='Pay Contractors'>
+                <Modal visible={state.paymentModalVisible} title='Pay Contractors' onClose={() => { this.setState({ paymentModalVisible: false }); }}>
                     <h2>Pay contractors</h2>
                     <p>
                         You are about to pay <b>{`${payout.totalCAD} CAD + ${payout.totalUSD} USD to ${state.selectedPayments.length} contractor(s)`}</b>.
