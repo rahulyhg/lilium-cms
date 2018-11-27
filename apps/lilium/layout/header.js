@@ -46,6 +46,7 @@ class HeaderUserDropdown extends Component {
 
                 { this.state.open ? (
                     <div class="header-dropdown">
+                        <div class="pointer"></div>
                         <Link href="/me" display="block">
                             Profile
                         </Link>
