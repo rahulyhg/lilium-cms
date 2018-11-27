@@ -114,7 +114,7 @@ export class URLRenderer extends Component {
         }
 
         // Look for user preference to set whether the UI is stretched or not 
-        getLocal(CACHEKEYS.SIDEBARSNAP) && this.state.classes.push("snap");
+        this.props.session.preferences.menuLocked && this.state.classes.push("snap");
         this.props.session.preferences.stretchUserInterface && this.state.classes.push("stretched")
     }
 
