@@ -70,17 +70,6 @@
             "section" : "home"            
         },
         {
-            "id": "support",
-            "v": "support",
-            "lys" : "support,help,github",
-            "faicon": "fa-life-ring",
-            "displayname": "Support",
-            "priority": 2500,
-            "rights": ["dash"],
-            "absURL": "/fix",
-            "section" : "home"
-        },
-        {
             "id": "flagging",
             "v": "flagging",
             "lys": "flagging,report,banning",
@@ -158,17 +147,6 @@
             "section" : "publishing"
         },
         {
-            "id": "crew",
-            "v": "crew",
-            "lys" : "crew,people,users",
-            "faicon": "fa-beer",
-            "displayname": "Crew",
-            "priority": 500,
-            "rights": ["dashboard"],
-            "absURL": "/crew",
-            "section" : "home"
-        },
-        {
             "id": "entities",
             "v": "entities",
             "lys" : "entities,users,people",
@@ -201,17 +179,6 @@
             "rights": ["manage-roles"],
             "absURL": "/role/list",
             "section" : "management"
-        },
-        {
-            "id": "socialdispatch",
-            "v": "socialdispatch",
-            "lys" : "social,dispatch,facebook,twitter",
-            "faicon": "fa-share-alt",
-            "displayname": "Social Dispatch",
-            "priority": 410,
-            "rights": ["editor"],
-            "absURL": "/socialdispatch",
-            "section" : "publishing"
         },
         {
             "id": "profile",
@@ -323,6 +290,42 @@
             "rights": ["manage-plugins"],
             "absURL": "/plugins",
             "section" : "lilium"
+        }
+    ],
+
+    "neutralizedSidebarMenus" : [
+        {
+            "id": "socialdispatch",
+            "v": "socialdispatch",
+            "lys" : "social,dispatch,facebook,twitter",
+            "faicon": "fa-share-alt",
+            "displayname": "Social Dispatch",
+            "priority": 410,
+            "rights": ["editor"],
+            "absURL": "/socialdispatch",
+            "section" : "publishing"
+        },
+        {
+            "id": "crew",
+            "v": "crew",
+            "lys" : "crew,people,users",
+            "faicon": "fa-beer",
+            "displayname": "Crew",
+            "priority": 500,
+            "rights": ["dashboard"],
+            "absURL": "/crew",
+            "section" : "home"
+        },
+        {
+            "id": "support",
+            "v": "support",
+            "lys" : "support,help,github",
+            "faicon": "fa-life-ring",
+            "displayname": "Support",
+            "priority": 2500,
+            "rights": ["dash"],
+            "absURL": "/fix",
+            "section" : "home"
         }
     ],
 
