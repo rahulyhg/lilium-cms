@@ -18,10 +18,11 @@ class PickerSession {
     /**
      * Instanciates a Picker Session object
      * @param {object} sessionOptions Session options
-     * @param {array} sessionOptions.accept The entities than can be picker
+     * @param {array} sessionOptions.accept The entities types that can be picked
      * @param {string} sessionOptions.tab The tab that is opened when the picker is cast
      * @param {object} sessionOptions.options Object keyed by tab name that holds tab specific options
-     * @param {callback} sessionOptions.callback Callback fired when an item is selected
+     * @param {string} sessionOptions.type Indicates whether the session is of type carousel
+     * @param {array} sessionOptions.carouselElements Array representing the elements of a carousel with which to open a carousel picker
      */
     constructor(sessionOptions) {
         this.accept = sessionOptions.accept;
@@ -31,7 +32,19 @@ class PickerSession {
 
         this.tab = sessionOptions.tab || this.getLastOpened() || this.accept[0];
         this.options = sessionOptions.options || {};
+        this.carouselElements = sessionOptions.carouselElements || [];
         this.type = sessionOptions.type;
+
+        this.accept.forEach(x => {
+            const opts = this.options[x] || {};
+            if (this.type == 'carousel' && !opts.selected) {
+                opts.selected = this.carouselElements.find(e => e.type == x);
+                this.options[x] = opts;
+            }
+        });
+
+        console.log('New session: ', this);
+        
     }
 
     getLastOpened() {
@@ -124,7 +137,7 @@ export class Picker extends Component {
                 log('Picker', "Picker.finish() got an undefined param and session wasn't of type carousel", 'warn');
             }
         }
-        
+
         Picker.dismiss();
     }
 
@@ -143,7 +156,7 @@ export class Picker extends Component {
                                 {
                                     state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} carousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]} />
+                                            <SubPicker onKeyDown={this.keydown.bind(this)} isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]} />
                                         </Tab>
                                     ))
                                 }
