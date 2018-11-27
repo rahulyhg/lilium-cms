@@ -25,6 +25,8 @@ class PickerSession {
      * @param {array} sessionOptions.carouselElements Array representing the elements of a carousel with which to open a carousel picker
      */
     constructor(sessionOptions) {
+        console.log('sessionOptions:', sessionOptions);
+        
         this.accept = sessionOptions.accept;
         if (!this.accept || !this.accept.length) {
             this.accept = AVAILABLE_PICKER_TABS;
@@ -68,20 +70,14 @@ export class Picker extends Component {
 
     static Session = PickerSession;
 
-    static get defaultSession() {
-        return {
-            accept : Object.keys(PickerMap).map(x => PickerMap[x])
-        }
-    }
-
     static cast(session, done) {
         if (session) {
-            session = Object.assign(Picker.defaultSession, session);
-
             log('Picker', 'Casting picker singleton', 'detail');
+            console.log('Session: ', session);
+            
             const tabs = session.accept.map(x => PickerMap[x]);
             if (!session.options) session.options = {};
-            _singleton.setState({ session: session, visible: true, tabs, callback: done });
+            _singleton.changeState({ session: session, visible: true, tabs, callback: done });
             window.addEventListener('keydown', _singleton.keydown_bound);
         } else {
             log('Picker', 'Cannot cast Picker without a Session object', 'error');
@@ -93,7 +89,7 @@ export class Picker extends Component {
     }
 
     static dismiss() {
-        log('Picker', 'Dismissing image picker singleton', 'detail');
+        log('Picker', 'Dismissing picker singleton', 'detail');
         _singleton.setState({ visible : false });
         window.removeEventListener('keydown', _singleton.keydown_bound);
 
@@ -139,6 +135,19 @@ export class Picker extends Component {
         }
 
         Picker.dismiss();
+    }
+
+    /**
+     * Triggers setState() method of the component instance. Allows the component to execute instructions before setting the state
+     * @param {object} state the new state to be affected to the component
+     */
+    changeState(state) {
+        const newState = {...state};
+        if (newState.session.type == 'carousel') {
+            newState.carouselElements = newState.session.carouselElements;
+        }
+
+        this.setState(newState);
     }
 
     keydown(ev) {
@@ -233,72 +242,26 @@ class CarouselPreview extends Component {
     }
 }
 
-class CarouselElement extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render(props, state) {
-        return (
-            <div className="carousel-element-preview-card">
-                <i className="remove-carousel-element fa fa-times" onClick={props.removeCarouselElement.bind(this, props.index)}></i>
-                {
-                    <props.PreviewComponent el={props.element.image || props.element.place} />
-                }
-            </div>
-        )
-    }
-}
-
-class ImageCarouselPreview extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render(props, state) {
-        return (
-            <img src={props.el.sizes.square.url} className='carousel-image-preview' alt="Carousel Image Embed"/>
-        )
-    }
-}
-
-class MapCarouselPreview extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            
+const CarouselElement = props => (
+    <div className="carousel-element-preview-card">
+        <i className="remove-carousel-element fa fa-times" onClick={props.removeCarouselElement.bind(this, props.index)}></i>
+        {
+            <props.PreviewComponent el={props.element.image || props.element.place} />
         }
-    }
-    
-    componentDidMount() {
-        
-    }
-    
-    render(props, state) {
-        return (
-            <div className="map-carousel-preview">
-                <i className="map-marker-icon fa-4x fas fa-map-marker-check"></i>
-                <p className="place-name">{props.el.displayname}</p>
-            </div>
-        );
-    }
-}
+    </div>
+)
 
-class DefaultCarouselPreview extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            
-        }
-    }
-    
-    componentDidMount() {
-        
-    }
-    
-    render() {
-        return (
-            <span>Default preview</span>
-        );
-    }
-}
+const ImageCarouselPreview = props => (
+    <img src={props.el.sizes.square.url} className='carousel-image-preview' alt="Carousel Image Embed"/>
+)
+
+const MapCarouselPreview = props => (
+    <div className="map-carousel-preview">
+        <i className="map-marker-icon fa-4x fas fa-map-marker-check"></i>
+        <p className="place-name">{props.el.displayname}</p>
+    </div>
+);
+
+const  DefaultCarouselPreview = props => (
+    <span>Default preview</span>
+);

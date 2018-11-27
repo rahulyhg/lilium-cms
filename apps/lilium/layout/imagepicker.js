@@ -166,7 +166,7 @@ export class ImagePicker extends Component {
     }
 
     static tabTitle =  'Uploads';
-    static slug =  'uploads';
+    static slug =  'upload';
 
     componentDidMount(params, done) {
         log('ImagePicker', 'Displaying image picker singleton', 'detail');
@@ -244,7 +244,7 @@ export class ImagePicker extends Component {
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { embedType: 'image', image: this.state.selected })} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { type: ImagePicker.slug, image: this.state.selected })} />       
                     </div>
                 </div>
             </div>
