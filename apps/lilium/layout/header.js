@@ -16,7 +16,15 @@ class HeaderUserDropdown extends Component {
     }
 
     componentDidMount() {
+        document.addEventListener('navigate', this.close.bind(this));
+    }
 
+    open() {
+        this.setState({ open : true });
+    }
+
+    close() {
+        this.setState({ open : false });
     }
 
     componentWillReceiveProps(props) {
@@ -31,9 +39,23 @@ class HeaderUserDropdown extends Component {
         log('HeaderUser', 'User dropdown was rerendered', 'detail');
         return (
             <div class="header-bar-avatar-wrapper">
-                <Link href="/me" display="block">
+                <div onClick={this.open.bind(this)}>
                     <img src={liliumcms.session.avatarURL} class="header-bar-avatar" />
-                </Link>
+                </div>
+
+                { this.state.open ? (
+                    <div class="header-dropdown">
+                        <Link href="/me" display="block">
+                            Profile
+                        </Link>
+                        <Link href="/me#password" display="block">
+                            Change password
+                        </Link>
+                        <Link href="/logout" display="block">
+                            Logout
+                        </Link>
+                    </div>
+                ) : null }
             </div>
         )
     }

@@ -71,7 +71,7 @@ class Builder {
         log('Builder', 'Compiling ES6 project from dir ' + input, 'info');
 
         const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-
+        
         const buildconfig = {
             mode : _c.env == "dev" ? "development" : "production",
             // externals: [nodeExternals()],
@@ -80,10 +80,10 @@ class Builder {
                     { 
                         test : /.m?js$/, 
                         exclude: /(node_modules)/,
-                        use : {
+                        use : [{
                             loader : "babel-loader?cacheDirectory=true", 
                             options : options.babel 
-                        }
+                        }]
                     },
                 ]
             },
