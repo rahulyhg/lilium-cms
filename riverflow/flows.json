@@ -471,7 +471,7 @@
         }, {
             "module" : "embed.js",
             "endpoint" : "embed",
-            "support" : []
+            "support" : ["livevar", "admin_post"]
         }, {
             "module" : "sharedcache.js",
             "endpoint" : "sharedcache",
