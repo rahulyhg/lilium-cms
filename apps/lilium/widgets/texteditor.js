@@ -73,7 +73,7 @@ export class TextEditor extends Component {
                     icon: 'fa fa-images',
                     tooltip: 'Insert Carousel',
                     onclick: () => {
-                        const session = new Picker.PickerSession({ type: 'carousel' });
+                        const session =  new Picker.Session({ type: 'carousel' });
                         Picker.cast(session, carousel => {
                             log('TextEditor', "Picker callback received carousel: ", carousel, 'info');
                             const carouselPlaceholder = document.createElement('div');

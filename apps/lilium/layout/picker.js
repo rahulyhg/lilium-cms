@@ -25,8 +25,6 @@ class PickerSession {
      * @param {array} sessionOptions.carouselElements Array representing the elements of a carousel with which to open a carousel picker
      */
     constructor(sessionOptions) {
-        console.log(sessionOptions);
-        
         this.accept = sessionOptions.accept;
         if (!this.accept || !this.accept.length) {
             this.accept = AVAILABLE_PICKER_TABS;
@@ -68,8 +66,6 @@ export class Picker extends Component {
     static Session = PickerSession;
 
     static cast(session, done) {
-        console.log(session);
-        
         if (session) {
             log('Picker', 'Casting picker singleton', 'detail');
             const tabs = session.accept.map(x => PickerMap[x]);
@@ -153,11 +149,10 @@ export class Picker extends Component {
     }
 
     carouselElementClicked(element) {
-        console.log('clicked element: ', element);
         if (AVAILABLE_PICKER_TABS.includes(element.type)) {
             const newState = {...this.state};
             newState.tab = element.type;
-            this.state.session.options[element.type].selected = element;
+            newState.session.options[element.type].selected = element;
             this.setState(newState);
         }
     }
@@ -173,7 +168,8 @@ export class Picker extends Component {
                                 {
                                     state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]} />
+                                            <SubPicker onKeyDown={this.keydown.bind(this)} isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]}
+                                                        selected={state.session.options[SubPicker.slug].selected} />
                                         </Tab>
                                     ))
                                 }
@@ -225,8 +221,6 @@ class CarouselPreview extends Component {
     }
 
     render(props, state) {
-        console.log(state.elements);
-        
         return (
             <div id="picker-carousel">
                 <div id="carousel-preview">
