@@ -18,10 +18,11 @@ class PickerSession {
     /**
      * Instanciates a Picker Session object
      * @param {object} sessionOptions Session options
-     * @param {array} sessionOptions.accept The entities than can be picker
+     * @param {array} sessionOptions.accept The entities types that can be picked
      * @param {string} sessionOptions.tab The tab that is opened when the picker is cast
      * @param {object} sessionOptions.options Object keyed by tab name that holds tab specific options
-     * @param {callback} sessionOptions.callback Callback fired when an item is selected
+     * @param {string} sessionOptions.type Indicates whether the session is of type carousel
+     * @param {array} sessionOptions.carouselElements Array representing the elements of a carousel with which to open a carousel picker
      */
     constructor(sessionOptions) {
         this.accept = sessionOptions.accept;
@@ -31,7 +32,16 @@ class PickerSession {
 
         this.tab = sessionOptions.tab || this.getLastOpened() || this.accept[0];
         this.options = sessionOptions.options || {};
+        this.carouselElements = sessionOptions.carouselElements || [];
         this.type = sessionOptions.type;
+
+        this.accept.forEach(x => {
+            const opts = this.options[x] || {};
+            if (this.type == 'carousel' && !opts.selected) {
+                opts.selected = this.carouselElements.find(e => e.type == x);
+                this.options[x] = opts;
+            }
+        });
     }
 
     getLastOpened() {
@@ -55,20 +65,12 @@ export class Picker extends Component {
 
     static Session = PickerSession;
 
-    static get defaultSession() {
-        return {
-            accept : Object.keys(PickerMap).map(x => PickerMap[x])
-        }
-    }
-
     static cast(session, done) {
         if (session) {
-            session = Object.assign(Picker.defaultSession, session);
-
             log('Picker', 'Casting picker singleton', 'detail');
             const tabs = session.accept.map(x => PickerMap[x]);
             if (!session.options) session.options = {};
-            _singleton.setState({ session: session, visible: true, tabs, callback: done });
+            _singleton.changeState({ session: session, visible: true, tabs, callback: done });
             window.addEventListener('keydown', _singleton.keydown_bound);
         } else {
             log('Picker', 'Cannot cast Picker without a Session object', 'error');
@@ -80,7 +82,7 @@ export class Picker extends Component {
     }
 
     static dismiss() {
-        log('Picker', 'Dismissing image picker singleton', 'detail');
+        log('Picker', 'Dismissing picker singleton', 'detail');
         _singleton.setState({ visible : false });
         window.removeEventListener('keydown', _singleton.keydown_bound);
 
@@ -115,17 +117,30 @@ export class Picker extends Component {
     static finish(el) {
         if (_singleton.state.session.type == 'carousel') {
             log('Picker', "Got a carousel and calling back", 'detail');
-            _singleton.state.callback && _singleton.state.callback({ embedType: 'carousel', elements: _singleton.state.carouselElements });
+            _singleton.state.callback && _singleton.state.callback({ type: 'carousel', elements: _singleton.state.carouselElements });
         } else {
             if (el) {
-                log('Picker', `Got an individual embed of type: '${el.embedType}'`, 'detail');
+                log('Picker', `Got an individual embed of type: '${el.type}'`, 'detail');
                 _singleton.state.callback && _singleton.state.callback(el);
             } else {
                 log('Picker', "Picker.finish() got an undefined param and session wasn't of type carousel", 'warn');
             }
         }
-        
+
         Picker.dismiss();
+    }
+
+    /**
+     * Triggers setState() method of the component instance. Allows the component to execute instructions before setting the state
+     * @param {object} state the new state to be affected to the component
+     */
+    changeState(state) {
+        const newState = {...state};
+        if (newState.session.type == 'carousel') {
+            newState.carouselElements = newState.session.carouselElements;
+        }
+
+        this.setState(newState);
     }
 
     keydown(ev) {
@@ -133,24 +148,35 @@ export class Picker extends Component {
         ev.keyCode == "13" && Picker.finish();
     }
 
+    carouselElementClicked(element) {
+        if (AVAILABLE_PICKER_TABS.includes(element.type)) {
+            const newState = {...this.state};
+            newState.tab = element.type;
+            newState.session.options[element.type].selected = element;
+            this.setState(newState);
+        }
+    }
+
     render(props, state) {
+        const selectedTabIndex = AVAILABLE_PICKER_TABS.indexOf(state.session.tab) || 0;
         if (state.visible) {
             return (
                 <div id="picker-overlay">
                     <div id="picker-wrapper">
                         <div id="picker" className={state.session.type == 'carousel' && 'carousel-session'}>
-                            <TabView id={"picker_" + (state.session.id ? state.session.id : "global")}>
+                            <TabView id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex}>
                                 {
                                     state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} carousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]} />
+                                            <SubPicker onKeyDown={this.keydown.bind(this)} isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]}
+                                                        selected={state.session.options[SubPicker.slug].selected} />
                                         </Tab>
                                     ))
                                 }
                             </TabView>
                             {
                                 state.session.type == 'carousel' ? (
-                                    <CarouselPreview elements={state.carouselElements} />
+                                    <CarouselPreview elements={state.carouselElements} onClick={this.carouselElementClicked.bind(this)} />
                                 ) : null
                             }
                         </div>
@@ -185,9 +211,9 @@ class CarouselPreview extends Component {
      */
     static getComponentByType(type = '') {
         switch (type.toLowerCase()) {
-            case 'image':
+            case ImagePicker.slug:
                 return ImageCarouselPreview;
-            case 'place':
+            case PlacePicker.slug:
                 return MapCarouselPreview;
             default:
                 return DefaultCarouselPreview;
@@ -201,8 +227,9 @@ class CarouselPreview extends Component {
                     {
                         state.elements && state.elements.length ? (
                             state.elements.map((el, index) => (
-                                <CarouselElement PreviewComponent={CarouselPreview.getComponentByType(el.embedType)} element={el}
-                                                    key={index} index={index} removeCarouselElement={this.removeCarouselElement.bind(this)} />
+                                <CarouselElement PreviewComponent={CarouselPreview.getComponentByType(el.type)} element={el}
+                                                    key={index} index={index} removeCarouselElement={this.removeCarouselElement.bind(this)}
+                                                    onClick={props.onClick.bind(this, el)} />
                             ))
                         ) : (
                             <div id="carousel-empty-text">
@@ -220,72 +247,26 @@ class CarouselPreview extends Component {
     }
 }
 
-class CarouselElement extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render(props, state) {
-        return (
-            <div className="carousel-element-preview-card">
-                <i className="remove-carousel-element fa fa-times" onClick={props.removeCarouselElement.bind(this, props.index)}></i>
-                {
-                    <props.PreviewComponent el={props.element.image || props.element.place} />
-                }
-            </div>
-        )
-    }
-}
-
-class ImageCarouselPreview extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render(props, state) {
-        return (
-            <img src={props.el.sizes.square.url} className='carousel-image-preview' alt="Carousel Image Embed"/>
-        )
-    }
-}
-
-class MapCarouselPreview extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            
+const CarouselElement = props => (
+    <div className="carousel-element-preview-card" onClick={props.onClick.bind(this)}>
+        <i className="remove-carousel-element fa fa-times" onClick={e => { e.stopPropagation(); props.removeCarouselElement(props.index); }}></i>
+        {
+            <props.PreviewComponent el={props.element.image || props.element.place} />
         }
-    }
-    
-    componentDidMount() {
-        
-    }
-    
-    render(props, state) {
-        return (
-            <div className="map-carousel-preview">
-                <i className="map-marker-icon fa-4x fas fa-map-marker-check"></i>
-                <p className="place-name">{props.el.displayname}</p>
-            </div>
-        );
-    }
-}
+    </div>
+)
 
-class DefaultCarouselPreview extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            
-        }
-    }
-    
-    componentDidMount() {
-        
-    }
-    
-    render() {
-        return (
-            <span>Default preview</span>
-        );
-    }
-}
+const ImageCarouselPreview = props => (
+    <img src={props.el.sizes.square.url} className='carousel-image-preview' alt="Carousel Image Embed"/>
+)
+
+const MapCarouselPreview = props => (
+    <div className="map-carousel-preview">
+        <i className="map-marker-icon fa-4x fas fa-map-marker-check"></i>
+        <p className="place-name">{props.el.displayname}</p>
+    </div>
+);
+
+const  DefaultCarouselPreview = props => (
+    <span>Default preview</span>
+);

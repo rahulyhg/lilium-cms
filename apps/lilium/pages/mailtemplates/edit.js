@@ -123,8 +123,8 @@ export class EditMailTemplate extends Component {
                     <TextField multiline={true} name='stylesheet' onChange={this.updateValues.bind(this)} initialValue={this.state.mailTemplate.stylesheet} />
                     <SelectField name='hooks' onChange={this.updateValues.bind(this)} options={this.hooksOptions} initialValue={this.state.mailTemplate.hooks} />
 
-                    <ButtonWorker text='Save' work={this.save.bind(this)} />
-                    <ButtonWorker text='Delete' theme='danger' work={this.remove.bind(this)} />
+                    <ButtonWorker text='Save' theme='purple' type='fill' work={this.save.bind(this)} />
+                    <ButtonWorker text='Delete' theme='red' type='outline' work={this.remove.bind(this)} />
                 </div>
             );
         } else {

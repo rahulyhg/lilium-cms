@@ -1,37 +1,13 @@
 import { castNotification } from '../../layout/notifications'
+import { ButtonWorker } from "../../widgets/form";
 import { Component, h } from "preact";
-
-const styles = {
-    copyColumn: {
-        textAlign: 'center',
-        width: '80px'
-    },
-    copyIcon: {
-        cursor: 'pointer'
-    },
-    actions: {
-        display: 'flex',
-    },
-    ponglinkAction: {
-        textAlign: 'center',
-        flexGrow: '1'
-    },
-    actionText: {
-        cursor: 'pointer'
-    },
-    archivedMessage: {
-        color: 'red',
-        margin: '6px',
-        textAlign: 'center'
-    }
-}
 
 export function Version(props) {
     return (       
         <tr>
             <td title={props.medium}>{props.medium}</td>
-            <td><a href={props.redir} target='_blank'>{props.redir}</a></td>
-            <td style={styles.copyColumn}><i className="fal fa-copy" onClick={copy.bind(this, props.dest)} style={styles.copyIcon}></i></td>
+            <td><a href={props.dest} target='_blank'>{props.dest}</a></td>
+            <td className='copy-column'><i className="fal fa-copy" onClick={copy.bind(this, props.dest)}></i></td>
         </tr>
     )
 };
@@ -46,13 +22,13 @@ export function copy(txt) {
 };
 
 const ActionArchive = props => (
-    <span style={styles.actionText} onClick={props.changeStatus}>Archive (this action is irreversible)</span>
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Archive (cannot be undone)' theme='red' type='outline' />
 )
 const ActionPause = props => (
-    <span style={styles.actionText} onClick={props.changeStatus}>Pause)</span>
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Pause' theme='blue' type='outline' />
 )
 const ActionResume = props => (
-    <span style={styles.actionText} onClick={props.changeStatus}>Resume</span>
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Resume' theme='purple' type='fill' />
 )
 
 export class PonglinkActions extends Component {
@@ -69,30 +45,22 @@ export class PonglinkActions extends Component {
     render() {
         if (this.state.status == 'active') {
             return (
-                <div className="ponglink-actions" style={styles.actions}>
-                    <div className="ponglink-action warning" style={{...styles.ponglinkAction, color: 'yellow'}}>
-                        <ActionPause changeStatus={this.props.changeStatus.bind(this, 'paused')} />
-                    </div>
-                    <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
-                        <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />
-                    </div>
+                <div className="ponglink-actions">
+                    <ActionPause changeStatus={this.props.changeStatus.bind(this, 'paused')} />
+                    <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />
                 </div>
             );
         } else if (this.state.status == 'paused') {
             return (
-                <div className="ponglink-actions" style={styles.actions}>
-                    <div className="ponglink-action success" style={{...styles.ponglinkAction, color: 'green'}}>
-                        <ActionResume changeStatus={this.props.changeStatus.bind(this, 'active')} />
-                    </div>
-                    <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
-                        <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />                        
-                    </div>
+                <div className="ponglink-actions">
+                    <ActionResume changeStatus={this.props.changeStatus.bind(this, 'active')} />
+                    <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />                        
                 </div>
             );
         } else {
             return (
                 <div className="ponglink-actions">
-                    <p className="ponglink-archived" style={styles.archivedMessage}>This campaign is archived and cannot be activated again</p>
+                    <p id="ponglink-archived">This ponglink is archived and cannot be activated again</p>
                 </div>
             );
         }

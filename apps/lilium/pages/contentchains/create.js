@@ -1,6 +1,7 @@
 import { Component, h } from "preact";
 import { TextField, ButtonWorker } from '../../widgets/form';
 import { navigateTo } from "../../routing/link";
+import { dismissOverlay } from '../../overlay/overlaywrap';
 import API from "../../data/api";
 
 export class CreateContentChain extends Component {
@@ -28,7 +29,8 @@ export class CreateContentChain extends Component {
                 <h1>Create a new content chain</h1>
                 <TextField name='title' placeholder='Title' onChange={this.updateValues.bind(this)} />
                 <TextField name='subtitle' placeholder='Subtitle' onChange={this.updateValues.bind(this)} />
-                <ButtonWorker work={this.create.bind(this)} text='Create' />
+                <ButtonWorker work={this.create.bind(this)} text='Create' theme='purple' type='fill' />
+                <ButtonWorker work={() => { dismissOverlay(); }} sync={false} text='Cancel' theme='red' type='outline' />
             </div>
         );
     }

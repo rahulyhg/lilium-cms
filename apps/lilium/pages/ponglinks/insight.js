@@ -143,7 +143,7 @@ export default class PonglinkInsight extends Component {
             const { lineLabels, lineClicks } = this.buildDailyClicksDataSet();
             const { pieLabels, pieClicks } = this.buildClicksPerMediumDataSet();
             return (
-                <div id="insights">
+                <div id="ponglink-insights">
                     <div id="general-info" style={styles.generalInfo}>
                         <h2 style={styles.identifier}>{this.state.link.identifier}</h2>
                         {this.state.link.status} 
@@ -157,7 +157,7 @@ export default class PonglinkInsight extends Component {
                                 <tr>
                                     <th align='left' className='medium-header' style={styles.mediumHeader}>Medium</th>
                                     <th align='left'>Destination</th>
-                                    <th style={{maxWidth: '80px'}}>Copy</th>
+                                    <th className='copy-column'>Copy</th>
                                 </tr>
                             </thead>
                             <tbody>

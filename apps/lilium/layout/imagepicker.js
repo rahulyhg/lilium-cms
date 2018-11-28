@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { TextField, ButtonWorker } from '../widgets/form';
 import API from '../data/api';
 import { Picker } from './picker';
+import { castNotification } from './notifications';
 
 const styles = {
     bigtitle : {
@@ -43,7 +44,7 @@ class SelectedImage extends Component {
         }
     }
 
-    componentWillReceiveProps(props) {
+    componentWillReceiveProps(props) {        
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
         this.imgtag && this.imgtag.getAttribute('src') != this.makeSrc(props.image) && this.imgtag.removeAttribute('src');
         if (props.image) props.image.embedType = 'image';
@@ -54,6 +55,25 @@ class SelectedImage extends Component {
 
     makeSrc(image) {
         return image.sizes.content.url;
+    }
+
+    imageInfoChanged(name, val) {
+        const newState = this.state;
+        newState.selected[name]= val;
+        API.post('/media/updatecredit', { id: newState.selected._id, name: newState.selected.artistname, url: newState.selected.artisturl }, (err, data, r) => {
+            this.setState(newState);
+            if (r.status == 200) {
+                castNotification({
+                    type: 'success',
+                    title: 'Information updated'
+                });
+            } else {
+                castNotification({
+                    type: 'error',
+                    title: 'Error updating information'
+                })
+            }
+        });
     }
 
     render() {
@@ -70,8 +90,10 @@ class SelectedImage extends Component {
             <div>
                 <img ref={img => this.imgtag = img} src={this.makeSrc(this.state.selected)} class="image-picker-selected-full" />
                 <div style={styles.selectedFields}>
-                    <TextField style={styles.textboxes} name="uploadArtistName" initialValue={this.state.selected.artistname} placeholder="Artist name" />
-                    <TextField style={styles.textboxes} name="uploadArtistURL" initialValue={this.state.selected.artisturl} placeholder="Source URL" />
+                    <TextField style={styles.textboxes} name="artistname" initialValue={this.state.selected.artistname} placeholder="Artist name"
+                                onChange={this.imageInfoChanged.bind(this)} />
+                    <TextField style={styles.textboxes} name="artisturl" initialValue={this.state.selected.artisturl} placeholder="Source URL"
+                                onChange={this.imageInfoChanged.bind(this)} />
                     <div>
                         <b>Full URL : </b>
                         <a href={document.location.protocol + liliumcms.url + "/" + this.state.selected.fullurl} target="_blank">
@@ -161,12 +183,12 @@ export class ImagePicker extends Component {
         super(props);
         this.state = {
             images : [],
-            selected : undefined
+            selected : props.options.selected ? props.options.selected.image : undefined
         };
     }
 
     static tabTitle =  'Uploads';
-    static slug =  'uploads';
+    static slug =  'upload';
 
     componentDidMount(params, done) {
         log('ImagePicker', 'Displaying image picker singleton', 'detail');
@@ -219,8 +241,14 @@ export class ImagePicker extends Component {
         this.fetchLatest();
     }
 
-    imageClicked(selected, comp) {
-        log('ImagePicker', 'Image click event was caught by image picker', 'detail');
+    componentWillReceiveProps(props) {
+        if (props.selected && props.selected.image) {
+            this.imageSelected(props.selected.image);
+        }
+    }
+
+    imageSelected(selected, comp) {
+        log('ImagePicker', 'New image selected', 'detail');        
         this.setState({ selected });
     }
 
@@ -239,12 +267,14 @@ export class ImagePicker extends Component {
                         </div>
 
                         {
-                            this.state.images.map(x => (<ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
+                            this.state.images.map(x => (
+                                <ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageSelected.bind(this)} />
+                            ))
                         }
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { embedType: 'image', image: this.state.selected })} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { type: ImagePicker.slug, image: this.state.selected })} />       
                     </div>
                 </div>
             </div>
