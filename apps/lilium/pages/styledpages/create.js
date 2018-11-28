@@ -3,6 +3,7 @@ import { TextField, ButtonWorker } from '../../widgets/form';
 import { navigateTo } from "../../routing/link";
 import API from "../../data/api";
 import slugify from 'slugify';
+import { dismissOverlay } from '../../overlay/overlaywrap';
 
 export class CreateStyledPage extends Component {
     constructor(props) {
@@ -34,7 +35,8 @@ export class CreateStyledPage extends Component {
                 <h1>Create a new styled page</h1>
                 <TextField name='title' placeholder='Title' onChange={this.updateValues.bind(this)} />
 
-                <ButtonWorker work={this.create.bind(this)} text='Create' />
+                <ButtonWorker work={this.create.bind(this)} theme='purple' type='fill' text='Create' />
+                <ButtonWorker work={() => { dismissOverlay(); }} theme='red' type='outline' text='Create' />
             </div>
         );
     }

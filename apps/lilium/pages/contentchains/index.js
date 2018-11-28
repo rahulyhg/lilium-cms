@@ -3,7 +3,7 @@ import { CreateContentChain } from './create';
 import { ListContentChains } from './list';
 import { EditContentChain } from './edit';
 import { addAction } from '../../layout/lys'
-import { castOverlay, registerOverlay } from '../../overlay/overlaywrap';
+import { castOverlay, registerOverlay, dismissOverlay } from '../../overlay/overlaywrap';
 
 export default class ContentChains extends Component {
     constructor(props) {

@@ -3,6 +3,7 @@ import { TextField, ButtonWorker } from "../../widgets/form";
 import API from "../../data/api";
 import { castNotification } from "../../layout/notifications";
 import { navigateTo } from "../../routing/link";
+import { dismissOverlay } from '../../overlay/overlaywrap';
 
 class Version extends Component {
     constructor(props) {
@@ -83,7 +84,8 @@ export class CreatePonglink extends Component {
                 <TextField name='publicCampaignName' placeholder='Public campaign name' onChange={this.updateValues.bind(this)} />
                 <TextField name='publicSourceName' placeholder='Public Source name' onChange={this.updateValues.bind(this)} />
 
-                <ButtonWorker text='Create' work={this.save.bind(this)} />
+                <ButtonWorker text='Create' theme='purple' type='fill' work={this.save.bind(this)} />
+                <ButtonWorker text='Create' theme='red' type='outline' work={this.save.bind(this)} />
 
                 <h1>Ponglink versions</h1>
                 {

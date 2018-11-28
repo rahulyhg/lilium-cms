@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
@@ -130,7 +129,8 @@ class PublishingActions extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            post : props.post
+            post: props.post,
+            destroyModalVisible: false
         }
     }
 
@@ -195,6 +195,11 @@ class PublishingActions extends Component {
         }
 
         return { actions : acts, dropdownActions : dropacts };
+    }
+
+    destroyArticle(done) {
+        this.props.actions.destroy(done);
+        this.setState({ destroyModalVisible: false });
     }
 
     render() {
@@ -455,7 +460,7 @@ export default class EditView extends Component {
             preview : this.preview.bind(this),
             save : this.save.bind(this),
             submitForApproval : this.submitForApproval.bind(this),
-            destroy : this.destroy.bind(this),
+            destroy : () => this.setState({ destroyModalVisible : true }), 
             validate : this.validate.bind(this),
             triggerAuthorChange : this.triggerAuthorChange.bind(this),
             triggerSlugChange : this.triggerSlugChange.bind(this),
@@ -963,6 +968,13 @@ export default class EditView extends Component {
                     } />
                     <ButtonWorker text='Update' work={this.updateAuthor.bind(this)} />
                 </Modal>
+
+                <Modal title='Destroy this article?' visible={this.state.destroyModalVisible} onClose={() => { this.setState({ destroyModalVisible: false }) }}>
+                    <p>Are you sure you want to <b>destroy</b> this article permanently?</p>
+                    <ButtonWorker theme="red"  type="fill" text="Yes, destroy" work={this.destroy.bind(this)} />
+                    <ButtonWorker theme="blue"  type="outline" text="No, I want to keep it" sync={true} work={() => { this.setState({ destroyModalVisible: false }) }} />
+                </Modal>
+
             </div>
         )
     }

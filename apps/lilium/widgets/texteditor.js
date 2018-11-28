@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import API from '../data/api';
 import { Picker } from '../layout/picker';
+import { ImagePicker } from '../layout/imagepicker';
 
 export class TextEditor extends Component {
     constructor(props) {

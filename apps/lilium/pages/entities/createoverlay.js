@@ -91,8 +91,8 @@ export class CreateEntity extends Component {
                         <MultiSelectBox onChange={this.fieldChanged.bind(this)} placeholder="Network access" name="sites" options={this.state.sites} />
                         <MultiSelectBox onChange={this.fieldChanged.bind(this)} placeholder="Roles" name="roles" options={this.state.roles} />
         
-                        <ButtonWorker text='Cancel' sync={true} work={this.dismiss.bind(this)} />
-                        <ButtonWorker text='Invite' theme="blue" type="fill" work={this.sendinvitation.bind(this)} />
+                        <ButtonWorker text='Invite' theme="purple" type="fill" work={this.sendinvitation.bind(this)} />
+                        <ButtonWorker text='Cancel' theme='red' type='outline' sync={true} work={this.dismiss.bind(this)} />
                     </div>
                 )}
             </div>

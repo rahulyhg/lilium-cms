@@ -45,6 +45,12 @@ export class TabView extends Component {
         storeLocal(TabView.TAB_VIEW_PREFIX + this.props.id, index);
     }
 
+    componentWillReceiveProps(props) {
+        if (typeof props.selectedIndex == 'number') {
+            this.setState({ selectedIndex: props.selectedIndex });
+        }
+    }
+
     render() {
         return (
             <div className="tabview">
