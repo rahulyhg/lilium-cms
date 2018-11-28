@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import API from '../data/api';
 import { Picker } from '../layout/picker';
 import { ImagePicker } from '../layout/imagepicker';
+import { PlacePicker } from '../layout/placepicker';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -37,6 +38,11 @@ export class TextEditor extends Component {
 
         node.dataset.id = embed[embed.type]._id;
         node.dataset.type = embed.type;
+        if (embed.type == ImagePicker.slug) {
+            node.dataset.thumbnail = embed[ImagePicker.slug].sizes.square.url;
+        } else if (embed.type == PlacePicker.slug) {
+            node.dataset.placename = embed[PlacePicker.slug].displayname;
+        }
 
         return node;
     }
@@ -66,7 +72,23 @@ export class TextEditor extends Component {
                     icon: 'fa fa-images',
                     tooltip: 'Insert Carousel',
                     onclick: () => {
-                        const session =  new Picker.Session({ type: 'carousel' });
+                        const oldNode = editor.selection.getNode();
+
+                        const selectedItems = Array.from(
+                            editor.selection.getNode().querySelectorAll(".lml-placeholder")
+                        ).map(x => ({ 
+                            type : x.dataset.type, 
+                            [ImagePicker.slug] : { _id : x.dataset.id, sizes : { square : { url : x.dataset.thumbnail } } },
+                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.displayname }
+                        }))
+
+                        const session = new Picker.Session({ type: 'carousel' });
+
+                        if (selectedItems.length != 0) {
+                            session.carouselElements = selectedItems;
+                            session.replaceOld = true;
+                        }
+
                         Picker.cast(session, carousel => {
                             log('TextEditor', "Picker callback received carousel: ", carousel, 'info');
                             const carouselPlaceholder = document.createElement('div');
@@ -84,7 +106,17 @@ export class TextEditor extends Component {
                             
                             carouselPlaceholder.setAttribute('contenteditable', false);
                             carouselPlaceholder.appendChild(carouselElement)
-                            editor.insertContent(carouselPlaceholder.outerHTML);
+                            if (session.replaceOld) {
+                                console.log(oldNode);
+                                oldNode.parentElement.insertBefore(
+                                    carouselPlaceholder, oldNode
+                                );
+
+                                oldNode.remove();
+                                editor.insertContent(" ");
+                            } else {
+                                editor.insertContent(carouselPlaceholder.outerHTML);
+                            }
                         });
                     }
                 });
