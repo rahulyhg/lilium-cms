@@ -98,3 +98,46 @@ header {
 #lilium-logo.spin {
     animation: anim 2s infinite 0s ease-in-out;
 }
+
+.header-dropdown {
+    
+}
+
+.header-bar-avatar-wrapper {
+    position: relative;
+
+    .header-dropdown {
+        position: absolute;
+        right: 20px;
+        top: @headerHeight + 10px;
+        background-color: @whiteish;
+        padding: 8px;
+        box-shadow: @softshadow;
+        border-radius: 4px;
+        width: 180px;
+
+        .block-link {
+            margin: 0px 2px;
+            padding: 4px 6px;
+            border-radius: 4px;
+
+            &:hover {
+                background: @lesswhiteish;
+            }
+
+            .red {
+                color: @red;
+            }   
+        }
+
+        .pointer {
+            background: @whiteish;
+            position: absolute;
+            right: 10px;
+            top: -5px;
+            width: 10px;
+            height: 10px;
+            transform: rotateZ(45deg);
+        }
+    }
+}

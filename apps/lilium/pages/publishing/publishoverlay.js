@@ -99,6 +99,10 @@ class PublishedReportDetails extends Component {
                         <div>Full URL : <a href={this.props.report.url} target="_blank">{this.props.report.url}</a></div>
                     </div>
                 </div>
+                <div class="card full publishing-overlay-dismiss" onClick={this.props.onDismiss.bind(this)}>
+                    <i class="far fa-chevron-left" style={{ marginRight: 20 }}></i>
+                    <span>Dismiss</span>
+                </div>
             </div>
         ) : null;
     }
@@ -281,7 +285,7 @@ export class PublishingOverlay extends Component {
                             {ARTICLE_PUBLISHED_TITLE.split('').map(letter => (<span class={letter == " " ? "space" : "letter"}>{letter}</span>))}
                         </b>
                         <PublishedReportSlider posts={this.state.report.lastpublished} />
-                        <PublishedReportDetails report={this.state.report} />
+                        <PublishedReportDetails report={this.state.report} onDismiss={this.dismiss.bind(this)} />
                     </div>
 
                 </div>) : null }

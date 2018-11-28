@@ -13,11 +13,20 @@ class HeaderUserDropdown extends Component {
         this.state = {
             session : props.session
         } 
+
+        this.maybeClose_bound = this.maybeClose.bind(this);
     }
 
     componentDidMount() {
-
+        document.addEventListener('navigate', this.close.bind(this));
     }
+
+    maybeClose(ev) {
+        !this.el.contains(ev.target) && this.el != ev.target && this.close();
+    }
+
+    open()   { this.setState({ open : true }); document.addEventListener('click', this.maybeClose_bound); }
+    close()  { this.setState({ open : false }); document.removeEventListener('click', this.maybeClose_bound); }
 
     componentWillReceiveProps(props) {
         props.session && this.setState({ session : props.session });
@@ -30,10 +39,27 @@ class HeaderUserDropdown extends Component {
 
         log('HeaderUser', 'User dropdown was rerendered', 'detail');
         return (
-            <div class="header-bar-avatar-wrapper">
-                <Link href="/me" display="block">
+            <div class="header-bar-avatar-wrapper" ref={x => (this.el = x)}>
+                <div onClick={this.open.bind(this)}>
                     <img src={liliumcms.session.avatarURL} class="header-bar-avatar" />
-                </Link>
+                </div>
+
+                { this.state.open ? (
+                    <div class="header-dropdown">
+                        <div class="pointer"></div>
+                        <Link href="/me" display="block">
+                            Profile
+                        </Link>
+                        <Link href="/me#password" display="block">
+                            Change password
+                        </Link>
+                        <Link href="/logout" display="block">
+                            <span class="red">
+                                Log out
+                            </span>
+                        </Link>
+                    </div>
+                ) : null }
             </div>
         )
     }
