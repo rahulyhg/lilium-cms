@@ -4,6 +4,7 @@ import slugify from "slugify";
 import API from '../data/api';
 import { Spinner } from '../layout/loading'
 import { Picker } from '../layout/picker';
+import { ImagePicker } from '../layout/imagepicker';
 import { castNotification } from '../layout/notifications';
 
 class FormField extends Component {
@@ -414,10 +415,11 @@ export class MediaPickerField extends FormField {
     }
 
     open() {
-        Picker.cast({
-            accept : ["uploads"],
+        Picker.cast(new Picker.Session({
+            accept : [ImagePicker.slug],
+            id : this.props.name,
             selected : this.state.mediaID || undefined
-        }, res => {
+        }), res => {
             if (res && res.image) {
                 const image = res.image;
                 this.changed(image, this.state.mediaURL);

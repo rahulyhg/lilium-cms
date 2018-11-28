@@ -1,0 +1,42 @@
+.lml-carousel-placeholder {
+    min-height: 240px;
+    width: 100%;
+    border: 5px dashed #DDD;
+    position: relative;
+}
+
+.lml-carousel-placeholder:before {
+    position: absolute;
+    top: 90px;
+    display: block;
+    text-align: center;
+    content: 'Carousel placeholder';
+    font-size: 48px;
+    font-family: Helvetica, sans-serif;
+    color: #CCC;
+    width: 100%;
+}
+
+.lml-adplaceholder, ad {
+    display: block;
+    border: 5px dashed #ddd;
+    padding: 50px 0;
+    text-align: center;
+    font-size: 48px;
+    color: #ddd;
+    font-weight: 300;
+    font-family: "Open Sans",sans-serif;
+    line-height: 28px;
+    margin-bottom: 10px;
+}
+
+.lml-adplaceholder:before, ad:before {
+    content: "Advertising";
+    display: block;
+}
+
+.lml-adplaceholder:after, ad:after {
+    content: "There will be an advertisement here. This can be moved from the source code.";
+    font-size: 14px;
+    font-weight: bold;
+}

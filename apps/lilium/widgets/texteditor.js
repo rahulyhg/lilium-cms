@@ -88,6 +88,7 @@ export class TextEditor extends Component {
                                 });
                             }
                             
+                            carouselPlaceholder.setAttribute('contenteditable', false);
                             carouselPlaceholder.appendChild(carouselElement)
                             editor.insertContent(carouselPlaceholder.outerHTML);
                         });
@@ -101,6 +102,7 @@ export class TextEditor extends Component {
             ],
             toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-element insert-carousel insertEmbed link unlink | bullist numlist | fullscreen | code',
             content_css: [
+                '/static/tinymcedefault.css',
                 '/compiled/theme/tinymce.css'
             ],
         }).then(editors => {
