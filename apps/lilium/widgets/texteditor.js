@@ -30,20 +30,13 @@ export class TextEditor extends Component {
      * @param {object} embed The embed object to serialize as markup
      */
     static embedToMarkup(embed) {
+        console.log(embed);
         const node = document.createElement('div');
-        node.className = 'lml-placeholder';
-        node.innerText = '';
+        node.className = 'lml-placeholder ' + embed.type;
+        node.innerText = "";
 
-        switch (embed.embedType) {
-            case 'image':
-                node.classList.add('image');
-                node.dataset.placeId = embed.image._id;
-                break;
-            case 'place':
-                node.classList.add('place');
-                node.dataset.placeId = embed.place._id;
-                break;
-        }
+        node.dataset.id = embed[embed.type]._id;
+        node.dataset.type = embed.type;
 
         return node;
     }

@@ -418,7 +418,11 @@ export class MediaPickerField extends FormField {
         Picker.cast(new Picker.Session({
             accept : [ImagePicker.slug],
             id : this.props.name,
-            selected : this.state.mediaID || undefined
+            options : {
+                [ImagePicker.slug] : {
+                    selected : this.state.mediaID || undefined
+                }
+            }
         }), res => {
             if (res && res.image) {
                 const image = res.image;

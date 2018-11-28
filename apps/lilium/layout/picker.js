@@ -251,7 +251,7 @@ const CarouselElement = props => (
     <div className="carousel-element-preview-card" onClick={props.onClick.bind(this)}>
         <i className="remove-carousel-element fa fa-times" onClick={e => { e.stopPropagation(); props.removeCarouselElement(props.index); }}></i>
         {
-            <props.PreviewComponent el={props.element.image || props.element.place} />
+            <props.PreviewComponent el={props.element[props.element.type]} />
         }
     </div>
 )

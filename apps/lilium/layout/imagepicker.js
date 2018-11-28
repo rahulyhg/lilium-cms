@@ -47,7 +47,11 @@ class SelectedImage extends Component {
     componentWillReceiveProps(props) {        
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
         this.imgtag && this.imgtag.getAttribute('src') != this.makeSrc(props.image) && this.imgtag.removeAttribute('src');
-        if (props.image) props.image.embedType = 'image';
+
+        if (props.image) {
+            props.image.embedType = 'image';
+        }
+
         this.setState({
             selected: props.image
         })
@@ -183,32 +187,30 @@ export class ImagePicker extends Component {
         super(props);
         this.state = {
             images : [],
-            selected : props.options.selected ? props.options.selected.image : undefined
+            selectedid : props.options.selected
         };
     }
 
     static tabTitle =  'Uploads';
     static slug =  'upload';
 
-    componentDidMount(params, done) {
+    componentDidMount() {
         log('ImagePicker', 'Displaying image picker singleton', 'detail');
-        const initState = { params, visible : true, selected : undefined, callback : done };
-        if (params && params.selected) {
-            initState.loading = true;
-            this.setState(initState);
+        const initState = { visible : true, selected : undefined };
+        this.fetchLatest(allImages => {
+            initState.images = allImages;
 
-            this.fetchLatest(allImages => {
-                API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
+            if (this.state.selectedid) {
+                API.get("/uploads/single/" + this.state.selectedid, {}, (err, upload) => {
                     allImages.unshift(upload);
-                    initState.images = allImages;
                     initState.selected = upload;
 
                     this.setState(initState);
                 });
-            });
-        } else {
-            this.setState(initState);
-        }
+            } else {
+                this.setState(initState);
+            }
+        });
     }
 
     castUpload() {
@@ -226,8 +228,6 @@ export class ImagePicker extends Component {
 
             log('ImagePicker', 'Prepared ' + ffs.length + ' files for upload', 'detail');
             this.setState({ images });
-        } else {
-            // NoOP
         }
     }
 
@@ -235,10 +235,6 @@ export class ImagePicker extends Component {
         API.get('/uploads', { limit : 100, skip : 0 }, (err, uploads) => {
             sendback ? sendback(uploads) : this.setState({ images : uploads });
         })
-    }
-
-    componentDidMount() {
-        this.fetchLatest();
     }
 
     componentWillReceiveProps(props) {
@@ -274,7 +270,7 @@ export class ImagePicker extends Component {
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { type: ImagePicker.slug, image: this.state.selected })} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker, { type: ImagePicker.slug, [ImagePicker.slug] : this.state.selected })} />       
                     </div>
                 </div>
             </div>
