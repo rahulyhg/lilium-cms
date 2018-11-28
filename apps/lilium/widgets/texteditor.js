@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import API from '../data/api';
 import { Picker } from '../layout/picker';
+import { ImagePicker } from '../layout/imagepicker';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -72,7 +73,7 @@ export class TextEditor extends Component {
                     icon: 'fa fa-images',
                     tooltip: 'Insert Carousel',
                     onclick: () => {
-                        const session =  new Picker.Session({ type: 'carousel' });
+                        const session = new Picker.PickerSession({ type: 'carousel' });
                         Picker.cast(session, carousel => {
                             log('TextEditor', "Picker callback received carousel: ", carousel, 'info');
                             const carouselPlaceholder = document.createElement('div');
