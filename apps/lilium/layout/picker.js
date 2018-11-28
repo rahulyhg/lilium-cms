@@ -155,7 +155,10 @@ export class Picker extends Component {
     carouselElementClicked(element) {
         console.log('clicked element: ', element);
         if (AVAILABLE_PICKER_TABS.includes(element.type)) {
-            this.setState({ tab: element.type });
+            const newState = {...this.state};
+            newState.tab = element.type;
+            this.state.session.options[element.type].selected = element;
+            this.setState(newState);
         }
     }
 

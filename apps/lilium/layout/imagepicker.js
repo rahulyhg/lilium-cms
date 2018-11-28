@@ -43,7 +43,7 @@ class SelectedImage extends Component {
         }
     }
 
-    componentWillReceiveProps(props) {
+    componentWillReceiveProps(props) {        
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
         this.imgtag && this.imgtag.getAttribute('src') != this.makeSrc(props.image) && this.imgtag.removeAttribute('src');
         if (props.image) props.image.embedType = 'image';
@@ -217,6 +217,11 @@ export class ImagePicker extends Component {
 
     componentDidMount() {
         this.fetchLatest();
+    }
+
+    componentWillReceiveProps(props) {
+        console.log('ImagePicker recieved props: ', props);
+
     }
 
     imageClicked(selected, comp) {
