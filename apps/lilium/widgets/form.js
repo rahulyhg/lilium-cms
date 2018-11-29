@@ -305,7 +305,7 @@ export class StackBox extends FormField {
                         ))
                     }
                 </div>
-                <div>
+                <div class="stackbox-input-add">
                     <TextField onKeyPress={this.handleInputBoxKeyPress.bind(this)} placeholderType="inside" placeholder="Provide a value and press Enter" />
                 </div>
             </div>
@@ -336,17 +336,12 @@ StackBox.StackField = class StackField extends Component {
 
     render() {
         return (
-            <div style={{ display : "flex" }}>
-                <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
-                {
-                    (this.props.index != 0) ? (
-                        <div onClick={this.moveUp.bind(this)} class="stackboxex"><i className="fal fa-chevron-up"></i></div>) : ( null )
-                }
-                {
-                    (!this.props.lastInList) ? (
-                        <div onClick={this.moveDown.bind(this)} class="stackboxex"><i className="fal fa-chevron-down"></i></div>) : ( null )
-                }
+            <div class="stackbox-entry">
                 <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+
+                <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
+                <div onClick={this.moveUp.bind(this)} class={"stackbox-up " + (this.props.index == 0 ? "disabled" : "")}><i className="far fa-chevron-up"></i></div>
+                <div onClick={this.moveDown.bind(this)} class={"stackbox-down " + (this.props.lastInList ? "disabled" : "")}><i className="far fa-chevron-down"></i></div>
             </div>
         )
     }

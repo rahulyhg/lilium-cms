@@ -36,13 +36,11 @@ export default class AdsManagement extends Component {
             this.setState({ adSets });
             
             API.post('/ads/' + id, {ads: adSets[adSetIndex].ads}, (err, data, r) => {
-                if (r.status == 200) {
+                if (!r.status == 200) {
                     castNotification({
-                        title: 'Modifications to the ad set saved'
-                    })
-                } else {
-                    castNotification({
-                        title: 'Could not save ad sets to the server'
+                        title : "Error",
+                        message : `[${r.status}] Could not save ad sets to the server`,
+                        type : 'error'
                     })
                 }
             });
