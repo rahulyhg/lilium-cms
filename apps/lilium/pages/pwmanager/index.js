@@ -27,8 +27,8 @@ class Password extends Component {
         } else {
             castNotification({
                 title: "Your browser is unable to generate a secure password",
-                message: `Your browser doesn't seem to support the features necessary to generate a secure ranodm password.
-                        It's advised that you use an external yet secure random string generator`
+                message: `Your browser doesn't seem to support the features necessary to generate a secure ranodm password.  It's advised that you use an external yet secure random string generator`,
+                type : 'info'
             });
         }
 
@@ -40,11 +40,15 @@ class Password extends Component {
         API.put('/pwmanager/passwords/' + this.props.id, this.values, (err, data, r) => {
             if (r.status == 200) {
                 castNotification({
-                    title: 'Password updated'
+                    title: 'Password updated',
+                    message : "The password has been encrypted safely.",
+                    type : 'success'
                 })
             } else {
                 castNotification({
-                    title: 'Error updating the password'
+                    title: 'Password not updated',
+                    message : "The password could not be saved.",
+                    type : 'error'
                 })
             }
         });
@@ -145,11 +149,16 @@ class Category extends Component {
                 }
 
                 <div class="detail-head">
-                    <h1 classNema='big-title'>{this.props.name}</h1>
-                    <h2 classNema='category-right' title={`This category is only visible by people who have the '${this.props.right}' right`}>Right</h2>
-                        <EditableText initialValue={this.props.right} onChange={this.updateValue.bind(this)} />
+                    <div class="bubble-wrap">
+                        <b className='big'><span>{this.props.name}</span></b>
+                        <span class="bubble">
+                            <EditableText initialValue={this.props.right} onChange={this.updateValue.bind(this)} />
+                        </span>
+                    </div>
+                </div>
+                <div class="detail-list">
                     {
-                        this.state.passwords.length ? (<h2>Passwords</h2>) : (<h3>There are no passwords in this category</h3>)
+                        this.state.passwords.length ? null : (<center>There are no passwords in this category</center>)
                     }
                     {
                         this.state.passwords.map(password => (
@@ -158,8 +167,8 @@ class Category extends Component {
                     }
                 </div>
                 <footer>
-                    <span onClick={() => {this.setState({ createPasswordModalVisible: true })}}><i className="fal fa-plus"></i> Create a new password</span>
-                    <span className='red' onClick={this.props.removeCategory.bind(this, this.props._id)}><i className="fal fa-trash"></i> Remove Category</span>
+                    <span className="clickable" onClick={() => {this.setState({ createPasswordModalVisible: true })}}><i className="fal fa-plus"></i> Create a new password</span>
+                    <span className='clickable red' onClick={this.props.removeCategory.bind(this, this.props._id)}><i className="fal fa-trash"></i> Remove Category</span>
                 </footer>
             </div>
         );
@@ -237,7 +246,7 @@ export default class PwManager extends Component {
     render() {
         log('PwManager', 'Rendering PwManager pane with ' + this.props.levels.length + ' levels', 'detail');
         return (
-            <div id="pw-manager" style={{ width: '800px', margin: 'auto' }}>
+            <div id="pw-manager">
                 <Modal visible={this.state.createCategoryModalVisible} title='Create a new password category' onClose={() => {  this.setState({ createCategoryModalVisible: false })}}>
                     <TextField name='name' placeholder='Name' onChange={(name, val) => { this.createCategoriesValues[name] = val; }} />
                     <TextField name='right' placeholder='Right necessary to access this category'
@@ -245,14 +254,21 @@ export default class PwManager extends Component {
                     <ButtonWorker text='Create' work={this.createCategory.bind(this)} theme='purple' type='fill' />
                 </Modal>
 
-                <h1>Password Manager</h1>
+                <div class="leader-title">
+                    <div class="leader-title-responsive">
+                        <h1>Password Manager</h1>
+                        <p>A centralized password bank with controlled access, grouping, and dynamic encryption.</p>
+                        <div className="button purple fill" onClick={() => { this.setState({ createCategoryModalVisible: true }) }}>
+                            <span>Create a new category</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="leader-content classic">
                 {
                     this.state.categories.map(category => (
                         <Category {...category} removeCategory={this.removeCategory.bind(this)} />
                     ))
                 }
-                <div className="button purple fill" onClick={() => { this.setState({ createCategoryModalVisible: true }) }}>
-                    <span>Create a new category</span>
                 </div>
             </div>
         )

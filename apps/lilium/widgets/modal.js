@@ -21,7 +21,7 @@ export default class Modal extends Component {
 
     show() {
         this.setState({ visible: true }, () => {
-            this.bodyEl && setTimeout(() => this.bodyEl.classList.add("shown"), 200);
+            this.bodyEl && setTimeout(() => this.bodyEl && this.bodyEl.classList.add("shown"), 200);
         });
     }
 
