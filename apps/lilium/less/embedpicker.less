@@ -1,0 +1,87 @@
+#embed-picker {
+    display: flex;
+    flex-wrap : wrap;
+
+    .embed-single {
+        width: 250px;
+        background: @whiteish;
+        box-shadow: @softshadow; 
+        min-height: 250px;
+        max-height: 400px;
+        margin-bottom: 10px;
+        cursor: pointer;
+
+        &.embed-add {
+            height: 400px;
+            font-size: 26px;
+            color: @grayish;
+            text-align: center;
+
+            padding-top: 140px;
+            box-sizing: border-box;
+
+            i {
+                font-size: 48px;
+                display: block;
+            }
+
+            &:hover {
+                background: @green;
+                color: @whiteish;
+            }
+        }
+    }
+
+    .instagram-preview {
+        position: relative;
+
+        .instagram-preview-image {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            max-height: 200px;
+        }
+
+        i {
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            right: 10px;
+            text-shadow: 0px 0px 2px @blackish;
+            color: @whiteish;
+            font-size: 32px;
+        }
+
+        .instagram-preview-credit {
+            padding: 10px;
+        }
+
+        p {
+            font-size: 14px;
+        }
+    }
+
+    .twitter-preview {
+        .fa-twitter {
+            font-size: 32px;
+            color : #38A1F3;
+        }
+
+        .twitter-tweet {
+            margin: 0px;
+            padding: 10px;
+
+            p {
+                margin: 0px;
+                padding: 0px;
+                font-size: 14px;
+            }
+
+            &>a {
+                text-decoration: none;
+                color: @grayish;
+                font-size: 12px;
+            }
+        }
+    }
+}
