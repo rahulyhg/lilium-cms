@@ -25,14 +25,14 @@ module.exports = cli => {
                 <div id="app"></div>
 
                 <script>
-                    window.liliumcms = {
-                        env : "${cli._c.env}",
-                        uid : "${cli._c.uid}",
-                        url : "${origin}",
-                        domain : "${cli._c.server.url.substring(2)}",
-                        sitename : "${cli._c.website.sitetitle}",
-                        fulldevenv : ${!!fulldevenv}
-                    };
+                    window.liliumcms = ${JSON.stringify({
+                        env : cli._c.env,
+                        uid : cli._c.uid,
+                        url : origin,
+                        domain : cli._c.server.url.substring(2),
+                        sitename : cli._c.website.sitetitle,
+                        fulldevenv : !!fulldevenv
+                    })};
                 </script>
                 
                 <script src="${origin}/tinymce/tinymce.js"></script>

@@ -1,56 +1,133 @@
-#profile-header {
-    display: block;
-    text-align: center;
-
-    padding-top: 20px;
-    color: @blackish;
-}
-
-#profile-picture-wrapper {
-    margin: auto;
-}
-
-#me-badge-wrapper {
-    text-align: center;
-}
-
 #profile {
-    max-width: 780px;
-    margin: auto;
-}
+    .me-card {
+        width: calc(100% - 80px);
+        max-width: 980px;
+        margin: auto;
 
-#me-badge-wrapper {
-    margin: 20px auto;
-}
-
-#profile-picture {
-    width: 250px;
-    height: 250px;
-    object-fit: cover;
-    border: 6px solid lighten(@liliumPurple, 10%);
-    border-radius: 50%;
-    background: @blackish;
-    overflow: hidden;
-    cursor: pointer;
-    
-    &:hover {
-        border-color: darken(@liliumPurple, 5%);
+        background: @whiteish;
+        margin-top: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0px 0px 30px rgba(0,0,0,0.2);
     }
-}
 
-#profile-info-wrapper {
-    text-align: left;
+    .me-header {
+        height: 140px;
+        background: @whiteish;
+        box-shadow: 0px 0px 60px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+        display: flex;
+
+        .me-header-split {
+            width: 50%;
+            box-sizing: border-box;
+
+            &:first-child {
+                border-right: 1px solid @grayBorderColor;
+            }
+
+            &:last-child {
+                overflow-x : auto;
+                overflow-y : hidden;
+            }
+        }
+
+        .me-avatar {
+            margin: 40px;
+            border-radius: 8px;
+            height: 200px;
+            width: 200px;
+            display: inline-block;
+            vertical-align: top;
+            cursor: pointer;
+        }
+
+        .me-header-text {
+            display: inline-block;
+            vertical-align: top;
+            margin-top: 40px;
+        }   
+
+        .me-header-badges {
+            padding-left: 18px;
+        }
+
+        .me-header-badges-title {
+            margin: 15px;
+            text-transform: uppercase;
+            color: @grayish;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+    }
+
+    .me-body {
+        display: flex;
+
+        .me-switcher {
+            width: 200px;
+            flex: 0 0 200px;
+            margin: 140px 40px 0px 40px;
+
+            .me-switcher-menu {
+                padding: 20px 0px;
+                border-top: 2px solid @grayBorderColor;
+                border-bottom: 2px solid @grayBorderColor;
+
+                div {
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                    position: relative;
+                    cursor: pointer;
+
+                    &.selected {
+                        background: @lesswhiteish;
+                    }
+                }
+            }
+        }
+
+        .me-panel {
+            padding: 60px 60px 60px 20px;
+            flex-grow: 1;
+        }
+    }
+
+    ol li {
+        margin-bottom: 12px;
+    }
+
+    .c2fa-flex {
+        display: flex;
+
+        &>ol {
+            width: 70%;
+        }
+
+        &>figure{
+            img {
+                border: 1px solid @grayBorderColor;
+            }
+        }
+    }
+
 }
 
 .me-decoration {
     display: inline-block;
     vertical-align: top;
     position: relative;
-    margin: 0px 3px;
+    margin: 0px 10px 0 0;
 
     .badge-image {
         height: 70px;
         width: auto;
+    }
+
+    svg {
+        path {
+            fill : lighten(@blue, 10%);
+        }
     }
 
     .fa {
@@ -60,11 +137,17 @@
         left: 0;
         right: 0;
         top: 23px;
-        color: @whiteish;
+        color: lighten(@blue, 30%);
+        font-size: 20px;
+        z-index: 2;
+    }
 
-        &.level-7, &.level-6 {
-            top: 27px;
-        }
+    &.level-7 svg, &.level-6 svg {
+        filter: drop-shadow(lighten(@blue, 10%) 0px 0px 10px);
+    }
+
+    &.level-5 svg, &.level-4 svg {
+        filter: drop-shadow(lighten(@blue, 5%) 0px 0px 10px);
     }
 }
 
