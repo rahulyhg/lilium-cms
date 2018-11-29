@@ -1,8 +1,14 @@
 const _c = require('./config');
 const qrcode = require('qrcode');
-const otplib = require('otplib');
 const base32Encode = require('base32-encode');
 const db = require('./includes/db.js');
+const otplib = require('otplib');
+
+otplib.authenticator.options = {
+    // THe window option controls the number of tokens before and after the current token
+    // that should be considered valid
+    window: 1
+};
 
 class twoFactor {
 
