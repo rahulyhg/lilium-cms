@@ -59,7 +59,7 @@ export class OverlayWrap extends Component {
 
         return (
             <div id="fullscreen-overlay">
-                <OverlaySlides options={this.state.options} extra={this.state.extra} component={this.state.component} />
+                <OverlaySlides options={this.state.options || {}} extra={this.state.extra} component={this.state.component} />
             </div>
         )
     }

@@ -27,7 +27,7 @@ export default class Ponglinks extends Component {
             }
         });
 
-        ('create-ponglink', CreatePonglink, { title: 'Create a new ponglink campaign' });
+        registerOverlay('create-ponglink', CreatePonglink, { title: 'New ponglink campaign' });
     }
 
     render() {

@@ -6,8 +6,8 @@ export function Version(props) {
     return (       
         <tr>
             <td title={props.medium}>{props.medium}</td>
-            <td><a href={props.dest} target='_blank'>{props.dest}</a></td>
-            <td className='copy-column'><i className="fal fa-copy" onClick={copy.bind(this, props.dest)}></i></td>
+            <td><a href={props.redir} target='_blank'>{props.dest}</a></td>
+            <td className='copy-column'><i className="fal fa-copy" onClick={copy.bind(this, `${liliumcms.url}/pong/${props.campaignhash}/${props.hash}`)}></i></td>
         </tr>
     )
 };
@@ -25,10 +25,10 @@ const ActionArchive = props => (
     <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Archive (cannot be undone)' theme='red' type='outline' />
 )
 const ActionPause = props => (
-    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Pause' theme='blue' type='outline' />
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Pause' theme='white' type='outline' />
 )
 const ActionResume = props => (
-    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Resume' theme='purple' type='fill' />
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Resume' theme='blue' type='fill' />
 )
 
 export class PonglinkActions extends Component {

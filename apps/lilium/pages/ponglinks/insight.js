@@ -163,9 +163,10 @@ export default class PonglinkInsight extends Component {
                             <tbody>
                                 {
                                     this.state.link.versions.map(version => {
+                                        const questPos = version.destination.indexOf('?');
                                         return (
-                                            <Version medium={version.medium} dest={`https://www.narcity.com/pong/${this.state.link.hash}/${version.hash}`} />
-                                        );
+                                            <Version medium={version.medium} redir={version.destination} dest={version.destination.substring(0, questPos == -1 ? vestion.destination.length : questPos)} campaignhash={this.state.link.hash} hash={version.hash} />
+                                        )
                                     })
                                 }
                             </tbody>

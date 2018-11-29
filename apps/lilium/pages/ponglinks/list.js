@@ -67,8 +67,9 @@ class Ponglink extends Component {
                     <tbody>
                         {
                             this.state.versions.map(version => {
+                                const questPos = version.destination.indexOf('?');
                                 return (
-                                    <Version medium={version.medium} redir={version.destination} dest={`https://www.narcity.com/pong/${this.state.hash}/${version.hash}`} />
+                                    <Version medium={version.medium} redir={version.destination} dest={version.destination.substring(0, questPos == -1 ? vestion.destination.length : questPos)} hash={version.hash} campaignhash={this.state.hash} />
                                 );
                             })
                         }
