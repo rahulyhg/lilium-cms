@@ -71,7 +71,7 @@ export class Picker extends Component {
             const tabs = session.accept.map(x => PickerMap[x]);
             if (!session.options) session.options = {};
             _singleton.changeState({ session: session, visible: true, tabs, callback: done });
-            window.addEventListener('keydown', _singleton.keydown_bound);
+            document.addEventListener('keydown', _singleton.keydown_bound);
         } else {
             log('Picker', 'Cannot cast Picker without a Session object', 'error');
         }
@@ -84,7 +84,7 @@ export class Picker extends Component {
     static dismiss() {
         log('Picker', 'Dismissing picker singleton', 'detail');
         _singleton.setState({ visible : false });
-        window.removeEventListener('keydown', _singleton.keydown_bound);
+        document.removeEventListener('keydown', _singleton.keydown_bound);
 
         // _singleton.state.callback && _singleton.state.callback(_singleton.state.selectedElement);
     }
@@ -145,7 +145,7 @@ export class Picker extends Component {
 
     keydown(ev) {
         ev.keyCode == "27" && Picker.dismiss();
-        ev.keyCode == "13" && Picker.finish();
+        // ev.keyCode == "13" && Picker.finish();
     }
 
     carouselElementClicked(element) {
