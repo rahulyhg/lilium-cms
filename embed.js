@@ -9,21 +9,48 @@ class EmbedController {
         const network = levels[1];
 
         if (action == "single") {
-            cli.throwHTTP(503, 'Method not implemented', true);
+            db.findUnique(cli._c, 'embeds', { _id : db.mongoID(network) }, (err, embed) => {
+                sendback({ embed });
+            });
         } else if (action == "fetch") {
-            this.fetch(network, params.url, (err, embed) => {
-                sendback({ err, embed });
+            this.fetch(db.mongoID(cli.userinfo.userid), network, params.url, (err, embed) => {
+                if (embed) {
+                    db.insert(cli._c, 'embeds', embed, () => {
+                        sendback({ embed });
+                    });
+                } else {
+                    sendback({ err, embed });
+                }
+            });
+        } else if (action == "bunch") {
+            const $match = { };
+
+            if (params.filters.type)   { $match.type = params.type; }
+            if (params.filters.search) { $match.originalurl = new RegExp(params.filters.search, 'i'); }
+
+            const $limit = 50;
+            const $skip = $limit * ( params.filters.skip ? parseInt(params.filters.skip) : 0 );
+
+            db.join(cli._c, 'embeds', [
+                { $match },
+                { $skip },
+                { $limit },
+                { $project : { html : 0 } }
+            ], items => {
+                sendback({ items });
             });
         } else {
             cli.throwHTTP(404, 'Undefined action ' + action, true);
         }
     }
 
-    fetch(network, url, done) {
+    fetch(userid, network, url, done) {
         if (network == "instagram" || network == "igcarousel") {
             request.get({ json : true, url : "https://api.instagram.com/oembed/?url=" + url }, (err, r, data) => {
                 if (r.status == 200 && data && data.thumbnail_url) {
                     done(undefined, {
+                        userid,
+                        at : Date.now(),
                         originalurl : url,
                         imageurl : data.thumbnail_url,
                         width : data.thumbnail_width,
@@ -43,6 +70,9 @@ class EmbedController {
             request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
                 if (r.status == 200 && data && data.html) {
                     done(undefined, {
+                        userid,
+                        at : Date.now(),
+                        type : network,
                         originalurl : url,
                         author : data.author_name, 
                         authorurl : data.author_url,
@@ -57,6 +87,9 @@ class EmbedController {
             request({url : "https://vimeo.com/api/oembed.json?url=" + url, json : true}, (err, r, data) => {
                 if (r.status == 200 && data && data.html) {
                     done(undefined, {
+                        userid,
+                        at : Date.now(),
+                        type : network,
                         originalurl : url,
                         caption : data.title,
                         author : data.author_name,
@@ -76,6 +109,8 @@ class EmbedController {
             });
         } else {
             done(undefined, {
+                userid,
+                at : Date.now(),
                 originalurl : url,
                 type : network
             });
