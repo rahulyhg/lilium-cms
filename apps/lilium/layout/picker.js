@@ -36,7 +36,7 @@ class PickerSession {
         this.type = sessionOptions.type;
 
         this.accept.forEach(x => {
-            const opts = this.options[x] || {};
+            const opts = this.options[x] = this.options[x] || {};
             if (this.type == 'carousel' && !opts.selected) {
                 opts.selected = this.carouselElements.find(e => e.type == x);
                 this.options[x] = opts;
