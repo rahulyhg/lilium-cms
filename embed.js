@@ -17,13 +17,19 @@ class EmbedController {
                 sendback({ embed });
             });
         } else if (action == "fetch") {
-            this.fetch(cli._c, db.mongoID(cli.userinfo.userid), network, params.url, (err, embed) => {
+            db.findUnique(cli._c, 'embeds', { type : network, originalurl : params.url }, (err, embed) => {
                 if (embed) {
-                    db.insert(cli._c, 'embeds', embed, () => {
-                        sendback({ embed });
-                    });
+                    sendback({ embed });
                 } else {
-                    sendback({ err, embed });
+                    this.fetch(cli._c, db.mongoID(cli.userinfo.userid), network, params.url, (err, embed) => {
+                        if (embed) {
+                            db.insert(cli._c, 'embeds', embed, () => {
+                                sendback({ embed });
+                            });
+                        } else {
+                            sendback({ err, embed });
+                        }
+                    });
                 }
             });
         } else if (action == "bunch") {
