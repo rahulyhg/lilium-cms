@@ -53,8 +53,13 @@ export default class AdsManagement extends Component {
         if (!this.state.loading) {
             return (
                 <div id="ads-management">
-                    <h1>Advertisement Management</h1>
-                    <div id="ads-tabs" style={{ width: '800px', margin: 'auto' }}>
+                    <div class="leader-title">
+                        <div class="leader-title-responsive">
+                            <h1>Advertisement Management</h1>
+                            <p>A list of ad tags to be used by the theme, grouped by language and page type. It's up to the theme to decide whether or not those settings will be respected.</p>
+                        </div>
+                    </div>
+                    <div class="leader-content solid classic">
                         <TabView id='ads-management'>
                             {
                                 this.state.adSets.map(adSet => (

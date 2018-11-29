@@ -50,8 +50,8 @@ class HeaderUserDropdown extends Component {
                         <Link href="/me" display="block">
                             Profile
                         </Link>
-                        <Link href="/me#password" display="block">
-                            Change password
+                        <Link href="/preferences" display="block">
+                            Customize Lilium 
                         </Link>
                         <Link href="/logout" display="block">
                             <span class="red">
