@@ -424,8 +424,9 @@ export class MediaPickerField extends FormField {
                 }
             }
         }), res => {
-            if (res && res.image) {
-                const image = res.image;
+            console.log(res);
+            if (res && res[ImagePicker.slug]) {
+                const image = res[ImagePicker.slug];
                 this.changed(image, this.state.mediaURL);
 
                 this.setState({ mediaURL : this.extractImageFromResponse(image), mediaID : image._id });

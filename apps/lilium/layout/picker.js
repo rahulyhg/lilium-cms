@@ -95,7 +95,7 @@ export class Picker extends Component {
      * @param {object} selectedEl 
      */
     static accept(selectedEl) {
-        log('Picker.accept() called by subpicker', 'detail');
+        log('Picker', 'Static method accept() called by subpicker', 'detail');
         if (_singleton.state.session.type == 'carousel') Picker.addToCarousel(selectedEl);
         else Picker.finish(selectedEl);
     }
