@@ -36,8 +36,15 @@ export class TabView extends Component {
 
         this.state = {
             tabs: props.children || [],
-            selectedIndex: getLocal(TabView.TAB_VIEW_PREFIX + this.props.id) || props.selectedIndex || 0
+            selectedIndex: typeof getLocal(TabView.TAB_VIEW_PREFIX + this.props.id) != "undefined" ? 
+                                  getLocal(TabView.TAB_VIEW_PREFIX + this.props.id) : 
+                           typeof props.selectedIndex != "undefined" ?
+                                  props.selectedIndex : 0
         };
+
+        if (this.state.selectedIndex >= props.children.length) {
+            this.state.selectedIndex = props.children.length - 1;
+        }
     }
 
     selectTabAtIndex(index) {
@@ -46,8 +53,8 @@ export class TabView extends Component {
     }
 
     componentWillReceiveProps(props) {
-        if (typeof props.selectedIndex == 'number') {
-            this.setState({ selectedIndex: props.selectedIndex });
+        if (typeof props.selectedIndex == 'number' && this.state.selectedIndex != props.selectedIndex) {
+            this.selectTabAtIndex(props.selectedIndex);
         }
     }
 
