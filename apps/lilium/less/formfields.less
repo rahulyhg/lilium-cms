@@ -95,11 +95,11 @@
         }
 
         &.green {
-            background-color: @green;
+            background-color: darken(@green, 5%);
             border-color: darken(@green, @buttonBorderDarken);
 
             &:hover {
-                background-color: darken(@green, @buttonDarken);
+                background-color: darken(@green, @buttonDarken + 5%);
                 color: @whiteish;
             }
         }
