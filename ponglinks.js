@@ -47,6 +47,9 @@ class PongLinks {
         const hash = this.hashDestination(JSON.stringify(link));
         const versions = link.versions.map((v, i) => {
             v.identifier = v.identifier.trim().replace(/[\s\&]/g, '_');
+            if (!v.destnation.startsWith('http')) {
+                v.destination = "https://" + v.destination.trim();
+            };
 
             return {
                 destination : v.destination.trim() + (v.destination.includes("?") ? "&" : "?") +
