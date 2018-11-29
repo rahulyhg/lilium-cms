@@ -360,15 +360,42 @@ textarea {
     margin-bottom: 8px;
 }
 
-.stackboxex {
-    width: 40px;
-    height: 40px;
-    background: @red;
-    color: @whiteish;
-    box-sizing: border-box;
-    font-size: 32px;
-    text-align: center;
-    cursor: pointer;
+.stack-box-list {
+    border : 1px solid @grayBorderColor;
+    box-shadow: @softshadow;
+}
+
+.stackbox-input-add {
+    margin-top: 10px;
+}
+
+.stackbox-entry {
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid @grayBorderColor;
+
+    .classic-field {
+        border: none;
+        background: transparent;
+    }
+
+    .stackbox-up, .stackbox-down, .stackboxex {
+        width: 28px;
+        height: 40px;
+        box-sizing: border-box;
+        font-size: 18px;
+        text-align: center;
+        cursor: pointer;
+        padding-top: 10px;
+
+        &.stackboxex {
+            color: @red;
+        }
+
+        &.disabled {
+            opacity: 0.3;
+        }
+    }
 }
 
 .multiselectbox-options-list {
@@ -418,12 +445,12 @@ textarea {
                 height: 100%;
             }
         }
-    
+
         b {
             margin-top: 100px;
             display: block;
         }
-    
+
         img {
             width: 100%;
             height: auto;
