@@ -194,7 +194,7 @@ class PublishingActions extends Component {
             }
         }
 
-        return { actions : acts, dropdownActions : dropacts };
+        return { actions : acts, dropdownActions : dropacts.filter(x => !x.hidden) };
     }
 
     destroyArticle(done) {
@@ -545,22 +545,34 @@ export default class EditView extends Component {
 
     validate(done) {
         this.save(() => {
-            validatePost(this.coldState.post._id, (err, { valid }) => {
-                if (!err && valid) {
-                    castOverlay('publish-article', {
-                        publishFunction : this.publish.bind(this),
-                        getReportFunction : this.getReport.bind(this)
-                    });
-                } else {
-                    castNotification({
-                        type : "warning",
-                        title : "Could not publish article",
-                        message : err
-                    });
-                }
-    
+            const missingFields = [];
+            if (!this.coldState.post.title[0])      { missingFields.push("a title");  }
+            if (!this.coldState.post.subtitle[0])   { missingFields.push("a subtitle");  } 
+            if (!this.coldState.post.topic)         { missingFields.push("a topic");  } 
+            if (!this.coldState.post.author)        { missingFields.push("an author");  } 
+            if (!this.coldState.post.media)         { missingFields.push("a featured image");  } 
+
+            if (missingFields.length != 0) {
+                castNotification({ type : "warning", title : "Missing field", message : "The article requires " + missingFields.join(', ') + "." })
                 done && done();
-            });            
+            } else {
+                validatePost(this.coldState.post._id, (err, { valid }) => {
+                    if (!err && valid) {
+                        castOverlay('publish-article', {
+                            publishFunction : this.publish.bind(this),
+                            getReportFunction : this.getReport.bind(this)
+                        });
+                    } else {
+                        castNotification({
+                            type : "warning",
+                            title : "Could not publish article",
+                            message : err
+                        });
+                    }
+    
+                    done && done();
+                });     
+            }       
         });
     }
 
