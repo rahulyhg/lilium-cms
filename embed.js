@@ -35,17 +35,18 @@ class EmbedController {
         } else if (action == "bunch") {
             const $match = { };
 
+            params.filters = params.filters || {};
             if (params.filters.type)   { $match.type = params.type; }
             if (params.filters.search) { $match.originalurl = new RegExp(params.filters.search, 'i'); }
 
             const $limit = 50;
-            const $skip = $limit * ( params.filters.skip ? parseInt(params.filters.skip) : 0 );
+            const $skip = $limit * ( params.skip ? parseInt(params.skip) : 0 );
 
             db.join(cli._c, 'embeds', [
                 { $match },
+                { $sort : { _id : -1 } },
                 { $skip },
                 { $limit },
-                { $project : { html : 0 } }
             ], items => {
                 sendback({ items });
             });
@@ -100,7 +101,7 @@ class EmbedController {
             });
         } else if (network == "twitter") {
             request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
-                if (r.status == 200 && data && data.html) {
+                if (data && data.html) {
                     done(undefined, {
                         userid,
                         at : Date.now(),
@@ -117,7 +118,7 @@ class EmbedController {
             });
         } else if (network == "vimeo") {
             request({url : "https://vimeo.com/api/oembed.json?url=" + url, json : true}, (err, r, data) => {
-                if (r.status == 200 && data && data.html) {
+                if (data && data.html) {
                     done(undefined, {
                         userid,
                         at : Date.now(),
