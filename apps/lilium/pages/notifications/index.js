@@ -74,9 +74,17 @@ export default class NotificationPage extends Component {
         }
 
         return (
-            <div style={{ maxWidth : 780, margin: "auto" }}>
-                <h1>Notifications</h1>
-                <BigList loadmoreButton={NotificationLoadMore} endpoint="/notifications/all" listitem={NotificationStrip} batchsize={50} livevarkey="" />
+            <div>
+                <div class="leader-title">
+                    <div class="leader-title-responsive">
+                        <h1>Notifications</h1>
+                        <p>A list of notifications sent to you from Lilium.</p>
+                    </div>
+                </div>
+
+                <div class="leader-content classic">
+                    <BigList loadmoreButton={NotificationLoadMore} endpoint="/notifications/all" listitem={NotificationStrip} batchsize={50} livevarkey="" />
+                </div>
             </div>
         );
     }
