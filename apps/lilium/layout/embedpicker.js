@@ -4,9 +4,12 @@ import API from '../data/api';
 import { Spinner } from '../layout/loading';
 
 const EmbedTypeInstagram = props => (<div>
+    <div class="embed-topbanner">
+        <i class="fab fa-instagram"></i>
+        <span>Instagram photo</span>
+    </div>
     <div class="instagram-preview">
         <img src={props.embed.urlpath} class="instagram-preview-image" />
-        <i class="fab fa-instagram"></i>
     </div>
     <div>
         <div class="instagram-preview-credit">@{props.embed.author}</div>
@@ -15,11 +18,12 @@ const EmbedTypeInstagram = props => (<div>
 </div>)
 
 const EmbedTypeTwitter = props => (<div>
+    <div class="embed-topbanner">
+        <i class="fab fa-twitter"></i>
+        <span>Twitter embed</span>
+    </div>
     <div class="twitter-preview">
-        <div dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
-        <div>
-            <i class="fab fa-twitter"></i>
-        </div>
+        <div class="twitter-tweet-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
     </div>
 </div>);
 
@@ -42,7 +46,7 @@ class EmbedSingle extends Component {
     render() {
         const ComponentClass = embedToComponent[this.props.embed.type] || embedToComponent.default;
         return (
-            <div class="embed-single card flex">
+            <div class={"embed-single card flex " + this.props.embed.type}>
                 <ComponentClass embed={this.props.embed} />
             </div>
         );

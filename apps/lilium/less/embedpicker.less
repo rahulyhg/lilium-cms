@@ -2,6 +2,11 @@
     display: flex;
     flex-wrap : wrap;
 
+    .embed-topbanner {
+        background : @blackish;
+        text : @whiteish;
+    }
+
     .embed-single {
         width: 250px;
         background: @whiteish;
@@ -62,6 +67,8 @@
     }
 
     .twitter-preview {
+        position: relative;
+
         .fa-twitter {
             font-size: 32px;
             color : #38A1F3;
@@ -73,7 +80,7 @@
 
             p {
                 margin: 0px;
-                padding: 0px;
+                padding: 0px 30px 0px 0px;
                 font-size: 14px;
             }
 
@@ -82,6 +89,12 @@
                 color: @grayish;
                 font-size: 12px;
             }
+        }
+
+        .twitter-logo-wrap {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
     }
 }
