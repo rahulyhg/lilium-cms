@@ -1,7 +1,11 @@
-var log = require('./log.js');
-var request = require('request');
-var Admin = require('./backend/admin.js');
-var db = require('./includes/db.js');
+const log = require('./log.js');
+const fs = require('fs');
+const request = require('request');
+const pathlib = require('path');
+const Admin = require('./backend/admin.js');
+const mkdirp = require('mkdirp');
+const dateformat = require('dateformat');
+const db = require('./includes/db.js');
 
 class EmbedController {
     livevar(cli, levels, params, sendback) {
@@ -13,29 +17,36 @@ class EmbedController {
                 sendback({ embed });
             });
         } else if (action == "fetch") {
-            this.fetch(db.mongoID(cli.userinfo.userid), network, params.url, (err, embed) => {
+            db.findUnique(cli._c, 'embeds', { type : network, originalurl : params.url }, (err, embed) => {
                 if (embed) {
-                    db.insert(cli._c, 'embeds', embed, () => {
-                        sendback({ embed });
-                    });
+                    sendback({ embed });
                 } else {
-                    sendback({ err, embed });
+                    this.fetch(cli._c, db.mongoID(cli.userinfo.userid), network, params.url, (err, embed) => {
+                        if (embed) {
+                            db.insert(cli._c, 'embeds', embed, () => {
+                                sendback({ embed });
+                            });
+                        } else {
+                            sendback({ err, embed });
+                        }
+                    });
                 }
             });
         } else if (action == "bunch") {
             const $match = { };
 
+            params.filters = params.filters || {};
             if (params.filters.type)   { $match.type = params.type; }
             if (params.filters.search) { $match.originalurl = new RegExp(params.filters.search, 'i'); }
 
             const $limit = 50;
-            const $skip = $limit * ( params.filters.skip ? parseInt(params.filters.skip) : 0 );
+            const $skip = $limit * ( params.skip ? parseInt(params.skip) : 0 );
 
             db.join(cli._c, 'embeds', [
                 { $match },
+                { $sort : { _id : -1 } },
                 { $skip },
                 { $limit },
-                { $project : { html : 0 } }
             ], items => {
                 sendback({ items });
             });
@@ -44,31 +55,53 @@ class EmbedController {
         }
     }
 
-    fetch(userid, network, url, done) {
+    fetch(_c, userid, network, url, done) {
         if (network == "instagram" || network == "igcarousel") {
+            log('Embed', 'Fetching embed information from Instagram API', 'info');
             request.get({ json : true, url : "https://api.instagram.com/oembed/?url=" + url }, (err, r, data) => {
-                if (r.status == 200 && data && data.thumbnail_url) {
-                    done(undefined, {
-                        userid,
-                        at : Date.now(),
-                        originalurl : url,
-                        imageurl : data.thumbnail_url,
-                        width : data.thumbnail_width,
-                        height : data.thumbnail_height,
-                        id : data.media_id,
-                        author : data.author_name,
-                        authorurl : data.author_url,
-                        caption : data.title,
-                        type : network,
-                        html : network == "igcarousel" ? data.html : ""
+                if (data && data.thumbnail_url) {
+                    log('Embed', 'Got valid response from Instagram, about to cache embed', 'success');
+                    const now = new Date();
+                    const dirpath = pathlib.join(_c.server.html, 'staticembed', dateformat(now, 'yyyy/mm/dd'));
+                    const filename = "igembed_" + 
+                        Math.random().toString(16).substring(2) +
+                        Math.random().toString(16).substring(2) + "_" +
+                        Math.random().toString(16).substring(2) + "." + data.thumbnail_url.split('.').pop(); 
+
+                    const urlpath = "/" + pathlib.join('staticembed', dateformat(now, 'yyyy/mm/dd'), filename);
+
+                    mkdirp(dirpath, () => {
+                        request.get(data.thumbnail_url).on('end', (err, r) => {
+                            log('Embed', 'Piped embed file as ' + filename, 'success');
+
+                            done(undefined, {
+                                userid,
+                                urlpath,
+
+                                at : Date.now(),
+                                originalurl : url,
+                                imageurl : data.thumbnail_url,
+                                width : data.thumbnail_width,
+                                height : data.thumbnail_height,
+                                id : data.media_id,
+                                author : data.author_name,
+                                authorurl : data.author_url,
+                                caption : data.title,
+                                type : network,
+                                html : network == "igcarousel" ? data.html : ""
+                            });
+                        }).pipe(fs.createWriteStream(pathlib.join(dirpath, filename)));
                     });
                 } else {
+                    log('Embed', `Got an unexpected response from Instagram`, 'warn');
+                    log('Embed', data, 'warn');
+
                     done(err || r.status);
                 }
             });
         } else if (network == "twitter") {
             request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
-                if (r.status == 200 && data && data.html) {
+                if (data && data.html) {
                     done(undefined, {
                         userid,
                         at : Date.now(),
@@ -85,7 +118,7 @@ class EmbedController {
             });
         } else if (network == "vimeo") {
             request({url : "https://vimeo.com/api/oembed.json?url=" + url, json : true}, (err, r, data) => {
-                if (r.status == 200 && data && data.html) {
+                if (data && data.html) {
                     done(undefined, {
                         userid,
                         at : Date.now(),
