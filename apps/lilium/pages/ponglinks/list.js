@@ -3,7 +3,7 @@ import { BigList } from '../../widgets/biglist';
 import { getSession } from '../../data/cache';
 import { ButtonWorker } from '../../widgets/form';
 import { castOverlay } from '../../overlay/overlaywrap';
-import { VersionsList } from './lib';
+import { VersionsList, STATUS_TO_COLOR } from './lib';
 import { Link } from '../../routing/link';
 
 const styles = {
@@ -19,12 +19,6 @@ const styles = {
         margin: '10px 100px',
         textAlign:'center'
     }
-}
-
-const STATUS_TO_COLOR = {
-    active : 'green',
-    paused : 'orange',
-    archived : ''
 }
 
 class Ponglink extends Component {

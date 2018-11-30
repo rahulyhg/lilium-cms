@@ -41,7 +41,7 @@ export class VersionsList extends Component {
         return (
             <div className="ponglink-versions-list">
                 <div className="version version-header">
-                    <div className="version-identifier"><h4>Identifier</h4></div>
+                    <div className="version-medium"><h4>Medium</h4></div>
                     <div className="version-destination"><h4>Destination</h4></div>
                     <div className="version-copy"><h4>Copy</h4></div>
                     <div className="version-remove"><h4>Remove</h4></div>
@@ -62,12 +62,12 @@ const Version = props => {
     const destination = props.destination.substring(0, questPos == -1 ? props.destination.length : questPos);
     return (
         <div className='version'>
-            <div className="version-identifier">
+            <div className="version-medium">
                 {
                     props.editable ? (
-                        <EditableText initialValue={props.identifier || props.medium} name='identifier' onChange={props.onChange.bind(this, props.hash)} />
+                        <EditableText initialValue={props.medium} name='medium' onChange={props.onChange.bind(this, props.hash)} />
                     ) : (
-                        <span>{props.identifier || props.medium}</span>
+                        <span>{props.medium}</span>
                     )
                 }
             </div>
@@ -100,6 +100,12 @@ export function copy(txt) {
         type: 'success'
     });
 };
+
+export const STATUS_TO_COLOR = {
+    active : 'green',
+    paused : 'orange',
+    archived : 'red'
+}
 
 const ActionArchive = props => (
     <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Archive (cannot be undone)' theme='red' type='outline' />

@@ -2,12 +2,11 @@ import { Component, h } from "preact";
 import { castNotification } from '../../layout/notifications'
 import API from '../../data/api';
 import { ChartGraph } from  '../../widgets/chart';
-import { PonglinkActions, VersionsList } from './lib';
+import { PonglinkActions, VersionsList, STATUS_TO_COLOR } from './lib';
 import { getSession } from '../../data/cache';
 import dateFormat from 'dateformat';
 import Modal from "../../widgets/modal";
-import { ButtonWorker } from "../../widgets/form";
-import { TextField } from "../../widgets/form";
+import { TextField, EditableText, ButtonWorker } from "../../widgets/form";
 
 const styles = {
     ponglink: {
@@ -177,10 +176,26 @@ export default class PonglinkInsight extends Component {
         this.newVersionValues[name] = val;
     }
 
+    saveField(name, val) {
+        API.put('/ponglinks/' + this.state.link._id, { [name]: val }, (err, data, r) => {
+            if (r.status == 200) {
+                castNotification({
+                    title: 'Updated ponglink',
+                    type: 'success'
+                });
+            } else {
+                castNotification({
+                    title: 'Error updateing ponglink',
+                    type: 'error'
+                });
+            }
+        });
+    }
+
     addVersion(done) {
-        if (this.newVersionValues.identifier && this.newVersionValues.destination) {
+        if (this.newVersionValues.medium && this.newVersionValues.destination) {
             const versions = this.state.link.versions;
-            versions.push({ identifier: this.newVersionValues.identifier, destination: this.newVersionValues.destination })
+            versions.push({ medium: this.newVersionValues.medium, destination: this.newVersionValues.destination })
             this.versionsChanged(versions, () => {
                 this.newVersionValues = {};
                 this.setState({ addVersionModalVisible: false });
@@ -189,7 +204,7 @@ export default class PonglinkInsight extends Component {
         } else {
             castNotification({
                 title: 'Some fields are missing',
-                message: 'Make sure both the Identifier and the Destination fields are filled',
+                message: 'Make sure both the medium and the Destination fields are filled',
                 type: 'warn'
             });
 
@@ -197,21 +212,25 @@ export default class PonglinkInsight extends Component {
         }
     }
 
-    render() {
+    render() {        
         if (!this.state.loading) {
             const { lineLabels, lineClicks } = this.buildDailyClicksDataSet();
             const { pieLabels, pieClicks } = this.buildClicksPerMediumDataSet();
             return (
                 <div id="ponglink-insights">
                     <Modal title='Add a PongLink version' visible={this.state.addVersionModalVisible} onClose={() => { this.setState({ addVersionModalVisible: false }) }}>
-                        <TextField name='identifier' placeholder='Identifier' onChange={this.newVersionValuesChanged.bind(this)} initialValue={this.newVersionValues.identifier} />
+                        <TextField name='medium' placeholder='Medium' onChange={this.newVersionValuesChanged.bind(this)} initialValue={this.newVersionValues.medium} />
                         <TextField name='destination' placeholder='Destination' onChange={this.newVersionValuesChanged.bind(this)} initialValue={this.newVersionValues.destination} />
                         <ButtonWorker text='Add' work={this.addVersion.bind(this)} theme='purple' type='fill' />
                         <ButtonWorker text='Cancel' sync work={() => { this.setState({ addVersionModalVisible: false }) }} theme='red' type='outline' />
                     </Modal>
-                    <div id="general-info" style={styles.generalInfo}>
-                        <h2 style={styles.identifier}>{this.state.link.identifier}</h2>
-                        {this.state.link.status} 
+                    <div id="general-info" className='card' style={styles.generalInfo}>
+                        <div className="bubble-wrap">
+                            <EditableText initialValue={this.state.link.identifier} name='identifier' onChange={this.saveField.bind(this)} />
+                            <div className={`bubble ${STATUS_TO_COLOR[this.state.link.status]}`}>
+                                {this.state.link.status} 
+                            </div>
+                        </div>
                         <div className="clickCounter" style={{ display: 'inline-block', float: 'right' }}>
                             <span>{`${this.state.link.clicks} clicks`}</span>
                         </div>

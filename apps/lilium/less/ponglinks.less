@@ -31,9 +31,17 @@
 }
 
 #ponglink-insights {
-    .copy-column {
-        max-width: 80px;
-        text-align: right;
+    #general-info {
+        width: initial;
+        
+        .field-wrap {
+            display: inline;
+            span {
+                display: inline;
+                font-size: 24px;
+                margin-right: 6px;
+            }
+        }
     }
 
     .ponglink-actions {
@@ -51,7 +59,7 @@
     .version {
         display: flex;
 
-        .version-identifier {
+        .version-medium {
             flex: 0 0 15%;
         }
         .version-destination {
