@@ -351,7 +351,9 @@ export class EditableText extends FormField {
     constructor(props) {
         super(props);
 
-        this.state.editing = false;
+        this.state = {
+            editing: false
+        }
     }
 
     handleBlur(ev) {
