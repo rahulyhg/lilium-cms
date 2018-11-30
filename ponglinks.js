@@ -97,18 +97,24 @@ class PongLinks {
     }
 
     /**
-     * Checks that all version objects have a hash, if not, attribute a new hash
+     * Checks that all version objects have a hash, if not, attribute a new hash (in place)
      * @param {array} versions Array of version objects
      */
     maybeCreateHash(versions) {
-        const findHighest = () => {
-            return data.reduce((a, b) => (a.y > b.y) ? a : b);
+        const nestHash = () => {
+            const highest = versions.reduce((a, b) => (a.hash > (b.hash || 0)) ? a : b);
+            console.log('highest: ', highest);
+            return (highest && highest.hash) ? highest.hash + 1 : 1000;
         }
+
         if (versions && versions.length) {
             versions.forEach(version => {
-                if (!version.hash) version.hash = ++findHighest;
+                if (!version.hash) version.hash = nestHash();
             });
         }
+
+        console.log('versions : ', versions);
+        
     }
 
     adminPUT(cli) {
@@ -116,27 +122,41 @@ class PongLinks {
             if (cli.routeinfo.path[2] && db.isValidMongoID(cli.routeinfo.path[2])) {
                 cli.readPostData(json => {
                     const newValues = {};
-                    if (json.versions) newValues.versions = json.versions;
+                    if (json.versions) {
+                        newValues.versions = json.versions || [];
+                        console.log('before: ', newValues);
+                        this.maybeCreateHash(json.versions);
+                        console.log('VERSIONS: ', newValues);
+                        
+                    }
                     if (json.defaults) newValues.defaults = json.defaults;
                     if (json.identifier) newValues.identifier = json.identifier;
 
                     db.update(cli._c, 'ponglinks', { _id: db.mongoID(cli.routeinfo.path[2]) }, {...json}, (err, r) => {
                         if (!err) {
-                            cli.sendJSON({ ok: true, updated: r.value });
-                            
-                            if (r.value.versions && r.value.versions.length) {
-                                const set = {};
-                                r.value.versions.forEach(v => {
-                                    set["ponglinks_" + r.value.hash + (v.name || v.hash)] = v.destination;
-                                });
-                                sharedcache.set(set);
-                            }
+                            db.findUnique(cli._c, 'ponglinks', { _id: db.mongoID(cli.routeinfo.path[2]) }, (err, updated) => {
+                                if (!err) {
+                                    cli.sendJSON({ ok: true, updated });
+
+                                    if (updated.versions && updated.versions.length) {
+                                        const set = {};
+                                        updated.versions.forEach(v => {
+                                            set["ponglinks_" + updated.hash + (v.name || v.hash)] = v.destination;
+                                        });
+                                        sharedcache.set(set);
+                                    }
+                                } else {
+                                    cli.throwHTTP(500, 'Error while updating ponglink', true);
+                                }
+                            });
                         } else {
                             cli.throwHTTP(500, 'Error while updating ponglink', true);
                         }
-                    }, false, true, undefined, true);
+                    }, false, true);
                 });
             } else {
+                console.log('send 400');
+                
                 cli.throwHTTP(400, 'A valid ponglink ID is required as url parameter', true);
             }
         }
@@ -227,9 +247,11 @@ class PongLinks {
                         const set = {};
                         log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
                         arr.forEach(x => {
-                            x.versions.forEach(v => {
-                                set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
-                            });
+                            if (x.versions) {
+                                x.versions.forEach(v => {
+                                    set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
+                                });
+                            }
                         });
 
                         sharedcache.set(set);
