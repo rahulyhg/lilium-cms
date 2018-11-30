@@ -103,7 +103,6 @@ class PongLinks {
     maybeCreateHash(versions) {
         const nestHash = () => {
             const highest = versions.reduce((a, b) => (a.hash > (b.hash || 0)) ? a : b);
-            console.log('highest: ', highest);
             return (highest && highest.hash) ? highest.hash + 1 : 1000;
         }
 
@@ -112,9 +111,6 @@ class PongLinks {
                 if (!version.hash) version.hash = nestHash();
             });
         }
-
-        console.log('versions : ', versions);
-        
     }
 
     adminPUT(cli) {
@@ -124,9 +120,7 @@ class PongLinks {
                     const newValues = {};
                     if (json.versions) {
                         newValues.versions = json.versions || [];
-                        console.log('before: ', newValues);
                         this.maybeCreateHash(json.versions);
-                        console.log('VERSIONS: ', newValues);
                         
                     }
                     if (json.defaults) newValues.defaults = json.defaults;
@@ -155,8 +149,6 @@ class PongLinks {
                     }, false, true);
                 });
             } else {
-                console.log('send 400');
-                
                 cli.throwHTTP(400, 'A valid ponglink ID is required as url parameter', true);
             }
         }
