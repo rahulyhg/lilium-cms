@@ -139,6 +139,8 @@ class GardenerCluster extends ProcessManager {
     }
 
     spawnDataServer() {
+        return;
+
         log('Network', 'Spawning dataserver', 'lilium');
         if (dataServerProcess) {
             dataServerProcess.kill("SIGHUP");

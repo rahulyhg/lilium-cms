@@ -13,6 +13,22 @@ module.exports.presentableFacebookUser = (u,picture,lmltk) => {
     }
 }
 
+module.exports.presentableFacebookKitUser = (_id, lmltk) => {
+    return {
+        _id,
+        displayname : "New user",
+        gender : "unknown",
+        createdAt : Date.now(),
+        feedtype : "full",
+        language : "all",
+        type : "accountkit",
+
+        picture : null,
+        lmltk
+    }
+}
+
+
 module.exports.presentableGoogleUser = (u,lmltk) => {
     return {
         _id : require('crypto').createHash('sha256').update(u.id).digest('hex'),
