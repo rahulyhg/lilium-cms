@@ -49,7 +49,7 @@ class Ponglink extends Component {
                     <div>Created by {getSession('mappedEntities')[this.state.creatorid].displayname}</div>
                 </div>
 
-                <VersionsList versions={this.state.versions} editable={false} />
+                <VersionsList ponglink={this.state} versions={this.state.versions} editable={false} />
             </div>
         );
     }

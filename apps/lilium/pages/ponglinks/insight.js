@@ -237,7 +237,7 @@ export default class PonglinkInsight extends Component {
                         <h3 style={styles.creatorName}>{`Created by ${getSession('mappedEntities')[this.state.link.creatorid].displayname}`}</h3>
                         
                         <hr />
-                        <VersionsList versions={this.state.link.versions} editable onChange={this.versionsChanged.bind(this)} />
+                        <VersionsList versions={this.state.link.versions} ponglink={this.state.link} editable onChange={this.versionsChanged.bind(this)} />
                         <ButtonWorker sync text='Add version' theme='blue' type='outline'
                                         work={() => { this.setState({ addVersionModalVisible: true }) }} />
                         <hr/>

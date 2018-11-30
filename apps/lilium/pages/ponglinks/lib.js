@@ -7,7 +7,8 @@ export class VersionsList extends Component {
         super(props);
         this.state = {
             versions: props.versions || [],
-            addVersionModalVisible: false
+            addVersionModalVisible: false,
+            ponglink : props.ponglink
         };
     }
 
@@ -43,12 +44,12 @@ export class VersionsList extends Component {
                 <div className="version version-header">
                     <div className="version-medium"><h4>Medium</h4></div>
                     <div className="version-destination"><h4>Destination</h4></div>
-                    <div className="version-copy"><h4>Copy</h4></div>
-                    <div className="version-remove"><h4>Remove</h4></div>
+                    <div className="version-copy"></div>
+                    <div className="version-remove"></div>
                 </div>
                 {
                     state.versions.map(version => (
-                        <Version {...version} editable={!!props.editable} key={version.hash} onChange={this.onVersionChange.bind(this)}
+                        <Version {...version} ponglink={props.ponglink} editable={!!props.editable} key={version.hash} onChange={this.onVersionChange.bind(this)}
                                 onRemove={this.removeVersion.bind(this)} />
                     ))
                 }
@@ -60,6 +61,8 @@ export class VersionsList extends Component {
 const Version = props => {
     const questPos = props.destination.indexOf('?');
     const destination = props.destination.substring(0, questPos == -1 ? props.destination.length : questPos);
+    const redirlink = liliumcms.url + "/pong/" + props.ponglink.hash + "/" + props.hash
+
     return (
         <div className='version'>
             <div className="version-medium">
@@ -80,7 +83,9 @@ const Version = props => {
                     )
                 }
             </div>
-            <div className="version-copy"><i className="far fa-copy" onClick={copy.bind(this, destination)} title='Copy'></i></div>
+            <div className="version-copy">
+                <i className="far fa-copy" onClick={copy.bind(this, redirlink)} title='Copy'></i>
+            </div>
             <div className="version-remove">
                 {
                     props.editable ? (
