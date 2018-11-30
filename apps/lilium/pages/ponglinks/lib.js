@@ -1,14 +1,94 @@
-import { castNotification } from '../../layout/notifications'
-import { ButtonWorker } from "../../widgets/form";
 import { Component, h } from "preact";
+import { castNotification } from '../../layout/notifications'
+import { ButtonWorker, EditableText } from "../../widgets/form";
 
-export function Version(props) {
-    return (       
-        <tr>
-            <td title={props.medium}>{props.medium}</td>
-            <td><a href={props.redir} target='_blank'>{props.dest}</a></td>
-            <td className='copy-column'><i className="fal fa-copy" onClick={copy.bind(this, `${liliumcms.url}/pong/${props.campaignhash}/${props.hash}`)}></i></td>
-        </tr>
+export class VersionsList extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            versions: props.versions || [],
+            addVersionModalVisible: false
+        };
+    }
+
+    onVersionChange(hash, name, val) {
+        const versions = this.state.versions;
+        const version = versions.find(x => x.hash == hash);
+        if (version) {
+            version[name] = val;
+            this.props.onChange(versions);
+        }
+    }
+
+    removeVersion(hash) {
+        const versions = this.state.versions;
+        const i = versions.findIndex(x => x.hash == hash);
+        if (i != -1) {
+            versions.splice(i, 1);
+            this.props.onChange(versions);
+        }
+    }
+
+    componentWillReceiveProps(props) {
+        const newState = {};
+        if (props.versions) {
+            newState.versions = props.versions;
+            this.setState(newState);
+        }
+    }
+
+    render(props, state) {
+        return (
+            <div className="ponglink-versions-list">
+                <div className="version version-header">
+                    <div className="version-identifier"><h4>Identifier</h4></div>
+                    <div className="version-destination"><h4>Destination</h4></div>
+                    <div className="version-copy"><h4>Copy</h4></div>
+                    <div className="version-remove"><h4>Remove</h4></div>
+                </div>
+                {
+                    state.versions.map(version => (
+                        <Version {...version} editable={!!props.editable} key={version.hash} onChange={this.onVersionChange.bind(this)}
+                                onRemove={this.removeVersion.bind(this)} />
+                    ))
+                }
+            </div>
+        )
+    }
+}
+
+const Version = props => {
+    const questPos = props.destination.indexOf('?');
+    const destination = props.destination.substring(0, questPos == -1 ? props.destination.length : questPos);
+    return (
+        <div className='version'>
+            <div className="version-identifier">
+                {
+                    props.editable ? (
+                        <EditableText initialValue={props.identifier || props.medium} name='identifier' onChange={props.onChange.bind(this, props.hash)} />
+                    ) : (
+                        <span>{props.identifier || props.medium}</span>
+                    )
+                }
+            </div>
+            <div className="version-destination">
+                {
+                    props.editable ? (
+                        <EditableText initialValue={destination} name='destination' onChange={props.onChange.bind(this, props.hash)} />
+                    ) : (
+                        <a target='_blank' href={props.destination}>{destination}</a>
+                    )
+                }
+            </div>
+            <div className="version-copy"><i className="far fa-copy" onClick={copy.bind(this, destination)} title='Copy'></i></div>
+            <div className="version-remove">
+                {
+                    props.editable ? (
+                        <i className="fal fa-trash red" onClick={props.onRemove.bind(this, props.hash)}></i>
+                    ) : null
+                }
+            </div>
+        </div>
     )
 };
 

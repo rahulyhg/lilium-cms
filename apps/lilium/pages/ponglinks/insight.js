@@ -2,9 +2,12 @@ import { Component, h } from "preact";
 import { castNotification } from '../../layout/notifications'
 import API from '../../data/api';
 import { ChartGraph } from  '../../widgets/chart';
-import { Version, PonglinkActions } from './lib';
+import { PonglinkActions, VersionsList } from './lib';
 import { getSession } from '../../data/cache';
 import dateFormat from 'dateformat';
+import Modal from "../../widgets/modal";
+import { ButtonWorker } from "../../widgets/form";
+import { TextField } from "../../widgets/form";
 
 const styles = {
     ponglink: {
@@ -72,7 +75,12 @@ export default class PonglinkInsight extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { loading: true };
+        this.newVersionValues = {};
+
+        this.state = {
+            loading: true,
+            addVersionModalVisible: false
+        };
     }
 
     componentDidMount() {
@@ -138,12 +146,69 @@ export default class PonglinkInsight extends Component {
         });
     }
 
+    versionsChanged(versions, done) {
+        const link = this.state.link;
+        API.put('/ponglinks/' + this.state.link._id, { versions }, (err, data, r) => {
+            if (r.status == 200) {
+                console.log('setting satate with new link', link);
+                
+                link.versions = data.updated.versions;
+                this.setState({ link });
+                castNotification({
+                    title: 'Ponglink updated',
+                    type: 'success'
+                });
+
+                done && done();
+            } else {
+                castNotification({
+                    title: 'Error updating ponglink versions',
+                    type: 'err'
+                });
+
+                done && done();
+            }
+        });
+
+        this.setState({ link });
+    }
+
+    newVersionValuesChanged(name, val) {
+        this.newVersionValues[name] = val;
+    }
+
+    addVersion(done) {
+        if (this.newVersionValues.identifier && this.newVersionValues.destination) {
+            const versions = this.state.link.versions;
+            versions.push({ identifier: this.newVersionValues.identifier, destination: this.newVersionValues.destination })
+            this.versionsChanged(versions, () => {
+                this.newVersionValues = {};
+                this.setState({ addVersionModalVisible: false });
+                done && done();
+            });
+        } else {
+            castNotification({
+                title: 'Some fields are missing',
+                message: 'Make sure both the Identifier and the Destination fields are filled',
+                type: 'warn'
+            });
+
+            done && done();
+        }
+    }
+
     render() {
         if (!this.state.loading) {
             const { lineLabels, lineClicks } = this.buildDailyClicksDataSet();
             const { pieLabels, pieClicks } = this.buildClicksPerMediumDataSet();
             return (
                 <div id="ponglink-insights">
+                    <Modal title='Add a PongLink version' visible={this.state.addVersionModalVisible} onClose={() => { this.setState({ addVersionModalVisible: false }) }}>
+                        <TextField name='identifier' placeholder='Identifier' onChange={this.newVersionValuesChanged.bind(this)} initialValue={this.newVersionValues.identifier} />
+                        <TextField name='destination' placeholder='Destination' onChange={this.newVersionValuesChanged.bind(this)} initialValue={this.newVersionValues.destination} />
+                        <ButtonWorker text='Add' work={this.addVersion.bind(this)} theme='purple' type='fill' />
+                        <ButtonWorker text='Cancel' sync work={() => { this.setState({ addVersionModalVisible: false }) }} theme='red' type='outline' />
+                    </Modal>
                     <div id="general-info" style={styles.generalInfo}>
                         <h2 style={styles.identifier}>{this.state.link.identifier}</h2>
                         {this.state.link.status} 
@@ -151,27 +216,11 @@ export default class PonglinkInsight extends Component {
                             <span>{`${this.state.link.clicks} clicks`}</span>
                         </div>
                         <h3 style={styles.creatorName}>{`Created by ${getSession('mappedEntities')[this.state.link.creatorid].displayname}`}</h3>
+                        
                         <hr />
-                        <table id="versions" style={styles.versions}>
-                            <thead>
-                                <tr>
-                                    <th align='left' className='medium-header' style={styles.mediumHeader}>Medium</th>
-                                    <th align='left'>Destination</th>
-                                    <th className='copy-column'>Copy</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    this.state.link.versions.map(version => {
-                                        const questPos = version.destination.indexOf('?');
-                                        return (
-                                            <Version medium={version.medium} redir={version.destination} dest={version.destination.substring(0, questPos == -1 ? vestion.destination.length : questPos)} campaignhash={this.state.link.hash} hash={version.hash} />
-                                        )
-                                    })
-                                }
-                            </tbody>
-                        </table>
-
+                        <VersionsList versions={this.state.link.versions} editable onChange={this.versionsChanged.bind(this)} />
+                        <ButtonWorker sync text='Add version' theme='blue' type='outline'
+                                        work={() => { this.setState({ addVersionModalVisible: true }) }} />
                         <hr/>
 
                         <PonglinkActions status={this.state.link.status} changeStatus={this.changeStatus.bind(this)} />
