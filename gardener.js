@@ -8,29 +8,70 @@ const { spawn } = require('child_process');
 
 const garden = {};
 
+const REDIS_SERVER_LOCAL_PORT = 6379;
+
 let sharedMemoryProcess;
 let dataServerProcess;
 let redisserver;
 let bootCount = 0;
 
-class Gardener {
+class ProcessManager {
+    start() { 
+        log('Network', 'Binding process termination', 'lilium');
+        process.on('SIGINT', this.onExit.bind(this));
+
+	    try {
+            this.networkConfig = require('./sites/default.json').network;
+	    } catch (err) {
+            return this.fireupInitialServer();
+        }
+
+        log('Network', 'Network configuration loaded', 'success');
+        log('Network', 'Spawning redis server', 'lilium');
+        redisserver = new RedisServer(REDIS_SERVER_LOCAL_PORT);
+    }
+
+    onExit() {
+        log();
+        log("Network", "----------------------------------------------", "lilium");
+        log('Network', 'Killing data server process', 'lilium');
+        dataServerProcess && dataServerProcess.kill("SIGHUP");
+
+        log('Network', 'Killing shared memory process', 'lilium');
+        sharedMemoryProcess && sharedMemoryProcess.kill("SIGHUP");
+
+        log('Network', 'Killing CAIJ process', 'lilium');
+        this.caijProc && this.caijProc.kill("SIGHUP");
+
+        const pids = Object.keys(garden);
+        log('Network', 'Killing Lilium processes with PIDs : ' + pids.join(', '), 'lilium');
+        pids.forEach(pid => garden[pid].kill("SIGHUP"));
+
+        log('Network', 'Gracefully terminated Lilium process', 'success');
+        process.exit();
+    }
+
+    fireupInitialServer() {
+        log('Network', 'Firing up initial server', 'lilium');
+        require("./includes/initialserver").init(this.followupInitServer.bind(this));
+    }
+
+    followupInitServer() {
+        this.start();
+    }
+}
+
+class GardenerCluster extends ProcessManager {
     start() {
         if (cluster.isMaster) {
             require('./masthead.js');
-
             log('Network', 'Loading network config', 'lilium');
-	        try {
-                this.networkConfig = require('./sites/default.json').network;
-	        } catch (err) {
-                return this.fireupInitialServer();
-            }
 
-            log('Network', 'Network configuration loaded', 'success');
-            log('Network', 'Spawning redis server', 'lilium');
-            redisserver = new RedisServer(6379);
+            super.start();
 
             this.spawnSharedMemory();
             this.spawnDataServer();
+
             redisserver.open(() => {
                 log('Network', 'Redis server spawned', 'success');
                 const lmlinstances = this.networkConfig.familysize || require('os').cpus().length;
@@ -86,15 +127,6 @@ class Gardener {
         } 
     }
 
-    fireupInitialServer() {
-        log('Network', 'Firing up initial server', 'lilium');
-        require("./includes/initialserver").init(this.followupInitServer.bind(this));
-    }
-
-    followupInitServer() {
-        this.start();
-    }
-
     spawnSharedMemory() {
         log('Network', 'Spawning local cache server', 'lilium');
         if (sharedMemoryProcess) {
@@ -145,5 +177,90 @@ class Gardener {
 
 };
 
-global.__LILIUMNETWORK = new Gardener();
+class PM2Cluster extends ProcessManager {
+    start() {
+        if (process.env.pm2children) {
+            log('PM2', 'Spawning cluster instance with pid ' + process.pid, 'lilium');
+            const Lilium = require('./lilium.js');
+            const lilium = new Lilium();
+            garden[process.id] = lilium.cms();
+        } else {
+            super.start();
+
+            redisserver.open(() => {
+                pm2.connect(() => {
+                    pm2.start({
+                        name : "Sharedcache",
+                        script : "network/spawn.js",
+                        output : require('path').join(liliumroot, "log", "sharedcache.log"),
+                        error : require('path').join(liliumroot, "log", "error.log"),
+                        env : { pm2children : true,  pm2process : true, parent : "pm2"},
+                        exec_mode : 'fork',
+                        mergeLogs : true
+                    }, (err, apps) => {
+                        pm2.start({
+                            name : "Dataserver API",
+                            script : "dataserver/spawn.js",
+                            output : require('path').join(liliumroot, "log", "dataserver.log"),
+                            error : require('path').join(liliumroot, "log", "error.log"),
+                            env : {"pm2children" : true, "pm2process" : true, parent : "pm2"},
+                            exec_mode : 'fork',
+                            mergeLogs : true
+                        });
+
+                        pm2.start({
+                            name : "CAIJ",
+                            script : "pm2.prod.js",
+                            output : require('path').join(liliumroot, "log", "caij.log"),
+                            error : require('path').join(liliumroot, "log", "error.log"),
+                            env : {"pm2children" : true, "pm2process" : true, parent : "pm2", job : "caij", handleError : "crash"},
+                            exec_mode : 'fork',
+                            mergeLogs : true
+                        });
+
+                        pm2.start({
+                            name : "Lilium elder process",
+                            script : "pm2.prod.js",
+                            output : require('path').join(liliumroot, "log", "elder.log"),
+                            error : require('path').join(liliumroot, "log", "error.log"),
+                            env : {"pm2children" : true, instancenum : 0, parent : "pm2"},
+                            mergeLogs : true,
+                            exec_mode : 'cluster',
+                            instances : 1
+                        }, (err, apps) => {
+                            const processCount = (this.networkConfig.familysize || require('os').cpus().length) - 1;
+
+                            if (processCount > 0) {
+                                pm2.start({
+                                    name : "Lilium child process",
+                                    script : "pm2.prod.js",
+                                    output : require('path').join(liliumroot, "log", "child.log"),
+                                    error : require('path').join(liliumroot, "log", "error.log"),
+                                    env : {"pm2children" : true, instancenum : 2, parent : "pm2"},
+                                    mergeLogs : true,
+                                    exec_mode : 'cluster',
+                                    instances : processCount, 
+                                }, () => {
+                                    log('PM2', 'Disconnecting from PM2 deamon', 'lilium');
+                                    pm2.disconnect();
+                                });
+                            } else {
+                                log('PM2', 'Disconnecting from PM2 deamon', 'lilium');
+                                pm2.disconnect();
+                            }
+                        });
+                    });
+
+                });
+            });
+        }
+    }
+}
+
+switch (global.psmanager) {
+    case "pm2"     : global.__LILIUMNETWORK = new PM2Cluster(); break;
+    case "cluster" : global.__LILIUMNETWORK = new GardenerCluster(); break;
+    default : log("Gardener", "No process manager defined.", "err"); process.exit(1);
+}
+
 global.__LILIUMNETWORK.start();
