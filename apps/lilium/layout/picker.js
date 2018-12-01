@@ -157,11 +157,17 @@ export class Picker extends Component {
         }
     }
 
+    maybeCloseOnClick(ev) {
+        if (ev.target == this.overlayEl) {
+            Picker.dismiss();
+        }
+    }
+
     render(props, state) {
         const selectedTabIndex = AVAILABLE_PICKER_TABS.indexOf(state.session.tab) || 0;
         if (state.visible) {
             return (
-                <div id="picker-overlay">
+                <div id="picker-overlay" ref={x => (this.overlayEl = x)} onClick={this.maybeCloseOnClick.bind(this)}>
                     <div id="picker-wrapper">
                         <div id="picker" className={state.session.type == 'carousel' && 'carousel-session'}>
                             <TabView hidesingletab id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex}>
