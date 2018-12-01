@@ -2,6 +2,8 @@ import { Component, h } from 'preact';
 import { Picker } from './picker';
 import API from '../data/api';
 import { Spinner } from '../layout/loading';
+import Modal from '../widgets/modal';
+import { TextField, SelectField, ButtonWorker } from '../widgets/form';
 
 const EmbedTypeInstagram = props => (<div>
     <div class="embed-topbanner instagram">
@@ -78,6 +80,10 @@ export class EmbedPicker extends Component {
     componentDidMount() {
         this.fetchNextBatch();
     }
+
+    newEmbedFieldChanged(name, value) {
+
+    }
     
     render() {
         if (this.state.loading) {
@@ -90,11 +96,37 @@ export class EmbedPicker extends Component {
 
         return (
             <div id="embed-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
-                <div class="embed-add embed-single card flex">
-                    <i class="fal fa-plus"></i>
-                    <div>New embed</div>
-                </div> 
-                { this.state.embeds.map(x => (<EmbedSingle embed={x} />)) }
+                <div class="embed-picker-list">
+                    <div class="embed-add embed-single card flex" onClick={() => this.setState({ newModalOpen : true })}>
+                        <i class="fal fa-plus"></i>
+                        <div>Create embed</div>
+                    </div> 
+                    { this.state.embeds.map(x => (<EmbedSingle embed={x} />)) }
+                </div>
+                <Modal visible={this.state.newModalOpen} title="New embed" onClose={() => this.setState({ newModalOpen : false })}>
+                    <div>
+                        <SelectField name="modal-embed-type" placeholder="Embed type" options={[
+                            { text: "Instagram photo", value : "instagram" },
+                            { text: "Instagram video", value: "igvideo"},
+                            { text: "Instagram carousel", value: "igcarousel"},
+                            { text: "Facebook Post", value: "fbpost"},
+                            { text: "Facebook Video", value: "fbvideo"},
+                            { text: "Youtube video", value: "youtube"},
+                            { text: "Vimeo video", value: "vimeo"},
+                            { text: "Twitter tweet", value: "twitter"},
+                            { text: "Soundcloud song", value: "soundcloud"},
+                            { text: "Reddit", value: "reddit"},
+                            { text: "HTML code", value: "html"}
+                        ]} onChange={this.newEmbedFieldChanged.bind(this)} />
+
+                        <TextField 
+                            name="modal-embed-text" placeholder="URL of embed resources" 
+                            onChange={this.newEmbedFieldChanged.bind(this)} />
+                    </div>
+                    <div style={{ textAlign : 'right' }}>
+                        <ButtonWorker text="Generate embed" type="outline" theme="white" />
+                    </div>
+                </Modal>
             </div>
         );
     }
