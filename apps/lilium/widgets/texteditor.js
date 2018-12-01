@@ -56,8 +56,19 @@ export class TextEditor extends Component {
             convert_urls : false,
             menubar: false,
             setup: editor => {
+                editor.addButton('insertAd', {
+                    icon: 'fa fa-usd-square',
+                    tooltip : 'Insert an ad banner', 
+                    onclick: () => {
+                        const div = document.createElement('div');
+                        div.setAttribute('contenteditable', false);
+                        div.className = "lml-adplaceholder";
+                        editor.insertContent(div.outerHTML);
+                    }
+                });
+
                 editor.addButton('insert-element', {
-                    icon: 'fa fa-plus-circle',
+                    icon: 'fa fa-image',
                     tooltip: 'Insert an image, a places or an embeds',
                     onclick: () => {
                         const session =  new Picker.Session({});
@@ -126,7 +137,7 @@ export class TextEditor extends Component {
                 'searchreplace visualblocks code fullscreen hr',
                 'media paste wordcount'
             ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-element insert-carousel insertEmbed link unlink | bullist numlist | fullscreen | code',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | insert-element insert-carousel insertEmbed link unlink insertAd hr | bullist numlist | fullscreen | code',
             content_css: [
                 '/static/tinymcedefault.css',
                 '/compiled/theme/tinymce.css'
