@@ -4,21 +4,18 @@ import API from '../data/api';
 import { Spinner } from '../layout/loading';
 
 const EmbedTypeInstagram = props => (<div>
-    <div class="embed-topbanner">
+    <div class="embed-topbanner instagram">
         <i class="fab fa-instagram"></i>
         <span>Instagram photo</span>
     </div>
     <div class="instagram-preview">
         <img src={props.embed.urlpath} class="instagram-preview-image" />
-    </div>
-    <div>
         <div class="instagram-preview-credit">@{props.embed.author}</div>
-        <p>{props.embed.caption.substring(0, 80) + (props.embed.caption.length > 80 ? "..." : "")}</p>
     </div>
 </div>)
 
 const EmbedTypeTwitter = props => (<div>
-    <div class="embed-topbanner">
+    <div class="embed-topbanner twitter">
         <i class="fab fa-twitter"></i>
         <span>Twitter embed</span>
     </div>

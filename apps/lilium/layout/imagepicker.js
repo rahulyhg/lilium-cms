@@ -251,11 +251,6 @@ export class ImagePicker extends Component {
     render() {
         return (
             <div id="image-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
-                <div>
-                    <b style={ styles.bigtitle }>Lilium gallery</b>
-                    <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
-                </div>
-                
                 <div id="image-picker-flex-wrapper">
                     <div id="image-gallery">
                         <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
@@ -267,6 +262,9 @@ export class ImagePicker extends Component {
                                 <ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageSelected.bind(this)} />
                             ))
                         }
+
+                        <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
+                
                     </div>
 
                     <div id="image-gallery-detail"> 

@@ -164,7 +164,7 @@ export class Picker extends Component {
                 <div id="picker-overlay">
                     <div id="picker-wrapper">
                         <div id="picker" className={state.session.type == 'carousel' && 'carousel-session'}>
-                            <TabView id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex}>
+                            <TabView hidesingletab id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex}>
                                 {
                                     state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
