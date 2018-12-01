@@ -4,25 +4,42 @@
 
     .embed-topbanner {
         background : @blackish;
-        text : @whiteish;
+        color : @whiteish;
+
+        padding: 6px 8px;
+
+        i {
+            font-size: 22px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        span {
+            margin-left: 6px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        &.instagram { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+        &.twitter   { background : #08A0E9; }
     }
 
     .embed-single {
         width: 250px;
         background: @whiteish;
         box-shadow: @softshadow; 
-        min-height: 250px;
+        min-height: 220px;
         max-height: 400px;
         margin-bottom: 10px;
         cursor: pointer;
+        border-radius: 5px;
 
         &.embed-add {
-            height: 400px;
             font-size: 26px;
             color: @grayish;
             text-align: center;
 
-            padding-top: 140px;
+            padding-top: 65px;
             box-sizing: border-box;
 
             i {
@@ -45,20 +62,18 @@
             height: auto;
             object-fit: cover;
             max-height: 200px;
-        }
-
-        i {
-            position: absolute;
-            z-index: 1;
-            top: 10px;
-            right: 10px;
-            text-shadow: 0px 0px 2px @blackish;
-            color: @whiteish;
-            font-size: 32px;
+            display: block;
         }
 
         .instagram-preview-credit {
-            padding: 10px;
+            position: absolute;
+            top : 6px;
+            left: 6px;
+            padding: 2px 5px;
+            font-size: 12px;
+            color: @blackish;
+            text-shadow: 1px 1px 0px @whiteish;
+            z-index: 1;
         }
 
         p {
