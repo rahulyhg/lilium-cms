@@ -193,6 +193,7 @@ class EmbedController {
                 userid,
                 at : Date.now(),
                 originalurl : url,
+                html : url,
                 type : network
             });
         }
