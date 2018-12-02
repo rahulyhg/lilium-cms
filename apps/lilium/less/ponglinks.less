@@ -31,9 +31,17 @@
 }
 
 #ponglink-insights {
-    .copy-column {
-        max-width: 80px;
-        text-align: right;
+    #general-info {
+        width: initial;
+        
+        .field-wrap {
+            display: inline;
+            span {
+                display: inline;
+                font-size: 24px;
+                margin-right: 6px;
+            }
+        }
     }
 
     .ponglink-actions {
@@ -41,6 +49,46 @@
 
         #ponglink-archived {
             color: @red;
+        }
+    }
+}
+
+.ponglink-versions-list {
+    padding: 8px;
+
+    .version {
+        display: flex;
+
+        .version-medium {
+            flex: 0 0 15%;
+        }
+        .version-destination {
+            flex-grow: 1;
+        }
+        .version-remove,
+        .version-copy {
+            flex: 0 0 5%;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+
+            i {
+                cursor: pointer;
+            }
+        }
+
+        .version-remove i {
+            color: @red;
+        }
+
+        &.version-header {
+            & > * > * {
+                margin: 4px 0px;
+            }
+        }
+
+        .field-wrap {
+            margin: 0px 0px 4px 0px;
         }
     }
 }

@@ -351,7 +351,9 @@ export class EditableText extends FormField {
     constructor(props) {
         super(props);
 
-        this.state.editing = false;
+        this.state = {
+            editing: false
+        }
     }
 
     handleBlur(ev) {
@@ -419,7 +421,6 @@ export class MediaPickerField extends FormField {
                 }
             }
         }), res => {
-            console.log(res);
             if (res && res[ImagePicker.slug]) {
                 const image = res[ImagePicker.slug];
                 this.changed(image, this.state.mediaURL);

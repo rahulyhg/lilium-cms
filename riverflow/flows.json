@@ -341,7 +341,7 @@
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
-            "support" : ["livevar", "admin_post", "setup"]
+            "support" : ["livevar", "admin_post", "admin_put", "setup"]
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "pong",

@@ -21,6 +21,7 @@ export class RestoreOverlay extends Component {
         this.originalframe.contentWindow.document.head.innerHTML = 
             this.patchframe.contentWindow.document.head.innerHTML = `
                 <link rel="stylesheet" type="text/css" id="u1" href="/compiled/theme/tinymce.css">
+                <link rel="stylesheet" type="text/css" id="u1" href="/static/tinymcedefault.css">
             `;
 
         this.originalframe.contentWindow.document.body.innerHTML = this.props.extra.content;

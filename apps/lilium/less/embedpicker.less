@@ -1,0 +1,241 @@
+#embed-picker {
+    .embed-picker-list {
+        display: flex;
+        flex-wrap : wrap;
+    }
+
+    .embed-topbanner {
+        background : @blackish;
+        color : @whiteish;
+
+        padding: 6px 8px;
+
+        i {
+            font-size: 22px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        span {
+            margin-left: 6px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        &.instagram  { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+        &.twitter    { background : #08A0E9; }
+        &.facebook   { background : #3b5998; }
+        &.youtube    { background : red; }
+        &.soundcloud { background : linear-gradient(to bottom, #f70, #f30); }
+        &.reddit     { background : #ff4500; }
+    }
+
+    .embed-single {
+        width: 250px;
+        background: @whiteish;
+        box-shadow: @softshadow; 
+        min-height: 220px;
+        max-height: 400px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        position: relative;
+
+        .clickable-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+
+            z-index: 3;
+            
+            cursor: pointer;
+            
+            .clickable-area-text {
+                font-size: 32px;
+                display: none;
+                text-align: center;
+                color: @whiteish;
+
+                i {
+                    display: block;
+                    margin-bottom: 10px;
+                    font-size: 48px;
+                }
+            }   
+
+            &:hover {
+                background: fade(@green, 90%);
+
+                .clickable-area-text {
+                    display: block;
+                }
+            }
+        }
+
+        &.embed-add {
+            font-size: 26px;
+            color: @grayish;
+            text-align: center;
+            cursor: pointer;
+
+            padding-top: 65px;
+            box-sizing: border-box;
+
+            i {
+                font-size: 48px;
+                display: block;
+            }
+
+            &:hover {
+                background: @green;
+                color: @whiteish;
+            }
+        }
+    }
+
+    .facebook-preview {
+
+    }
+
+    .reddit-preview-html {
+        blockquote {
+            padding: 10px;
+            margin: 0;
+            word-break: break-all;
+        }
+    }
+
+    .instagram-preview {
+        position: relative;
+        min-height: 200px;
+
+        .instagram-preview-image {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            max-height: 200px;
+            display: block;
+        }
+
+        .instagram-preview-credit {
+            position: absolute;
+            bottom : 6px;
+            left: 6px;
+            padding: 2px 5px;
+            font-size: 12px;
+            color: @blackish;
+            text-shadow: 1px 1px 0px @whiteish;
+            z-index: 1;
+        }
+
+        p {
+            font-size: 14px;
+        }
+
+        .fa-play, .fa-columns {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 70px;
+            font-size: 62px;
+            text-align: center;
+            color: @whiteish;
+            opacity: 0.8;
+        }
+    }
+
+    .facebook-preview-url {
+        padding: 10px;
+        font-size: 14px;
+        word-break: break-word;
+    }
+
+    .vimeo-preview {
+        img {
+            width: 100%;
+            height: auto;
+            max-height: 320px;
+            object-fit: cover;
+            min-height: 185px;
+            display: block;
+        }
+    }
+
+    .twitter-preview {
+        position: relative;
+
+        .fa-twitter {
+            font-size: 32px;
+            color : #38A1F3;
+        }
+
+        .twitter-tweet {
+            margin: 0px;
+            padding: 10px;
+
+            p {
+                margin: 0px;
+                padding: 0px 30px 0px 0px;
+                font-size: 14px;
+            }
+
+            &>a {
+                text-decoration: none;
+                color: @grayish;
+                font-size: 12px;
+            }
+        }
+
+        .twitter-logo-wrap {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    }
+}
+
+.embed-carousel-preview {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+
+    &.instagram  { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+    &.igvideo    { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+    &.igcarousel { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+    &.fbpost     { background : #3b5998; }
+    &.fbvideo    { background : #3b5998; }
+    &.twitter    { background : #08A0E9; }
+    &.youtube    { background : red; }
+    &.soundcloud { background : linear-gradient(to bottom, #f70, #f30); }
+    &.reddit     { background : #ff4500; }
+
+    &>div {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .embed-topbanner {
+            text-align: center;
+            i {
+                font-size: 32px;
+                display: block;
+            }
+
+            span {
+                display: block;
+            }
+        }
+
+        .embed-preview {
+            display: none;
+        }
+    }
+}
