@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
@@ -130,7 +129,8 @@ class PublishingActions extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            post : props.post
+            post: props.post,
+            destroyModalVisible: false
         }
     }
 
@@ -144,51 +144,147 @@ class PublishingActions extends Component {
 
     makeButtonSection() {
         const acts = [];
+        const dropacts = [];
         const status = this.state.post.status;
 
         if (liliumcms.session.roles.includes('contributor')) {
             if (status == "draft" || status == "deleted" || status == "refused") {
                 acts.push(
-                    <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
-                    <ButtonWorker type="fill" theme="blue" text="Submit for approval" work={this.props.actions.submitForApproval.bind(this)} />,
-                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.props.actions.destroy.bind(this)} />
+                    <ButtonWorker theme="green" type="fill" text="Save" work={this.props.actions.save.bind(this)} />
+                );
+
+                dropacts.push(
+                    { color : "blue", text : "Submit for approval", work : this.props.actions.submitForApproval.bind(this)  },
+                    { color : "red", text : "Destroy", work : this.props.actions.destroy.bind(this) }
                 );
             } 
         } else {
             if (status == "draft" || status == "deleted") {
                 acts.push(
-                    <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
-                    <ButtonWorker theme="red"  type="outline" text="Destroy" work={this.props.actions.destroy.bind(this)} />,
-                    <ButtonWorker type="fill" theme="blue" text="Publish" work={this.props.actions.validate.bind(this)} />
+                    <ButtonWorker theme="green" type="fill" text="Save" work={this.props.actions.save.bind(this)} />
+                );
+
+                dropacts.push(
+                    { color : "blue", text : "Publish", work : this.props.actions.validate.bind(this)  },
+                    { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
+                    { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "red", text : "Destroy", work : this.props.actions.destroy.bind(this) }
                 );
             } else if (status == "published") {
                 acts.push(
-                    <ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.props.actions.commitchanges.bind(this)} />, 
-                    <ButtonWorker theme="red"  type="outline" text="Unpublish" work={this.props.actions.unpublish.bind(this)} />
+                    <ButtonWorker theme="green"  type="fill" text="Update" work={this.props.actions.commitchanges.bind(this)} />
+                );
+
+                dropacts.push(
+                    { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
+                    { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "red", text : "Unpublish", work : this.props.actions.unpublish.bind(this) }
                 );
             } else if (status == "reviewing") {
                 acts.push(
-                    <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />, 
-                    <ButtonWorker type="fill" theme="blue" text="Approve and publish" work={this.props.actions.validate.bind(this)} />,
-                    <ButtonWorker theme="red"  type="outline" text="Refuse submission" work={this.props.actions.refuse.bind(this)} />
+                    <ButtonWorker theme="white" text="Save" work={this.props.actions.save.bind(this)} />
+                );
+
+                dropacts.push(
+                    { color : "blue", text : "Accept and publish", work : this.props.actions.validate.bind(this)  },
+                    { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
+                    { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "red", text : "Refuse submission", work : this.props.actions.refuse.bind(this) }
                 );
             }
         }
 
-        return acts;
+        return { actions : acts, dropdownActions : dropacts.filter(x => !x.hidden) };
+    }
+
+    destroyArticle(done) {
+        this.props.actions.destroy(done);
+        this.setState({ destroyModalVisible: false });
     }
 
     render() {
+        const actionSection = this.makeButtonSection();
         return (
             <div>
                 <div>
                     <ButtonWorker theme="white" text="Preview" work={this.props.actions.preview.bind(this)} />
-                </div>
-                <div>
-                    {this.makeButtonSection()}
+                    {actionSection.actions}
+                    { actionSection.dropdownActions.length != 0 ? 
+                        <PublishingActionMore actions={actionSection.dropdownActions} /> : 
+                    null }
                 </div>
             </div>
         )
+    }
+}
+
+class PublishingActionMore extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            actions : props.actions || []
+        }
+
+        this.maybeClose_bound = this.maybeClose.bind(this);
+    }
+
+    maybeClose(ev) {
+        !this.el.contains(ev.target) && this.el != ev.target && this.close();
+    }
+
+    open()   { this.setState({ open : true }); document.addEventListener('click', this.maybeClose_bound); }
+    close()  { this.setState({ open : false }); document.removeEventListener('click', this.maybeClose_bound); }
+
+    toggle() {
+        this.state.open ? this.close() : this.open();
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState({ actions : props.actions })
+    }
+
+    componentWillUnmount() {
+        this.close();
+    }
+
+    render() {
+        return (
+            <div class="publishing-more-actions-box" ref={x => (this.el = x)}>
+                <div class="publishing-more-actions-ellipsis button-worker white" onClick={this.toggle.bind(this)}><i class="far fa-ellipsis-h"></i></div>
+                { this.state.open ? (
+                    <div class="publishing-more-actions-dropdown">
+                        { this.state.actions.map(x => (
+                            <PublishingActionMoreSingle onClose={this.close.bind(this)} work={x.work} color={x.color} text={x.text} />
+                        )) }
+                    </div>
+                ) : null }
+            </div>
+        );
+    }
+}
+
+class PublishingActionMoreSingle extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    onClick() {
+        this.setState({ working : true }, () => {
+            this.props.work(() => {
+                this.setState({ working : false });
+                this.props.onClose();
+            });
+        })
+    }
+
+    render() {
+        if (this.state.working) {
+            return (<div class="publishing-more-actions"><i class="far fa-spinner-third fa-spin"></i></div>);
+        }
+
+        return (
+            <div onClick={this.onClick.bind(this)} class={"publishing-more-actions " + this.props.color}>{this.props.text}</div>
+        );
     }
 }
 
@@ -308,40 +404,6 @@ class PostDetails extends Component {
         }
     }
 
-    triggerAuthorChange() {
-        this.setState({
-            updatingAuthor : true,
-            updatingSlug : false
-        });
-    }
-
-    triggerSlugChange() {
-        this.setState({
-            updatingSlug : true,
-            updatingAuthor : false
-        });        
-    }
-
-    triggerPreviewLinkInvalidation() {
-        this.props.onAction('previewkey');
-    }
-
-    updateAuthor() {
-        this.props.onAction("author", this.stage.author);
-        this.setState({
-            updatingSlug : false,
-            updatingAuthor : false
-        });
-    }
-
-    updateSlug() {
-        this.props.onAction("name", this.stage.name);
-        this.setState({
-            updatingSlug : false,
-            updatingAuthor : false
-        });
-    }
-
     render() {
         return (
             <div class="publication-details-card">
@@ -380,24 +442,6 @@ class PostDetails extends Component {
                         </div>
                     ) : null}
                 </div>
-
-                <footer>
-                    <span class="clickable" onClick={this.triggerAuthorChange.bind(this)}>Change author</span>
-                    { this.state.post.url ? (<span class="clickable" onClick={this.triggerSlugChange.bind(this)}>Change URL</span>) : null }
-                    <span class="red clickable" onClick={this.triggerPreviewLinkInvalidation.bind(this)}>Invalidate preview link</span>
-                </footer>
-
-                <Modal visible={this.state.updatingSlug} title='Update slug' onClose={ () => this.setState({ updatingSlug : false }) }>
-                    <TextField name='name' placeholder='URL Slug' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.name} />
-                    <ButtonWorker text='Update' work={this.updateSlug.bind(this)} />
-                </Modal>
-
-                <Modal visible={this.state.updatingAuthor} title='Update author' onClose={ () => this.setState({ updatingAuthor : false }) }>
-                    <SelectField name='author' placeholder='Author' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.author} options={
-                        getSession("entities").map(user => ({ value : user._id, displayname : user.displayname }))
-                    } />
-                    <ButtonWorker text='Update' work={this.updateAuthor.bind(this)} />
-                </Modal>
             </div>
         )
     }
@@ -416,8 +460,10 @@ export default class EditView extends Component {
             preview : this.preview.bind(this),
             save : this.save.bind(this),
             submitForApproval : this.submitForApproval.bind(this),
-            destroy : this.destroy.bind(this),
+            destroy : () => this.setState({ destroyModalVisible : true }), 
             validate : this.validate.bind(this),
+            triggerAuthorChange : this.triggerAuthorChange.bind(this),
+            triggerSlugChange : this.triggerSlugChange.bind(this),
             commitchanges : this.commitchanges.bind(this),
             unpublish : this.unpublish.bind(this),
             refuse : this.refuse.bind(this)
@@ -426,6 +472,7 @@ export default class EditView extends Component {
         this.coldState = {};
         this.edits = {};
         this.modalStage = {};
+        this.stage = {};
 
         this.socketArticleUpdateEvent_bound = this.socketArticleUpdateEvent.bind(this);
     }
@@ -498,22 +545,34 @@ export default class EditView extends Component {
 
     validate(done) {
         this.save(() => {
-            validatePost(this.coldState.post._id, (err, { valid }) => {
-                if (!err && valid) {
-                    castOverlay('publish-article', {
-                        publishFunction : this.publish.bind(this),
-                        getReportFunction : this.getReport.bind(this)
-                    });
-                } else {
-                    castNotification({
-                        type : "warning",
-                        title : "Could not publish article",
-                        message : err
-                    });
-                }
+            const missingFields = [];
+            if (!this.coldState.post.title[0])      { missingFields.push("a title");  }
+            if (!this.coldState.post.subtitle[0])   { missingFields.push("a subtitle");  } 
+            if (!this.coldState.post.topic)         { missingFields.push("a topic");  } 
+            if (!this.coldState.post.author)        { missingFields.push("an author");  } 
+            if (!this.coldState.post.media)         { missingFields.push("a featured image");  } 
+
+            if (missingFields.length != 0) {
+                castNotification({ type : "warning", title : "Missing field", message : "The article requires " + missingFields.join(', ') + "." })
+                done && done();
+            } else {
+                validatePost(this.coldState.post._id, (err, { valid }) => {
+                    if (!err && valid) {
+                        castOverlay('publish-article', {
+                            publishFunction : this.publish.bind(this),
+                            getReportFunction : this.getReport.bind(this)
+                        });
+                    } else {
+                        castNotification({
+                            type : "warning",
+                            title : "Could not publish article",
+                            message : err
+                        });
+                    }
     
-                done();
-            });            
+                    done && done();
+                });     
+            }       
         });
     }
 
@@ -574,7 +633,7 @@ export default class EditView extends Component {
                 });
             }
 
-            done();
+            done && done();
         });
     }
 
@@ -592,7 +651,7 @@ export default class EditView extends Component {
                 this.previewWindow = window.open(loc);
             }
 
-            done();
+            done && done();
         });        
     }
 
@@ -616,7 +675,7 @@ export default class EditView extends Component {
                             });
                         }
 
-                        done();
+                        done && done();
                     });
                 } else {
                     castNotification({
@@ -624,14 +683,14 @@ export default class EditView extends Component {
                         title : "Could not send article for approval",
                         message : err
                     });
-                    done();
+                    done && done();
                 }
 
             });
         })
     }
 
-    refuse() {
+    refuse(done) {
         refusePost(this.coldState.post._id, (err, json, r) => {
             if (!err) {
                 castNotification({
@@ -649,13 +708,13 @@ export default class EditView extends Component {
                 });
             }
 
-            done();
+            done && done();
         });
     }
 
-    destroy() {
+    destroy(done) {
         destroyPost(this.coldState.post._id, (err, json, r) => {
-            if (err) {
+            if (!err) {
                 castNotification({
                     type : "success",
                     title : "Article destroyed",
@@ -671,7 +730,7 @@ export default class EditView extends Component {
                 });
             }
 
-            done();
+            done && done();
         });
     }
 
@@ -692,7 +751,7 @@ export default class EditView extends Component {
                     });
                 }
 
-                done();
+                done && done();
             });
         });
     }
@@ -767,6 +826,36 @@ export default class EditView extends Component {
                 delete this.edits.content;
                 this.setState({ post });
             }
+        });
+    }
+
+    triggerAuthorChange() {
+        this.setState({
+            updatingAuthor : true,
+            updatingSlug : false
+        });
+    }
+
+    triggerSlugChange() {
+        this.setState({
+            updatingSlug : true,
+            updatingAuthor : false
+        });        
+    }
+
+    updateAuthor() {
+        this.handleDetailsAction("author", this.stage.author);
+        this.setState({
+            updatingSlug : false,
+            updatingAuthor : false
+        });
+    }
+
+    updateSlug() {
+        this.handleDetailsAction("name", this.stage.name);
+        this.setState({
+            updatingSlug : false,
+            updatingAuthor : false
         });
     }
 
@@ -879,6 +968,25 @@ export default class EditView extends Component {
                 <div class="publishing-sidebar">
                     <PublishingSidebar post={this.state.post} actions={this.actions} history={this.state.history} historyEntryClicked={this.historyEntryClicked.bind(this)} />
                 </div>
+
+                <Modal visible={this.state.updatingSlug} title='Update slug' onClose={ () => this.setState({ updatingSlug : false }) }>
+                    <TextField name='name' placeholder='URL Slug' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.name} />
+                    <ButtonWorker text='Update' work={this.updateSlug.bind(this)} />
+                </Modal>
+
+                <Modal visible={this.state.updatingAuthor} title='Update author' onClose={ () => this.setState({ updatingAuthor : false }) }>
+                    <SelectField name='author' placeholder='Author' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.author} options={
+                        getSession("entities").map(user => ({ value : user._id, displayname : user.displayname }))
+                    } />
+                    <ButtonWorker text='Update' work={this.updateAuthor.bind(this)} />
+                </Modal>
+
+                <Modal title='Destroy this article?' visible={this.state.destroyModalVisible} onClose={() => { this.setState({ destroyModalVisible: false }) }}>
+                    <p>Are you sure you want to <b>destroy</b> this article permanently?</p>
+                    <ButtonWorker theme="red"  type="fill" text="Yes, destroy" work={this.destroy.bind(this)} />
+                    <ButtonWorker theme="blue"  type="outline" text="No, I want to keep it" sync={true} work={() => { this.setState({ destroyModalVisible: false }) }} />
+                </Modal>
+
             </div>
         )
     }

@@ -3,6 +3,7 @@ import { Link } from '../routing/link';
 import { LILIUM } from '../data/const';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../realtime/connection';
 import { AnimeNumber } from '../widgets/animenumber';
+import { Spinner } from '../layout/loading';
 import dateformat from 'dateformat';
 import API from '../data/api';
 
@@ -12,11 +13,20 @@ class HeaderUserDropdown extends Component {
         this.state = {
             session : props.session
         } 
+
+        this.maybeClose_bound = this.maybeClose.bind(this);
     }
 
     componentDidMount() {
-
+        document.addEventListener('navigate', this.close.bind(this));
     }
+
+    maybeClose(ev) {
+        !this.el.contains(ev.target) && this.el != ev.target && this.close();
+    }
+
+    open()   { this.setState({ open : true }); document.addEventListener('click', this.maybeClose_bound); }
+    close()  { this.setState({ open : false }); document.removeEventListener('click', this.maybeClose_bound); }
 
     componentWillReceiveProps(props) {
         props.session && this.setState({ session : props.session });
@@ -29,10 +39,27 @@ class HeaderUserDropdown extends Component {
 
         log('HeaderUser', 'User dropdown was rerendered', 'detail');
         return (
-            <div class="header-bar-avatar-wrapper">
-                <Link href="/me" display="block">
+            <div class="header-bar-avatar-wrapper" ref={x => (this.el = x)}>
+                <div onClick={this.open.bind(this)}>
                     <img src={liliumcms.session.avatarURL} class="header-bar-avatar" />
-                </Link>
+                </div>
+
+                { this.state.open ? (
+                    <div class="header-dropdown">
+                        <div class="pointer"></div>
+                        <Link href="/me" display="block">
+                            Profile
+                        </Link>
+                        <Link href="/preferences" display="block">
+                            Customize Lilium 
+                        </Link>
+                        <Link href="/logout" display="block">
+                            <span class="red">
+                                Log out
+                            </span>
+                        </Link>
+                    </div>
+                ) : null }
             </div>
         )
     }
@@ -164,7 +191,7 @@ class NotificationLists extends Component {
         if (this.state.loading) {
             return (
                 <div class="notification-dropdown-list loading">
-                    <i class="far fa-spinner-third fa-spin-fast"></i>
+                    <Spinner centered={true} />
                 </div>
             );
         }

@@ -4,6 +4,7 @@ import slugify from "slugify";
 import API from '../data/api';
 import { Spinner } from '../layout/loading'
 import { Picker } from '../layout/picker';
+import { ImagePicker } from '../layout/imagepicker';
 import { castNotification } from '../layout/notifications';
 
 class FormField extends Component {
@@ -35,7 +36,7 @@ class FormField extends Component {
     changed(value, oValue) {
         const oldValue = typeof oValue != "undefined" ? oValue : this.value;
         this.value = this.props.format ? this.props.format(value) : value;
-        this.valid = this.props.validate ? this.props.validate(value) : true;
+        this.valid = this.props.validate ? this.props.validate(this.value) : true;
         this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
 
         if (this.autosave) {
@@ -304,7 +305,7 @@ export class StackBox extends FormField {
                         ))
                     }
                 </div>
-                <div>
+                <div class="stackbox-input-add">
                     <TextField onKeyPress={this.handleInputBoxKeyPress.bind(this)} placeholderType="inside" placeholder="Provide a value and press Enter" />
                 </div>
             </div>
@@ -335,17 +336,12 @@ StackBox.StackField = class StackField extends Component {
 
     render() {
         return (
-            <div style={{ display : "flex" }}>
-                <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
-                {
-                    (this.props.index != 0) ? (
-                        <div onClick={this.moveUp.bind(this)} class="stackboxex"><i className="fal fa-chevron-up"></i></div>) : ( null )
-                }
-                {
-                    (!this.props.lastInList) ? (
-                        <div onClick={this.moveDown.bind(this)} class="stackboxex"><i className="fal fa-chevron-down"></i></div>) : ( null )
-                }
+            <div class="stackbox-entry">
                 <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+
+                <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
+                <div onClick={this.moveUp.bind(this)} class={"stackbox-up " + (this.props.index == 0 ? "disabled" : "")}><i className="far fa-chevron-up"></i></div>
+                <div onClick={this.moveDown.bind(this)} class={"stackbox-down " + (this.props.lastInList ? "disabled" : "")}><i className="far fa-chevron-down"></i></div>
             </div>
         )
     }
@@ -355,7 +351,9 @@ export class EditableText extends FormField {
     constructor(props) {
         super(props);
 
-        this.state.editing = false;
+        this.state = {
+            editing: false
+        }
     }
 
     handleBlur(ev) {
@@ -414,12 +412,18 @@ export class MediaPickerField extends FormField {
     }
 
     open() {
-        Picker.cast({
-            accept : ["uploads"],
-            selected : this.state.mediaID || undefined
-        }, res => {
-            if (res && res.image) {
-                const image = res.image;
+        Picker.cast(new Picker.Session({
+            accept : [ImagePicker.slug],
+            id : this.props.name,
+            options : {
+                [ImagePicker.slug] : {
+                    selected : this.state.mediaID || undefined
+                }
+            }
+        }), res => {
+            console.log(res);
+            if (res && res[ImagePicker.slug]) {
+                const image = res[ImagePicker.slug];
                 this.changed(image, this.state.mediaURL);
 
                 this.setState({ mediaURL : this.extractImageFromResponse(image), mediaID : image._id });

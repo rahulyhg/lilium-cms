@@ -4,11 +4,16 @@ import { TextField, ButtonWorker, SelectField } from '../../widgets/form';
 import { castNotification } from '../../layout/notifications';
 
 export class CreditCardEdit extends Component {
+    static get defaultCard() {
+        return {
+            currency : "CAD"
+        }
+    }
+
     constructor(props) {
         super(props);
-        this.modified = {};
         this.state = {
-            cc: props.cc || {},
+            cc: props.cc || CreditCardEdit.defaultCard,
             inserting: props.inserting
         };
 
@@ -22,7 +27,7 @@ export class CreditCardEdit extends Component {
     
     componentWillReceiveProps(props) {
         const newState = {};
-        if (props.hasOwnProperty('cc')) newState.cc = props.cc || {};
+        if (props.hasOwnProperty('cc')) newState.cc = props.cc || CreditCardEdit.defaultCard;
         if (props.hasOwnProperty('inserting')) newState.inserting = props.inserting;
 
         this.setState(newState);
@@ -31,11 +36,11 @@ export class CreditCardEdit extends Component {
     saveCreditCard(done) {
         if (!this.errors.length) {
             const cb = this.state.inserting ? this.props.onCreate : this.props.onEdit;
-            cb && cb(this.modified, done);
+            cb && cb(this.state.cc, done);
         } else {
             castNotification({
                 title: 'Invalid Fields',
-                message: 'Some fields are still invalid',
+                message: 'Some fields are still invalid : ' + this.errors.join(', '),
                 type: 'warning'
             });
 
@@ -47,8 +52,6 @@ export class CreditCardEdit extends Component {
     }
 
     fieldEdited(name, val, old, valid) {
-        this.modified[name] = val;
-
         if (valid) {
             if (this.errors.length) {
                 const i = this.errors.indexOf(name);
@@ -63,7 +66,7 @@ export class CreditCardEdit extends Component {
             }
         }
         
-        const cc = this.state.cc;
+        const cc = {...this.state.cc};
         cc[name] = val;
         this.setState({ cc });
     }
@@ -76,13 +79,13 @@ export class CreditCardEdit extends Component {
                     <div id="credit-card-form">
                         <TextField value={state.cc.number} initialValue={state.cc.number} placeholder='Credit Card Number' name='number' onChange={this.fieldEdited.bind(this)}
                                     validate={value => this.cardNumberRegEx.test(value)} format={value => value.replace(this.numberReplaceRegEx, '')} />
-                        <div className='flex'>
-                            <TextField value={state.cc.expiryMonth} initialValue={state.cc.expiryMonth} placeholder='Expiry Month' name='expiryMonth' onChange={this.fieldEdited.bind(this)}
+                        <div className='flex-wrap'>
+                            <TextField value={state.cc.expiryMonth} initialValue={state.cc.expiryMonth} placeholder='Expiry Month (MM)' name='expiryMonth' onChange={this.fieldEdited.bind(this)}
                                         validate={value => this.dateSegmentRegEx.test(value) && parseInt(value) <= 12 } />
-                            <TextField value={state.cc.expiryYear} initialValue={state.cc.expiryYear} placeholder='Expiry Year' name='expiryYear' onChange={this.fieldEdited.bind(this)}
-                                        validate={value => this.dateSegmentRegEx.test(value)} />
+                            <TextField value={state.cc.expiryYear} initialValue={state.cc.expiryYear} placeholder='Expiry Year (YY)' name='expiryYear' onChange={this.fieldEdited.bind(this)}
+                                        validate={value => this.dateSegmentRegEx.test(value)} format={value => value.length == 4 ? value.substring(2) : value} />
                         </div>
-                        <div className="flex" id='bottom-line'>
+                        <div className="flex-wrap" id='bottom-line'>
                             <TextField value={state.cc.cvc} initialValue={state.cc.cvc} placeholder='CVC' name='cvc' onChange={this.fieldEdited.bind(this)}
                                         validate={value => this.cvcRegEx.test(value)} />
                             <SelectField value={state.cc.currency} initialValue={state.cc.currency} placeholder='Currency' name='currency' onChange={this.fieldEdited.bind(this)}

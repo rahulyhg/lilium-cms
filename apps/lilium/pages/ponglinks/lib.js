@@ -1,38 +1,99 @@
-import { castNotification } from '../../layout/notifications'
 import { Component, h } from "preact";
+import { castNotification } from '../../layout/notifications'
+import { ButtonWorker, EditableText } from "../../widgets/form";
 
-const styles = {
-    copyColumn: {
-        textAlign: 'center',
-        width: '80px'
-    },
-    copyIcon: {
-        cursor: 'pointer'
-    },
-    actions: {
-        display: 'flex',
-    },
-    ponglinkAction: {
-        textAlign: 'center',
-        flexGrow: '1'
-    },
-    actionText: {
-        cursor: 'pointer'
-    },
-    archivedMessage: {
-        color: 'red',
-        margin: '6px',
-        textAlign: 'center'
+export class VersionsList extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            versions: props.versions || [],
+            addVersionModalVisible: false,
+            ponglink : props.ponglink
+        };
+    }
+
+    onVersionChange(hash, name, val) {
+        const versions = this.state.versions;
+        const version = versions.find(x => x.hash == hash);
+        if (version) {
+            version[name] = val;
+            this.props.onChange(versions);
+        }
+    }
+
+    removeVersion(hash) {
+        const versions = this.state.versions;
+        const i = versions.findIndex(x => x.hash == hash);
+        if (i != -1) {
+            versions.splice(i, 1);
+            this.props.onChange(versions);
+        }
+    }
+
+    componentWillReceiveProps(props) {
+        const newState = {};
+        if (props.versions) {
+            newState.versions = props.versions;
+            this.setState(newState);
+        }
+    }
+
+    render(props, state) {
+        return (
+            <div className="ponglink-versions-list">
+                <div className="version version-header">
+                    <div className="version-medium"><h4>Medium</h4></div>
+                    <div className="version-destination"><h4>Destination</h4></div>
+                    <div className="version-copy"></div>
+                    <div className="version-remove"></div>
+                </div>
+                {
+                    state.versions.map(version => (
+                        <Version {...version} ponglink={props.ponglink} editable={!!props.editable} key={version.hash} onChange={this.onVersionChange.bind(this)}
+                                onRemove={this.removeVersion.bind(this)} />
+                    ))
+                }
+            </div>
+        )
     }
 }
 
-export function Version(props) {
-    return (       
-        <tr>
-            <td title={props.medium}>{props.medium}</td>
-            <td><a href={props.redir} target='_blank'>{props.redir}</a></td>
-            <td style={styles.copyColumn}><i className="fal fa-copy" onClick={copy.bind(this, props.dest)} style={styles.copyIcon}></i></td>
-        </tr>
+const Version = props => {
+    const questPos = props.destination.indexOf('?');
+    const destination = props.destination.substring(0, questPos == -1 ? props.destination.length : questPos);
+    const redirlink = liliumcms.url + "/pong/" + props.ponglink.hash + "/" + props.hash
+
+    return (
+        <div className='version'>
+            <div className="version-medium">
+                {
+                    props.editable ? (
+                        <EditableText initialValue={props.medium} name='medium' onChange={props.onChange.bind(this, props.hash)} />
+                    ) : (
+                        <span>{props.medium}</span>
+                    )
+                }
+            </div>
+            <div className="version-destination">
+                {
+                    props.editable ? (
+                        <EditableText initialValue={destination} name='destination' onChange={props.onChange.bind(this, props.hash)} />
+                    ) : (
+                        <a target='_blank' href={props.destination}>{destination}</a>
+                    )
+                }
+            </div>
+            <div className="version-copy">
+                <i className="far fa-copy" onClick={copy.bind(this, redirlink)} title='Copy'></i>
+            </div>
+            <div className="version-remove">
+                {
+                    props.editable ? (
+                        <i className="fal fa-trash red" onClick={props.onRemove.bind(this, props.hash)}></i>
+                    ) : null
+                }
+            </div>
+        </div>
     )
 };
 
@@ -45,14 +106,20 @@ export function copy(txt) {
     });
 };
 
+export const STATUS_TO_COLOR = {
+    active : 'green',
+    paused : 'orange',
+    archived : 'red'
+}
+
 const ActionArchive = props => (
-    <span style={styles.actionText} onClick={props.changeStatus}>Archive (this action is irreversible)</span>
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Archive (cannot be undone)' theme='red' type='outline' />
 )
 const ActionPause = props => (
-    <span style={styles.actionText} onClick={props.changeStatus}>Pause)</span>
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Pause' theme='white' type='outline' />
 )
 const ActionResume = props => (
-    <span style={styles.actionText} onClick={props.changeStatus}>Resume</span>
+    <ButtonWorker work={props.changeStatus.bind(this)} sync={true} text='Resume' theme='blue' type='fill' />
 )
 
 export class PonglinkActions extends Component {
@@ -69,30 +136,22 @@ export class PonglinkActions extends Component {
     render() {
         if (this.state.status == 'active') {
             return (
-                <div className="ponglink-actions" style={styles.actions}>
-                    <div className="ponglink-action warning" style={{...styles.ponglinkAction, color: 'yellow'}}>
-                        <ActionPause changeStatus={this.props.changeStatus.bind(this, 'paused')} />
-                    </div>
-                    <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
-                        <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />
-                    </div>
+                <div className="ponglink-actions">
+                    <ActionPause changeStatus={this.props.changeStatus.bind(this, 'paused')} />
+                    <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />
                 </div>
             );
         } else if (this.state.status == 'paused') {
             return (
-                <div className="ponglink-actions" style={styles.actions}>
-                    <div className="ponglink-action success" style={{...styles.ponglinkAction, color: 'green'}}>
-                        <ActionResume changeStatus={this.props.changeStatus.bind(this, 'active')} />
-                    </div>
-                    <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
-                        <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />                        
-                    </div>
+                <div className="ponglink-actions">
+                    <ActionResume changeStatus={this.props.changeStatus.bind(this, 'active')} />
+                    <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />                        
                 </div>
             );
         } else {
             return (
                 <div className="ponglink-actions">
-                    <p className="ponglink-archived" style={styles.archivedMessage}>This campaign is archived and cannot be activated again</p>
+                    <p id="ponglink-archived">This ponglink is archived and cannot be activated again</p>
                 </div>
             );
         }

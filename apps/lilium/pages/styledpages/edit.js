@@ -121,11 +121,11 @@ export class EditStyledPage extends Component {
                     <CheckboxField name='skiplayout' autosave={false} placeholder='Skip Layout' initialValue={this.state.styledPage.skiplayout} onChange={this.updateValues.bind(this)} />
                     <CheckboxField name='staticfile' autosave={false} placeholder='Serve as a static file' initialValue={this.state.styledPage.staticfile} onChange={this.updateValues.bind(this)} />
 
-                    <ButtonWorker text='Save' work={this.save.bind(this)} />
-                    <Link href={'/' + this.state.styledPage.slug}>
-                        <ButtonWorker text='View page' />
-                    </Link>
-                    <ButtonWorker text='Delete' work={this.remove.bind(this)} theme='danger' />
+                    <ButtonWorker text='Save' work={this.save.bind(this)} theme='purple' type='fill' />
+                    <a target="_blank" href={'/' + this.state.styledPage.slug + (this.state.styledPage.status == "magiclink" ? ("?accesskey=" + this.state.styledPage.magiclink) : "")}>
+                        <ButtonWorker text='View page' theme='blue' type='fill' />
+                    </a>
+                    <ButtonWorker text='Delete' work={this.remove.bind(this)} theme='red' type="outline" />
                 </div>
             );
         } else {

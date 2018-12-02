@@ -75,10 +75,10 @@ export class RolesList extends Component {
                     <div class="leader-title-responsive">
                         <h1>Role management</h1>
                         <p>Roles are combinations of several rights given to the entities. Entities can have multiple roles, and roles have multiple rights.</p>
-                        <ButtonWorker text='Create Role' style={{ float: 'right', margin: '16px' }} work={done => { this.setState({ createModalVisible: true }); done && done(); } } />
+                        <ButtonWorker text='Create Role' work={done => { this.setState({ createModalVisible: true }); done && done(); } } />
                     </div>
                 </div>
-                <Modal visible={this.state.createModalVisible} title='Create a role'>
+                <Modal visible={this.state.createModalVisible} title='Create a role' onClose={() => { this.setState({ createModalVisible: false }); }}>
                     <TextField name='displayname' placeholder='Display Name' onChange={(name, val) => { this.values[name] = val; }} />
                     <TextField name='name' placeholder='Name' onChange={(name, val) => { this.values[name] = val; }} />
                     <MultitagBox name='rights' placeholder='Rights' onChange={(name, val) => { this.values[name] = val; }} />

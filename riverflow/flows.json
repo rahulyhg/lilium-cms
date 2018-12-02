@@ -16,6 +16,7 @@
     "menus" : [
         {
             "id": "ponglinks",
+            "v": "ponglinks",
             "lys" : "ponglinks",
             "faicon": "fa-external-link",
             "displayname": "Ponglinks",
@@ -26,6 +27,7 @@
         },
         {
             "id": "comments",
+            "v": "comments",
             "lys" : "comments,threads",
             "faicon": "fa-comments",
             "displayname": "Comment threads",
@@ -36,6 +38,7 @@
         },
         {
             "id": "thedailylilium",
+            "v": "thedailylilium",
             "lys" : "daily,lilium",
             "faicon": "fa-newspaper",
             "displayname": "The Daily Lilium",
@@ -46,6 +49,7 @@
         },
         {    
             "id": "paymentdashboard",
+            "v": "paymentdashboard",
             "lys" : "payments,contractors",
             "faicon": "fa-dollar-sign",
             "displayname": "Payments Dashboard",
@@ -56,6 +60,7 @@
         },
         {    
             "id": "paymenthistory",
+            "v": "paymenthistory",
             "lys" : "payments,history,contractors",
             "faicon": "fa-history",
             "displayname": "Payments Reports",
@@ -65,17 +70,8 @@
             "section" : "home"            
         },
         {
-            "id": "support",
-            "lys" : "support,help,github",
-            "faicon": "fa-life-ring",
-            "displayname": "Support",
-            "priority": 2500,
-            "rights": ["dash"],
-            "absURL": "/fix",
-            "section" : "home"
-        },
-        {
             "id": "flagging",
+            "v": "flagging",
             "lys": "flagging,report,banning",
             "faicon": "fa-flag",
             "displayname": "Flagging",
@@ -86,6 +82,7 @@
         },
         {
             "id": "dashboard",
+            "v": "dashboard",
             "lys": "dashboard,home,traffic,trafic,realtime",
             "faicon": "fa-tachometer",
             "displayname": "Dashboard",
@@ -96,6 +93,7 @@
         },
         {
             "id": "mailtemplates",
+            "v": "mailtemplates",
             "lys" : "mail,templates,email",
             "faicon": "fa-envelope",
             "displayname": "Email Templates",
@@ -106,6 +104,7 @@
         },
         {
             "id" : "publishing",
+            "v" : "publishingcontent",
             "lys" : "articles,publishing,content",
             "faicon": "fa-pencil",
             "displayname": "Publishing",
@@ -116,6 +115,7 @@
         },
         {
             "id": "articles-topics",
+            "v": "topics",
             "lys" : "topics,categories,category",
             "faicon": "fa-tags",
             "displayname": "Topics",
@@ -126,6 +126,7 @@
         }, 
         {
             "id": "contentchains",
+            "v": "contentchains",
             "lys" : "chains,content,series",
             "faicon": "fa-link",
             "displayname": "Content Chains",
@@ -136,6 +137,7 @@
         }, 
         {
             "id": "styledpages",
+            "v": "styledpages",
             "lys" : "styledpages,static,pages",
             "faicon": "fa-paragraph",
             "displayname": "Styled Pages",
@@ -145,17 +147,8 @@
             "section" : "publishing"
         },
         {
-            "id": "crew",
-            "lys" : "crew,people,users",
-            "faicon": "fa-beer",
-            "displayname": "Crew",
-            "priority": 500,
-            "rights": ["dashboard"],
-            "absURL": "/crew",
-            "section" : "home"
-        },
-        {
             "id": "entities",
+            "v": "entities",
             "lys" : "entities,users,people",
             "faicon": "fa-users",
             "displayname": "Entities",
@@ -166,6 +159,7 @@
         },
         {
             "id": "staffing",
+            "v": "staffing",
             "lys" : "staffing,hire,contractors",
             "faicon": "fa-address-card",
             "displayname": "Staffing",
@@ -177,6 +171,7 @@
 
         {
             "id": "entities-rights",
+            "v" : "roles",
             "lys" : "roles,rights",
             "faicon": "fa-minus-circle",
             "displayname": "Roles",
@@ -186,17 +181,8 @@
             "section" : "management"
         },
         {
-            "id": "socialdispatch",
-            "lys" : "social,dispatch,facebook,twitter",
-            "faicon": "fa-share-alt",
-            "displayname": "Social Dispatch",
-            "priority": 410,
-            "rights": ["editor"],
-            "absURL": "/socialdispatch",
-            "section" : "publishing"
-        },
-        {
             "id": "profile",
+            "v": "profile",
             "lys" : "profile",
             "faicon": "fa-user",
             "displayname": "Profile",
@@ -207,6 +193,7 @@
         },        
         {
             "id": "notifications",
+            "v": "notifications",
             "lys" : "notifications",
             "faicon": "fa-inbox",
             "displayname": "Notifications",
@@ -217,6 +204,7 @@
         },        
         {
             "id": "preferences",
+            "v": "preferences",
             "lys" : "preferences",
             "faicon": "fa-user-cog",
             "displayname": "Preferences",
@@ -228,6 +216,7 @@
         
         {
             "id": "pwmanager",
+            "v": "pwmanager",
             "lys" : "password,manager,pw,social,facebook,twitter,instagram",
             "faicon": "fa-key",
             "displayname": "Password Manager",
@@ -238,6 +227,7 @@
         },
         {
             "id": "cakepop",
+            "v": "cakepop",
             "lys" : "cakepop,popups",
             "faicon": "fa-window-maximize",
             "displayname": "Cakepops",
@@ -248,6 +238,7 @@
         },
         {
             "id": "settings",
+            "v": "settings",
             "lys" : "settings,configurations,",
             "faicon": "fa-cogs",
             "displayname": "Settings",
@@ -258,6 +249,7 @@
         },
         {    
             "id": "ads",
+            "v": "adsmanagement",
             "lys" : "advertising,banners,ads",
             "faicon": "fa-usd-square",
             "displayname": "Ads management",
@@ -268,6 +260,7 @@
         }, 
         {
             "id": "themes",
+            "v": "themes",
             "lys" : "themes,website,appearance",
             "faicon": "fa-paint-brush",
             "displayname": "Themes",
@@ -278,6 +271,7 @@
         }, 
         {
             "id": "devtools",
+            "v" : "devtools",
             "lys" : "dev,tools,programming",
             "faicon": "fa-hashtag",
             "displayname": "Dev Tools",
@@ -288,6 +282,7 @@
         }, 
         {
             "id": "plugins",
+            "v": "plugins",
             "lys" : "plugins",
             "faicon": "fa-plug",
             "displayname": "Plugins",
@@ -297,6 +292,7 @@
             "section" : "lilium"
         }
     ],
+<<<<<<< HEAD
     "neutralized": [
         {    
             "id": "translations",
@@ -307,6 +303,42 @@
             "rights": ["admin"],
             "absURL": "/translations",
             "section" : "lilium"            
+=======
+
+    "neutralizedSidebarMenus" : [
+        {
+            "id": "socialdispatch",
+            "v": "socialdispatch",
+            "lys" : "social,dispatch,facebook,twitter",
+            "faicon": "fa-share-alt",
+            "displayname": "Social Dispatch",
+            "priority": 410,
+            "rights": ["editor"],
+            "absURL": "/socialdispatch",
+            "section" : "publishing"
+        },
+        {
+            "id": "crew",
+            "v": "crew",
+            "lys" : "crew,people,users",
+            "faicon": "fa-beer",
+            "displayname": "Crew",
+            "priority": 500,
+            "rights": ["dashboard"],
+            "absURL": "/crew",
+            "section" : "home"
+        },
+        {
+            "id": "support",
+            "v": "support",
+            "lys" : "support,help,github",
+            "faicon": "fa-life-ring",
+            "displayname": "Support",
+            "priority": 2500,
+            "rights": ["dash"],
+            "absURL": "/fix",
+            "section" : "home"
+>>>>>>> f9401cd27d8e47ef03da6232e20928779f6c5fec
         }
     ],
     "rivers" : [
@@ -321,7 +353,7 @@
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
-            "support" : ["livevar", "admin_post", "setup"]
+            "support" : ["livevar", "admin_post", "admin_put", "setup"]
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "pong",
@@ -451,7 +483,7 @@
         }, {
             "module" : "embed.js",
             "endpoint" : "embed",
-            "support" : []
+            "support" : ["livevar", "admin_post"]
         }, {
             "module" : "sharedcache.js",
             "endpoint" : "sharedcache",
@@ -578,6 +610,10 @@
             "module" : "creditcardscontroller.js",
             "endpoint" : "creditcards",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
+        }, {
+            "module" : "vocab.js",
+            "endpoint" : "vocab",
+            "support" : ["admin_post"]
         }, {
             "module" : "contractorsreports.js",
             "endpoint" : "contractorsreports",

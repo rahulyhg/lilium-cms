@@ -13,9 +13,9 @@
     position: relative;
     margin: 150px auto 0px;
     padding: 10px;
-    background: #ece7ef;
+    background: lighten(@liliumPurple, 35%);
     border-radius: 10px;
-    border : 3px solid #ca9be6;
+    border : 3px solid lighten(@liliumPurple, 10%);
 }
 
 #lys-input {
@@ -28,14 +28,14 @@
 }
 
 #lys-input:focus {
-    outline-color: #af57e4;
+    outline-color: @liliumPurple;
 }
 
 #lys-sugg-big-icon {
     width: 60px;
     height: 60px;
     margin-right: 10px;
-    border: 2px solid #ca9be6;
+    border: 2px solid lighten(@liliumPurple, 10%);
     border-radius: 5px;
     box-sizing: border-box;
 }
@@ -55,9 +55,9 @@
     &>i {
         width: 32px;
         height: 32px;
-        border: 1px solid #AAA;
-        background: #EEE;
-        color: #333;
+        border: 1px solid lighten(@liliumPurple, 10%);
+        background: @lesswhiteish;
+        color: @blackish;
         text-align: center;
         box-sizing: border-box;
         padding-top: 7px;
@@ -83,7 +83,7 @@
 #lys-sugg-cmds {
     padding-top: 4px;
     margin-top: 10px;
-    border-top: 1px dashed #af57e4;
+    border-top: 1px dashed @liliumPurple;
 }
 
 #lys-help {

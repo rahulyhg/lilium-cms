@@ -54,7 +54,6 @@ class Builder {
     }
 
     build(_c, input, outputkey, options, done) {
-        log('Builder', 'Compiling ES6 project from dir ' + input, 'info');
         const now = Date.now();
         options = options || Builder.defaultOptions;
 
@@ -64,11 +63,15 @@ class Builder {
         if (options.dontOverwite) {
             try {
                 fs.statSync(path.join(options.outputpath || (_c.server.html + "/apps/" + outputkey), options.bundlename || "app.bundle.js"));
-                log('Build', 'Will not build Preact project ' + input + ' because it already exists', 'info');
+                log('Builder', 'Will not build Preact project ' + input + ' because it already exists', 'info');
                 return done && done();
             } catch (err) { }
         }
 
+        log('Builder', 'Compiling ES6 project from dir ' + input, 'info');
+
+        const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+        
         const buildconfig = {
             mode : _c.env == "dev" ? "development" : "production",
             // externals: [nodeExternals()],
@@ -77,10 +80,10 @@ class Builder {
                     { 
                         test : /.m?js$/, 
                         exclude: /(node_modules)/,
-                        use : {
+                        use : [{
                             loader : "babel-loader?cacheDirectory=true", 
                             options : options.babel 
-                        }
+                        }]
                     },
                 ]
             },
@@ -88,19 +91,36 @@ class Builder {
             plugins: [],
             output : {
                 path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
-                filename : options.bundlename || "app.bundle.js"
+                filename : options.bundlename || "[name].bundle.js"
             },
             optimization : {
                 runtimeChunk: 'single',
                 splitChunks: {
                     cacheGroups: {
-                        vendor: {
-                            test: /[\\/]node_modules[\\/]/,
-                            name: 'vendors',
-                            chunks: 'all'
-                        }
+                        preact: {
+                            name: 'preact',
+                            chunks: 'all',
+                            minSize: 0,
+                            test: /[\\/]preact[\\/]/,
+                            priority: 99,
+                        },
                     }
-                }
+                },
+                minimizer: [
+                    new UglifyJsPlugin({
+                        include: /preact\.js$/,
+                        uglifyOptions: {
+                            compress: {
+                                reduce_funcs: false,
+                            },
+                        },
+                    }),
+                    new UglifyJsPlugin({
+                        exclude: /preact\.js$/,
+                        cache: true,
+                        parallel: true,
+                    })
+                ],
             }
         };
 

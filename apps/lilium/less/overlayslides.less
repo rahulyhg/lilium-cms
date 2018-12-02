@@ -24,8 +24,8 @@
         bottom: 0;
         width: 400px;
     
-        background: #333;
-        color: #EEE;
+        background: @blackish;
+        color: @lesswhiteish;
     
         animation: left-pane 0.3s ease-out;
     
@@ -42,13 +42,13 @@
             
             .overlay-slide-title {
                 font-size: 24px;
-                color: #EEE;
+                color: @lesswhiteish;
             }
             
             .overlay-slide-subtitle {
                 font-size: 18px;
                 text-transform: uppercase;
-                color: #AAA;
+                color: @middleGray;
                 font-weight: bold;
             }
         }
@@ -61,8 +61,8 @@
         bottom: 0;
         width: calc(100% - 400px);
         overflow-y: auto;
-        background: #EEE;
-        color: #333;
+        background: @lesswhiteish;
+        color: @blackish;
     
         animation: right-pane 0.3s ease-out;
     }

@@ -1,7 +1,25 @@
+.endpoint-paymentdashboard {
+    .tabview {
+        margin: 0;
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tabview .tab-content {
+        padding: 0;
+    }
+}
+
 #pending-payment-overviews {
     display: flex;
     flex-direction: row;
     height: 100%;
+
+    .pad10 {
+        padding: 10px;
+    }
 
     .payment-selection-boc {
         cursor: pointer;
@@ -23,8 +41,31 @@
         height: 65px;
     }
 
+    .contractor-info-multi-item {
+        text-align: left;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid @grayBorderColor; 
+
+        img {
+            vertical-align: middle;
+            display: inline-block;
+
+            height: 48px;
+            margin-right: 12px;
+            border-radius: 50%;
+        }
+
+        h2 {
+            vertical-align: middle;
+            display: inline-block;
+
+            font-size: 20px;
+        }
+    }
+
     img.contractor-avatar {
-        height: 100%;
+        height: 50px;
         width: auto;
         border-radius: 50%;
         padding: 0px 12px;
@@ -35,9 +76,9 @@
         }
     }
 
-    @controlsHeight: 5%;
+    @controlsHeight: 40px;
     & > #pending-payments-list {
-        flex: 0 0 25%;
+        flex: 0 0 400px;
         max-height: 100%;
 
         #list-controls {
@@ -56,21 +97,22 @@
         
         .pending-payment-card {
             margin: 1px;
-            padding: 6px;
-            box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+            padding: 6px 0px 6px 20px;
             display: flex;
+            cursor: pointer;
+            border-bottom: 1px solid @grayBorderColor;
             
             &.selected {
                 background: @liliumPurple;
                 background: -webkit-linear-gradient(35deg, #b48efb 0%, #f777e1 100%);
-                color: white;
+                color: @whiteish;
                 .selection-box-wrapper {
                     .payment-selection-boc {
-                        background-color: white;
+                        background-color: @whiteish;
 
                         i.fa {
                             display: initial;
-                            color: #333;
+                            color: @blackish;
                             margin-left: 2px;
                         }
                     }
@@ -78,7 +120,7 @@
             }
 
             .contractor-name {
-                margin: 0px 4px;
+                margin: 0px 4px 4px;
             }
             p.payment-text-detail {
                 margin: 0px 4px;
@@ -93,7 +135,8 @@
 
     #payment-details-column {
         flex-grow: 1;
-        background: @bodyBackgroundGray;
+        background: @liliumBackground;
+        overflow-y: auto;
 
         #no-selected-payment {
             margin: 40px auto;
@@ -103,35 +146,35 @@
         }
 
         #payment-details-header {
-            display: flex;
-            background: white;
-            padding: 8px;
+            text-align: center;
+            background: @whiteish;
+            padding: 20px 10px;
             box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 4px;
 
             img {
-                height: 100px;
+                height: 75px;
                 width: auto;
+                margin-top: 10px;
             }
 
             #detailled-payment-info {
-                flex-grow: 1;
-                margin-left: 12px;
-
-                & > * {
-                    margin: 6px 0px;
+                #payment-period {
+                    font-weight: 400;
                 }
 
-                #payment-period {
-                    color: darken(@liliumPurple, 15%);
-                    font-weight: 400;
+                p {
+                    margin: 0px 0px 8px;
                 }
             }
 
             #pay-individual {
-                flex: 0 0 150px;
+                padding: 10px 0px;
             }
 
+            .button-worker {
+                margin: 0px;
+            }
         }
 
         #individual-payment-breakdown {
@@ -140,36 +183,61 @@
 
         .payments-breakdown {
             height: 100%;
-            @headerHeight: 5%;
+            overflow-y: auto;
+            text-align: center;
+
             #breakdown-header {
-                display: flex;
-                justify-content: space-around;
-                background: white;
-                max-height: @headerHeight;
+                background: @whiteish;
                 margin-bottom: 4px;
                 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-                padding: 6px;
+                padding: 6px 0px 20px;
 
                 h1 {
-                    border-bottom: none;
-                    margin: 0px 12px;
+                    padding: 40px 20px 10px 20px;
+                    font-size: 28px;
+                    border-bottom: 0px;
+                    text-align: center;
+                    margin: 0;
+                    font-weight: normal;
                 }
             }
-    
-            #payment-breakdown-list {
-                overflow-x: hidden;
-                overflow-y: auto;
-                height: calc(100% - @headerHeight);
-                padding: 0px 8px;
+
+            .payment-avatar-list {
+                text-align: center;
+                padding: 20px;
+
+                .payment-multi-thumbnail {
+                    width: 50px;
+                    margin: 5px;
+                    border-radius: 50%;
+                    border: 2px solid @whiteish;
+                    box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
+                }
+            }
+
+            .payment-totals {
+                text-align: center;
+
+                .payment-total {
+                    font-size: 20px;
+                    margin-bottom: 12px;
+                    display: inline-block;
+
+                    &:not(:first-child) {
+                        &:before {
+                            content : ', ';
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 .card.payment-summary {
-    margin: 12px;
     padding: 12px;
     box-sizing: border-box;
+    text-align: left;
 
     .contractor-name {
         flex-grow: 1;
@@ -196,8 +264,6 @@ table.articles-summary {
             max-width: @headlineColumnWidth;
             width: @headlineColumnWidth;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     }
 }
@@ -209,15 +275,17 @@ table.articles-summary {
     #credit-card-list {
         height: 100%;
         overflow-y: scroll;
-        flex: 0 0 25%;
+        width: 350px;
+        padding: 25px;
 
         & > * {
             .credit-card {
                 margin: 8px auto;
+                cursor: pointer;
             }
 
             &.selected .credit-card {
-                transform: scale(1.1);
+                transform: scale(1.1) rotateZ(-3deg);
                 margin-bottom: 16px;
                 margin-top: 16px;
             }
@@ -225,13 +293,11 @@ table.articles-summary {
     }
 
     #credit-card-details-pane {
-        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-        background: @liliumBackground;
         height: 100%;
         flex-grow: 1;
 
         #credit-card-edit {
-            background: white;
+            background: @whiteish;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             margin: 20px auto;
             border-radius: @ccBorderRadius;
@@ -257,13 +323,17 @@ table.articles-summary {
     }
 }
 
+.payment-nothing-selected {
+    height: 100%;
+}
+
 #invoices-history {
     height: 100%;
     
     .invoice {
         display: flex;
         justify-content: space-between;
-        align-content: center;
+        align-items: center;
         margin: 3px 12px;
 
         & > * {
@@ -277,20 +347,21 @@ table.articles-summary {
 
         .invoice-contractor {
             display: flex;
-            align-content: center;
+            align-items: center;
 
             img {
                 height: 40px;
                 width: auto;
                 border-radius: 50%;
+                padding: 0px 6px;
             }
         }
 
         .invoice-status {
-            color: #ff2634;
+            color: @red;
 
             &.valid {
-                color: rgb(16, 111, 16);
+                color: @green;
             }
         }
     }

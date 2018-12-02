@@ -18,24 +18,36 @@ module.exports = cli => {
                 <link href="https://fonts.googleapis.com/css?family=Nunito+Sans|Oswald|Yanone+Kaffeesatz:700|Lora" rel="stylesheet">
                 <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-j8y0ITrvFafF4EkV1mPW0BKm6dp3c+J9Fky22Man50Ofxo2wNe5pT1oZejDH9/Dt" crossorigin="anonymous">
                 <link rel="stylesheet" type="text/css" href="${origin}/static/compiled/v4.css" />
+
                 <link rel="stylesheet" type="text/css" href="${origin}/flatpickr/flatpickr.min.css" />    
             </head>
             <body>
                 <div id="app"></div>
+
                 <script>
-                    window.liliumcms = {
-                        env : "${cli._c.env}",
-                        uid : "${cli._c.uid}",
-                        url : "${origin}",
-                        sitename : "${cli._c.website.sitetitle}",
-                        fulldevenv : ${fulldevenv}
-                    };
+                    window.liliumcms = ${JSON.stringify({
+                        env : cli._c.env,
+                        uid : cli._c.uid,
+                        url : origin,
+                        domain : cli._c.server.url.substring(2),
+                        sitename : cli._c.website.sitetitle,
+                        fulldevenv : !!fulldevenv
+                    })};
                 </script>
+                
                 <script src="${origin}/tinymce/tinymce.js"></script>
                 <script src="${origin}/chartjs/Chart.min.js"></script>
-                <script src="${buildLocation}/app.bundle.js"></script>
-                <script src="${buildLocation}/vendors.app.bundle.js"></script>
-                <script src="${buildLocation}/main.app.bundle.js"></script>
-            </body>
-        </html>`.replace(/\n/g, '').replace(/\>\s*\</g, '><');
+
+                ${
+                    fulldevenv ? `
+                        <script src="${buildLocation}/app.bundle.js"></script>
+                        <script src="${buildLocation}/vendors.app.bundle.js"></script>
+                        <script src="${buildLocation}/main.app.bundle.js"></script>
+                    ` : `
+                        <script src="${buildLocation}/main.bundle.js"></script>
+                        <script src="${buildLocation}/preact.bundle.js"></script>
+                        <script src="${buildLocation}/runtime.bundle.js"></script>
+                    `
+                }
+        </html>`.replace(/\n/g, '').replace(/\>\s*\</g, '><').replace(/\s\s+/g, ' ');
 };

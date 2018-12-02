@@ -1,33 +1,36 @@
-@tabBarHeight: 35px;
-
 .tabview:extend(.card) {
-    box-shadow: none;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
     height: 100%;
+    background: @whiteish;
+    box-sizing: border-box;
+    border-radius: 4px;
 
     .tabs-bar {
-        height: @tabBarHeight;
-        background: #F6F6F6;
+        background: @lesswhiteish;
+        box-sizing: border-box;
+        padding: 4px;
 
         .tab-name {
-            margin: 0px;
+            margin: 4px;
             padding: 6px 18px;
             display: inline-block;
             cursor: pointer;
+            box-sizing: border-box;
+            color: @middleGray;
+            border-radius: 4px;
 
             &.active {
-                padding-top: 3px;
-                font-size: 19px;
-                background: #FCFCFC;
-                border-top: 2px solid #af57e4;
-                box-shadow: 0px -4px 0px 3px rgba(0, 0, 0, 0.1);
+                color: @whiteish;
+                background: @liliumPurple;
             }
         }
     }
 
     .tab-content {
-        height: calc(100% - @tabBarHeight);
         padding: 14px;
         box-sizing: border-box;
+        height: 100%;
+        overflow-y: auto;
 
         & > .tab-inner-content-wrapper {
             height: 100%;

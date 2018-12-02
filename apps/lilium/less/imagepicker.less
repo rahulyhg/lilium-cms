@@ -18,6 +18,7 @@
 
 #image-gallery-detail {
     flex: 0 0 300px;
+    overflow-y: auto;
 }
 
 .image-picker-thumb,
@@ -26,7 +27,7 @@
     height: 150px;
     object-fit: cover;
     margin: 2px;
-    border: 2px solid #CCC;
+    border: 2px solid @grayBorderColor;
     cursor: pointer;
     transition: transform 0.2s, border 0.2s;
     box-sizing: border-box;
@@ -34,7 +35,7 @@
 
 .image-upload-loading,
 #image-upload-button {
-    background-color: #DDD;
+    background-color: @grayBorderColor;
     font-size: 68px;
     text-align: center;
     transition: none;
@@ -43,24 +44,24 @@
 #image-upload-button i,
 .image-upload-loading i {
     margin-top: 40px;
-    color: white;
+    color: @whiteish;
 }
 
 #image-upload-button:hover {
-    background-color: #AAA;
+    background-color: @middleGray;
 }
 
 .image-picker-thumb:hover {
-    border: 10px solid rgb(175, 87, 228);
+    border: 10px solid @liliumPurple;
 }
 
 .image-picker-thumb.selected {
-    border: 5px solid #73358f;
+    border: 5px solid darken(@liliumPurple, 20%);
     transform: rotateZ(5deg) scale(1.1);
 }
 
 .image-picker-selected-full {
-    background-color: #DDD;
+    background-color: @grayBorderColor;
     width: 100%;
     height: auto;
     max-height: 280px;
@@ -76,6 +77,6 @@
     width: 0px;
     height: 100%;
     display: block;
-    background: #CCC;
+    background: @grayBorderColor;
 }
 

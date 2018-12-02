@@ -8,6 +8,9 @@ keys/*
 plugins/*
 flowers/*
 
+# Less prod file
+apps/lilium/less/_prod*
+
 # Logs
 logs
 *.log

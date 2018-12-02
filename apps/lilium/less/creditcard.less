@@ -1,21 +1,32 @@
-@cardBg: @liliumPurple;
 @ccWidth: 85mm;
 @ccBorderRadius: 10px;
 
 .credit-card {
-    background-color: @cardBg;
-    background: linear-gradient(to right, lighten(@cardBg, 3%) 60%, darken(@cardBg, 5%) 90%);
-    border: 1px solid darken(@cardBg, 5%);
-    color: white;
+    background-color: lighten(@liliumPurple, 10%);
+
+    background:
+        linear-gradient(115deg, transparent 75%, rgba(255,255,255,.1) 75%) 0 0,
+        linear-gradient(245deg, transparent 75%, rgba(255,255,255,.1) 75%) 0 0,
+        linear-gradient(115deg, transparent 75%, rgba(255,255,255,.1) 75%) 7px -15px,
+        linear-gradient(245deg, transparent 75%, rgba(255,255,255,.1) 75%) 7px -15px,
+        lighten(@liliumPurple, 10%);
+
+    background-size: 15px 30px;
+
+    border: 1px solid darken(@liliumPurple, 5%);
+    color: @whiteish;
     border-radius: 10px;
     width: @ccWidth;
     height: 53mm;
     margin: 8px;
     position: relative;
-    box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.2);
     text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.2);
     font-family: monospace;
     transition: all 0.2s ease-out;
+    
+    sup {
+        font-size: 12px;
+    }
 
     .scheme-logo {
         position: absolute;
@@ -33,7 +44,7 @@
     }
 
     .card-data {
-        font-size: 16px;
+        font-size: 18px;
         margin: 30% 30px 12px 30px;
 
         p.card-number {
@@ -52,11 +63,5 @@
         position: absolute;
         right: 6px;
         bottom: 6px;
-    }
-}
-
-#credit-card-list {
-    .credit-card {
-        cursor: pointer;
     }
 }

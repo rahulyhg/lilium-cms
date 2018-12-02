@@ -20,15 +20,30 @@ export class ContractorReport extends Component {
         this.state = {
             sortedByAmount : [...props.report.data].sort((a, b) => b.total - a.total),
             sortedByDisplayname : props.report.data,
-            csvlink : props.report.csv
+            csvlink : props.report.csv,
+            totalinvoices : props.report.data.reduce((cur, acc) => acc.invoices + cur, 0)
         };
+
+        const totals = {};
+        props.report.data.forEach(entry => {
+            totals[entry.currency] = (totals[entry.currency] || 0) + entry.total;
+        });
+
+        this.state.totals = totals;
     }
 
     componentWillReceiveProps(props) {
+        const totals = {};
+        props.report.data.forEach(entry => {
+            totals[entry.currency] = (totals[entry.currency] || 0) + entry.total;
+        });
+
         this.setState({
             sortedByAmount : [...props.report.data].sort((a, b) => b.total - a.total),
             sortedByDisplayname : props.report.data,
-            csvlink : props.report.csv
+            csvlink : props.report.csv,
+            totalinvoices : props.report.data.reduce((cur, acc) => acc.invoices + cur, 0),
+            totals
         });
     }
 
@@ -85,6 +100,13 @@ export class ContractorReport extends Component {
                         <tbody>
                             { this.state.sortedByDisplayname.map(entry => (<ReportEntry entry={entry} key={entry.to._id} />)) }
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>{this.state.sortedByDisplayname.length} contractors</td>
+                                <td>{this.state.totalinvoices} invoices</td>
+                                <td>{Object.keys(this.state.totals).map(currency => this.state.totals[currency] + " " + currency.toUpperCase()).join(', ')}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

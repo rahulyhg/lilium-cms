@@ -25,14 +25,16 @@ export class InvoicesHistory extends Component {
         return (
             <div id="invoices-history">
                 <BigList endpoint='/contractorspayments/management/invoices' listitem={InvoiceHistoryItem} toolbar={InvoicesHistory.TOOLBAR_CONFIG}
-                        liststyle={{ display: 'block', overflow: 'scroll', height: '80%' }} loadmoreButton={LoadMoreInvoices} />
+                        liststyle={{ display: 'block', overflow: 'auto' }} loadmoreButton={LoadMoreInvoices} />
             </div>
         );
     }
 }
 
 const LoadMoreInvoices = props => (
-    <div className="button outline blue" onClick={props.onClick}>Load More</div>
+    <center>
+        <div className="button outline blue" style={{ width: 300, margin : 20 }} onClick={props.onClick}>Load More</div>
+    </center>
 );
 
 class InvoiceHistoryItem extends Component {
@@ -61,7 +63,7 @@ class InvoiceHistoryItem extends Component {
                     <span className="contractor-name">{this.contractor.displayname}</span>
                 </div>
                 <span className="invoice-total">{props.item.total + ' ' + props.item.currency.toUpperCase()}</span>
-                <span className="invoice-date">{dateformat(this.props.item.date, 'mmmm, dd yyyy - HH:MM')}</span>
+                <span className="invoice-date">{dateformat(this.props.item.date, 'mmmm dd, yyyy - HH:MM')}</span>
                 <span className={"invoice-status " + status}>{status}</span>
             </div>
         );

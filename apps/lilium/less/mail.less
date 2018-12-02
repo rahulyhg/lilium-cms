@@ -1,0 +1,76 @@
+.envelope {
+    border: 16px border transparent;
+    background-image: repeating-linear-gradient( -45deg, antiquewhite 0px, antiquewhite 15px, #3498db 15px, #3498db 30px, antiquewhite 30px, antiquewhite 45px, #e74c3c 45px, #e74c3c 60px);
+    padding: 10px;
+    border-radius: 5px;
+
+    display: block;
+    overflow: hidden;
+
+    margin: 20px auto;
+    width: 640px;
+
+    position: relative;
+    box-sizing: border-box;
+
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+
+    .envelope-content {
+        background: antiquewhite;
+        border-radius: 5px;
+
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+        min-height: 300px;
+    }
+
+    .envelope-title {
+        font-size: 22px;
+        padding-right: 50px;
+    }
+
+    .envelope-subtitle {
+        font-size: 19px;
+        padding-right: 50px;
+    }
+
+    .envelope-top {
+
+    }
+
+    .envelope-center {
+        width: 400px;
+        margin: 50px auto 0px;
+    }
+
+    .envelope-grunge {
+        z-index: 3;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+
+        mix-blend-mode: soft-light;
+    }
+
+    .envelope-stamp {
+        img {
+            z-index: 2;
+            position: absolute;
+            filter: sepia(0.9);
+            opacity: 0.8;
+
+            width: 70px;
+        }
+    }
+}
+
+.mail-templates-list {
+    .big-list-items {
+        display: block;
+    }
+}

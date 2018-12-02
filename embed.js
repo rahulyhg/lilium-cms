@@ -1,31 +1,158 @@
-var log = require('./log.js');
-var request = require('request');
-var Admin = require('./backend/admin.js');
-var db = require('./includes/db.js');
+const log = require('./log.js');
+const fs = require('fs');
+const request = require('request');
+const pathlib = require('path');
+const Admin = require('./backend/admin.js');
+const mkdirp = require('mkdirp');
+const dateformat = require('dateformat');
+const db = require('./includes/db.js');
 
-var Embed = function() {};
+class EmbedController {
+    livevar(cli, levels, params, sendback) {
+        const action = levels[0];
+        const network = levels[1];
 
-var createDivFromResponse = function(data) {
-    return '<p><img data-width="'+data.thumbnail_width+'" data-height="'+data.thumbnail_height+'" src="'+data.thumbnail_url+                  
-        '" class="lml-instagram-embed-2" /><a class="lml-instagram-op-2" href="'+                                                       
-        data.author_url +'" >via @'+data.author_name+'</a></p>';
-}
+        if (action == "single") {
+            db.findUnique(cli._c, 'embeds', { _id : db.mongoID(network) }, (err, embed) => {
+                sendback({ embed });
+            });
+        } else if (action == "fetch") {
+            db.findUnique(cli._c, 'embeds', { type : network, originalurl : params.url }, (err, embed) => {
+                if (embed) {
+                    sendback({ embed });
+                } else {
+                    this.fetch(cli._c, db.mongoID(cli.userinfo.userid), network, params.url, (err, embed) => {
+                        if (embed) {
+                            db.insert(cli._c, 'embeds', embed, () => {
+                                sendback({ embed });
+                            });
+                        } else {
+                            sendback({ err, embed });
+                        }
+                    });
+                }
+            });
+        } else if (action == "bunch") {
+            const $match = { };
 
-var createV3DivFromResponse = function(data, ourl) {
-    return data.is_video ? 
-            '<p contenteditable="false">'+
-            '<video class="lml-instagram-video-3" data-width="'+data.dimensions.width+'" data-height="'+data.dimensions.height+'" controls>' +
-            ' <source src="'+data.video_url+ '"> This video is not available.' +
-            '</video><a class="lml-instagram-op-3" href="'+
-            ourl +'" ><img src="'+data.owner.profile_pic_url+'" class="lml-instagram-avatar-3" /> @'+data.owner.username+
-            '<span class="lml-instagram-via-3">embedded via <i class="fab fa-instagram">&nbsp;</i> </span> </a> </p>'
-        : (
-            '<p contenteditable="false">'+
-            '<img data-width="'+data.dimensions.width+'" data-height="'+data.dimensions.height+'" src="'+data.display_url+ 
-            '" class="lml-instagram-embed-3" /><a class="lml-instagram-op-3" href="'+
-            ourl +'" ><img src="'+data.owner.profile_pic_url+'" class="lml-instagram-avatar-3" /> @'+data.owner.username+
-            '<span class="lml-instagram-via-3">embedded via <i class="fab fa-instagram">&nbsp;</i> </span> </a> </p>'
-        );
+            params.filters = params.filters || {};
+            if (params.filters.type)   { $match.type = params.type; }
+            if (params.filters.search) { $match.originalurl = new RegExp(params.filters.search, 'i'); }
+
+            const $limit = 50;
+            const $skip = $limit * ( params.skip ? parseInt(params.skip) : 0 );
+
+            db.join(cli._c, 'embeds', [
+                { $match },
+                { $sort : { _id : -1 } },
+                { $skip },
+                { $limit },
+            ], items => {
+                sendback({ items });
+            });
+        } else {
+            cli.throwHTTP(404, 'Undefined action ' + action, true);
+        }
+    }
+
+    fetch(_c, userid, network, url, done) {
+        if (network == "instagram" || network == "igcarousel") {
+            log('Embed', 'Fetching embed information from Instagram API', 'info');
+            request.get({ json : true, url : "https://api.instagram.com/oembed/?url=" + url }, (err, r, data) => {
+                if (data && data.thumbnail_url) {
+                    log('Embed', 'Got valid response from Instagram, about to cache embed', 'success');
+                    const now = new Date();
+                    const dirpath = pathlib.join(_c.server.html, 'staticembed', dateformat(now, 'yyyy/mm/dd'));
+                    const filename = "igembed_" + 
+                        Math.random().toString(16).substring(2) +
+                        Math.random().toString(16).substring(2) + "_" +
+                        Math.random().toString(16).substring(2) + "." + data.thumbnail_url.split('.').pop(); 
+
+                    const urlpath = "/" + pathlib.join('staticembed', dateformat(now, 'yyyy/mm/dd'), filename);
+
+                    mkdirp(dirpath, () => {
+                        request.get(data.thumbnail_url).on('end', (err, r) => {
+                            log('Embed', 'Piped embed file as ' + filename, 'success');
+
+                            done(undefined, {
+                                userid,
+                                urlpath,
+
+                                at : Date.now(),
+                                originalurl : url,
+                                imageurl : data.thumbnail_url,
+                                width : data.thumbnail_width,
+                                height : data.thumbnail_height,
+                                id : data.media_id,
+                                author : data.author_name,
+                                authorurl : data.author_url,
+                                caption : data.title,
+                                type : network,
+                                html : network == "igcarousel" ? data.html : ""
+                            });
+                        }).pipe(fs.createWriteStream(pathlib.join(dirpath, filename)));
+                    });
+                } else {
+                    log('Embed', `Got an unexpected response from Instagram`, 'warn');
+                    log('Embed', data, 'warn');
+
+                    done(err || r.status);
+                }
+            });
+        } else if (network == "twitter") {
+            request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
+                if (data && data.html) {
+                    done(undefined, {
+                        userid,
+                        at : Date.now(),
+                        type : network,
+                        originalurl : url,
+                        author : data.author_name, 
+                        authorurl : data.author_url,
+                        width : data.width,
+                        html : data.html
+                    })
+                } else {
+                    done(err || r.status);
+                }
+            });
+        } else if (network == "vimeo") {
+            request({url : "https://vimeo.com/api/oembed.json?url=" + url, json : true}, (err, r, data) => {
+                if (data && data.html) {
+                    done(undefined, {
+                        userid,
+                        at : Date.now(),
+                        type : network,
+                        originalurl : url,
+                        caption : data.title,
+                        author : data.author_name,
+                        authorurl : data.author_url,
+                        html : data.html,
+                        width : data.width,
+                        height : data.height,
+                        description : data.description, 
+                        thumbnail : data.thumbnail_url,
+                        thumbnailplay : data.thumbnail_url_with_play_button,
+                        id : data.video_id,
+                        date : new Date(data.upload_date)
+                    })
+                } else {
+                    done(err || r.status);
+                }
+            });
+        } else {
+            done(undefined, {
+                userid,
+                at : Date.now(),
+                originalurl : url,
+                type : network
+            });
+        }
+    }
+
+    adminPOST(cli) {
+
+    }
 }
 
 var handleRequest = function(cli) {
@@ -34,75 +161,6 @@ var handleRequest = function(cli) {
     var as = cli.routeinfo.params.as;
 
     switch (type) {
-        case "igcarousel":
-            request.get({json : true, url : "https://api.instagram.com/oembed/?url=" + url}, (err, r, data) => {
-                if (data) {
-                    cli.sendJSON({
-                        instagram : data,
-                        markup : data.html
-                    });
-                } else {
-                    cli.sendJSON( { 
-                        instagram : "", 
-                        markup : '<p class="lml-instagram-embed-err">Oops. It appears <b>Instagram.com</b> responded with an error. Make sure the Instagram account is public, that the picture is still available and that Instagram is not down.</p>', 
-                        error : "Invalid Instagram Response" 
-                    });
-                }
-            });
-            break;
-
-        case "instagram":
-            url += (url.includes('?') ? '&' : '?') + "__a=1";
-            request.get({url, json:true}, function(err, r, data) {
-                if (as == "json") {
-                    data ? cli.sendJSON(data.graphql ? {
-                        instagram : data.graphql.shortcode_media,
-                        markup : createV3DivFromResponse(data.graphql.shortcode_media, cli.routeinfo.params.url)
-                    } : data) : { instagram : "", markup : '<p class="lml-instagram-embed-err">Oops. It appears <b>Instagram.com</b> responded with an error. Make sure the Instagram account is public, that the picture is still available and that Instagram is not down.</p>', error : "Invalid Instagram Response" };
-                } else {
-                    cli.response.end(
-                        data.graphql ? 
-                            createV3DivFromResponse(data.graphql.shortcode_media, cli.routeinfo.params.url) :
-                            '<p class="lml-instagram-embed-err">Oops. It appears <b>Instagram.com</b> responded with an error. Make sure the Instagram account is public, that the picture is still available and that Instagram is not down.</p>'
-                    );
-                }
-            });
-            break;
-
-        case "fbvideo":
-            cli.sendJSON({
-                markup : `<div class="fb-video-wrap" contenteditable="false">
-                    <div class="lml-fb-video"
-                        data-href="${url}"
-                        data-width="640"
-                        data-allowfullscreen="true"
-                        data-autoplay="true"
-                        data-show-captions="true">
-                    </div>  
-                </div>`
-            });
-            break;
-
-        case "fbpost":
-            cli.sendJSON({
-                markup : `<div class="fb-post-wrap" contenteditable="false">
-                    <div class="lml-fb-post" data-width="640" data-href="${url}"></div>
-                </div>`
-            });
-            break;
-
-        case "twitter":
-            request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
-                data && data.html ? cli.sendJSON({
-                    data : data,
-                    markup : data.html
-                }) : cli.sendJSON({
-                    data : {},
-                    markup : ""
-                });
-            });
-            break;
-
         case "vimeo":
             request({url : "https://vimeo.com/api/oembed.json?url=" + url, json : true}, (err, r, data) => {
                 data && data.html ? cli.sendJSON({
@@ -114,91 +172,8 @@ var handleRequest = function(cli) {
                 });
             });
             break;
-
-        case "instagram_DEPRECATED":
-            request.get({url:"https://api.instagram.com/oembed?url=" + url, json:true}, function(err, r, data) {
-                cli.response.end(createDivFromResponse(data));
-            });
-            break;
     }
 };
 
-var canRequest = function(cli) {
-    return cli.hasRightOrRefuse('create-articles');
-};
 
-Embed.prototype.adminGET = function(cli) {
-    cli.touch("embed.GET");
-    if (canRequest(cli)) {
-        handleRequest(cli);
-    }
-};
-
-var scanInstagramSingle = function(cli, err, cur, done) {
-    if (!err) {
-        cur.hasNext(function(err, hasNext) {
-            if (hasNext) {
-                cur.next(function(err, obj) {
-                    var ctn = obj.content ? obj.content.replace(/<p>(&nbsp;)?<\/p>/g, "").replace(/\r\n/g, "") : "";
-
-                    var instaReg = /<p>https?\:\/\/www.instagram.com\/p\/[a-zA-Z0-9\-\_]*\/?[a-z\-\?\=0-9]*<\/p>/g;
-                    var instaStrings = [];
-
-                    while (m = instaReg.exec(ctn)) {
-                        instaStrings.push(m[0].slice(3, -4));
-                    }
-
-                    if (instaStrings.length == 0) {
-                        setTimeout(function() { scanInstagramSingle(cli, err, cur, done); }, 0);
-                    } else { 
-                        var instaindex = 0;
-                        var nextInsta = function() {
-                            if (instaindex > instaStrings.length) {
-                                db.update(cli._c, "content", {_id : obj._id}, {content : ctn}, function() {
-                                    log('Embed', 'Parsed ' + obj.title);
-                                    setTimeout(function() {
-                                        scanInstagramSingle(cli, err, cur, done);
-                                    }, 0);
-                                }, false, true);
-                            } else {
-                                var url = instaStrings[instaindex];
-                                request.get({url:"https://api.instagram.com/oembed?url=" + url, json:true}, function(err, r, data) {
-                                    ctn = ctn.replace(url, createDivFromResponse(data));                                                                     
-                                    instaindex++;                                                                                          
-                                    nextInsta();   
-                                });
-                            }
-                        }
-
-                        nextInsta();
-                    }
-                });
-            } else {
-                done();
-            }
-        });
-    }
-};
-
-var scanImgur = function(cli, er, cur, done) {
-
-};
-
-Embed.prototype.scanInstagram = function(cli) {
-    db.find(cli._c, "content", {}, [], function(err, cur) {
-        if (err) {
-
-        } else {
-            log('Embed', 'Going through all content for Instagram links left untransformed');
-            scanInstagramSingle(cli, err, cur, function() {
-                require('./notifications.js').notifyUser(cli.userinfo.userid, cli._c.id, {
-                    title: "Instagram",
-                    msg : "Refreshed all content",
-                    type: "success"
-                });
-            });
-        }
-    });
-};
-
-module.exports = new Embed();
+module.exports = new EmbedController();

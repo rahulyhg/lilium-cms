@@ -1,38 +1,55 @@
 import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { Link } from '../../routing/link';
-import API from '../../data/api';
 import { castNotification } from "../../layout/notifications";
 import { ButtonWorker } from "../../widgets/form";
+
+import API from '../../data/api';
 
 class MailTemplateListItem extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+
+        this.state = props.item;
+        this.state.hooktext = MailTemplateListItem.hooks.find(x => x.name == props.item.hooks);
     }
 
     render() {
         return (
-            <div class="card">
-                <div class="detail-head">
-                    <div class="bubble-wrap">
-                        <h2 className="big-title">{this.props.item.displayname}</h2>
+            <div class="envelope" style={{
+                transform : "rotateZ(" + (Math.random() * (-2) + 1) + "deg)"
+            }}>
+                <div class="envelope-stamp">
+                    <img src="/static/media/lmllogo.png" style={{
+                        top : Math.random() * 25,
+                        right: Math.random() * 30,
+                        transform : "rotateZ(" + (Math.random() * (-90) + 90) + "deg)"
+                    }} />
+                </div>
+                <div class="envelope-grunge">
+                    <Link href={'/mailtemplates/edit/' + this.state._id}>
+                        <img src="/static/media/grunge.jpg" />
+                    </Link>
+                </div>
+                <div class="envelope-content">
+                    <div class="envelope-top">
+                        <div class="envelope-title">
+                            {this.state.displayname}
+                        </div>
+                        <div class="envelope-subtitle">
                         {
-                            this.props.item.hooks ? (
-                                <h2 className="bubble purple">{this.props.item.hooks}</h2>
+                            this.state.hooktext ? (
+                                <div>{this.state.hooktext.displayname}</div>
                             ) : null
                         }
-                        
+                        </div>
+                    </div>
+                    <div class="envelope-center" style={{
+                        transform : "rotateZ(" + (Math.random() * (-2) + 1) + "deg)"
+                    }}>
+                        <p>{this.state.description}</p>
                     </div>
                 </div>
-                <div class="detail-list">
-                    <p>{this.props.item.description}</p>
-                </div>
-                <footer>
-                    <Link href={'/mailtemplates/edit/' + this.props.item._id}>
-                        <span className="mail-template-title">Edit</span>
-                    </Link>
-                </footer>
             </div>
         );
     }
@@ -55,8 +72,7 @@ export class ListMailTemplates extends Component {
             id: "mailtemplates",
             title: "Filters",
             fields: [
-                { type: "text", name: "search", title: "Search by name" },
-                { type: "select", name: "hook", title: "Hooks", options: [] },
+                { type: "text", name: "search", title: "Search by name" }
             ]
         };
     }
@@ -65,12 +81,23 @@ export class ListMailTemplates extends Component {
         API.get('/mailtemplates/hooks', {}, (err, data, r) => {
             if (!err) {
                 const toolbarConfig = ListMailTemplates.TOOLBAR_CONFIG;
-                toolbarConfig.fields[1].options.push(data.map(hook => ({ value: hook.name, text: hook.displayname })));
+                toolbarConfig.fields.push({
+                    type : "select",
+                    name : "hook",
+                    title : "Hooks",
+                    options : [{
+                        value : "", text : "All hooks"
+                    }, ...data.map(hook => ({ value: hook.name, text: hook.displayname }))]
+                });
+
+                MailTemplateListItem.hooks = data;
+
                 this.toolbarConfig = toolbarConfig;
                 this.setState({ loading: false })
             } else {
                 castNotification({
-                    title: "Couldn't get hooks from server",
+                    title : "Filter error",
+                    message : "Couldn't get hooks from server",
                     type: 'error'
                 })
             }
@@ -80,11 +107,9 @@ export class ListMailTemplates extends Component {
     render() {
         if (!this.state.loading) {
             return (
-                <div id="mail-templates-list">
-                    <h1>Styled Pages</h1>
+                <div class="mail-templates-list">
                     <BigList listitem={MailTemplateListItem} endpoint='/mailtemplates/search' toolbar={this.toolbarConfig}
-                            liststyle={{ maxWidth: '800px', margin: '0 auto' }}
-                            loadmoreButton={LoadMore}  />
+                        loadmoreButton={LoadMore}  />
                 </div>
             );
         } else {

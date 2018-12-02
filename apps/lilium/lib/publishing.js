@@ -7,7 +7,7 @@ export function savePost(postid, edits, done) {
 }
 
 export function validatePost(postid, done) {
-    API.get('/publishing/validate/' + postid, {}, (err, json, r) => {
+    API.put('/publishing/validate/' + postid, {}, (err, json, r) => {
         done(r.status != 200 && r.responseText, { valid : r.status == 200 });
     });
 }

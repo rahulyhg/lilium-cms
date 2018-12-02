@@ -47,6 +47,9 @@ class PongLinks {
         const hash = this.hashDestination(JSON.stringify(link));
         const versions = link.versions.map((v, i) => {
             v.identifier = v.identifier.trim().replace(/[\s\&]/g, '_');
+            if (!v.destnation.startsWith('http')) {
+                v.destination = "https://" + v.destination.trim();
+            };
 
             return {
                 destination : v.destination.trim() + (v.destination.includes("?") ? "&" : "?") +
@@ -81,17 +84,73 @@ class PongLinks {
     }
 
     adminPOST(cli) {
-        if (!cli.hasRight('ponglinks')) {
-            return cli.refuse();
+        if (!cli.hasRightOrRefuse('ponglinks')) {            
+            const action = cli.routeinfo.path[2];
+            if (action == "create") {
+                this.createLink(cli._c, db.mongoID(cli.userinfo.userid), cli.postdata.data, (err, id)  => cli.sendJSON(err ? { error : err.toString() } : { id }) );
+            } else if (action == "edit") {
+                this.editLink(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, (err, mod) => cli.sendJSON(err ? { error : err.toString() } : { mod }));
+            } else {
+                cli.throwHTTP(404, undcefined, true);
+            }
+        }
+    }
+
+    /**
+     * Checks that all version objects have a hash, if not, attribute a new hash (in place)
+     * @param {array} versions Array of version objects
+     */
+    maybeCreateHash(versions) {
+        const nestHash = () => {
+            const highest = versions.reduce((a, b) => (a.hash > (b.hash || 0)) ? a : b);
+            return (highest && highest.hash) ? highest.hash + 1 : 1000;
         }
 
-        const action = cli.routeinfo.path[2];
-        if (action == "create") {
-            this.createLink(cli._c, db.mongoID(cli.userinfo.userid), cli.postdata.data, (err, id)  => cli.sendJSON(err ? { error : err.toString() } : { id }) );
-        } else if (action == "edit") {
-            this.editLink(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, (err, mod) => cli.sendJSON(err ? { error : err.toString() } : { mod }));
-        } else {
-            cli.throwHTTP(404, undcefined, true);
+        if (versions && versions.length) {
+            versions.forEach(version => {
+                if (!version.hash) version.hash = nestHash();
+            });
+        }
+    }
+
+    adminPUT(cli) {
+        if (cli.hasRightOrRefuse('ponglinks')) {
+            if (cli.routeinfo.path[2] && db.isValidMongoID(cli.routeinfo.path[2])) {
+                cli.readPostData(json => {
+                    const newValues = {};
+                    if (json.versions) {
+                        newValues.versions = json.versions || [];
+                        this.maybeCreateHash(json.versions);
+                        
+                    }
+                    if (json.defaults) newValues.defaults = json.defaults;
+                    if (json.identifier) newValues.identifier = json.identifier;
+
+                    db.update(cli._c, 'ponglinks', { _id: db.mongoID(cli.routeinfo.path[2]) }, {...json}, (err, r) => {
+                        if (!err) {
+                            db.findUnique(cli._c, 'ponglinks', { _id: db.mongoID(cli.routeinfo.path[2]) }, (err, updated) => {
+                                if (!err) {
+                                    cli.sendJSON({ ok: true, updated });
+
+                                    if (updated.versions && updated.versions.length) {
+                                        const set = {};
+                                        updated.versions.forEach(v => {
+                                            set["ponglinks_" + updated.hash + (v.name || v.hash)] = v.destination;
+                                        });
+                                        sharedcache.set(set);
+                                    }
+                                } else {
+                                    cli.throwHTTP(500, 'Error while updating ponglink', true);
+                                }
+                            });
+                        } else {
+                            cli.throwHTTP(500, 'Error while updating ponglink', true);
+                        }
+                    }, false, true);
+                });
+            } else {
+                cli.throwHTTP(400, 'A valid ponglink ID is required as url parameter', true);
+            }
         }
     }
 
@@ -180,9 +239,11 @@ class PongLinks {
                         const set = {};
                         log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
                         arr.forEach(x => {
-                            x.versions.forEach(v => {
-                                set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
-                            });
+                            if (x.versions) {
+                                x.versions.forEach(v => {
+                                    set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
+                                });
+                            }
                         });
 
                         sharedcache.set(set);

@@ -758,7 +758,7 @@ class LMLCompiler {
 
         if (!ctx.vocab) {
             let langCode = ctx.extra.lang || ctx.extra.language || ctx.config.website.language;
-            ctx.vocab = require('../vocab/' + langCode + ".json");
+            // ctx.vocab = require('../vocab/' + langCode + ".json");
         }
     };
 

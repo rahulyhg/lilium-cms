@@ -1,6 +1,21 @@
 #pw-manager {
     .password {
         display: flex;
+        align-content: center;
+        margin-bottom: 6px;
+        .field-wrap {
+            margin: 0px;
+        }
+
+        .delete-password {
+            flex: 0 0 25px;
+            height: 25px;
+            color: @red;
+            margin-right: 8px;
+            box-sizing: border-box;
+            text-align: center;
+            cursor: pointer;
+        }
     }
     
     .password-name {
@@ -11,16 +26,3 @@
     }
 }
 
-.password {
-    .delete-password {
-        background-color: #FF3333;
-        width: 15px;
-        height: 15px;
-        margin: 8px;
-        margin-top: 18px;
-        padding: 5px;
-        text-align: center;
-        color: white;
-        cursor: pointer;
-    }
-}

@@ -2,7 +2,7 @@
 
 .dashboard-tabs {
     display: flex;
-    background: #ede5ef;
+    background: @lesswhiteish;
 
     .dashboard-tab {
         padding: 20px;
@@ -23,12 +23,12 @@
 .dashboard-selected-expand-tab {
     flex-grow : 1;
     overflow-y: scroll;
-    background: #F6F6F6;
+    background: @whiteish;
 }
 
 .dashboard-graph-wrap {
     padding: 20px;
-    background: white;
+    background: @whiteish;
     box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
     border-radius: 10px;
     margin-bottom: 20px;
@@ -59,7 +59,7 @@
         &>* {
             display:table-cell;
             padding: 10px;
-            border-bottom: 1px solid #DDD;
+            border-bottom: 1px solid @grayBorderColor;
         }
     }
 
@@ -78,8 +78,8 @@
             margin-right: 8px;
             display: inline-block;
             vertical-align: middle;
-            background: #333;
-            color: white;
+            background: @blackish;
+            color: @whiteish;
             padding: 2px 5px;
             border-radius: 4px;
             font-style: normal;
@@ -97,7 +97,7 @@
 
         .realtime-post-url {
             text-decoration: none;
-            color: #333;
+            color: @blackish;
         }
     }
 }
@@ -109,7 +109,7 @@
     border-radius: 10px;
     overflow: hidden;
     height: @sideTabHeight * 4;
-    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+    box-shadow: @softshadow;
 
     .dashboard-side-tabs {
         width: 240px;
@@ -118,7 +118,7 @@
             display: block;
             padding: 15px;
             width: 240px;
-            background: #ede5ef;
+            background: @lesswhiteish;
             cursor: pointer;
             height: @sideTabHeight;
             box-sizing: border-box;
@@ -126,7 +126,7 @@
             .dashboard-side-tab-diff {
                 float: right;
                 font-size: 12px;
-                color: white;
+                color: @whiteish;
                 padding: 3px 5px;
                 border-radius: 4px;
                 vertical-align: text-bottom;
@@ -142,11 +142,11 @@
                 }
 
                 &.green {
-                    background: #2f9e17;
+                    background: @green;
                 }
 
                 &.red {
-                    background: #9e1717;
+                    background: @red;
                 }
             }
 
@@ -165,7 +165,7 @@
             }
                 
             &.selected {
-                color: white;
+                color: @whiteish;
 
                 background : -moz-linear-gradient(-3.38% 87.38% 35deg,rgba(180, 142, 251, 1) 0%,rgba(247, 119, 225, 1) 100%);
                 background : -webkit-linear-gradient(35deg, rgba(180, 142, 251, 1) 0%, rgba(247, 119, 225, 1) 100%);
@@ -221,7 +221,7 @@
         box-sizing: border-box;
         z-index: 2;
         font-size: 26px;
-        color: white;
+        color: @whiteish;
         text-shadow: 0px 0px 2px black;
     }
 
@@ -250,13 +250,13 @@
     h3 {
         text-align: left;
         padding: 0px 20px;
-        color: #333;
+        color: @blackish;
     }
 
     .top-post-author {
         padding: 16px 20px;
-        background: #F1F1F1;
-        border-top: 1px solid #DDD;
+        background: @whiteish;
+        border-top: 1px solid @grayBorderColor;
 
         .top-post-author-image {
             display: inline-block;
@@ -285,17 +285,17 @@
     padding-bottom: 10px;
 
     .dashboard-ponglink-campaign {
-        background: #F6F6F6;
+        background: @whiteish;
         margin-right: 10px;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+        box-shadow: @softshadow;
         cursor: pointer;
         height: 260px;
         position: relative;
 
         &:hover {
-            background:#FCFCFC;
+            background: @whiteish;
         }
 
         &.active {
@@ -308,11 +308,11 @@
             background: linear-gradient(55deg, #b48efb 0%, #f777e1 100%);
             filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#B48EFB', endColorstr='#F777E1', GradientType=1);
 
-            color: white;
+            color: @whiteish;
 
             .dashboard-ponglink-card-date,
             .dashboard-ponglink-card-clicks {
-                color: white;
+                color: @whiteish;
             }
 
             .dashboard-ponglink-card-author {
@@ -322,7 +322,7 @@
 
         .dashboard-ponglink-card-date {
             font-weight: bold;
-            color: #999;
+            color: @middleGray;
             margin-bottom: 4px;
             font-size: 14px;
         }       
@@ -330,7 +330,6 @@
         .dashboard-ponglink-card-clicks {
             font-weight: bold;
             font-size: 16px;
-            color: #46354c;
         }
 
         .dashboard-ponglink-card-bot {
@@ -382,9 +381,9 @@
 }
 
 .dashboard-ponglink-graph-wrap {
-    background: #FCFCFC;
+    background: @whiteish;
     padding: 20px;
-    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+    box-shadow: @softshadow;
     border-radius: 10px;
 
     h2 {
@@ -404,17 +403,17 @@
     justify-content: center;
 
     &:hover {
-        background: #F3F3F3;
+        background: @whiteish;
 
         .dashboard-contractor-invoice-bill-icon {
-            background: #96f381;
+            background: lighten(@green, 25%);
         }
     }
 
     .dashboard-contractor-invoice-bill-icon {
         width: 50px;
         text-align: center;
-        background: #bff5b3;
+        background: lighten(@green, 15%);
         border-radius: 50%;
         height: 50px;
         padding-top: 14px;
@@ -423,7 +422,7 @@
 
         i {
             font-size: 22px;
-            color: #59944c;
+            color: darken(@green, 15%);
         }
     }
 
@@ -452,7 +451,7 @@
         text-align: center;
         font-size: 48px;
         font-weight: 100;
-        color: #333;
+        color: @blackish;
     }
 
     &:first-child { margin-right: 20px; }

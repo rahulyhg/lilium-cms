@@ -18,7 +18,7 @@ const loginSuccess = (cli, userObj, cb) => {
             log('Login', 'Logged in user ' + userObj.username + " for the first time");
 
             entities.firstLogin(cli, userObj, () => {
-                cli.redirect(cli._c.server.url + '/lilium/welcome', false);
+                cli.redirect(cli._c.server.url + '/lilium/onboarding', false);
             });
         } else {
             entities.registerLogin(cli, userObj, () => {

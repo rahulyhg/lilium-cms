@@ -28,16 +28,16 @@
             display: inline-block;
             height: 12px;
             width: 12px;
-            background: #333;
+            background: @blackish;
             border-radius: 50%;
             margin-right: 8px;
 
             &.status-active {
-                background: #8279e2;
+                background: @blue;
             }
 
             &.status-terminated {
-                background: #d66664;
+                background: @orange;
             }
         }
     }
@@ -47,15 +47,15 @@
     &>.th {
         font-weight: bold;
         padding: 10px;
-        border-bottom: 1px solid #DDD;
-        background: #F6F6F6;
+        border-bottom: 1px solid @grayBorderColor;
+        background: @whiteish;
     }
 }
 
 .single-staff-header {
     padding: 50px;
-    background: #F9F9F9;
-    border-bottom: 1px solid #DDD;
+    background: @whiteish;
+    border-bottom: 1px solid @grayBorderColor;
     display: flex;
     align-content : center;
 
@@ -80,8 +80,8 @@
 
         small {
             display: inline-block;
-            background-color: #777;
-            color: white;
+            background-color: @middleGray;
+            color: @whiteish;
             padding: 2px 4px 1px;
             border-radius: 3px;
         }

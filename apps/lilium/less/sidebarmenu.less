@@ -7,11 +7,11 @@
     margin: 0;
     bottom: 0px;
     width: 240px;
-    color: white;
+    color: @whiteish;
     transition: 0.2s;
     transform: translate3d(-210px, 0px, 0px);
     z-index: @z_liliumMenu;
-    background: #333;
+    background: @blackish;
 
     &:hover {
         transform: translate3d(0px, 0px, 0px);    
@@ -25,7 +25,7 @@
 
     .lilium-menu-active {
         margin-top: 10px;
-        color: #DDD;
+        color: @lesswhiteish;
 
         .sidebar-menu-item {
             display: block;
@@ -57,7 +57,7 @@
     .lilium-menu-section-header {
         display: inline-block;
         padding: 14px 0;
-        background: #222;
+        background: darken(@blackish, 5%);
         margin: 4px;
         border-radius: 6px;
         text-align: center;
@@ -68,7 +68,7 @@
         box-shadow: 0px 0px 3px rgba(0,0,0,0.5) inset;
 
         &:hover {
-            background: #111;
+            background: darken(@blackish, 5%);
         }
         
         &.grad {

@@ -118,7 +118,7 @@ const CARD_WIDTH = 250;
 export class PonglinkTab extends Component {
     static get tabprops() {
         return {
-            text : "Ponglinks",
+            text : _v("ponglinks"),
             right : "ponglink",
             id : "ponglink"
         }

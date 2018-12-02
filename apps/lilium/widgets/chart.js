@@ -31,11 +31,13 @@ export class ChartGraph extends Component {
 
     componentWillReceiveProps(props) {
         if (props.chart && this.chart) {
-            this.chart.data = props.chart.data;
-            this.chart.type = props.chart.type;
-            this.chart.options = props.chart.options;
+            if (JSON.stringify(this.props.chart.data.datasets[0].data) != JSON.stringify(props.chart.data.datasets[0].data)) {
+                this.chart.data = props.chart.data;
+                this.chart.type = props.chart.type;
+                this.chart.options = props.chart.options;
 
-            this.chart.update();
+                this.chart.update();
+            }
         }
     }
 

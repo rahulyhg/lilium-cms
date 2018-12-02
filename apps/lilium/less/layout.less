@@ -8,11 +8,11 @@
 }
  
 ::-webkit-scrollbar-track {
-    border: 0.5px solid #CCC;
+    border: 0.5px solid darken(@grayBorderColor, 5%);
 }
  
 ::-webkit-scrollbar-thumb {
-    background: #DDD;
+    background: @grayBorderColor;
 }
 
 *:hover::-webkit-scrollbar-thumb {
@@ -21,43 +21,85 @@
 
 .fa-spin-fast {
     font-size: 60px;
-    color: rgb(170, 153, 185);
+    color: lighten(@liliumPurple, 20%);
     margin-top : 20px;
 }
 
+
 .leader-title {
-    padding-bottom: 250px;
-    color: #F6F6F6;
-    background: #be78cf;
-    background: linear-gradient(55deg, #815bc7 0%, #ab4f9b 100%);
+    padding-bottom: 150px;
+    color: @whiteish;
+    background: lighten(@liliumPurple, 5%);
+    background: linear-gradient(55deg, darken(@liliumPurple, 25%) 0%, lighten(@liliumPurple, 0%) 100%);
     box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+    overflow-x : hidden;
+
+    position: relative;
 
     .leader-title-responsive {
         margin: auto;
         max-width: 720px;
         padding-top: 60px;
+        z-index: 3;
+        position: relative;
 
         h1 {
-            color: #F6F6F6;
+            color: @whiteish;
             border: none;
             margin: 0px 0px 20px;
         }
     }
+
+    &:before{
+        background: linear-gradient(55deg, darken(@liliumPurple, 25%) 0%, transparent 50%);
+        position: absolute;
+        width: 130%;
+        height: 250px;
+        bottom: -10px;
+        left: -10%;
+        right: 0;
+        content: ' ';
+        border-radius: 100%;
+    }
+
+    &:after {
+        background: linear-gradient(55deg, darken(@liliumPurple, 25%) 0%, transparent 85%);
+        position: absolute;
+        width: 80%;
+        height: 250px;
+        bottom: -100px;
+        left: -10%;
+        right: 0;
+        content: ' ';
+        border-radius: 100%;
+    }
+
+    clip-path: ellipse(100% 100% at 50% 0%);
 }
 
 .leader-content {
     margin-top: -120px;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 2;
+    position: relative;
 
     &.solid {
         border-top-right-radius: 10px;
         border-top-left-radius: 10px;
         background: @liliumBackground;
-        margin-left: auto;
-        margin-right: auto;
         box-shadow: 0px -2px 0px 0px rgba(0,0,0,0.1);
+    }
+
+    &.classic {
+        padding: 40px;
+        width: 720px;
+        box-sizing: border-box;
     }
 }
 
-.flex {
+.flex-wrap {
     display: flex;
 }

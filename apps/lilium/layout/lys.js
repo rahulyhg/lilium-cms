@@ -39,8 +39,8 @@ export class Lys extends Component {
 
     createCommandFromProp(menus) {
         this.commands = menus.filter(x => x.lys).map(x => ({
-            command : x.lys.replace(/,/g, ''),
-            displayname : x.displayname,
+            command : x.lys.replace(/,/g, '') + _v(x.v),
+            displayname : _v(x.v),
             icon : "fa " + x.faicon,
             url : x.absURL.replace('admin', '')
         }));

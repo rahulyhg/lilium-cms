@@ -36,13 +36,11 @@ export default class AdsManagement extends Component {
             this.setState({ adSets });
             
             API.post('/ads/' + id, {ads: adSets[adSetIndex].ads}, (err, data, r) => {
-                if (r.status == 200) {
+                if (!r.status == 200) {
                     castNotification({
-                        title: 'Modifications to the ad set saved'
-                    })
-                } else {
-                    castNotification({
-                        title: 'Could not save ad sets to the server'
+                        title : "Error",
+                        message : `[${r.status}] Could not save ad sets to the server`,
+                        type : 'error'
                     })
                 }
             });
@@ -53,8 +51,13 @@ export default class AdsManagement extends Component {
         if (!this.state.loading) {
             return (
                 <div id="ads-management">
-                    <h1>Advertisement Management</h1>
-                    <div id="ads-tabs" style={{ width: '800px', margin: 'auto' }}>
+                    <div class="leader-title">
+                        <div class="leader-title-responsive">
+                            <h1>Advertisement Management</h1>
+                            <p>A list of ad tags to be used by the theme, grouped by language and page type. It's up to the theme to decide whether or not those settings will be respected.</p>
+                        </div>
+                    </div>
+                    <div class="leader-content solid classic">
                         <TabView id='ads-management'>
                             {
                                 this.state.adSets.map(adSet => (

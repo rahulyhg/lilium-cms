@@ -3,7 +3,7 @@ import { BigList } from '../../widgets/biglist';
 import { getSession } from '../../data/cache';
 import { ButtonWorker } from '../../widgets/form';
 import { castOverlay } from '../../overlay/overlaywrap';
-import { Version } from './lib';
+import { VersionsList, STATUS_TO_COLOR } from './lib';
 import { Link } from '../../routing/link';
 
 const styles = {
@@ -19,12 +19,6 @@ const styles = {
         margin: '10px 100px',
         textAlign:'center'
     }
-}
-
-const STATUS_TO_COLOR = {
-    active : 'green',
-    paused : 'orange',
-    archived : ''
 }
 
 class Ponglink extends Component {
@@ -48,33 +42,14 @@ class Ponglink extends Component {
                         </div>
 
                         <div class="right">
-                            <span>{this.state.clicks} <i class="far fa-share"></i></span>
+                            <span title={`${this.state.clicks || 0} clicks`}>{this.state.clicks || 0} <i class="far fa-share"></i></span>
                         </div>
                     </div>
-                    
+
                     <div>Created by {getSession('mappedEntities')[this.state.creatorid].displayname}</div>
                 </div>
 
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th align='left' className='medium-header' style={styles.mediumHeader}>Medium</th>
-                            <th align='left'>Destination</th>
-                            <th style={{maxWidth: '80px'}}>Copy</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            this.state.versions.map(version => {
-                                return (
-                                    <Version medium={version.medium} redir={version.destination} dest={`https://www.narcity.com/pong/${this.state.hash}/${version.hash}`} />
-                                );
-                            })
-                        }
-                    </tbody>
-                </table>
-
+                <VersionsList ponglink={this.state} versions={this.state.versions} editable={false} />
             </div>
         );
     }
@@ -126,14 +101,11 @@ export class PonglinksList extends Component {
         };
     }
 
-    componentWillUnmount() {
-
-    }
-
     render() {
         return (
             <div id="ponglinks-list">
-                <BigList listitem={Ponglink} addComponent={PonglinkListItemAdd} batchsize={15} endpoint='/ponglinks/bunch' liststyle={{ maxWidth: 800, margin: 'auto' }} toolbar={PonglinksList.TOOLBAR_CONFIG} loadmoreButton={LoadMore} />                
+                <BigList listitem={Ponglink} addComponent={PonglinkListItemAdd} batchsize={15} endpoint='/ponglinks/bunch'
+                        liststyle={{ maxWidth: 800, margin: 'auto' }} toolbar={PonglinksList.TOOLBAR_CONFIG} loadmoreButton={LoadMore} />                
             </div>
         );
     }
