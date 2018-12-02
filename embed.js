@@ -116,6 +116,54 @@ class EmbedController {
                     done(err || r.status);
                 }
             });
+        } else if (network == "fbpost" || network == "fbvideo") {
+            request({url : "https://www.facebook.com/plugins/" + (network == "fbpost" ? "post" : "video") + "/oembed.json/?url=" + url, json:true}, (err, r, data) => {
+                if (data && data.html) {
+                    done(undefined, {
+                        userid, 
+                        at : Date.now(),
+                        type : network, 
+                        pagename : data.author_name,
+                        pageurl : data.author_url,
+                        embedurl : data.url,
+                        originalurl : url, 
+                        html : data.html
+                    });
+                } else {
+                    done(err || r.status);
+                }
+            });
+        } else if (network == "soundcloud") {
+            done(undefined, {
+                userid, 
+                at : Date.now(),
+                type : network, 
+                originalurl : url,
+                html : `<iframe src="https://w.soundcloud.com/player/?url=${url}" width="100%" height="320" frameborder="0"></iframe>`
+            });
+        } else if (network == "reddit") {
+            const fromarr = url.split('/');
+            const from = "https://" + fromarr.splice(2, 3).join('/')
+            done(undefined, {
+                userid, 
+                at : Date.now(),
+                type : network,
+                originalurl : url,
+                html : `<blockquote class="reddit-card" data-card-created="${Math.floor(Date.now() / 1000)}"><a href="${url}">${url}</a> from <a href="${from}">${from}</a></blockquote>`
+            });
+        } else if (network == "youtube") {
+            const videoid = url.split('v=')[1].split('&')[0];
+            if (!videoid) {
+                return done("Missing 'v' parameter");
+            }
+
+            done(undefined, {
+                userid, 
+                at : Date.now(),
+                type : network, 
+                originalurl : url, 
+                html : `<iframe src="https://www.youtube.com/embed/${videoid}" allow="autoplay; encrypted-media" width="640" height="360" frameborder="0"></iframe>`
+            });
         } else if (network == "vimeo") {
             request({url : "https://vimeo.com/api/oembed.json?url=" + url, json : true}, (err, r, data) => {
                 if (data && data.html) {
