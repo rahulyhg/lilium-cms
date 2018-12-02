@@ -30,8 +30,12 @@
     .tab-content {
         padding: 14px;
         box-sizing: border-box;
-        height: 100%;
+        height: calc(100% - 50px);
         overflow-y: auto;
+
+        &.singletab {
+            height: 100%;
+        }
 
         & > .tab-inner-content-wrapper {
             height: 100%;
