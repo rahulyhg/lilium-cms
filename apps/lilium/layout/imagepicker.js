@@ -155,6 +155,10 @@ class ImageThumbnail extends Component {
         this.props.clicked(this.state.image, this);
     }
 
+    doubleclicked() {
+        Picker.accept({ type: ImagePicker.slug, [ImagePicker.slug] : this.state.image });
+    }
+
     render() {
         if (this.state.uploading) {
             return (
@@ -174,7 +178,7 @@ class ImageThumbnail extends Component {
         }
 
         return (
-            <img onClick={this.clicked.bind(this)} 
+            <img onClick={this.clicked.bind(this)} onDblClick={this.doubleclicked.bind(this)} 
                 class={"image-picker-thumb " + (this.state.selected ? "selected" : "")} 
                 src={this.state.image.sizes.thumbnail.url} 
             />
