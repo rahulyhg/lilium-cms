@@ -58,6 +58,7 @@
 
     .instagram-preview {
         position: relative;
+        min-height: 200px;
 
         .instagram-preview-image {
             width: 100%;
@@ -69,7 +70,7 @@
 
         .instagram-preview-credit {
             position: absolute;
-            top : 6px;
+            bottom : 6px;
             left: 6px;
             padding: 2px 5px;
             font-size: 12px;
@@ -80,6 +81,17 @@
 
         p {
             font-size: 14px;
+        }
+
+        .fa-play, .fa-columns {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 70px;
+            font-size: 62px;
+            text-align: center;
+            color: @whiteish;
+            opacity: 0.8;
         }
     }
 

@@ -56,7 +56,7 @@ class EmbedController {
     }
 
     fetch(_c, userid, network, url, done) {
-        if (network == "instagram" || network == "igcarousel") {
+        if (network == "instagram" || network == "igcarousel" || network == "igvideo") {
             log('Embed', 'Fetching embed information from Instagram API', 'info');
             request.get({ json : true, url : "https://api.instagram.com/oembed/?url=" + url }, (err, r, data) => {
                 if (data && data.thumbnail_url) {

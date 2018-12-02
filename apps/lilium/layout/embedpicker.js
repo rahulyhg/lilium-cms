@@ -11,8 +11,32 @@ const EmbedTypeInstagram = props => (<div>
         <span>Instagram photo</span>
     </div>
     <div class="instagram-preview">
-        <img src={props.embed.urlpath} class="instagram-preview-image" />
+        <img src={props.embed.urlpath} class="instagram-preview-image" alt={props.embed.caption} />
         <div class="instagram-preview-credit">@{props.embed.author}</div>
+    </div>
+</div>)
+
+const EmbedTypeInstagramVideo = props => (<div>
+    <div class="embed-topbanner instagram">
+        <i class="fab fa-instagram"></i>
+        <span>Instagram video</span>
+    </div>
+    <div class="instagram-preview">
+        <img src={props.embed.urlpath} class="instagram-preview-image" alt={props.embed.caption} />
+        <div class="instagram-preview-credit">@{props.embed.author}</div>
+        <i class="fas fa-play"></i>
+    </div>
+</div>)
+
+const EmbedTypeInstagramCarousel = props => (<div>
+    <div class="embed-topbanner instagram">
+        <i class="fab fa-instagram"></i>
+        <span>Instagram carousel</span>
+    </div>
+    <div class="instagram-preview">
+        <img src={props.embed.urlpath} class="instagram-preview-image" alt={props.embed.caption} />
+        <div class="instagram-preview-credit">@{props.embed.author}</div>
+        <i class="fal fa-columns"></i>
     </div>
 </div>)
 
@@ -32,6 +56,8 @@ const EmbedTypeDefault = props => (<div>
 
 const embedToComponent = {
     instagram : EmbedTypeInstagram,
+    igvideo : EmbedTypeInstagramVideo,
+    igcarousel : EmbedTypeInstagramCarousel,
     twitter : EmbedTypeTwitter,
     default : EmbedTypeDefault
 };
@@ -45,7 +71,7 @@ class EmbedSingle extends Component {
     render() {
         const ComponentClass = embedToComponent[this.props.embed.type] || embedToComponent.default;
         return (
-            <div class={"embed-single card flex " + this.props.embed.type}>
+            <div class={"embed-single card flex " + this.props.embed.type} data-id={this.props.embed._id}>
                 <ComponentClass embed={this.props.embed} />
             </div>
         );
@@ -60,6 +86,8 @@ export class EmbedPicker extends Component {
             batchIndex : 0,
             loading : true
         };
+
+        this.stage = {};
     }
 
     static tabTitle = 'Embed';
@@ -82,7 +110,23 @@ export class EmbedPicker extends Component {
     }
 
     newEmbedFieldChanged(name, value) {
+        this.stage[name] = value
+    }
 
+    fetchEmbed(done) {
+        if (this.stage["modal-embed-type"] && this.stage["modal-embed-text"]) {
+            API.get('/embed/fetch/' + this.stage["modal-embed-type"], { url : this.stage["modal-embed-text"] }, (err, json, r) => {
+                if (json && json.embed) {
+                    this.setState({ embeds : [json.embed, ...this.state.embeds], newModalOpen : false });
+                    done();
+                } else {
+                    log('Embed', "There was an error embedding this resources.", "err");
+                }
+            });
+        } else {
+            log('Embed', "You must provide a URL and an embed type.", "warn");
+            done();
+        }
     }
     
     render() {
@@ -101,9 +145,9 @@ export class EmbedPicker extends Component {
                         <i class="fal fa-plus"></i>
                         <div>Create embed</div>
                     </div> 
-                    { this.state.embeds.map(x => (<EmbedSingle embed={x} />)) }
+                    { this.state.embeds.map(x => (<EmbedSingle embed={x} key={x._id} />)) }
                 </div>
-                <Modal visible={this.state.newModalOpen} title="New embed" onClose={() => this.setState({ newModalOpen : false })}>
+                <Modal visible={this.state.newModalOpen} title="New embed" onClose={() => { this.setState({ newModalOpen : false }); this.stage = {}; }}>
                     <div>
                         <SelectField name="modal-embed-type" placeholder="Embed type" options={[
                             { text: "Instagram photo", value : "instagram" },
@@ -124,7 +168,7 @@ export class EmbedPicker extends Component {
                             onChange={this.newEmbedFieldChanged.bind(this)} />
                     </div>
                     <div style={{ textAlign : 'right' }}>
-                        <ButtonWorker text="Generate embed" type="outline" theme="white" />
+                        <ButtonWorker text="Generate embed" type="outline" theme="white" work={this.fetchEmbed.bind(this)} />
                     </div>
                 </Modal>
             </div>
