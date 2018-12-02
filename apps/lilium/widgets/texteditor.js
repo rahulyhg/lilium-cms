@@ -3,6 +3,7 @@ import API from '../data/api';
 import { Picker } from '../layout/picker';
 import { ImagePicker } from '../layout/imagepicker';
 import { PlacePicker } from '../layout/placepicker';
+import { EmbedPicker } from '../layout/embedpicker';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -31,7 +32,6 @@ export class TextEditor extends Component {
      * @param {object} embed The embed object to serialize as markup
      */
     static embedToMarkup(embed) {
-        console.log(embed);
         const node = document.createElement('div');
         node.className = 'lml-placeholder ' + embed.type;
         node.innerText = "";
@@ -42,6 +42,8 @@ export class TextEditor extends Component {
             node.dataset.thumbnail = embed[ImagePicker.slug].sizes.square.url;
         } else if (embed.type == PlacePicker.slug) {
             node.dataset.placename = embed[PlacePicker.slug].displayname;
+        } else if (embed.type == EmbedPicker.slug) {
+            node.dataset.embedtype = embed[EmbedPicker.slug].type;
         }
 
         return node;
@@ -56,8 +58,19 @@ export class TextEditor extends Component {
             convert_urls : false,
             menubar: false,
             setup: editor => {
+                editor.addButton('insertAd', {
+                    icon: 'fa fa-usd-square',
+                    tooltip : 'Insert an ad banner', 
+                    onclick: () => {
+                        const div = document.createElement('div');
+                        div.setAttribute('contenteditable', false);
+                        div.className = "lml-adplaceholder";
+                        editor.insertContent(div.outerHTML);
+                    }
+                });
+
                 editor.addButton('insert-element', {
-                    icon: 'fa fa-plus-circle',
+                    icon: 'fa fa-image',
                     tooltip: 'Insert an image, a places or an embeds',
                     onclick: () => {
                         const session =  new Picker.Session({});
@@ -79,7 +92,8 @@ export class TextEditor extends Component {
                         ).map(x => ({ 
                             type : x.dataset.type, 
                             [ImagePicker.slug] : { _id : x.dataset.id, sizes : { square : { url : x.dataset.thumbnail } } },
-                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.displayname }
+                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.displayname },
+                            [EmbedPicker.slug] : { _id : x.dataset.id, type : x.dataset.embedtype }
                         }))
 
                         const session = new Picker.Session({ type: 'carousel' });
@@ -107,7 +121,6 @@ export class TextEditor extends Component {
                             carouselPlaceholder.setAttribute('contenteditable', false);
                             carouselPlaceholder.appendChild(carouselElement)
                             if (session.replaceOld) {
-                                console.log(oldNode);
                                 oldNode.parentElement.insertBefore(
                                     carouselPlaceholder, oldNode
                                 );
@@ -126,7 +139,7 @@ export class TextEditor extends Component {
                 'searchreplace visualblocks code fullscreen hr',
                 'media paste wordcount'
             ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-element insert-carousel insertEmbed link unlink | bullist numlist | fullscreen | code',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | insert-element insert-carousel insertEmbed link unlink insertAd hr | bullist numlist | fullscreen | code',
             content_css: [
                 '/static/tinymcedefault.css',
                 '/compiled/theme/tinymce.css'

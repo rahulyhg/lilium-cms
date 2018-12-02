@@ -5,10 +5,15 @@
     box-sizing: border-box;
     border-radius: 4px;
 
+    &.noshadow {
+        box-shadow: none;
+    }
+
     .tabs-bar {
         background: @lesswhiteish;
         box-sizing: border-box;
         padding: 4px;
+        border-bottom: 1px solid @grayish;
 
         .tab-name {
             margin: 4px;
@@ -29,8 +34,12 @@
     .tab-content {
         padding: 14px;
         box-sizing: border-box;
-        height: 100%;
+        height: calc(100% - 50px);
         overflow-y: auto;
+
+        &.singletab {
+            height: 100%;
+        }
 
         & > .tab-inner-content-wrapper {
             height: 100%;
