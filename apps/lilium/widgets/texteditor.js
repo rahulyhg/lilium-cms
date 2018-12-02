@@ -3,6 +3,7 @@ import API from '../data/api';
 import { Picker } from '../layout/picker';
 import { ImagePicker } from '../layout/imagepicker';
 import { PlacePicker } from '../layout/placepicker';
+import { EmbedPicker } from '../layout/embedpicker';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -31,7 +32,6 @@ export class TextEditor extends Component {
      * @param {object} embed The embed object to serialize as markup
      */
     static embedToMarkup(embed) {
-        console.log(embed);
         const node = document.createElement('div');
         node.className = 'lml-placeholder ' + embed.type;
         node.innerText = "";
@@ -42,6 +42,8 @@ export class TextEditor extends Component {
             node.dataset.thumbnail = embed[ImagePicker.slug].sizes.square.url;
         } else if (embed.type == PlacePicker.slug) {
             node.dataset.placename = embed[PlacePicker.slug].displayname;
+        } else if (embed.type == EmbedPicker.slug) {
+            node.dataset.embedtype = embed[EmbedPicker.slug].type;
         }
 
         return node;
@@ -90,7 +92,8 @@ export class TextEditor extends Component {
                         ).map(x => ({ 
                             type : x.dataset.type, 
                             [ImagePicker.slug] : { _id : x.dataset.id, sizes : { square : { url : x.dataset.thumbnail } } },
-                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.displayname }
+                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.displayname },
+                            [EmbedPicker.slug] : { _id : x.dataset.id, type : x.dataset.embedtype }
                         }))
 
                         const session = new Picker.Session({ type: 'carousel' });
@@ -118,7 +121,6 @@ export class TextEditor extends Component {
                             carouselPlaceholder.setAttribute('contenteditable', false);
                             carouselPlaceholder.appendChild(carouselElement)
                             if (session.replaceOld) {
-                                console.log(oldNode);
                                 oldNode.parentElement.insertBefore(
                                     carouselPlaceholder, oldNode
                                 );
