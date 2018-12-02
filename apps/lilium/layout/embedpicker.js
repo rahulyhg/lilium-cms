@@ -50,6 +50,69 @@ const EmbedTypeTwitter = props => (<div>
     </div>
 </div>);
 
+const EmbedTypeFacebookPost = props => (<div>
+    <div class="embed-topbanner facebook">
+        <i class="fab fa-facebook"></i>
+        <span>Facebook post</span>
+    </div>
+    <div class="facebook-preview">
+        <div class="facebook-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
+        <div class="facebook-preview-url">{props.embed.originalurl}</div>
+    </div>
+</div>)
+
+const EmbedTypeFacebookVideo = props => (<div>
+    <div class="embed-topbanner facebook">
+        <i class="fab fa-facebook"></i>
+        <span>Facebook video</span>
+    </div>
+    <div class="facebook-preview">
+        <div class="facebook-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
+        <div class="facebook-preview-url">{props.embed.embedurl}</div>
+    </div>
+</div>)
+
+const EmbedTypeYoutube = props => (<div>
+    <div class="embed-topbanner youtube">
+        <i class="fab fa-youtube"></i>
+        <span>Youtube video</span>
+    </div>
+    <div class="youtube-preview">
+        <div class="youtube-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
+    </div>
+</div>)
+
+const EmbedTypeVimeo = props => (<div>
+    <div class="embed-topbanner vimeo">
+        <i class="fab fa-vimeo"></i>
+        <span>Vimeo video</span>
+    </div>
+    <div class="vimeo-preview">
+        <img src={props.embed.thumbnailplay} />
+    </div>
+</div>)
+
+const EmbedTypeSoundcloud = props => (<div>
+    <div class="embed-topbanner soundcloud">
+        <i class="fab fa-soundcloud"></i>
+        <span>Soundcloud content</span>
+    </div>
+    <div class="soundcloud-preview">
+        <div class="soundcloud-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
+    </div>
+</div>)
+
+const EmbedTypeReddit = props => (<div>
+    <div class="embed-topbanner reddit">
+        <i class="fab fa-reddit"></i>
+        <span>Reddit content</span>
+    </div>
+    <div class="reddit-preview">
+        <div class="reddit-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
+    </div>
+</div>)
+
+
 const EmbedTypeDefault = props => (<div>
     
 </div>);
@@ -59,6 +122,12 @@ const embedToComponent = {
     igvideo : EmbedTypeInstagramVideo,
     igcarousel : EmbedTypeInstagramCarousel,
     twitter : EmbedTypeTwitter,
+    fbpost : EmbedTypeFacebookPost,
+    fbvideo : EmbedTypeFacebookVideo,
+    youtube : EmbedTypeYoutube,
+    vimeo : EmbedTypeVimeo,
+    soundcloud : EmbedTypeSoundcloud,
+    reddit : EmbedTypeReddit,
     default : EmbedTypeDefault
 };
 
@@ -68,11 +137,41 @@ class EmbedSingle extends Component {
 
     }
 
+    fixIframe() {
+        const maybeiFrame = this.el.querySelector('iframe');
+        if (maybeiFrame) {
+            maybeiFrame.setAttribute('width', 250);
+            maybeiFrame.setAttribute('height', 250);
+        }
+    }
+
+    componentDidMount() {
+        this.fixIframe();
+    }
+
+    componentDidUpdate() {
+        this.fixIframe();
+    }
+
+    shouldComponentUpdate() {
+        return false;
+    }
+
+    onClick(ev) {
+
+    }
+
     render() {
         const ComponentClass = embedToComponent[this.props.embed.type] || embedToComponent.default;
         return (
-            <div class={"embed-single card flex " + this.props.embed.type} data-id={this.props.embed._id}>
+            <div ref={x => (this.el = x)} class={"embed-single card flex " + this.props.embed.type} data-id={this.props.embed._id}>
                 <ComponentClass embed={this.props.embed} />
+                <div class="clickable-area" onClick={this.onClick.bind(this)}>
+                    <div class="clickable-area-text">
+                        <i class="far fa-check"></i>
+                        <span>Use embed</span>
+                    </div>
+                </div>
             </div>
         );
     }

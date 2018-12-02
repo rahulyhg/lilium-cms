@@ -22,8 +22,12 @@
             vertical-align: middle;
         }
 
-        &.instagram { background : linear-gradient(to top left, #FFDC80, #E1306C); }
-        &.twitter   { background : #08A0E9; }
+        &.instagram  { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+        &.twitter    { background : #08A0E9; }
+        &.facebook   { background : #3b5998; }
+        &.youtube    { background : red; }
+        &.soundcloud { background : linear-gradient(to bottom, #f70, #f30); }
+        &.reddit     { background : #ff4500; }
     }
 
     .embed-single {
@@ -33,13 +37,53 @@
         min-height: 220px;
         max-height: 400px;
         margin-bottom: 10px;
-        cursor: pointer;
         border-radius: 5px;
+        position: relative;
+
+        .clickable-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+
+            z-index: 3;
+            
+            cursor: pointer;
+            
+            .clickable-area-text {
+                font-size: 32px;
+                display: none;
+                text-align: center;
+                color: @whiteish;
+
+                i {
+                    display: block;
+                    margin-bottom: 10px;
+                    font-size: 48px;
+                }
+            }   
+
+            &:hover {
+                background: fade(@green, 90%);
+
+                .clickable-area-text {
+                    display: block;
+                }
+            }
+        }
 
         &.embed-add {
             font-size: 26px;
             color: @grayish;
             text-align: center;
+            cursor: pointer;
 
             padding-top: 65px;
             box-sizing: border-box;
@@ -53,6 +97,18 @@
                 background: @green;
                 color: @whiteish;
             }
+        }
+    }
+
+    .facebook-preview {
+
+    }
+
+    .reddit-preview-html {
+        blockquote {
+            padding: 10px;
+            margin: 0;
+            word-break: break-all;
         }
     }
 
@@ -92,6 +148,23 @@
             text-align: center;
             color: @whiteish;
             opacity: 0.8;
+        }
+    }
+
+    .facebook-preview-url {
+        padding: 10px;
+        font-size: 14px;
+        word-break: break-word;
+    }
+
+    .vimeo-preview {
+        img {
+            width: 100%;
+            height: auto;
+            max-height: 320px;
+            object-fit: cover;
+            min-height: 185px;
+            display: block;
         }
     }
 
