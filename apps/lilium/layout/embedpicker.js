@@ -10,7 +10,7 @@ const EmbedTypeInstagram = props => (<div>
         <i class="fab fa-instagram"></i>
         <span>Instagram photo</span>
     </div>
-    <div class="instagram-preview">
+    <div class="embed-preview instagram-preview">
         <img src={props.embed.urlpath} class="instagram-preview-image" alt={props.embed.caption} />
         <div class="instagram-preview-credit">@{props.embed.author}</div>
     </div>
@@ -21,7 +21,7 @@ const EmbedTypeInstagramVideo = props => (<div>
         <i class="fab fa-instagram"></i>
         <span>Instagram video</span>
     </div>
-    <div class="instagram-preview">
+    <div class="embed-preview instagram-preview">
         <img src={props.embed.urlpath} class="instagram-preview-image" alt={props.embed.caption} />
         <div class="instagram-preview-credit">@{props.embed.author}</div>
         <i class="fas fa-play"></i>
@@ -33,7 +33,7 @@ const EmbedTypeInstagramCarousel = props => (<div>
         <i class="fab fa-instagram"></i>
         <span>Instagram carousel</span>
     </div>
-    <div class="instagram-preview">
+    <div class="embed-preview instagram-preview">
         <img src={props.embed.urlpath} class="instagram-preview-image" alt={props.embed.caption} />
         <div class="instagram-preview-credit">@{props.embed.author}</div>
         <i class="fal fa-columns"></i>
@@ -45,7 +45,7 @@ const EmbedTypeTwitter = props => (<div>
         <i class="fab fa-twitter"></i>
         <span>Twitter embed</span>
     </div>
-    <div class="twitter-preview">
+    <div class="embed-preview twitter-preview">
         <div class="twitter-tweet-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
     </div>
 </div>);
@@ -55,7 +55,7 @@ const EmbedTypeFacebookPost = props => (<div>
         <i class="fab fa-facebook"></i>
         <span>Facebook post</span>
     </div>
-    <div class="facebook-preview">
+    <div class="embed-preview facebook-preview">
         <div class="facebook-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
         <div class="facebook-preview-url">{props.embed.originalurl}</div>
     </div>
@@ -66,7 +66,7 @@ const EmbedTypeFacebookVideo = props => (<div>
         <i class="fab fa-facebook"></i>
         <span>Facebook video</span>
     </div>
-    <div class="facebook-preview">
+    <div class="embed-preview facebook-preview">
         <div class="facebook-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
         <div class="facebook-preview-url">{props.embed.embedurl}</div>
     </div>
@@ -77,7 +77,7 @@ const EmbedTypeYoutube = props => (<div>
         <i class="fab fa-youtube"></i>
         <span>Youtube video</span>
     </div>
-    <div class="youtube-preview">
+    <div class="embed-preview youtube-preview">
         <div class="youtube-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
     </div>
 </div>)
@@ -87,7 +87,7 @@ const EmbedTypeVimeo = props => (<div>
         <i class="fab fa-vimeo"></i>
         <span>Vimeo video</span>
     </div>
-    <div class="vimeo-preview">
+    <div class="embed-preview vimeo-preview">
         <img src={props.embed.thumbnailplay} />
     </div>
 </div>)
@@ -97,7 +97,7 @@ const EmbedTypeSoundcloud = props => (<div>
         <i class="fab fa-soundcloud"></i>
         <span>Soundcloud content</span>
     </div>
-    <div class="soundcloud-preview">
+    <div class="embed-preview soundcloud-preview">
         <div class="soundcloud-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
     </div>
 </div>)
@@ -107,14 +107,20 @@ const EmbedTypeReddit = props => (<div>
         <i class="fab fa-reddit"></i>
         <span>Reddit content</span>
     </div>
-    <div class="reddit-preview">
+    <div class="embed-preview reddit-preview">
         <div class="reddit-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
     </div>
 </div>)
 
 
 const EmbedTypeDefault = props => (<div>
-    
+    <div class="embed-topbanner other">
+        <i class="far fa-link"></i>
+        <span>HTML snippet</span>
+    </div>
+    <div class="embed-preview other-preview">
+        <div class="other-preview-html" dangerouslySetInnerHTML={{ __html : props.embed.html }}></div>
+    </div>
 </div>);
 
 const embedToComponent = {
@@ -130,6 +136,15 @@ const embedToComponent = {
     reddit : EmbedTypeReddit,
     default : EmbedTypeDefault
 };
+
+export function embedToComponentCarousel(type, embed) {
+    const ComponentClass = embedToComponent[type] || embedToComponent.default;
+    return (
+        <div class={"embed-carousel-preview " + type}>
+            <ComponentClass embed={embed} />
+        </div>
+    );
+}
 
 class EmbedSingle extends Component {
     constructor(props) {
@@ -158,7 +173,7 @@ class EmbedSingle extends Component {
     }
 
     onClick(ev) {
-
+        Picker.accept({ embedType : "embed", type : "embed", embed : this.props.embed });
     }
 
     render() {
