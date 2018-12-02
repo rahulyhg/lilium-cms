@@ -200,3 +200,42 @@
         }
     }
 }
+
+.embed-carousel-preview {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+
+    &.instagram  { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+    &.igvideo    { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+    &.igcarousel { background : linear-gradient(to top left, #FFDC80, #E1306C); }
+    &.fbpost     { background : #3b5998; }
+    &.fbvideo    { background : #3b5998; }
+    &.twitter    { background : #08A0E9; }
+    &.youtube    { background : red; }
+    &.soundcloud { background : linear-gradient(to bottom, #f70, #f30); }
+    &.reddit     { background : #ff4500; }
+
+    &>div {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .embed-topbanner {
+            text-align: center;
+            i {
+                font-size: 32px;
+                display: block;
+            }
+
+            span {
+                display: block;
+            }
+        }
+
+        .embed-preview {
+            display: none;
+        }
+    }
+}

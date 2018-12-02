@@ -56,15 +56,15 @@
 
                 #carousel-preview {
                     flex-grow: 1;
-                    padding: 8px 16px;
+                    padding: 8px 0px;
                     display: flex;
                     flex-wrap: nowrap;
-                    overflow-x: scroll;
+                    overflow-x: auto;
 
                     & > .carousel-element-preview-card {
                         border: 3px solid @liliumPurple;
                         border-radius: 2px;
-                        background: lighten(@liliumPurple, 15%);
+                        background: @grayish;
                         color: @whiteish;
                         width: @carouselPreviewCardWidth;
                         margin: 0px 8px;
@@ -79,6 +79,11 @@
                             right: -8px;
                             top: -8px;
                             cursor: pointer;
+                            width: 25px;
+                            height: 25px;
+                            text-align: center;
+                            padding-top: 1px;
+                            box-sizing: border-box;
                         }
 
                         img.carousel-image-preview {
@@ -107,18 +112,23 @@
                 }
 
                 #picker-carousel-actions {
-                    flex: 0 0 60px;
+                    flex: 0 0 250px;
                     display: flex;
                     align-items: center;
                     justify-items: center;
+                    font-size: 14px;
                     padding: 8px;
-                    box-shadow: -4px 0 0 rgba(0, 0, 0, 0.1);
+                    justify-content: center;
+                    border-left: 1px solid @grayBorderColor;
                 }
 
                 #carousel-empty-text {
-                    & > * {
-                        text-align: center;
-                    }
+                    width: 100%;
+                    color: @grayish;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 32px;
+                    padding-top: 18px;
                 }
             }
         }
