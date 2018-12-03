@@ -20,7 +20,11 @@ class Last30DaysStats extends Component {
 
     render() {
         if (!this.state.last30days || this.state.last30days.err) {
-            return (<h2>{_v('nostats')}</h2>)
+            return (
+                <div className="card" id='nostats'>
+                    <h2 id='nostats-text'>{_v('nostats')}</h2>
+                </div>
+            )
         }
 
         return (
