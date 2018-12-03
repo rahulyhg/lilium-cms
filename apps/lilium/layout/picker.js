@@ -9,7 +9,7 @@ const PickerMap = {
     [ImagePicker.slug]: ImagePicker,
     [PlacePicker.slug]: PlacePicker,
     [EmbedPicker.slug]: EmbedPicker
-}
+};
 
 const LAST_OPENED_LOCAL_KEY = 'picker.lastopened';
 const AVAILABLE_PICKER_TABS = Object.keys(PickerMap);

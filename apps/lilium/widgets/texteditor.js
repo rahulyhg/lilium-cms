@@ -32,16 +32,40 @@ export class TextEditor extends Component {
      * @param {object} embed The embed object to serialize as markup
      */
     static embedToMarkup(embed) {
+        embed.type = embed.type || embed.embedType;
+
         const node = document.createElement('div');
         node.className = 'lml-placeholder ' + embed.type;
-        node.innerText = "";
+        node.setAttribute('contenteditable', false);
+        node.textContent = "";
 
         node.dataset.id = embed[embed.type]._id;
         node.dataset.type = embed.type;
         if (embed.type == ImagePicker.slug) {
+            let imagepreview = document.createElement('img');
+            imagepreview.src = embed[ImagePicker.slug].sizes.facebook.url;
+            imagepreview.className = "lml-content-image lml-upload-v4";
+            imagepreview.dataset.width = embed[ImagePicker.slug].size.width;
+            imagepreview.dataset.height = embed[ImagePicker.slug].size.height;
+
             node.dataset.thumbnail = embed[ImagePicker.slug].sizes.square.url;
+            node.appendChild(imagepreview);
         } else if (embed.type == PlacePicker.slug) {
+            let mappreview = document.createElement('div');
+            mappreview.className = "lml-content-map lml-place-v4";
+
+            let spanname = document.createElement('div');
+            spanname.textContent = embed[PlacePicker.slug].displayname;
+            spanname.className = "lml-place-v4-name";
+            mappreview.appendChild(spanname);
+
+            let fancymap = document.createElement('img');
+            fancymap.src = "/static/svg/continents.svg";
+            fancymap.className = "lml-place-v4-fancymap";
+            mappreview.appendChild(fancymap);
+
             node.dataset.placename = embed[PlacePicker.slug].displayname;
+            node.appendChild(mappreview);
         } else if (embed.type == EmbedPicker.slug) {
             node.dataset.embedtype = embed[EmbedPicker.slug].type;
         }
