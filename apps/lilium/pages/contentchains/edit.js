@@ -107,7 +107,7 @@ export class EditContentChain extends Component {
                 chain.status = this.state.chain.status == 'draft' ? 'live' : 'draft';
                 this.setState({ chain }, () => {
                     castNotification({
-                        title: `THe content chain was ${(this.state.chain.status == 'draft') ? 'unpublished' : 'published'}`,
+                        title: `The content chain was ${(this.state.chain.status == 'draft') ? 'unpublished' : 'published'}`,
                         type: 'success'
                     })
                 });
@@ -147,7 +147,13 @@ export class EditContentChain extends Component {
                     <h4>Select articles for the content chain</h4>
                     <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
                     <hr />
-                    <ButtonWorker text={this.state.chain.status == 'draft' ? 'Publish' : 'Unpublish'} work={this.togglePublishState.bind(this)} />
+                    {
+                        this.state.chain.status == 'draft' ? (
+                            <ButtonWorker text='Publish' theme='purple' type='fill' work={this.togglePublishState.bind(this)}  />
+                        ) : (
+                            <ButtonWorker text='Unpublish' theme='red' type='outline' work={this.togglePublishState.bind(this)}  />
+                        )
+                    }
                 </div>
             );
         } else {
