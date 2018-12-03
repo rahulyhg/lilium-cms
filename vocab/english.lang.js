@@ -19,6 +19,7 @@ const dictionary = {
     hits : "hits",
     publishedon : "Published on ",
     hitsbyurl : "Hits by URL",
+    nostats: 'No stats to show',
 
     // Menus
     comments : "Comments",

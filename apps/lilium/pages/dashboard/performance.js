@@ -19,8 +19,8 @@ class Last30DaysStats extends Component {
     }
 
     render() {
-        if (!this.state.last30days) {
-            return null;
+        if (!this.state.last30days || this.state.last30days.err) {
+            return (<h2>{_v('nostats')}</h2>)
         }
 
         return (
