@@ -177,7 +177,7 @@ class ContentChains {
                     items[0].articles.forEach(article => { article.title = article.title[0] } );
                     sendback({ items });
                 } else {
-                    cli.throwHTTP(404, 'Content chain not found', true);
+                    sendback({ items: [] });
                 }
             });
         } else if (levels[0] == "searchContent") {
