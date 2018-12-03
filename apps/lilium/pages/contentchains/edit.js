@@ -4,7 +4,7 @@ import { castNotification } from '../../layout/notifications'
 import { TextField, ButtonWorker } from "../../widgets/form";
 import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
-import { ImagePicker } from '../../layout/imagepicker';
+import { Picker } from "../../layout/picker";
 
 export class EditContentChain extends Component {
     constructor(props) {
@@ -78,12 +78,12 @@ export class EditContentChain extends Component {
     }
 
     chooseFeaturedImage() {
-        ImagePicker.cast({}, image => {
-            console.log('image picked: ', image);
+        Picker.cast(new Picker.Session({}), selected => {
+            console.log('image picked: ', selected);
             const chain = this.state.chain;
-            chain.media = image;
+            chain.media = selected.upload;
             this.setState({ chain });
-            API.post('/chains/edit/' + this.state.chain._id, { media: image._id }, (err, data, t) => {
+            API.post('/chains/edit/' + this.state.chain._id, { media: selected.upload._id }, (err, data, r) => {
                 if (r.status == 200) {
                     castNotification({
                         title: 'New Featured image saved',
@@ -95,7 +95,7 @@ export class EditContentChain extends Component {
                         type: 'error'
                     });
                 }
-            })
+            });
         });
     }
 
@@ -139,8 +139,8 @@ export class EditContentChain extends Component {
                             (this.state.chain.media) ? (
                                 <img className='featured-image' src={this.state.chain.media.sizes.content.url} alt="Content chain featured image" />
                             ) : (
-                                    <p id="choose-features-image">Choose a featured image</p>
-                                )
+                                <p id="choose-features-image">Choose a featured image</p>
+                            )
                         }
                     </div>
 
