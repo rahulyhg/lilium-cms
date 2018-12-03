@@ -2,6 +2,10 @@ import { DefaultDictionary } from './LangDico';
 import { h } from 'preact';
 
 const dictionary = {
+    // General
+    emailAddress: "Address email",
+    password: 'Mot de passe',
+
     // Dashboard
     publishing : "Publications",
     ponglinks : "Ponglinks",
@@ -48,10 +52,62 @@ const dictionary = {
     themes : "Thème",
     devtools : "Développement",
     plugins : "Plugins",
+
+    // Profile
+    badges: 'Badges',
+    general: 'Général',
+    fullName: 'Nom complet',
+    jobTitle: 'Titre de poste',
+    writeIntro: "Écrivez un court texte pour vous présenter",
+    contactInfo: 'Informations de contact',
+    socialNetworks: 'Réseaux Sociaux',
+    paymentInfo: 'Informations de paiement',
+    paymentCurrency: 'Devise des paiements',
+    phoneNumber: 'Numéro de téléphone',
+    facebookURL: 'Facebook (URL du profil)',
+    twitterName: "Nom de compte Twitter (sans le '@')",
+    googlePlusName: "Google Plus (nom d'utilisateur)",
+    instagramName: "Instagram (nom du compte sans le '@')",
+    currentPW: 'Mot de passe actuel',
+    newPW: 'Nouveau mot de passe',
+    confirmPW: 'Confirmation du mot de passe',
+    changePW: 'Changer mon mot de passe',
+    twoFactorAuth: 'Authentification à deux facteurs',
+    enter6digits: 'Entrerz le nombre à 6 chiffres',
+    activate2FA: 'Activer 2FA pour mon compte',
+    deactivate2FA: 'Désactiver 2FA'
 }
 
 const extendedDictionary = { 
-    greetUser: username => (<div>Bonjour, <span>{username}</span>.</div>)
+    greetUser: username => (<div>Bonjour, <span>{username}</span>.</div>),
+    passwordGuidelines: () => (
+        <div id="password-guidelines">
+            <p>Si jamais vous oubliez votre mot de passe, vous pourrez cliquer sur "j'ai oublié mon mot de passe" afin de demander un code de changement de mot de passe via SMS. Pour recevoir des SMS vous devez indiquer votre numéro de téléphone dans vos informations de contact.</p>
+            <p>Pour des raisons de <b>sécurité</b> il est recommandé de changer votre mot de passe de façon régulière.</p>
+        </div>
+    ),
+    presentation2FA: () => (
+        <p>
+            L'authentification à deux facteurs, parfois appelée '2FA', est une couche de sécurité supplémentaire pouvant être appliquée à votre compte Lilium.
+            Une fois activé, le protocole de '2FA' requiert que vous entriez un nomber à 6 chiffres lorsque vous vous connectez dans Lilium, en plus de votre mot de passe.
+        </p>
+    ),
+    getStarted2FA: () => (
+        <div id="2fa-get-started">
+            <p>Pour débuter, suivez ces quelques étapes :</p>
+            <ol>
+                <li>
+                    Installez l'application Google Authenticator sur votre téléphone intelligent. L'application est disponible pour
+                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" target='_blank'> Android </a>
+                    et <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8" target='_blank'>iOS</a>.
+                </li>
+                <li>Dans Google Authenticator, cliquez sur l'icône '+'.</li>
+                <li>Choisissez l'option 'scanner un code barre'.</li>
+                <li>Centrez le code QR montré sur cette page dans la zone désignée sur votre téléphone intelligent. L'application le détectera automatiquement.</li>
+                <li>Vous devriez maintenant voir un compte nommé 'Lilium CMS [nom de compagnie] (nom d'utilisateur). avec un nombre à 6 chiffres qui se rafraichit toutes les 30 secondes.</li>
+            </ol>
+        </div>
+    )
 }
 
 const datetime = {

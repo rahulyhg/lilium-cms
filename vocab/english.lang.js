@@ -2,6 +2,10 @@ import { DefaultDictionary } from './LangDico';
 import { h } from 'preact';
 
 const dictionary = {
+    // General
+    emailAddress: 'Email Address',
+    password: 'Password',
+
     // Dashboard
     publishing : "Publishing",
     ponglinks : "Ponglinks",
@@ -50,12 +54,65 @@ const dictionary = {
     plugins : "Plugins",
 
     // Profile
-    
+    badges: 'Badges',
+    general: 'General',
+    fullName: 'Full Name',
+    jobTitle: 'Job Title',
+    writeIntro: "Write a small introduction paragraph",
+    contactInfo: 'Contact Information',
+    socialNetworks: 'Social Networks',
+    paymentInfo: 'Payment Information',
+    paymentCurrency: 'Payment Currency',
+    phoneNumber: 'Phone Number',
+    facebookURL: 'Facebook Profile URL',
+    twitterName: "Twitter account name, without the '@'",
+    googlePlusName: 'Google Plus username',
+    instagramname: "Instagram account name, without the '@'",
+    currentPW: 'Current Password',
+    newPW: 'New Password',
+    confirmPW: 'Confirm New Password',
+    changePW: 'Change my password',
+    twoFactorAuth: 'Two Factor Authentication',
+    enter6digits: 'Enter the 6 digits code',
+    activate2FA: 'Activate 2FA for my account',
+    deactivate2FA: 'Deactivate 2FA'
 }
 
 const extendedDictionary = { 
-    greetUser: username => (<div>Hi, <span>{username}</span>.</div>)
+    greetUser: username => (<div>Hi, <span>{username}</span>.</div>),
+    passwordGuidelines: () => (
+        <div id="password-guidelines">
+            <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
+            <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
+        </div>
+    ),
+    presentation2FA: () => (
+        <p>
+            Two Factor Authentication, '2FA' for short, is an extra layer of security you can apply on your Lilium account.
+            It works by requiring that you provide a 6 digits code displayed by your smartphone in addition to your password when you login.
+        </p>
+    ),
+    getStarted2FA: () => (
+        <div id="2fa-get-started">
+            <p>To get started, follow these few steps :</p>
+            <ol>
+                <li>
+                    Install the Google Authenticator application on your smartphone, the application is available on 
+                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" target='_blank'> Android </a>
+                    and on <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8" target='_blank'>iOS</a>.
+                </li>
+                <li>Inside Google Authenticator, tap the '+' icon to add an account.</li>
+                <li>Choose the 'Scan a barcode' option.</li>
+                <li>Center the QR Code displayed below in the designate area on your phone's screen, it will be detected automatically.</li>
+                <li>You should now see an account named 'Lilium CMS [company name] (username). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
+            </ol>
+        </div>
+    )
 }
+
+const presentation2FA = () =­­> (
+    <p></p>
+)
 
 const datetime = {
     dayNames: [

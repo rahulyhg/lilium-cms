@@ -2,9 +2,6 @@ const path = require('path');
 const log = require('./log.js');
 const { readdir, readdirSync, writeFileSync } = require('fs');
 const _c = require('./config');
-<<<<<<< HEAD
-const wp = require('webpack');
-=======
 const webpack = require('webpack');
 
 function compileVocabFile(lang, done) {
@@ -41,7 +38,6 @@ function compileVocabFile(lang, done) {
             filename : lang.split('.')[0] + ".bundle.js"
         }
     };
->>>>>>> f9401cd27d8e47ef03da6232e20928779f6c5fec
 
     webpack(buildconfig, (err, result) => {
         done && done(err);
@@ -57,24 +53,6 @@ class Vocab {
         const languagesToCompile = readdirSync('./vocab').filter(x => x.endsWith('.lang.js'));
         this.supportedLanguages =languagesToCompile.map(l => l.split('.lang.js')[0]);
 
-<<<<<<< HEAD
-        readdirSync(path.join(liliumroot, 'vocab')).filter(dirName => dirName.endsWith('.js')).forEach(langDirItem => {
-            log('Vocab', 'Reading vocab file ' + langDirItem, 'info');
-            
-
-        });
-
-        log('Vocab', `Detected supported languages ${this.supportedLanguages}`, 'success');
-        done && done();
-    }
-
-    compile() {
-        
-    }
-}
-
-
-=======
         let langIndex = -1;
 
         const nextLanguage = () => {
@@ -111,6 +89,5 @@ class Vocab {
         }
     }
 };
->>>>>>> f9401cd27d8e47ef03da6232e20928779f6c5fec
 
 module.exports = new Vocab();

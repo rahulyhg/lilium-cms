@@ -292,18 +292,6 @@
             "section" : "lilium"
         }
     ],
-<<<<<<< HEAD
-    "neutralized": [
-        {    
-            "id": "translations",
-            "lys" : "translations,languages",
-            "faicon": "fa-globe",
-            "displayname": "Translations",
-            "priority": 3000,
-            "rights": ["admin"],
-            "absURL": "/translations",
-            "section" : "lilium"            
-=======
 
     "neutralizedSidebarMenus" : [
         {
@@ -338,7 +326,6 @@
             "rights": ["dash"],
             "absURL": "/fix",
             "section" : "home"
->>>>>>> f9401cd27d8e47ef03da6232e20928779f6c5fec
         }
     ],
     "rivers" : [

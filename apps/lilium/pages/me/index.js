@@ -52,12 +52,12 @@ export default class ProfilePage extends Component {
         };
 
         this.tabs = [
-            { text : "General", component : ProfileHeader } , 
-            { text : "Contact info", component : ContactInfo }, 
-            { text : "Payment", component : PaymentInfo }, 
-            { text : "Social networks", component : SocialMedia }, 
-            { text : "Password", component : PasswordResetForm }, 
-            { text : "2-factor authentication", component : Manage2FAForm }
+            { text : _v('general'), component : ProfileHeader } , 
+            { text : _v('contactInfo'), component : ContactInfo }, 
+            { text : _v('paymentInfo'), component : PaymentInfo }, 
+            { text : _v('socialNetworks'), component : SocialMedia }, 
+            { text : _v('password'), component : PasswordResetForm }, 
+            { text : _v('twoFactorAuth'), component : Manage2FAForm }
         ];
     }
 
@@ -129,7 +129,7 @@ export default class ProfilePage extends Component {
                                 </div>
                             </div>
                             <div class="me-header-split">
-                                <div class="me-header-badges-title">Badges</div>
+                                <div class="me-header-badges-title">{_v('badges')}</div>
                                 <div class="me-header-badges" style={{ width : ((BADGE_WIDTH + 10) * this.state.user.badges.length) }}>
                                     {
                                         this.state.user.badges.map(badge => (
@@ -159,7 +159,7 @@ export default class ProfilePage extends Component {
         } else {
             return (
                 <div id="profile-error">
-                    <h3>There was an error when trying to retrieve your user info, are you loggedchange-placeholder in?</h3>
+                    <h3>There was an error when trying to retrieve your user info, are you logged in?</h3>
                 </div>
             );
         }
@@ -178,16 +178,16 @@ class ProfileHeader extends Component {
         return (
             <div id="profile-header">
                 <div id="profile-info-wrapper" >
-                    <h2>General</h2>
+                    <h2>{_v('general')}</h2>
 
                     <TextField name="displayname"  initialValue={this.state.user.displayname} value={this.state.user.displayname}
-                        onChange={this.props.onChange.bind(this)} endpoint="/me/updateOneField" autosave placeholder="Full name" />
+                        onChange={this.props.onChange.bind(this)} endpoint="/me/updateOneField" autosave placeholder={_v('fullName')} />
 
-                    <TextField name="jobtitle" initialValue={this.state.user.jobtitle || ''} value={this.state.user.jobtitle} placeholder='Job Title'
+                    <TextField name="jobtitle" initialValue={this.state.user.jobtitle || ''} value={this.state.user.jobtitle} placeholder={_v('jobTitle')}
                         onChange={this.props.onChange.bind(this)} endpoint="/me/updateOneField" autosave   />
 
                     <TextField name="description" className='change-placeholder' id="descriptichange-placeholderon" 
-                        placeholder='Write a small introduction paragraph' multiline={true} value={this.state.user.description}
+                        placeholder={_v('writeIntro')} multiline={true} value={this.state.user.description}
                         onChange={this.props.onChange.bind(this)} endpoint="/me/updateOneField" autosave initialValue={this.state.user.description} />
                 </div>
             </div>
@@ -203,11 +203,11 @@ class ContactInfo extends Component {
     render() {
         return (
             <div id="contact-info">
-                <h2>Contact Information</h2>
+                <h2>{_v('contactInfo')}</h2>
 
-                <TextField type="tel" name="phone" placeholder="Phone number" initialValue={this.props.user.phone}
+                <TextField type="tel" name="phone" placeholder={_v('phoneNumber')} initialValue={this.props.user.phone}
                         onChange={this.props.onChange.bind(this)} endpoint="/me/updateOneField" autosave />
-                <TextField type="email" name="email" placeholder="Email address" initialValue={this.props.user.email}
+                <TextField type="email" name="email" placeholder={_v('emailAddress')} initialValue={this.props.user.email}
                         onChange={this.props.onChange.bind(this)} endpoint="/me/updateOneField" autosave />
             </div>
         );
@@ -222,18 +222,18 @@ class SocialMedia extends Component {
     render() {
         return (
             <div id="social-media">
-                <h2>Social Network</h2>
+                <h2>{_v('socialNetworks')}</h2>
 
-                <TextField type='url' name='socialnetworks.facebook' placeholder='Facebook profile URL'
+                <TextField type='url' name='socialnetworks.facebook' placeholder={_v('facebookURL')}
                     initialValue={this.props.user.socialnetworks.facebook} onChange={asyncFieldUpdate.bind(this)} />
 
-                <TextField name='socialnetworks.twitter' placeholder="Twitter account name, without the '@'"
+                <TextField name='socialnetworks.twitter' placeholder={_v('twitterName')}
                     initialValue={this.props.user.socialnetworks.twitter} onChange={asyncFieldUpdate.bind(this)} />
 
-                <TextField name='socialnetworks.googleplus' placeholder='Google Plus username'
+                <TextField name='socialnetworks.googleplus' placeholder={_v('googlePlusName')}
                     initialValue={this.props.user.socialnetworks.googleplus} onChange={asyncFieldUpdate.bind(this)} />
 
-                <TextField name='socialnetworks.instagram' placeholder="Instagram account name, without the '@'"
+                <TextField name='socialnetworks.instagram' placeholder={_v('instagramName')}
                     initialValue={this.props.user.socialnetworks.instagram} onChange={asyncFieldUpdate.bind(this)} />
             </div>
         );
@@ -243,9 +243,9 @@ class SocialMedia extends Component {
 const PaymentInfo = props => {
     return (
         <div id="payment-info">
-            <h2>Payment Information</h2>
+            <h2>{_v('paymentInfo')}</h2>
 
-            <SelectField name='currency' placeholder='Payment Currency' initialValue={props.user.currency || 'CAD'} 
+            <SelectField name='currency' placeholder={_v('paymentCurrency')} initialValue={props.user.currency || 'CAD'} 
                             options={[{ value: 'CAD' }, { value:'USD' }]} 
                            onChange={props.onChange.bind(this)} endpoint="/me/updateOneField" autosave />
         </div>
@@ -288,19 +288,18 @@ class PasswordResetForm extends Component {
     render() {
         return (
             <div id="password-reset-form">
-                <h2>Password</h2>
+                <h2>{_v('password')}</h2>
 
-                <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
-                <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
+                {_ev('passwordGuidelines')}
                 
-                <TextField type='password' name='oldpassword' placeholder='Current password'
+                <TextField type='password' name='oldpassword' placeholder={_v('currentPW')}
                         onChange={this.updatePasswordField.bind(this)} />
-                <TextField type='password' name='newpassword' placeholder='New password'
+                <TextField type='password' name='newpassword' placeholder={_v('newPW')}
                         onChange={this.updatePasswordField.bind(this)} />
-                <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
+                <TextField type='password' name='confirmnewpassword' placeholder={_v('confirmPW')}
                         onChange={this.updatePasswordField.bind(this)} />
 
-                <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} theme='purple' type='fill' />
+                <ButtonWorker text={_v('changePW')} work={this.changePassword.bind(this)} theme='purple' type='fill' />
             </div>
         );
     }
@@ -377,38 +376,23 @@ class Manage2FAForm extends Component {
     render() {
         return (
             <div>
-                <h2>2-Factor Authentication</h2>
-                <p>
-                    Two Factor Authentication, '2FA' for short, is an extra layer of security you can apply on your Lilium account.
-                    It works by requiring that you provide a 6 digits code displayed by your smartphone in addition to your password when you login.
-                </p>
-                <p>To get started, follow these few steps :</p>
+                <h2>{_v('twoFactorAuth')}</h2>
+                {_ev('presentation2FA')}
                 <div class="c2fa-flex">
-                    <ol>
-                        <li>
-                            Install the Google Authenticator application on your smartphone, the application is available on 
-                            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" target='_blank'> Android </a>
-                            and on <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8" target='_blank'>iOS</a>.
-                        </li>
-                        <li>Inside Google Authenticator, tap the '+' icon to add an account.</li>
-                        <li>Choose the 'Scan a barcode' option.</li>
-                        <li>Center the QR Code displayed below in the designate area on your phone's screen, it will be detected automatically.</li>
-                        <li>You should now see an account named 'Lilium CMS [company name] (username). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
-                    </ol>
-
+                    {_ev('getStarted2FA')}
                     <figure>
                         <img src={this.state.qrCode} id="qr-code-2fa" alt="Something went wrong when displaying the 2FA QRCode" />
                     </figure>
                 </div>
 
-                <TextField name='token2fa' placeholder='Enter the 6 digits code' onChange={(name, value) => this.setState({ token2fa: value })} value={this.state.token2fa} />
+                <TextField name='token2fa' placeholder={_v('enter6digits')} onChange={(name, value) => this.setState({ token2fa: value })} value={this.state.token2fa} />
 
                 {
                     this.state.confirmed2fa ? (
-                        <ButtonWorker text='Deactivate 2FA for my account'
+                        <ButtonWorker text={_v('deactivate2FA')}
                                 theme='red' type='outline' work={this.deactivate2fa.bind(this)} />
                     ) : (
-                        <ButtonWorker text='Activate 2FA for my account'
+                        <ButtonWorker text={_v("activate2FA")}
                                 theme='purple' type='fill' work={ this.activate2fa.bind(this)} />
                     )
                 }
