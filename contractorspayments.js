@@ -127,7 +127,7 @@ class ContractorHandler {
                 return cli.throwHTTP(400, undefined, true);
             }
             
-            if (twoFactor.validate2fa(cli.userinfo.user, dat.secret)) {
+            if (twoFactor.validate2fa(cli.userinfo.userid, dat.secret)) {
                 cli.sendJSON({ working : true });
                 money.dispatchPending(dat.ids, db.mongoID(cli.userinfo.userid), () => {
                     require(liliumroot + "/notifications").notifyUser(

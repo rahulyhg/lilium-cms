@@ -6,8 +6,7 @@ const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 const log = require('../log.js');
 const api = require('../api.js');
-const otplib = require('otplib');
-const base32Encode = require('base32-encode');
+const twoFactor = require('../twoFactor');
 
 const loginSuccess = (cli, userObj, cb) => {
 	cli.touch('login.loginsuccess');
@@ -99,11 +98,10 @@ class Login {
 
             cli.touch("login.authUser@networkcheck");
             db.findUnique(_c.default(), 'entities', conds, (err, user) => {
-                // console.log(err, user);
                 if (!err && user) {
                     if (user.enforce2fa && user.confirmed2fa) {
-                        const secret = base32Encode(Buffer.from(usr + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
-                        if (token2fa && otplib.authenticator.check(token2fa, secret)) {
+                        
+                        if (token2fa && twoFactor.validate2fa(user._id.toString(), token2fa)) {
                             entities.fetchFromDB(cli._c, user.username, userObj => {
                                 log("Auth", "Login with credentials and 2FA success with user " + user.username, "lilium");
                                 loginSuccess(cli, userObj);
