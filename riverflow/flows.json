@@ -36,17 +36,6 @@
             "absURL": "/comments",
             "section" : "management"
         },
-        {
-            "id": "thedailylilium",
-            "v": "thedailylilium",
-            "lys" : "daily,lilium",
-            "faicon": "fa-newspaper",
-            "displayname": "The Daily Lilium",
-            "priority": 80,
-            "rights": ["dash"],
-            "absURL": "/thedailylilium",
-            "section" : "home"
-        },
         {    
             "id": "paymentdashboard",
             "v": "paymentdashboard",
@@ -304,6 +293,17 @@
             "rights": ["editor"],
             "absURL": "/socialdispatch",
             "section" : "publishing"
+        },
+        {
+            "id": "thedailylilium",
+            "v": "thedailylilium",
+            "lys" : "daily,lilium",
+            "faicon": "fa-newspaper",
+            "displayname": "The Daily Lilium",
+            "priority": 80,
+            "rights": ["dash"],
+            "absURL": "/thedailylilium",
+            "section" : "home"
         },
         {
             "id": "crew",
