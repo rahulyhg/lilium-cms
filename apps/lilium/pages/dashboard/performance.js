@@ -1,12 +1,16 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
 import { ChartGraph } from '../../widgets/chart';
+import { Spinner } from '../../layout/loading';
 import dateformat from 'dateformat';
 
 class Last30DaysStats extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            last30days: undefined,
+            loading: true
+        };
 
         const d = new Date();
         this.firstday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 30).getTime();
@@ -14,12 +18,18 @@ class Last30DaysStats extends Component {
 
     componentDidMount() {
         API.get('/googleanalytics/author', {}, (err, json, r) => {
-            this.setState({ last30days : json });
+            this.setState({ last30days: json, loading: false });
         });
     }
 
     render() {
-        if (!this.state.last30days || this.state.last30days.err) {
+        console.log(this.state);
+        
+        if (this.state.loading) {
+            return ( <Spinner centered /> );
+        }
+
+        if (!this.state.last30days || this.state.last30days.error) {
             return (
                 <div className="card" id='nostats'>
                     <h2 id='nostats-text'>{_v('nostats')}</h2>
@@ -163,14 +173,6 @@ export class PerformanceTab extends Component {
             right : "create-articles",
             id : "performance"
         }
-    }
-
-    componentDidMount() {
-
-    }
-
-    componentWillUnmount() {
-
     }
 
     render() {
