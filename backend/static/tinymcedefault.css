@@ -114,14 +114,7 @@
     color: #333;
 }
 
-.lml-placeholder {
+.lml-placeholder > * {
     pointer-events: none;
 }
-
-.lml-placeholder.embed > * {
-    
-}
-
-
-
 
