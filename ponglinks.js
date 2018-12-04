@@ -44,12 +44,14 @@ class PongLinks {
     }   
 
     createLink(_c, creatorid, link, done) {
+        console.log('link: ', link);
+        
         const hash = this.hashDestination(JSON.stringify(link));
         const versions = link.versions.map((v, i) => {
             v.identifier = v.identifier.trim().replace(/[\s\&]/g, '_');
-            if (!v.destnation.startsWith('http')) {
+            if (!v.destination.startsWith('http')) {
                 v.destination = "https://" + v.destination.trim();
-            };
+            }
 
             return {
                 destination : v.destination.trim() + (v.destination.includes("?") ? "&" : "?") +
@@ -80,11 +82,13 @@ class PongLinks {
             });
 
             sharedcache.set(set);
+            
+            done && done();
         });
     }
 
     adminPOST(cli) {
-        if (!cli.hasRightOrRefuse('ponglinks')) {            
+        if (cli.hasRightOrRefuse('ponglinks')) {            
             const action = cli.routeinfo.path[2];
             if (action == "create") {
                 this.createLink(cli._c, db.mongoID(cli.userinfo.userid), cli.postdata.data, (err, id)  => cli.sendJSON(err ? { error : err.toString() } : { id }) );

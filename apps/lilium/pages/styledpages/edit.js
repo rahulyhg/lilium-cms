@@ -123,7 +123,7 @@ export class EditStyledPage extends Component {
 
                     <ButtonWorker text='Save' work={this.save.bind(this)} theme='purple' type='fill' />
                     <a target="_blank" href={'/' + this.state.styledPage.slug + (this.state.styledPage.status == "magiclink" ? ("?accesskey=" + this.state.styledPage.magiclink) : "")}>
-                        <ButtonWorker text='View page' theme='blue' type='fill' />
+                        <ButtonWorker text='View page' theme='blue' type='fill' sync />
                     </a>
                     <ButtonWorker text='Delete' work={this.remove.bind(this)} theme='red' type="outline" />
                 </div>

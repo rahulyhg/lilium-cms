@@ -37,25 +37,28 @@ class FormField extends Component {
         const oldValue = typeof oValue != "undefined" ? oValue : this.value;
         this.value = this.props.format ? this.props.format(value) : value;
         this.valid = this.props.validate ? this.props.validate(this.value) : true;
-        this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
 
         if (this.autosave) {
             this.savedTimeout && clearTimeout(this.savedTimeout);
-            this.setState({ saving : true });
+            this.setState({ saving : true }, () => {
+                API[this.savemethod](this.endpoint, { 
+                    [this.fieldkey] : this.props.name, [this.valuekey] : this.value 
+                }, (err, resp, r) => {
+                    if (!err && Math.floor(r.status / 200) == 1) {
+                        this.setState({ saving : false, saved : true }, () => {
+                            this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
+                        });
 
-            API[this.savemethod](this.endpoint, { 
-                [this.fieldkey] : this.props.name, [this.valuekey] : this.value 
-            }, (err, resp, r) => {
-                if (!err && Math.floor(r.status / 200) == 1) {
-                    this.setState({ saving : false, saved : true });
-
-                    this.savedTimeout = setTimeout(() => {
-                        this.setState({ saved : false, saveerror : false })
-                    }, 3000);
-                } else {
-                    this.setState({ saving : false, saveerror : true });
-                }
-            })
+                        this.savedTimeout = setTimeout(() => {
+                            this.setState({ saved : false, saveerror : false })
+                        }, 3000);
+                    } else {
+                        this.setState({ saving : false, saveerror : true });
+                    }
+                })
+            });
+        } else {
+            this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
         }
     }
 

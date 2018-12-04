@@ -15,7 +15,7 @@ class twoFactor {
     adminPOST(cli) {
         cli.touch("twoFactor.adminPOST");
         if (cli.postdata.data.token2fa) {
-            if (this.validate2fa(cli.userinfo.user, cli.postdata.data.token2fa)) {
+            if (this.validate2fa(cli.userinfo.userid, cli.postdata.data.token2fa)) {
                 if (cli.routeinfo.path[2] == 'activate') {
                     this.activate2fa(cli);
                 } else if (cli.routeinfo.path[2] == 'deactivate') {
@@ -35,8 +35,8 @@ class twoFactor {
         }
     }
 
-    validate2fa(username, token) {
-        const secret = base32Encode(Buffer.from(username + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
+    validate2fa(userid, token) {
+        const secret = base32Encode(Buffer.from(userid + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
         return otplib.authenticator.check(token, secret);
     }
 
@@ -91,7 +91,7 @@ class twoFactor {
     }
 
     livevar(cli, levels, params, sendback) {
-        const seed = base32Encode(Buffer.from(cli.userinfo.user + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
+        const seed = base32Encode(Buffer.from(cli.userinfo.userid + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
         const uri = otplib.authenticator.keyuri(cli.userinfo.user, 'Lilium CMS ' + _c.default().website.sitetitle, seed);
 
         qrcode.toDataURL(uri, (err, data) => {

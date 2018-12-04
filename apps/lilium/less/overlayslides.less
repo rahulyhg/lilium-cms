@@ -8,6 +8,21 @@
     z-index: @z_fullscreenOverlay;
 }
 
+@keyframes logoRollFromLeft {
+    from { transform: translate3d(-200px, 0px, 0px) rotateZ(-155deg); }
+    to   { transform: translate3d(0,0,0) rotateZ(0deg); }
+}
+
+@keyframes slideFromLeft {
+    from { transform: translate3d(-100px, 0px, 0px); }
+    to   { transform: translate3d(0,0,0); }
+}
+
+@keyframes slideFromRight {
+    from { transform: translate3d(100px, 0px, 0px); }
+    to   { transform: translate3d(0,0,0); }
+}
+
 .overlay-slides {
     position: absolute;
     top: 0;
@@ -38,11 +53,13 @@
     
             .overlay-slide-lilium-logo {
                 width: 80px;
+                animation: logoRollFromLeft 0.7s ease-out;
             }
             
             .overlay-slide-title {
                 font-size: 24px;
                 color: @lesswhiteish;
+                animation: slideFromLeft 0.7s ease-out;
             }
             
             .overlay-slide-subtitle {
@@ -50,6 +67,7 @@
                 text-transform: uppercase;
                 color: @middleGray;
                 font-weight: bold;
+                animation: slideFromLeft 1.0s ease-out;
             }
         }
     }
@@ -76,6 +94,8 @@
     }
 
     .create-article-overlay-form {
+        animation: slideFromRight 0.8s;
+
         height: 200px;
         position: absolute;
         left:  50px;

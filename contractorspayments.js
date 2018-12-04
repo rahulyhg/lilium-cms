@@ -67,6 +67,38 @@ class ContractorHandler {
         }
     }
 
+    GET(cli) {
+        if (!cli.isLoggedIn || !cli.routeinfo.path[1] || isNaN(cli.routeinfo.path[1])) {
+            return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
+        }
+
+        const $match = { number : parseInt(cli.routeinfo.path[1]) };
+        if (!cli.hasRight('manage-contractors')) {
+            $match.to = db.mongoID(cli.userinfo.userid);
+        }
+
+        db.findUnique(require(liliumroot + "/config").default(), 'contractorinvoices', $match, (err, invoice) => {
+            if (!invoice) {
+                return cli.throwHTTP(404, undefined, true);
+            }
+            
+            db.findUnique(
+                require(liliumroot + "/config").default(), 
+                'entities', 
+                { _id : invoice.to },
+            (err, contractor) => {
+                require(liliumroot + "/lml3/compiler").compile(
+                    cli._c, 
+                    liliumroot + "/backend/dynamic/invoice.lml3",
+                    { invoice, contractor },
+                    markup => {
+                        cli.sendHTML(markup, 200);
+                    }
+                );
+            });
+        });
+    }
+
     adminEditArticlePost(cli) {
         if (!cli.hasRight("manage-contractors")) {
             return cli.refuse();
@@ -95,7 +127,7 @@ class ContractorHandler {
                 return cli.throwHTTP(400, undefined, true);
             }
             
-            if (twoFactor.validate2fa(cli.userinfo.user, dat.secret)) {
+            if (twoFactor.validate2fa(cli.userinfo.userid, dat.secret)) {
                 cli.sendJSON({ working : true });
                 money.dispatchPending(dat.ids, db.mongoID(cli.userinfo.userid), () => {
                     require(liliumroot + "/notifications").notifyUser(

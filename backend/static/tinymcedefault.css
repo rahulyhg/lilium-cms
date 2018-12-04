@@ -1,20 +1,55 @@
+.lml-embed-carousel-color {
+    
+}
+
 .lml-carousel-placeholder {
     min-height: 240px;
     width: 100%;
-    border: 5px dashed #DDD;
+    border: 1px solid #DDD;
     position: relative;
+    overflow-y: hidden;
+    overflow-x: auto;
+    padding: 5px;
 }
 
-.lml-carousel-placeholder:before {
-    position: absolute;
-    top: 90px;
-    display: block;
-    text-align: center;
-    content: 'Carousel placeholder';
-    font-size: 48px;
-    font-family: Helvetica, sans-serif;
-    color: #CCC;
+.lml-carousel-placeholder .carousel-element {
+    height: 100%;
+    white-space: nowrap;
+}
+
+.lml-carousel-placeholder .carousel-element .lml-placeholder {
+    width: 240px;
+    height: 240px;
+    margin-right: 5px;    
+    border: 1px solid #DDD;
+    display: inline-block;
+    box-sizing: border-box;
+    overflow: hidden;
+    vertical-align: top;
+    pointer-events: none;
+}
+
+.embed-carousel-preview {
+    height: 100%;
     width: 100%;
+}
+
+.lml-placeholder .lml-upload-v4,
+.lml-embed-carousel-v4-preview {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.lml-placeholder .lml-place-v4-fancymap {
+    top: -4px;
+    left: -82px;
+    width: 500px;
+}
+
+.lml-placeholder .lml-place-v4-name {
+    font-size: 20px;
+    font-weight: bold;
 }
 
 .lml-adplaceholder, ad {
@@ -40,3 +75,46 @@
     font-size: 14px;
     font-weight: bold;
 }
+
+.lml-place-v4 {
+    position: relative;
+    overflow: hidden;
+    height: 220px;
+    width: auto;
+    border: 3px solid #DDD;
+}
+
+.lml-place-v4:after {
+    position: absolute;
+    content : 'Embed map';
+    bottom: 20px;
+    right: 20px;
+    font-size: 12px;
+    color: #555;
+    z-index: 4;
+    font-family: "Open Sans",sans-serif;
+    font-weight: bold;
+}
+
+.lml-place-v4-fancymap {
+    position: absolute;
+    top: -48px;
+    width: 850px;
+    max-width: none;
+    left: -81px;
+    z-index: 2;
+}
+
+.lml-place-v4-name {
+    position: absolute;
+    z-index: 5;
+    font-size: 40px;
+    padding: 20px 30px;
+    font-family: "Open Sans",sans-serif;
+    color: #333;
+}
+
+.lml-placeholder > * {
+    pointer-events: none;
+}
+

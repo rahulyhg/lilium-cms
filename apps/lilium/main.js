@@ -79,6 +79,7 @@ import { URLRenderer } from './routing/urlrenderer';
 import { Picker } from './layout/picker';
 import { LoadingView } from './layout/loading';
 import { OverlayWrap } from './overlay/overlaywrap';
+import { PasswordReset } from './layout/passwordreset';
 import { Lys } from './layout/lys';
 import { LiliumSession } from './data/session';
 import { initiateConnection, bindRealtimeEvent } from './realtime/connection';
@@ -226,6 +227,7 @@ export class Lilium extends Component {
                 <LiliumMenu menus={this.state.menus} />
                 <URLRenderer session={this.state.session} />
                 <Lys menus={this.state.menus} session={this.state.session} />
+                <PasswordReset />
                 <NotificationWrapper />
                 <CakepopWrapper />
                 <Picker />

@@ -1,4 +1,4 @@
-// Heka
+// Feronia 
 // Libraries
 const db = require('../includes/db');
 
@@ -25,7 +25,9 @@ const createStaffing = (_c, done) => {
 
 module.exports = (_c, done) => {
     if (_c.default) {
-        createStaffing(_c, done);
+        createStaffing(_c, () => {
+            done();
+        });
     } else {
         done();
     }

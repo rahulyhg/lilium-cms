@@ -5,6 +5,44 @@ import { ImagePicker } from '../layout/imagepicker';
 import { PlacePicker } from '../layout/placepicker';
 import { EmbedPicker } from '../layout/embedpicker';
 
+function embedToCarouselPreviewElement(embed, isCarousel) {
+    let contentNode = document.createElement('div');
+    contentNode.className = (isCarousel ? "embed-carousel-preview " : "embed-preview ") + embed.embed.type;
+
+    switch (embed.embed.type) {
+        case "instagram":
+        case "igvideo":
+        case "igcarousel":
+            let img = document.createElement('img');
+            img.className = "lml-embed-carousel-v4-preview";
+            img.src = embed.embed.urlpath;
+            contentNode.appendChild(img);
+            break;
+
+        case "vimeo":
+            let vimg = document.createElement('img');
+            vimg.className = "lml-embed-carousel-v4-preview";
+            vimg.src = embed.embed.thumbnailplay;
+            contentNode.appendChild(vimg);
+            break;
+
+        default:
+            contentNode.innerHTML = embed.embed.html;
+            let iframe = contentNode.querySelector('iframe');
+            if (iframe) {
+                if (isCarousel) {
+                    iframe.width = 240;
+                    iframe.height = 240;
+                } else {
+                    iframe.width = 640;
+                    iframe.height = 320;
+                }
+            }
+    }
+
+    return contentNode;
+}
+
 export class TextEditor extends Component {
     constructor(props) {
         super(props);
@@ -31,19 +69,48 @@ export class TextEditor extends Component {
      * This markup is to be used bi the theme as an article is displayed by a client
      * @param {object} embed The embed object to serialize as markup
      */
-    static embedToMarkup(embed) {
+    static embedToMarkup(embed, isCarousel) {
+        embed.type = embed.type || embed.embedType;
+
         const node = document.createElement('div');
         node.className = 'lml-placeholder ' + embed.type;
-        node.innerText = "";
+        node.setAttribute('contenteditable', false);
+        node.textContent = "";
 
         node.dataset.id = embed[embed.type]._id;
         node.dataset.type = embed.type;
         if (embed.type == ImagePicker.slug) {
+            let imagepreview = document.createElement('img');
+            imagepreview.src = embed[ImagePicker.slug].sizes.facebook.url;
+            imagepreview.className = "lml-content-image lml-upload-v4";
+            imagepreview.dataset.width = embed[ImagePicker.slug].size.width;
+            imagepreview.dataset.height = embed[ImagePicker.slug].size.height;
+
             node.dataset.thumbnail = embed[ImagePicker.slug].sizes.square.url;
+            node.appendChild(imagepreview);
         } else if (embed.type == PlacePicker.slug) {
+            let mappreview = document.createElement('div');
+            mappreview.className = "lml-content-map lml-place-v4";
+
+            let spanname = document.createElement('div');
+            spanname.textContent = embed[PlacePicker.slug].displayname;
+            spanname.dataset.placename = embed[PlacePicker.slug].displayname;
+            spanname.className = "lml-place-v4-name";
+            mappreview.appendChild(spanname);
+
+            let fancymap = document.createElement('img');
+            fancymap.src = "/static/svg/continents.svg";
+            fancymap.className = "lml-place-v4-fancymap";
+            mappreview.appendChild(fancymap);
+
             node.dataset.placename = embed[PlacePicker.slug].displayname;
+            node.appendChild(mappreview);
         } else if (embed.type == EmbedPicker.slug) {
             node.dataset.embedtype = embed[EmbedPicker.slug].type;
+            node.dataset.embedjson = JSON.stringify(embed[EmbedPicker.slug]);
+
+            let elContent = embedToCarouselPreviewElement(embed, isCarousel);
+            node.appendChild(elContent);
         }
 
         return node;
@@ -91,9 +158,9 @@ export class TextEditor extends Component {
                             editor.selection.getNode().querySelectorAll(".lml-placeholder")
                         ).map(x => ({ 
                             type : x.dataset.type, 
-                            [ImagePicker.slug] : { _id : x.dataset.id, sizes : { square : { url : x.dataset.thumbnail } } },
-                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.displayname },
-                            [EmbedPicker.slug] : { _id : x.dataset.id, type : x.dataset.embedtype }
+                            [ImagePicker.slug] : { _id : x.dataset.id, sizes : { square : { url : x.dataset.thumbnail }, facebook : { url : x.dataset.thumbnail } }, size : { width : x.dataset.width, height : x.dataset.height } },
+                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.dataset.placename },
+                            [EmbedPicker.slug] : { _id : x.dataset.id, type : x.dataset.embedtype, ...JSON.parse(x.dataset.embedjson) }
                         }))
 
                         const session = new Picker.Session({ type: 'carousel' });
@@ -113,7 +180,7 @@ export class TextEditor extends Component {
 
                             if (carousel.elements) {
                                 carousel.elements.forEach(element => {
-                                    const embed = TextEditor.embedToMarkup(element);
+                                    const embed = TextEditor.embedToMarkup(element, true);
                                     carouselElement.appendChild(embed);
                                 });
                             }
