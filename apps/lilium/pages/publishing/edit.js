@@ -823,7 +823,7 @@ export default class EditView extends Component {
             overwriteCallback : patch => {
                 const post = this.state.post;
                 post.content[0] = patch;
-                delete this.edits.content;
+                this.edits.content = post.content;
                 this.setState({ post });
             }
         });
