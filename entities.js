@@ -223,6 +223,8 @@ class Entities {
 
     adminPOST(cli) {
         cli.touch('entities.handlePOST');
+        console.log(cli.routeinfo.path);
+        
         if (cli.routeinfo.path[1] == 'me') {
             if (cli.routeinfo.path[2] == "updateOneField") {
                 if (ALLOWED_ME_FIELDS.includes(cli.postdata.data.field)) {
@@ -237,13 +239,6 @@ class Entities {
                     });
                 } else {
                     cli.refuse();
-                }
-            } else if (cli.routeinfo.path[2] == 'mustUpdatePassword') {
-                if (cli.hasRightOrRefuse('manage-entities')) {
-                    const _id = db.mongoID(cli.routeinfo.path[3]);
-                    db.update(_c.default(), 'entities', { _id }, { mustupdatepassword: true }, (err, r) => {
-                        cli.sendJSON({ success: true });
-                    });
                 }
             } else if (cli.routeinfo.path[2] == 'updatePassword') {
                 const old = CryptoJS.SHA256(cli.postdata.data.old).toString(CryptoJS.enc.Hex);
@@ -274,6 +269,15 @@ class Entities {
             }
         } else if (cli.routeinfo.path[2] == "revoke") {
             cli.hasRightOrRefuse('revoke-access') && this.revoke(db.mongoID(cli.routeinfo.path[3]), () => { cli.sendJSON({ ok : 1 }) });
+        } else if (cli.routeinfo.path[2] == 'mustUpdatePassword') {
+            console.log('Mustupdatepassword hit');
+            
+            if (cli.hasRightOrRefuse('manage-entities')) {
+                const _id = db.mongoID(cli.routeinfo.path[3]);
+                db.update(_c.default(), 'entities', { _id }, { mustupdatepassword: true }, (err, r) => {
+                    cli.sendJSON({ success: true });
+                });
+            }
         } else if (cli.routeinfo.path[2] == "edit") {
             cli.hasRightOrRefuse('edit-entities') && this.editInformation(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
         } else if (cli.routeinfo.path[2] == "invite") {
