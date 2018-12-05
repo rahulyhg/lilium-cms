@@ -7,12 +7,6 @@
         "livevar", "setup"
     ],
 
-    "extensions" : [
-        "admin_menu",
-        "admin_sub_menu",
-        "hooks"
-    ],
-
     "menus" : [
         {
             "id": "ponglinks",
@@ -100,6 +94,17 @@
             "priority": 225,
             "rights": ["list-articles"],
             "absURL": "/publishing",
+            "section" : "publishing"
+        },
+        {
+            "id": "editions",
+            "v": "editions",
+            "lys" : "editions,topics,categories,category",
+            "faicon": "fa-tags",
+            "displayname": "Editions",
+            "priority": 274,
+            "rights": ["manage-editions"],
+            "absURL": "/editions",
             "section" : "publishing"
         },
         {
@@ -582,6 +587,10 @@
             "module" : "sites.js",
             "endpoint" : "sites",
             "support" : ["admin_post", "livevar"]
+        }, {
+            "module" : "editions.js",
+            "endpoint" : "editions",
+            "support" : ["livevar", "admin_delete", "admin_put", "admin_post"]
         }, {
             "module" : "session.js",
             "endpoint" : "session",
