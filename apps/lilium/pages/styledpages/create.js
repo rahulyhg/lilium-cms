@@ -36,7 +36,7 @@ export class CreateStyledPage extends Component {
                 <TextField name='title' placeholder='Title' onChange={this.updateValues.bind(this)} />
 
                 <ButtonWorker work={this.create.bind(this)} theme='purple' type='fill' text='Create' />
-                <ButtonWorker work={() => { dismissOverlay(); }} theme='red' type='outline' text='Create' />
+                <ButtonWorker work={() => { dismissOverlay(); }} theme='red' type='outline' text='Cancel' />
             </div>
         );
     }
