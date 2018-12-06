@@ -34,7 +34,7 @@ class FlowHandle {
             case "api_delete"  : API.registerApiEndpoint(this.flow.endpoint,     'DELETE',  this.river[this.flow.overrides.apiDELETE || "apiDELETE"].bind(this.river));     break;
             case "setup"       : this.river.setup.apply(this.river);                                                                                                        break;
 
-            default : log("Riverflow", "Used unknown Riverflow handle " + this.type, "warn"); return this; 
+            default : log("Riverflow", "Used unknown Riverflow handle " + this.type, "warn"); console.log(new Error()); return this; 
         }
 
         log('Riverflow', "Created '" + this.type + "' handle for flow with endpoint : " + this.flow.endpoint);
