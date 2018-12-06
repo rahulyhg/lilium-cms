@@ -90,6 +90,7 @@ var FormBuilder = function() {
     this.addTemplate = function(name, auto) {
         if (typeof templates[name] == 'undefined') {
             var err = new Error ( "[FormBuilderException] - Template not created. Please call createFormTemplate() first.");
+            console.log(err.stack);
             log('FormBuilder', err, 'warn');
             return this;
          }
