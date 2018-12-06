@@ -48,6 +48,9 @@ class Inbound {
     handleQueue() {
         this.ready = true;
         this.initqueue.forEach(cli => this.validate(cli.request, cli.response) && require("./handler.js").handle(cli));
+
+        // Get rid of references to Client objects
+        this.initqueue = [];
     }
 
     start() {
