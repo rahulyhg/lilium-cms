@@ -7,7 +7,7 @@
     "test": "node gardener.js crash-on-error",
     "build": "",
     "dev": "node gardener.js dev",
-    "pm2" : "node pm2.prod.js",
+    "pm2": "node pm2.prod.js",
     "start": "node index.prod.js"
   },
   "repository": {
