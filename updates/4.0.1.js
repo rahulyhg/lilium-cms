@@ -42,33 +42,39 @@ const storeV3URL = (_c, next) => {
     });
 };
 
-const merges = {};
+let maximumLevel = 0;
 const handleTopicCursor = (_c, col, cur, done) => {
     cur.next((err, topic) => {
         if (!topic) {
-            return db.insert(_c, 'editions', Object.values(merges), () => {
-                db.insert(_c, 'sections', {
-                    displayname : "Level 0"
-                }, () => {
-                    done();
-                });
+            const sects = new Array(maximumLevel).fill(0).map((x, i) => ({ displayname : "Level " + i, level : i }));
+
+            return db.insert(_c, 'sections', sects, () => {
+                done();
             });
         }
 
-        merges[topic.displayname] = merges[topic.displayname] || { 
-            topicids : [],
+        log('Update', 'Parsing topic ' + topic.displayname + " /" + topic.completeSlug, 'detail');
+        const merge = { 
+            topicid : topic._id,
+            oldtopicslug : topic.slug,
+            oldtopiccompleteslug : topic.completeSlug,
+            oldtopicfamily : topic.family,
             displayname : topic.displayname,
+            slug : topic.slug,
             lang : {
                 en : {
-                    displayname : topic.displayname
+                    displayname : topic.displayname,
+                    slug : topic.slug
                 }
             },
-            level : 0
+            level : topic.family.length - 1
         };
 
-        merges[topic.displayname].topicids.push(topic._id);
+        maximumLevel = maximumLevel > topic.family.length ? maximumLevel : topic.family.length;
 
-        setImmediate(() => handleTopicCursor(_c, col, cur, done));
+        db.insert(_c, 'editions', merge, () => {
+            setImmediate(() => handleTopicCursor(_c, col, cur, done));
+        });
     });
 };
 
@@ -86,8 +92,15 @@ const topicsToEditions = (_c, next) => {
     });
 };
 
-const handleArticleCursor = (_c, cur, col, next) => {
-    next();
+const handleContentCursor = (_c, cur, col, next) => {
+    cur.next((err, post) => {
+        if (!post) {
+            return next();
+        }
+
+
+        setImmediate(() => handleContentCursor(_c, cur, col, next));
+    });
 }
 
 const parseContentTopics = (_c, next) => {
@@ -101,7 +114,7 @@ const parseContentTopics = (_c, next) => {
                 foreignField : '_id'
             } },
         ], (err, cur) => {
-            handleArticleCursor(_c, cur, col, () => next());
+            handleContentCursor(_c, cur, col, () => next());
         });
     });
 };
