@@ -28,7 +28,7 @@ const MIMES = {
 }
 
 class BotResponder {
-    isBot(useragent) {
+    isBot(useragent = "") {
         return useragent.includes("Googlebot") || useragent.includes("bingbot") || 
                useragent.includes("comscore")  || useragent.includes("SemrushBot") ||
                useragent.includes("DotBot");
