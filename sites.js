@@ -4,7 +4,6 @@ var livevars = require('./livevars.js');
 var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');
 var analytics = require('./analytics.js');
-var formbuilder = require('./formBuilder.js');
 var db = require('./includes/db.js');
 var fs = require('fs');
 var Precompiler = require('./precomp.js');
@@ -13,7 +12,6 @@ var hooks = require('./hooks.js');
 var themes = require('./themes.js');
 var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
-var templateBuilder = require('./templateBuilder.js');
 var buildLib = require('./build');
 var events = require('./events.js');
 var various = require('./various.js');
@@ -241,8 +239,7 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadTheme = function(cb) {
         themes.initializeSite(conf, function() {
-            if (!isElder) { return cb(); }
-            templateBuilder.precompThemeFiles(conf, cb);
+            cb();
         });
     };
 
@@ -304,7 +301,6 @@ var SiteInitializer = function (conf, siteobj) {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
                     initEvents(function() {
-                        templateBuilder.init(conf);
 
                         if (/*isElder &&*/ conf.emails) {
                             mail.setSender(conf.id, {

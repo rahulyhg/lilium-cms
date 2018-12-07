@@ -36,7 +36,6 @@ class Core {
                 endpoints : require('./endpoints'),
                 livevars : require('./livevars'),
                 API : require('./api'),
-                formBuilder : require('./formBuilder'),
                 imageResizer : require('./imageResizer'),
                 LML3 : require('./lml3/compiler'),
                 LML2 : require('./lml'),
@@ -92,7 +91,6 @@ class Core {
                                         log('Core', 'Firing initialized signal', 'info');
                                         hooks.fire('init');
                                     });
-                                
                                 });
                             });
                         });

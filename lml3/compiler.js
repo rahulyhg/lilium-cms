@@ -115,15 +115,13 @@ class LMLContext {
 
     loadLibraries() {
         this.libs = {
-            formbuilder : require('../formBuilder.js'),
             encodec : require('entities'),
             app : require('../build').getAppScript,
             cdn : require('../cdn'),
             slugify : require('slugify'),
             fileio : require('../fileserver.js'),
             encode : x => (x && x.replace ? x.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") : x),
-            snip : (snipid, ...args) => require('../themes').renderSnip(this._c, snipid, args),
-            getQueueTags : () => require('../templateBuilder').getQueueTags(this._c)
+            snip : (snipid, ...args) => require('../themes').renderSnip(this._c, snipid, args)
         };
 
         return this;

@@ -203,5 +203,6 @@ var templateBuilder = function () {
 
 };
 
-
+console.log(new Error().stack);
+log('Deprec', 'Template builder is deprecated, and will not export anything', 'warn');
 module.exports = new templateBuilder();

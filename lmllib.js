@@ -65,6 +65,9 @@ const registeredLibraries = {
     themes: function (context) {
         return require('./themes.js');
     },
+    theme: function (context) {
+        return require('./themes.js');
+    },
     slug : function(context) {
         return {
             ify : function(str) {

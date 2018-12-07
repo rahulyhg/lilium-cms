@@ -452,4 +452,5 @@ var FormBuilder = function() {
     this.init = function() { };
 };
 
+console.log(new Error().stack)
 module.exports = new FormBuilder();

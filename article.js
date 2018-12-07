@@ -1,5 +1,4 @@
 const filelogic = require('./filelogic.js');
-const formBuilder = require('./formBuilder.js');
 const conf = require('./config.js');
 const db = require('./includes/db.js');
 const mongo = require('mongodb');
@@ -850,7 +849,7 @@ class Article {
             var redirect = '';
 
             if (true || response.success) {
-                var formData = cli.postdata.data; //formBuilder.serializeForm(form);
+                var formData = cli.postdata.data; 
                 formData.status = 'published';
 
                 if (!cli.postdata.data._keepURL || cli.postdata.data._keepURL == "false") {
@@ -1136,8 +1135,7 @@ class Article {
         // Article already exists
         cli.postdata.data.form_name = "post_create";
 
-        //var form = formBuilder.handleRequest(cli);
-        var formData = cli.postdata.data; // formBuilder.serializeForm(form);
+        var formData = cli.postdata.data; 
         var id;
 
         if (cli.postdata.data.autosaveid) {
@@ -1249,88 +1247,77 @@ class Article {
             var id = db.mongoID(cli.routeinfo.path[3]);
             if (cli.method == 'POST') {
 
-                var form = formBuilder.handleRequest(cli);
-                var response = formBuilder.validate(form, true);
+                let formData = cli.postdata.data; 
 
-                if (response.success) {
-                    formData = formBuilder.serializeForm(form);
+                if (!cli.postdata.data._keepURL) {
+                    formData.name = slugify(formData.title[0]).toLowerCase();
+                }
 
-                    if (!cli.postdata.data._keepURL) {
-                        formData.name = slugify(formData.title[0]).toLowerCase();
-                    }
+                formData.media = db.mongoID(formData.media);
+                formData.updated = new Date();
+                formData.status = 'published';
+                formData.date = new Date(formData.date);
 
-                    formData.media = db.mongoID(formData.media);
-                    formData.updated = new Date();
-                    formData.status = 'published';
-                    formData.date = new Date(formData.date);
-
-                    if (formData.tags.map) {
-                        formData.tagslugs = formData.tags.map((tagname)  => {
-                            return slugify(tagname).toLowerCase();
-                        });
-                    }
-
-                    db.findToArray(cli._c, 'content', {
-                        _id: id
-                    }, (err, row)  => {
-                        if (err || row.length == 0) {
-                            cli.sendJSON({
-                                success: false,
-                                error: "Content not found for id " + id
-                            });
-
-                            return;
-                        }
-
-                        // Check if user can edit this article
-                        if (cli.userinfo.userid !== row[0]._id && !cli.hasRight('modify_all_articles')) {
-                            cli.throwHTTP(405);
-                        }
-
-                        hooks.fire('article_will_edit', {
-                            cli: cli,
-                            old: row,
-                            article: formData
-                        });
-
-                        db.findAndModify(cli._c, 'content', {
-                            _id: id
-                        }, formData, (err, r)  => {
-                            that.deepFetch(cli._c, id, (deepArticle)  => {
-                                cli.did('content', 'edited', {title : cli.postdata.data.title[0]});
-                                
-                                hooks.fire('article_edited', {
-                                    cli: cli,
-                                    article: r.value
-                                });
-   
-                                var extra = {};
-                                extra.article = deepArticle;
-                                extra.topic = deepArticle.topic;
-                                extra.ctx = "article";
- 
-                                filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , (name)  => {
-                                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                        title: "Article is updated!",
-                                        url: cli._c.server.url + '/' + formData.name,
-                                        msg: "Your changes are live. Click to see the live article.",
-                                        type: 'success'
-                                    });
-                                });
-    
-                                cli.sendJSON({
-                                    success: true
-                                });
-                            });
-                        });
-                    });
-
-                } else {
-                    cli.sendJSON({
-                        form: response
+                if (formData.tags.map) {
+                    formData.tagslugs = formData.tags.map((tagname)  => {
+                        return slugify(tagname).toLowerCase();
                     });
                 }
 
+                db.findToArray(cli._c, 'content', {
+                    _id: id
+                }, (err, row)  => {
+                    if (err || row.length == 0) {
+                        cli.sendJSON({
+                            success: false,
+                            error: "Content not found for id " + id
+                        });
+
+                        return;
+                    }
+
+                    // Check if user can edit this article
+                    if (cli.userinfo.userid !== row[0]._id && !cli.hasRight('modify_all_articles')) {
+                        cli.throwHTTP(405);
+                    }
+
+                    hooks.fire('article_will_edit', {
+                        cli: cli,
+                        old: row,
+                        article: formData
+                    });
+
+                    db.findAndModify(cli._c, 'content', {
+                        _id: id
+                    }, formData, (err, r)  => {
+                        that.deepFetch(cli._c, id, (deepArticle)  => {
+                            cli.did('content', 'edited', {title : cli.postdata.data.title[0]});
+                            
+                            hooks.fire('article_edited', {
+                                cli: cli,
+                                article: r.value
+                            });
+
+                            var extra = {};
+                            extra.article = deepArticle;
+                            extra.topic = deepArticle.topic;
+                            extra.ctx = "article";
+
+                            filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , (name)  => {
+                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                    title: "Article is updated!",
+                                    url: cli._c.server.url + '/' + formData.name,
+                                    msg: "Your changes are live. Click to see the live article.",
+                                    type: 'success'
+                                });
+                            });
+
+                            cli.sendJSON({
+                                success: true
+                            });
+                        });
+                    });
+                });
             } else {
                 filelogic.serveAdminLML(cli, true);
             }
@@ -1450,7 +1437,7 @@ class Article {
             cursor.next((err, article)  => {
                 if (article) {
                     cli.sendJSON({
-                        form: formBuilder.unescapeForm(article)
+                        form: article
                     });
                 } else {
                     cli.throwHTTP(404, 'Article Not Found');
