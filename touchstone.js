@@ -2,6 +2,7 @@ const log = require('./log');
 global.liliumenv = {
     mode : "script"
 };
+global.liliumroot = __dirname;
 
 const clearCache = () => {
     Object.keys(require.cache).forEach(file => !require.resolve(file).endsWith('.node') && delete require.cache[file]);
@@ -51,7 +52,7 @@ const rrequire = file => {
 };
 
 const fs = require('fs');
-const exclusion = ["gardener.js", "runscript.js", "index.prod.js", "masthead.js", "touchstone.js"];
+const exclusion = ["gardener.js", "runscript.js", "index.prod.js", "pm2.prod.js", "masthead.js", "touchstone.js"];
 const corefiles = fs.readdirSync(".").filter(x => x.endsWith('.js') && !exclusion.includes(x)).map(x => "./" + x); 
 corefiles.forEach(file => {
     rrequire(file);
