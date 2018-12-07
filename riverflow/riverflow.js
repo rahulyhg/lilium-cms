@@ -32,7 +32,7 @@ class FlowHandle {
             case "api_post"    : API.registerApiEndpoint(this.flow.endpoint,     'POST',    this.river[this.flow.overrides.apiPOST || "apiPOST"].bind(this.river));         break;
             case "api_put"     : API.registerApiEndpoint(this.flow.endpoint,     'PUT',     this.river[this.flow.overrides.apiPUT || "apiPUT"].bind(this.river));           break;
             case "api_delete"  : API.registerApiEndpoint(this.flow.endpoint,     'DELETE',  this.river[this.flow.overrides.apiDELETE || "apiDELETE"].bind(this.river));     break;
-            case "setup"       : this.river.setup.apply(this.river);                                                                                                        break;
+            case "setup"       : this.river.setup ? this.river.setup.apply(this.river) : console.log("Missing setup for " + this.flow.endpoint);                                                            break;
 
             default : log("Riverflow", "Used unknown Riverflow handle " + this.type, "warn"); console.log(new Error()); return this; 
         }

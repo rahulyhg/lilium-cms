@@ -47,7 +47,7 @@
             "lys" : "payments,history,contractors",
             "faicon": "fa-history",
             "displayname": "Payments Reports",
-            "priority": 3000,
+            "priority": 3001,
             "rights": ["hr"],
             "absURL": "/paymentshistory",
             "section" : "home"            
@@ -376,10 +376,6 @@
             "endpoint" : "ads",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "history.js",
-            "endpoint" : "history",
-            "support" : ["admin_post", "livevar"]
-        }, {
             "module" : "datareader.js",
             "endpoint" : "datareader",
             "support" : ["admin_post", "livevar"]
@@ -537,16 +533,9 @@
             "endpoint" : "entityrelationship",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "personas.js",
-            "endpoint" : "persona",
-            "support" : ["admin_post", "livevar"],
-            "hooks" : [
-                { "name" : "post_create_persona", "priority" : 15, "callback" : "postCreatePersona" }
-            ]
-        }, {
             "module" : "role.js",
             "endpoint" : "role",
-            "support" : ["admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "preferences.js",
             "endpoint" : "preferences",

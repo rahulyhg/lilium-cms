@@ -4,7 +4,6 @@ var filelogic = require('./filelogic.js');
 var lml = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
 var notif = require('./notifications.js');
-var formBuilder = require('./formBuilder.js');
 var configs = require('./config');
 var precomp = require('./precomp.js');
 var fs = require('fs');

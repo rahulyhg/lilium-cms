@@ -49,7 +49,6 @@ class Core {
                 socialdispatch : require('./socialdispatch'),
                 themes : require('./themes'),
                 topics : require('./topics'),
-                utils : require('./utils'),
                 various : require('./various')
             };
 
@@ -80,7 +79,6 @@ class Core {
                                         inbound.handleQueue();
                 
                                         loadCacheInvalidator();
-                                        scheduleGC();
                 
                                         log('Lilium', 'Starting inbound server', 'info');
                                         loadNotifications();
@@ -319,21 +317,6 @@ const loadCacheInvalidator = () => {
     const cacheInvalidator = require('./cacheInvalidator.js');
     cacheInvalidator.init(() => {
         log("CacheInvalidator", 'Ready to invalidate cached files', 'success');
-    });
-};
-
-const scheduleGC = () => {
-    log('GC', 'Scheduling temporary file collection', 'info');
-    const scheduler = require('./scheduler.js');
-    scheduler.schedule('GCcollecttmp', {
-        every: {
-            secondCount: 1000 * 60 * 60
-        }
-    }, () => {
-        const GC = require('./gc.js');
-        GC.clearTempFiles(() => {
-            log("GC", "Scheduled temporary files collection done", 'success');
-        });
     });
 };
 
