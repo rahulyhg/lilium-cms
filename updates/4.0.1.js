@@ -56,6 +56,7 @@ const handleTopicCursor = (_c, col, cur, done) => {
         log('Update', 'Parsing topic ' + topic.displayname + " /" + topic.completeSlug, 'detail');
         const merge = { 
             topicid : topic._id,
+            active : true,
             oldtopicslug : topic.slug,
             oldtopiccompleteslug : topic.completeSlug,
             oldtopicfamily : topic.family,
@@ -98,21 +99,27 @@ const handleContentCursor = (_c, cur, col, next) => {
             return next();
         }
 
-
-        setImmediate(() => handleContentCursor(_c, cur, col, next));
+        const editions = post.fulledition.map(x => x._id);
+        db.update(_c, 'content', { _id : post._id }, { editions }, () => setImmediate(() => handleContentCursor(_c, cur, col, next)));
     });
 }
 
 const parseContentTopics = (_c, next) => {
     db.rawCollection(_c, 'content', {}, (err, col) => {
         col.aggregate([
-            { $match : { status : 'published' } },
+            { $match : { topicfamily : { $exists : 1 } } },
             { $lookup : {
-                from : "topics",
-                as : "fulltopic", 
-                localField : 'topicfamily',
-                foreignField : '_id'
+                from : "topics", as : "fulltopic", 
+                localField : 'topicfamily', foreignField : '_id'
             } },
+            { $lookup : {
+                from : 'editions', as : 'fulledition',
+                localField : 'fulltopic._id', foreignField : 'topicid'
+            } },
+            { $project : {
+                _id : 1,
+                "fulledition._id" : 1,
+            } }
         ], (err, cur) => {
             handleContentCursor(_c, cur, col, () => next());
         });
