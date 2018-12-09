@@ -5,6 +5,7 @@ import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, 
 import { getSession } from '../../data/cache';
 import { navigateTo } from '../../routing/link';
 import { castNotification } from '../../layout/notifications';
+import { Spinner } from '../../layout/loading';
 import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
 import Modal from '../../widgets/modal';
@@ -168,6 +169,7 @@ class PublishingActions extends Component {
                     { color : "blue", text : "Publish", work : this.props.actions.validate.bind(this)  },
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Destroy", work : this.props.actions.destroy.bind(this) }
                 );
             } else if (status == "published") {
@@ -178,6 +180,7 @@ class PublishingActions extends Component {
                 dropacts.push(
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Unpublish", work : this.props.actions.unpublish.bind(this) }
                 );
             } else if (status == "reviewing") {
@@ -189,6 +192,7 @@ class PublishingActions extends Component {
                     { color : "blue", text : "Accept and publish", work : this.props.actions.validate.bind(this)  },
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Refuse submission", work : this.props.actions.refuse.bind(this) }
                 );
             }
@@ -464,6 +468,7 @@ export default class EditView extends Component {
             validate : this.validate.bind(this),
             triggerAuthorChange : this.triggerAuthorChange.bind(this),
             triggerSlugChange : this.triggerSlugChange.bind(this),
+            triggerPreviewLinkChange : this.triggerPreviewLinkChange.bind(this),
             commitchanges : this.commitchanges.bind(this),
             unpublish : this.unpublish.bind(this),
             refuse : this.refuse.bind(this)
@@ -475,6 +480,7 @@ export default class EditView extends Component {
         this.stage = {};
 
         this.socketArticleUpdateEvent_bound = this.socketArticleUpdateEvent.bind(this);
+        this.onPageKeyPress = this.onPageKeyPress.bind(this);
     }
 
     componentDidMount() {
@@ -484,6 +490,10 @@ export default class EditView extends Component {
 
     componentWillUnmount() {
         unbindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound);
+    }
+
+    onPageKeyPress(ev) {
+        console.log(ev);
     }
 
     socketArticleUpdateEvent(ev) {
@@ -843,6 +853,30 @@ export default class EditView extends Component {
         });        
     }
 
+    triggerPreviewLinkChange(done) {
+         getNewPreviewLink(this.state.post._id, (err, { previewkey }, r) => {
+            if (!err) {
+                const post = this.state.post;
+                post.previewkey = previewkey;
+
+                this.setState({ post })
+
+                castNotification({
+                    type : "success",
+                    title : "Preview link",
+                    message : "The old preview links are no longer available."
+                });
+            } else {
+                castNotification({
+                    type : "warning",
+                    title : "Could not invalidate preview link"
+                })         
+            }
+
+            done && done(); 
+        });
+    }
+
     updateAuthor() {
         this.handleDetailsAction("author", this.stage.author);
         this.setState({
@@ -891,26 +925,6 @@ export default class EditView extends Component {
         } else if (field == "author") {
             this.edits.author = value;
             this.save();
-        } else if (field == "previewkey") {
-            getNewPreviewLink(this.state.post._id, (err, { previewkey }, r) => {
-                if (!err) {
-                    const post = this.state.post;
-                    post.previewkey = previewkey;
-
-                    this.setState({ post })
-
-                    castNotification({
-                        type : "success",
-                        title : "Preview link",
-                        message : "The old preview links are no longer available."
-                    });
-                } else {
-                    castNotification({
-                        type : "warning",
-                        title : "Could not invalidate preview link"
-                    })         
-                }
-            });
         }
     }
 
@@ -926,7 +940,7 @@ export default class EditView extends Component {
         if (this.state.loading) {
             return (
                 <div style={{ textAlign : 'center', paddingTop : 150 }}>
-                    <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
+                    <Spinner centered />
                 </div>
             )
         }
@@ -934,8 +948,13 @@ export default class EditView extends Component {
         return (
             <div>
                 <div class="publishing-edit-section">
-                    <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} style={{ fontFamily : '"Oswald", sans-serif', background : "transparent", fontSize : 32, border : "none", borderBottom : "1px solid #DDD", padding : "3px 0px", textAlign : 'center' }} />
-                    <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" style={{ background : "transparent", border : "none", padding : "5px 0px", marginBottom : 10, textAlign : 'center' }} />
+                    <div class="publishing-bigtitle-wrap">
+                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} />
+                    </div>
+
+                    <div class="publishing-subtitle-wrap">
+                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" />
+                    </div>
                     
                     <div style={{ margin: "auto", maxWidth: 1200 }}>
                         <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} />
