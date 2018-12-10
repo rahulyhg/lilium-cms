@@ -100,6 +100,7 @@ const handleContentCursor = (_c, cur, col, next) => {
         }
 
         const editions = post.fulledition.map(x => x._id);
+        log('Update', 'Setting edition to post with id ' + post._id, 'info');
         db.update(_c, 'content', { _id : post._id }, { editions }, () => setImmediate(() => handleContentCursor(_c, cur, col, next)));
     });
 }
