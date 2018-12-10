@@ -38,13 +38,55 @@ class EditionController {
                     } else if (mergeeDoc.level != parentDoc.level) {
                         cli.sendJSON({ error : "Cannot merge different levels", errorcode : "difflvl" })
                     } else {
-                        db.update(cli._c, 'editions', { _id : mergee }, { active : false }, () => {
+                        db.update(cli._c, 'editions', { _id : mergee }, { active : false, merged : true, mergedinto : parent }, () => {
                             updatePostsAfterMerge(cli._c, mergeeDoc, parentDoc, mergeresult => {
                                 cli.sendJSON({ mergeresult, parent, mergee });
                             });
                         });
                     }
                 });
+            });
+        } else if (act == "automergesimilar") {
+            db.aggregate(cli._c, 'editions', [ 
+                { $match : { active : true } },
+                { $group : { 
+                    _id : { displayname : "$displayname", level : "$level" }, 
+                    total : { $sum : 1 }, 
+                    parent : { $first : "$_id" },
+                    mergees : { $push : "$_id" }
+                } }, 
+                { $match : { 
+                    total : { $gt : 1 } 
+                } },
+                { $project : {
+                    parent : 1,
+                    mergees : 1
+                } }
+            ], arr => {
+                if (cli.routeinfo.path[3] == "commit") {
+                    const tasks = [];
+                    arr.forEach(x => {
+                        x.mergees.splice(1).forEach(mergee => tasks.push({ parent : x.parent, mergee, level : x._id.level }));
+                    });
+
+                    let taskCursor = -1;
+                    const nextTask = () => {
+                        const task = tasks[++taskCursor];
+                        if (task) {
+                            db.update(cli._c, 'editions', { _id : task.mergee }, { active : false, merged : true, mergedinto : task.parent }, () => {
+                                updatePostsAfterMerge(cli._c, { _id : task.mergee, level : task.level }, { _id : task.parent, level : task.level }, () => {
+                                    setImmediate(() => nextTask());
+                                });
+                            });
+                        } else {
+                            cli.sendJSON({ taskcount : tasks.length, tasks })
+                        }
+                    };
+
+                    nextTask();
+                } else {
+                    cli.sendJSON(arr)
+                }
             });
         } else {
             cli.throwHTTP(404, undefined, 'Unknown level ' + act);
