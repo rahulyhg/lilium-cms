@@ -15,7 +15,8 @@ const ENTITY_COLLECTION = 'entities';
 
 const LOOKUPS = {
     media : { from : "uploads", as : "deepmedia", localField : "media", foreignField : "_id" },
-    topic : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" }
+    topic : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" },
+    editions : { from : "editions", as : "alleditions", localField : "editions", foreignField : "_id" }
 };
 
 const PUBLICATION_REPORT_TODAY_PROJECTION = {
@@ -372,9 +373,8 @@ class ContentLib {
             { $match },
             { $limit : 1 },
             { $lookup : LOOKUPS.media },
-            { $lookup : LOOKUPS.topic },
+            { $lookup : LOOKUPS.edition },
             { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
-            { $unwind : { path : "$fulltopic", preserveNullAndEmptyArrays : true } },
         ], arr => {
             const post = arr[0];
             if (!post) {
@@ -384,7 +384,7 @@ class ContentLib {
             db.findUnique(config.default(), ENTITY_COLLECTION, { _id : post.author }, (err, author) => {
                 post.fullauthor = author;
                 post.headline = post.title[0];
-                post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
+                // post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
 
                 hooks.fireSite(_c, 'contentGetFull', {article : post});
                 this.fetchSponsoredInformation(_c, post, () => {
@@ -645,9 +645,11 @@ class ContentLib {
                         post.name = require('slug')(post.title[0]).toLowerCase();
                         post.name = post.name;
                     }
-        
+
+                    post.url = post.alleditions.reduce((acc, cur) => acc.slug + "/" + cur.slug) + "/" + post.name;
+
                     if (
-                        !post.topic || !post.author || !post.media || 
+                        !post.alleditions || !post.alleditions[0] || !post.author || !post.media || 
                         !post.title[0] || !post.subtitle[0] || !post.content[0]
                     ) {
                         return sendback({ error : "Missing fields", code : 401 });

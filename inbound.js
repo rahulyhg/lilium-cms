@@ -27,8 +27,8 @@ class Inbound {
     handleReq(req, resp) {
         require('./cachefront.js').getURL(req.url, (dat) => {
             if (dat && (!dat.expiry || dat.expiry > Date.now())) {
-                resp.writeHead(200, { "Content-Type" : dat.ctype });
-                resp.end(dat.data);
+                resp.writeHead(dat.status || 200, dat.headers || { "Content-Type" : dat.ctype });
+                dat.data ? resp.end(dat.data) : resp.end();
 
                 return false;
             }

@@ -11,7 +11,7 @@ const handleArticleCursor = (col, cur, done) => {
             const v3url = "/" + article.fulltopic.completeSlug + "/" + article.name;
 
             log('Update', "V3 URL : " + v3url, 'detail');
-            col.updateOne({ _id : article._id }, { v3url }, {}, () => {
+            col.updateOne({ _id : article._id }, { $set : { v3url, url : v3url, wordcount : article.contractorTotalWords || 0 } }, {}, () => {
                 setImmediate(() => handleArticleCursor(col, cur, done));
             });
         } else {

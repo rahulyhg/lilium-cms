@@ -4,7 +4,6 @@ var sharedcache = require("../sharedcache.js");
 var styledpages = require('../styledpages.js');
 var _conf = require('../config.js');
 var article = require('../article.js');
-var topics = require('../topics.js');
 var ipevents = require('../ipevents.js');
 var db = require('../includes/db');
 var noop = function() {};
@@ -53,7 +52,7 @@ class BotResponder {
             status : "published"
         }, (err, article) => {
             if (article) {
-                const permalink = "/" + article.topicslug + "/" + article.name;
+                const permalink = article.url; 
                 log('BotResponder', 'Redirected to ' + permalink, 'info');
                 return cli.redirect(permalink, true);
             } else {
@@ -112,7 +111,7 @@ class HTMLServer {
                         styledpages.serveOrFallback(cli, function() {
                             log('HTMLServer', "Styledpages fellback", 'details');
 
-                            topics.serveOrFallback(cli, function() {
+                            // topics.serveOrFallback(cli, function() {
                                 log('HTMLServer', "Topics fellback", 'details');
 
                                 var name = cli.routeinfo.path[cli.routeinfo.path.length - 1];
@@ -165,7 +164,7 @@ class HTMLServer {
                                         }
                                     }
                                 }, true, pageIndex)
-                            });
+                            // });
                         });
 					}
 				});

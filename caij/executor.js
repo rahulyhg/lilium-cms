@@ -8,7 +8,6 @@ const config = require('../config.js');
 const hooks = require('../hooks.js');
 const db = require('../includes/db.js');
 const sitemapLib = require('../sitemap.js');
-const topicLib = require('../topics.js');
 const articleLib = require('../article.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
@@ -216,29 +215,26 @@ class RunningTask {
                     media : "$deepmedia.sizes.thumbnailarchive.url"
                 }}
             ], arr => {
-                const topicList = Array.from(new Set(arr.map(x => x.topic)));
-                topicLib.batchDeepFetch(this._c, topicList, deeptopics => {
-                    arr.forEach(post => {
-                        if (!deeptopics[post.topic]) { return; }
+                arr.forEach(post => {
+                    if (!post.editions) { return; }
 
-                        post.score = rowSlug[post.name].score || Math.random();
-                        post.url = this._c.server.protocol + this._c.server.url + "/" + deeptopics[post.topic].completeSlug + "/" + post.name;
-                        post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
-                        post.title = post.title[0];
-                        post.language = deeptopics[post.topic].override.language || this._c.website.language || "en-ca";
-                        post.subtitle = post.subtitle[0];
-                    });
+                    post.score = rowSlug[post.name].score || Math.random();
+                    post.url = this._c.server.protocol + this._c.server.url + "/" + post.url;
+                    post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
+                    post.title = post.title[0];
+                    post.language = post.language; 
+                    post.subtitle = post.subtitle[0];
+                });
 
-                    const jsonpath = this._c.server.html + "/lmlsug.json";
-                    const jsonfrpath = this._c.server.html + "/lmlsug-fr-ca.json";
-                    const jsonenpath = this._c.server.html + "/lmlsug-en-ca.json";
+                const jsonpath = this._c.server.html + "/lmlsug.json";
+                const jsonfrpath = this._c.server.html + "/lmlsug-fr-ca.json";
+                const jsonenpath = this._c.server.html + "/lmlsug-en-ca.json";
 
-                    arr = arr.sort((a, b) => b.score - a.score);
-                    fs.writeFile(jsonpath, JSON.stringify(arr), { encoding : "utf8", flag : "w+" }, () => {
-                        fs.writeFile(jsonfrpath, JSON.stringify(arr.filter(x => x.language == "fr-ca")), { encoding : "utf8", flag : "w+" }, () => {
-                            fs.writeFile(jsonenpath, JSON.stringify(arr.filter(x => x.language == "en-ca")), { encoding : "utf8", flag : "w+" }, () => {
-                                sendback();
-                            });
+                arr = arr.sort((a, b) => b.score - a.score);
+                fs.writeFile(jsonpath, JSON.stringify(arr), { encoding : "utf8", flag : "w+" }, () => {
+                    fs.writeFile(jsonfrpath, JSON.stringify(arr.filter(x => x.language == "fr-ca")), { encoding : "utf8", flag : "w+" }, () => {
+                        fs.writeFile(jsonenpath, JSON.stringify(arr.filter(x => x.language == "en-ca")), { encoding : "utf8", flag : "w+" }, () => {
+                            sendback();
                         });
                     });
                 });
@@ -264,7 +260,8 @@ class RunningTask {
                 if (++i == arr.length) {
                     sendback();
                 } else {
-                    topicLib.generateTopicLatestJSON(conf, arr[i]._id, next);
+                    // topicLib.generateTopicLatestJSON(conf, arr[i]._id, next);
+                    next();
                 }
             };
 
@@ -365,6 +362,8 @@ class RunningTask {
     }
 
     cacheTopic(sendback) {
+        return sendback && sendback();
+
         let trigger = hooks.getHooksFor('topic_needs_refresh_' + this._c.uid);
         let firstKey = Object.keys(trigger).shift();
         if (!firstKey) {

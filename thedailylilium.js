@@ -90,19 +90,20 @@ class TheDailyLilium {
                             db.join(_c, 'content', [
                                 { $match : { $and : [ { date : { $gte : datestart } }, { date : { $lte : dateend } } ] } },
                                 { $lookup : { from : "uploads", as : "fullmedia", localField : "media", foreignField : "_id" } },
-                                { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" } },
+                                { $lookup : { from : "editions", as : "fulleditions", localField : "editions", foreignField : "_id" } },
                                 { $project : {
                                     headline : { $arrayElemAt : ["$title", 0] },
-                                    author : 1, isSponsored : 1, topic : 1,
+                                    author : 1, isSponsored : 1, 
                                     "fullmedia.sizes.square.url": 1,
-                                    "fulltopic.displayname" : 1
+                                    "editions.displayname" : 1,
+                                    "editions._id" : 1
                                 } }
                             ], articles => {   
                                 log('DailyLilium', "Fetched all published articles from provided date", 'detail');
                                 report.articles = articles;
                                 articles.forEach(x => {
                                     x.fullmedia = x.fullmedia[0].sizes.square.url;
-                                    x.fulltopic = x.fulltopic[0].displayname;
+                                    x.fulledition = x.fulledition[0].displayname;
                                 });     
 
                                 dashboard.getQuote(quote => {

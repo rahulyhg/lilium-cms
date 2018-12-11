@@ -108,17 +108,6 @@
             "section" : "publishing"
         },
         {
-            "id": "articles-topics",
-            "v": "topics",
-            "lys" : "topics,categories,category",
-            "faicon": "fa-tags",
-            "displayname": "Topics",
-            "priority": 273,
-            "rights": ["manage-topics"],
-            "absURL": "/topics",
-            "section" : "publishing"
-        }, 
-        {
             "id": "contentchains",
             "v": "contentchains",
             "lys" : "chains,content,series",
@@ -411,10 +400,6 @@
             "module" : "fix.js",
             "endpoint" : "fix",
             "support" : ["livevar","admin_post"]
-        }, {
-            "module" : "topics.js",
-            "endpoint" : "topics",
-            "support" : ["admin_post", "admin_put", "livevar"]
         }, {
             "module" : "plugins.js",
             "endpoint" : "plugins",
