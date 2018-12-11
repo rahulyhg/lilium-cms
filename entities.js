@@ -223,7 +223,6 @@ class Entities {
 
     adminPOST(cli) {
         cli.touch('entities.handlePOST');
-        console.log(cli.routeinfo.path);
         
         if (cli.routeinfo.path[1] == 'me') {
             if (cli.routeinfo.path[2] == "updateOneField") {
@@ -270,8 +269,6 @@ class Entities {
         } else if (cli.routeinfo.path[2] == "revoke") {
             cli.hasRightOrRefuse('revoke-access') && this.revoke(db.mongoID(cli.routeinfo.path[3]), () => { cli.sendJSON({ ok : 1 }) });
         } else if (cli.routeinfo.path[2] == 'mustUpdatePassword') {
-            console.log('Mustupdatepassword hit');
-            
             if (cli.hasRightOrRefuse('manage-entities')) {
                 const _id = db.mongoID(cli.routeinfo.path[3]);
                 db.update(_c.default(), 'entities', { _id }, { mustupdatepassword: true }, (err, r) => {
