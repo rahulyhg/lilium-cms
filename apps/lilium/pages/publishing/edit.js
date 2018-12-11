@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { setPageCommands } from '../../layout/lys';
+import { getTimeAgo } from '../../widgets/timeago';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
 import { getSession } from '../../data/cache';
@@ -9,12 +10,8 @@ import { Spinner } from '../../layout/loading';
 import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
 import Modal from '../../widgets/modal';
-
 import dateFormat from 'dateformat';
-import { getTimeAgo } from '../../widgets/timeago';
-
 import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink } from '../../lib/publishing';
-
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
@@ -318,12 +315,30 @@ class PublishingSidebar extends Component {
         if (!this.state.post) {
             return null;
         }
-
+        
+        const timeAgo = getTimeAgo(Date.now() - new Date(this.props.history[0].at).getTime()).toString();
+        
         return (
             <div>
                 <b style={styles.sidebarTitle}>Manage</b>
                 <div style={{ padding : 10 }}>
                     <PublishingActions post={this.state.post} actions={this.props.actions} />
+
+                    <div id="sidebar-info">
+                        <div>
+                            <span id="word-count"><b>Word Count</b>: <span>{this.state.post.wordcount}</span></span>
+                        </div>
+                        {
+                            this.props.history && this.props.history[0] ?(
+                                <div>
+                                    <span className="last-modified-interval"><b>Last Modified</b>: <span>{timeAgo}</span></span>
+                                </div>
+                            ) : null
+                        }
+                        <div>
+                            <span id="status"><b>Status</b>: <span>{this.state.post.status}</span></span>
+                        </div>
+                    </div>
                 </div>
 
                 <b style={styles.sidebarTitle}>Activity</b>
@@ -805,6 +820,8 @@ export default class EditView extends Component {
         ].reduce((prev, cur) => prev + cur, 0);
 
         tempdiv.innerHTML = "";
+
+        this.save();
     }
 
     imageChanged(name, image) {
@@ -945,9 +962,7 @@ export default class EditView extends Component {
             )
         }
 
-        console.log(this.state.post);
         return (
-            
             <div>
                 <div class="publishing-edit-section">
                     <div class="publishing-bigtitle-wrap">
