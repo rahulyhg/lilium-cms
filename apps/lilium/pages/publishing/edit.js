@@ -945,7 +945,9 @@ export default class EditView extends Component {
             )
         }
 
+        console.log(this.state.post);
         return (
+            
             <div>
                 <div class="publishing-edit-section">
                     <div class="publishing-bigtitle-wrap">
@@ -960,8 +962,17 @@ export default class EditView extends Component {
                         <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} />
                     </div>
 
+                    <div class="card publishing-card">
+                        <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
+                    </div>
+
                     <div class="publishing-card nopad">
                         <TopicPicker onChange={this.topicChanged.bind(this)} name="topic" initialValue={this.state.post.topic || undefined} placeholder="Select a topic" />
+                    </div>
+
+                    <div className="card publishing-card" id="seo">
+                        <TextField name='seotitle' placeholder='SEO Optimised Title' onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seotitle} />
+                        <TextField name='seosubtitle' placeholder='SEO Optimized Subtitle' onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seosubtitle} />
                     </div>
 
                     <div class="card publishing-card">
@@ -973,10 +984,6 @@ export default class EditView extends Component {
 
                     <div class="card publishing-card">
                         <PublishingSponsoredSection fieldChanged={this.fieldChanged.bind(this)} post={this.state.post} />
-                    </div>
-
-                    <div class="card publishing-card">
-                        <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
 
                     <div class="card publishing-card nopad">

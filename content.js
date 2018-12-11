@@ -640,12 +640,15 @@ class ContentLib {
                         post.date = new Date();
                         post.date = post.date;
                     }
-                    
+
+                    post.seotitle = post.seotitle || post.title[0]
+                    post.seosubtitle = post.seosubtitle || post.subtitle[0]
+
                     if (!post.name) {
-                        post.name = require('slug')(post.title[0]).toLowerCase();
+                        post.name = require('slug')(post.seotitle).toLowerCase();
                         post.name = post.name;
                     }
-        
+
                     if (
                         !post.topic || !post.author || !post.media || 
                         !post.title[0] || !post.subtitle[0] || !post.content[0]
