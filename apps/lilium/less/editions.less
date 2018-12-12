@@ -8,9 +8,10 @@
         height: 100%;
         vertical-align: top;
 
-        &.inactive {
-            opacity: 0.4
-        }
+        animation: willSlideFromLeft 0.2s;
+        background-color: white;
+        position: relative;
+        z-index: 1;
     }
 
     .ep-flex-wrap {
@@ -36,6 +37,23 @@
         .ep-level-edition {
             padding: 4px 6px;
             border-bottom: 1px solid @grayBorderColor; 
+            cursor: pointer;
+
+            &.selected {
+                background: @liliumPurple;
+                color: @whiteish;
+            }
         }
+    }
+}
+
+@keyframes willSlideFromLeft {
+    from {
+        transform: translate3d(-100%, 0, 0);
+        opacity: 0;
+    }
+    to {
+        transform: translate3d(0px, 0, 0);
+        opacity: 1;
     }
 }

@@ -787,6 +787,13 @@ export default class EditView extends Component {
         });
     }
 
+    editionChanged(name, value) {
+        this.edits[name] = value;
+        const post = this.state.post;
+        post.editions = value;
+
+        this.setState({ post });
+    }
 
     fieldChanged(name, value) {
         this.edits[name] = value;
@@ -962,7 +969,7 @@ export default class EditView extends Component {
                     </div>
 
                     <div class="card publishing-card nopad">
-                        <EditionPicker initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.fieldChanged.bind(this)} />
+                        <EditionPicker initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.editionChanged.bind(this)} />
                     </div>      
 
                     <div class="card publishing-card">
