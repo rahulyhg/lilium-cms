@@ -971,7 +971,7 @@ export default class EditView extends Component {
         }
 
         return (
-            <div>
+            <div class="publishing-page-flex">
                 <div class="publishing-edit-section">
                     <div class="publishing-bigtitle-wrap">
                         <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} />

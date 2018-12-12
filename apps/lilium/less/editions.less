@@ -1,17 +1,44 @@
 .edition-picker {
     height: 400px;
-    white-space: nowrap;
+    flex-wrap : nowrap;
+    display : flex;
+    overflow-x: auto;
 
     .ep-level {
-        display: inline-block;
-        width: 240px;
+        // display: inline-block;
         height: 100%;
         vertical-align: top;
+
+        flex: 1 0 30%;
 
         animation: willSlideFromLeft 0.2s;
         background-color: white;
         position: relative;
         z-index: 1;
+
+        .ep-level-search {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 3px 5px;
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            color: @whiteish;
+
+            outline: none;
+
+            &::placeholder {
+                color: @grayish;
+            }
+        }
+    }
+
+    .ep-level-no-edition {
+        padding: 50px 20px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+        color: @grayish;
     }
 
     .ep-flex-wrap {
@@ -25,6 +52,12 @@
             background-color: @blackish;
             color: @whiteish;
             padding: 8px 6px;
+            cursor: pointer;
+
+            i {
+                float: right;
+                padding: 3px;
+            }
         }
 
         .ep-level-editions {
