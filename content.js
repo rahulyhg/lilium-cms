@@ -2,6 +2,7 @@ const db = require('./includes/db');
 const config = require('./config');
 const filelogic = require('./filelogic');
 const log = require('./log');
+const CDN = require('./cdn');
 const hooks = require('./hooks');
 const notifications = require('./notifications');
 const DeepDiff = require('deep-diff');
@@ -76,16 +77,98 @@ class ContentLib {
         }, {reportsto : 1, displayname : 1});
     }
 
+    toPresentables(_c, articles) {
+        return articles.map(x => this.toPresentable(_c, x, true));
+    }
+
+    toPresentable(_c, article, stripContent) {
+        let featuredimages = {};
+        if (article.featuredimage && article.featuredimage[0]) {
+            for (let size in article.featuredimage[0].sizes) {
+                featuredimages[size] = CDN.parseOne(_c, article.featuredimage[0].sizes[size].url);
+            }
+
+            article.featuredimageartist = article.featuredimage[0].artistname;
+            article.featuredimagelink = article.featuredimage[0].artisturl;
+        }
+
+        let topic;
+        if (article.topic) {
+            topic = {
+                id : article.topic._id,
+                displayname : article.topic.displayname,
+                slug : article.topic.slug,
+                completeSlug : article.topic.completeSlug
+            }
+        }
+
+        let author;
+        if (article.authors && article.authors[0]) {
+            author = article.authors[0];
+            author = {
+                id : author._id,
+                displayname : author.displayname,
+                bio : author.description,
+                avatarURL : author.avatarURL,
+                avatarMini : author.avatarMini,
+                slug : author.slug
+            };
+        }
+
+        return {
+            id : article._id.toString(),
+            title : article.title,
+            subtitle : article.subtitle,
+            featuredimageartist : article.featuredimageartist,
+            featuredimagelink : article.featuredimagelink,
+            geolocation : article.geolocation && article.geolocation.split('_'),
+            date : article.date,
+            isPaginated : article.content.length > 1,
+            totalPages : article.content.length,
+            isSponsored : article.isSponsored,
+            useSponsoredBox : article.useSponsoredBox,
+            sponsoredBoxTitle : article.sponsoredBoxTitle,
+            sponsoredBoxURL : article.sponsoredBoxURL,
+            sponsoredBoxLogo : article.sponsoredBoxLogo,
+            sponsoredBoxContent : article.sponsoredBoxContent,
+            slug : article.name,
+            nsfw : article.nsfw,
+            url : article.url,
+
+            content : (stripContent ? undefined : article.content),
+
+            author, topic, featuredimages
+        };
+    }
+
     generateJSON(_c, deepArticle, done) {
         log('Content', 'Creating JSON version of article ' + deepArticle._id, 'detail');
         const filedir = _c.server.html + "/content/"; 
         const fullpath = filedir + deepArticle._id + ".json";
         mkdirp(filedir, () => {
-            fs.writeFile(fullpath, JSON.stringify(require('./article').toPresentable(_c, deepArticle)), { encoding : "utf8" }, () => {
+            fs.writeFile(fullpath, JSON.stringify(this.toPresentable(_c, deepArticle)), { encoding : "utf8" }, () => {
                 log('Content', 'Created JSON version of article ' + deepArticle._id, 'success');
                 done()
             });
         });
+    }
+
+    generateOrFallback(_c, slug, sendback) {
+        db.findUnique(_c, 'content', { $or : [{name:slug}, {aliases:slug}] }, (err, post) => {
+            if (!post) {
+                sendback(false);
+            } else {
+                if (slug == name) {
+                    this.getFull(_c, post._id, deepArticle => {
+                        this.generate(_c, deepArticle, () => {
+                            sendback(true);
+                        });
+                    });
+                } else {
+                    sendback(true, { url : post.url });
+                }
+            }
+        }, { _id : 1, name : 1 });
     }
 
     generate(_c, deepArticle, cb, pageIndex) {
@@ -207,11 +290,11 @@ class ContentLib {
             deepArticle.numberOfPages = 1;
         }
  
-        const asyncHooks = hooks.getSiteHooksFor(_c, 'article_async_render');
+        const asyncHooks = hooks.getSiteHooksFor(_c, 'article_async_render') || [];
         const dom = new JSDOM(deepArticle.content);
     
         let hookIndex = -1;
-        const nextHook = ()  => {
+        const nextHook = () => {
             if (++hookIndex != asyncHooks.length) {
                 let hk = asyncHooks[hookIndex];
                 hk({
@@ -365,15 +448,33 @@ class ContentLib {
         }
     }
 
+    batchFetch(_c, matches, callback, fieldToMatch = "_id") {
+        let index = -1;
+        const posts = [];
+        const next = () => {
+            if (++index == matched.length) {
+                callback(posts);
+            } else {
+                this.getFull(_c, undefined, deeparticle => {
+                    posts.push(deeparticle);
+                }, { [fieldToMatch] : matches[index] });
+            }
+        };
+
+        next();
+    }
+
     getFull(_c, _id, sendback, match = {}, collection = CONTENT_COLLECTION) {
         const $match = match;
-        $match._id = db.mongoID(_id);
+        if (_id) {
+            $match._id = db.mongoID(_id);
+        }
 
         db.join(_c, collection, [
             { $match },
             { $limit : 1 },
             { $lookup : LOOKUPS.media },
-            { $lookup : LOOKUPS.edition },
+            { $lookup : LOOKUPS.editions },
             { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
         ], arr => {
             const post = arr[0];
@@ -881,7 +982,6 @@ class ContentLib {
 
         done && done();
     }
-
 
     getPreview(_c, postid, previewkey, sendback) {
         // this.parseSpecialValues(payload);

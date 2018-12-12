@@ -891,7 +891,7 @@ class Entities {
                     { $project : { day : "$_id", published : 1, _id : 0 } }
                 ], activity => {
                     sendback({
-                        totalposts : topics.reduce((acc, cur) => acc + cur.posts, 0),
+                        totalposts : editions.reduce((acc, cur) => acc + cur.posts, 0),
 
                         editions, activity
                     });

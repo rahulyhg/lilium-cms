@@ -1,7 +1,7 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
 const filelogic = require('./filelogic.js');
-const articleLib = require('./article.js');
+const articleLib = require('./content.js');
 
 const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     title : 1,
@@ -288,7 +288,7 @@ class ContentChains {
 
                 let landingPath = _c.server.html + "/" + df.slug + ".html";
                 filelogic.renderThemeLML(_c, 'chain', landingPath, extra, callback);
-            });
+            }, '_id');
         });
     }
 }

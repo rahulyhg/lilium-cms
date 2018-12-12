@@ -3,7 +3,7 @@ const log = require('./log.js');
 const config = require('./config.js');
 const filelogic = require('./filelogic.js');
 const request = require('request');
-const articleLib = require('./article.js');
+const articleLib = require('./content.js');
 const searchLib = require('./search.js');
 const sharedcache = require('./sharedcache.js');
 
@@ -47,7 +47,7 @@ class SocialPost {
             let _c = config.fetchConfig(this.siteid);
 
             if (account.network == "facebook") {
-                articleLib.deepFetch(_c, this.postid, (article) => {
+                articleLib.getFull(_c, db.mongoID(this.postid), (article) => {
                     log("SDispatch", "Sending POST request to Facebook Graph /feed on page " + account.displayname);
                     let reqURL = GRAPH_API + _c.social.facebook.apiversion + FEED_ENDPOINT + GRAPH_TOKEN + account.accesstoken;
 

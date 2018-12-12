@@ -490,17 +490,9 @@
             "endpoint" : "publishing",
             "support" : ["admin_post", "admin_put", "admin_delete", "get", "livevar"]
         }, {
-            "module" : "article.js",
-            "endpoint" : "article",
-            "support" : ["admin_post", "api_get", "api_post"]
-        }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
             "support" : ["livevar", "admin_post"]
-        }, {
-            "module" : "article.js",
-            "endpoint" : "content",
-            "support" : ["livevar"]
         }, {
             "module" : "crew.js",
             "endpoint" : "crew",

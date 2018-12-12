@@ -101,6 +101,11 @@ class EditionController {
         
     }
 
+    serveOrFallback(cli, sendback) {
+        log('Editions', "TODO : Implement serveOrFallback", 'warn');
+        sendback();
+    }
+
     getFull(_id, sendback) {
         db.findUnique(cli._c, 'editions', { _id }, (err, ed) => {
             sendback(ed);

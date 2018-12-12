@@ -8,7 +8,7 @@ const config = require('../config.js');
 const hooks = require('../hooks.js');
 const db = require('../includes/db.js');
 const sitemapLib = require('../sitemap.js');
-const articleLib = require('../article.js');
+const articleLib = require('../content.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
 const CDN = require('../cdn');
@@ -342,7 +342,7 @@ class RunningTask {
                         });
 
                         sendback();
-                    });
+                    }, 'name');
                 });
             }
         });
@@ -444,8 +444,8 @@ class RunningTask {
                             return sendback();
                         }
 
-                        articleLib.deepFetch(this._c, postids[index]._id, deepArticle => {
-                            articleLib.generateArticle(this._c, deepArticle, nextpost, true);
+                        articleLib.getFull(this._c, postids[index]._id, deepArticle => {
+                            articleLib.generate(this._c, deepArticle, nextpost);
                         });
                     };
 
@@ -475,7 +475,9 @@ class RunningTask {
                     sendback();
                 } else if (article) {
                     log('RunningTask', "Generating article : " + article.title[0], 'info');
-                    articleLib.generateArticle(this._c, article._id, sendback);
+                    articleLib.getFull(this._c, article._id, deeparticle => {
+                        articleLib.generate(this._c, deeparticle, sendback);
+                    });
                 } else {
                     log('RunningTask', 'No article found at index ' + stats.skip);
                     stats.skip = 0;

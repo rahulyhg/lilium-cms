@@ -960,10 +960,6 @@ export default class EditView extends Component {
                         <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} />
                     </div>
 
-                    <div class="publishing-card nopad">
-                        <TopicPicker onChange={this.topicChanged.bind(this)} name="topic" initialValue={this.state.post.topic || undefined} placeholder="Select a topic" />
-                    </div>
-
                     <div class="card publishing-card">
                         <MultitagBox onChange={this.fieldChanged.bind(this)} name='tags' placeholder='Tags' initialValue={this.state.post.tags} />
                         <CheckboxField onChange={this.fieldChanged.bind(this)} name='sticky' placeholder='Make this article sticky' initialValue={this.state.post.sticky} />
