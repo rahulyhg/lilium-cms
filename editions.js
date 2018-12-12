@@ -122,10 +122,24 @@ class EditionController {
         } else if (act == "full") {
             this.getFull(db.mongoID(levels[1]), ed => done(ed));
         } else if (act == "all") {
-            db.findToArray(cli._c, 'editions', { active : true }, (err, eds) => {
-                done(eds);
-            }, {
-                displayname : 1, slug : 1, level : 1
+            db.findToArray(cli._c, 'sections', {}, (err, sections) => {
+                db.join(cli._c, 'editions', [
+                    { $match : { active : true } },
+                    { $group : { _id : "$level", editions : { $push : "$$ROOT" } } },
+                    { $lookup : { from : 'sections', as : 'section', localField : '_id', foreignField : 'level' } },
+                    { $unwind : "$section" },
+                    { $project : { 
+                        _id : 0,
+                        level : "$_id", 
+                        "section" : 1,
+                        "editions._id" : 1,
+                        "editions.slug" : 1,
+                        "editions.displayname" : 1,
+                    } },
+                    { $sort : { level : 1 } }
+                ], levels => {
+                    done({ levels, sections });
+                });
             });
         } else {
             done({ error : "Unknown level " + act });

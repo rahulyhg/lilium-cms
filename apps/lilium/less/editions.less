@@ -1,0 +1,41 @@
+.edition-picker {
+    height: 400px;
+    white-space: nowrap;
+
+    .ep-level {
+        display: inline-block;
+        width: 240px;
+        height: 100%;
+        vertical-align: top;
+
+        &.inactive {
+            opacity: 0.4
+        }
+    }
+
+    .ep-flex-wrap {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        flex-direction: column;
+
+        .ep-level-name {
+            display: block;
+            background-color: @blackish;
+            color: @whiteish;
+            padding: 8px 6px;
+        }
+
+        .ep-level-editions {
+            flex-grow: 1;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            white-space: pre-wrap;
+        }
+
+        .ep-level-edition {
+            padding: 4px 6px;
+            border-bottom: 1px solid @grayBorderColor; 
+        }
+    }
+}

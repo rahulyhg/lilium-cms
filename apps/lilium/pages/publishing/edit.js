@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
+import { EditionPicker } from '../../widgets/editionpicker';
 import { getSession } from '../../data/cache';
 import { navigateTo } from '../../routing/link';
 import { castNotification } from '../../layout/notifications';
@@ -959,6 +960,10 @@ export default class EditView extends Component {
                     <div style={{ margin: "auto", maxWidth: 1200 }}>
                         <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} />
                     </div>
+
+                    <div class="card publishing-card nopad">
+                        <EditionPicker initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.fieldChanged.bind(this)} />
+                    </div>      
 
                     <div class="card publishing-card">
                         <MultitagBox onChange={this.fieldChanged.bind(this)} name='tags' placeholder='Tags' initialValue={this.state.post.tags} />
