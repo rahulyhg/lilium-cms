@@ -101,7 +101,10 @@ export class EditionPicker extends Component {
 
     componentWillReceiveProps(props) {
         if (props.value) {
-            this.setState({ value : props.value });
+            const willscroll = this.state.value.length < props.value.length;
+            this.setState({ value : props.value }, () => {
+                willscroll && this.el.scrollTo(1000, 0);
+            });
         }
     }
 
