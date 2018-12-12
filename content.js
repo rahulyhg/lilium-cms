@@ -16,13 +16,12 @@ const ENTITY_COLLECTION = 'entities';
 
 const LOOKUPS = {
     media : { from : "uploads", as : "deepmedia", localField : "media", foreignField : "_id" },
-    topic : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" },
     editions : { from : "editions", as : "alleditions", localField : "editions", foreignField : "_id" }
 };
 
 const PUBLICATION_REPORT_TODAY_PROJECTION = {
     headline : { $arrayElemAt : ["$title", 0] }, subline : { $arrayElemAt : ["$subtitle", 0] }, 
-    date : 1, name : 1, facebookmedia : 1, topicslug : 1, author : 1
+    date : 1, name : 1, facebookmedia : 1, author : 1
 };
 
 const PAST_PUBLISHED_PROJECTION = {
@@ -182,12 +181,6 @@ class ContentLib {
             return cb && cb(new Error("Cannot generate article without a topic"));
         }
 
-        // Legacy support
-        if (deepArticle.fulltopic) {
-            deepArticle.topic = deepArticle.fulltopic;
-            deepArticle.topicslug = deepArticle.topic.completeSlug;
-            extra.topic = deepArticle.fulltopic;
-        }
         if (deepArticle.deepmedia) {
             deepArticle.featuredimage = [ deepArticle.deepmedia ];
             deepArticle.imagecreditname = deepArticle.deepmedia.artistname;
@@ -195,13 +188,6 @@ class ContentLib {
         }
         if (deepArticle.fullauthor) {
             deepArticle.authors = [deepArticle.fullauthor];
-        }
-
-        if (deepArticle.topic && deepArticle.topic.override && deepArticle.topic.override.language) {
-            extra.language = deepArticle.topic.override.language;
-        }
-        if (deepArticle.topicslug.startsWith('/')) {
-            deepArticle.topicslug = deepArticle.topicslug.slice(1, -1);
         }
 
         deepArticle.content = deepArticle.content.map(x => x.replace(/lml-fb-video/g, 'fb-video').replace(/lml-fb-post/g, 'fb-post'));
@@ -212,7 +198,7 @@ class ContentLib {
         });
 
         let ctx = deepArticle.templatename || (deepArticle.topic && deepArticle.topic.articletemplate) || "article";
-        let filename = deepArticle.topicslug + "/" + deepArticle.name;
+        let filename = deepArticle.name;
 
         deepArticle.headline = deepArticle.title[0];
         deepArticle.headsub = deepArticle.subtitle[0]
@@ -361,7 +347,7 @@ class ContentLib {
                                 lastpublished.push({
                                     headline : article.title[0], subline : article.subtitle[0], 
                                     date : article.date, name : article.name, facebookmedia : article.facebookmedia, 
-                                    topicslug : article.topicslug, author : article.author._id || article.author
+                                    author : article.author._id || article.author, editions : article.editions
                                 });
 
                                 db.join(_c, 'hits', [
@@ -424,9 +410,8 @@ class ContentLib {
             { $skip },
             { $limit },
             { $lookup : LOOKUPS.media },
-            { $lookup : LOOKUPS.topic },
+            { $lookup : LOOKUPS.editions },
             { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
-            { $unwind : { path : "$fulltopic", preserveNullAndEmptyArrays : true } },
             { $project }
         ];
 
@@ -558,11 +543,12 @@ class ContentLib {
             if (!existing) {
                 db.join(_c, 'content', [
                     { $match : { _id : postid } },
-                    { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" } },
+                    { $lookup : LOOKUPS.editions }, 
                     { $project : { fulltopic : 1, name : 1, title : 1 } }
                 ], article => {
+                    const url = article[0].alleditions.reduce((acc, cur) => acc.slug + "/" + cur.slug) + "/" + article[0].name
                     db.update(_c, 'content', { _id : postid }, { 
-                        $set : { name },
+                        $set : { name, url },
                         $addToSet : { aliases : article[0].name }
                     }, () => {
                         this.pushHistoryEntryFromDiff(_c, postid, caller, diff(
@@ -572,16 +558,16 @@ class ContentLib {
                                 _c : _c,
                                 oldslug : article[0].name,
                                 newslug : name,
-                                oldurl : "/" + article[0].fulltopic[0].completeSlug + "/" + article[0].name,
+                                oldurl : "/" + article[0].url, 
                                 paginated : article[0].title.length > 1
                             });
 
-                            hooks.fireSite(_c, 'article_updated', { article, _c });
+                            hooks.fireSite(_c, 'article_updated', { article : article[0], _c });
 
-                            if (article[0] && article[0].fulltopic[0]) {
+                            if (url) {
                                 callback(
                                     undefined, 
-                                    _c.server.protocol + _c.server.url + "/" + article[0].fulltopic[0].completeSlug + "/" + name
+                                    _c.server.protocol + _c.server.url + "/" + url
                                 );
                             } else {
                                 callback(undefined, name);
@@ -601,7 +587,7 @@ class ContentLib {
 
         const pipeline = [
             { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
-            { $lookup : { from : "topics", as : "fulltopic", localField : 'topic', foreignField : '_id' } },
+            { $lookup : LOOKUPS.editions }, 
             { $project : PAST_PUBLISHED_PROJECTION },
             { $group : { _id : { day: {$dayOfYear : "$date"}, year : { $year : "$date" } }, articles : { $push : "$$ROOT" } } },
             { $sort : { _id : 1 } },
@@ -615,23 +601,6 @@ class ContentLib {
 
     fetchDeepFieldsFromDiff(_c, post, deepdiff, done) {        
         const fields = deepdiff.diffs.map( x => x.field );
-
-        let doTopic = next => {
-            if (fields.includes('topic') && post.topic) {
-                require('./topics').deepFetch(_c, post.topic, topic => {
-                    if (topic) {
-                        post.topicslug = topic.completeSlug;
-                        post.topicdisplay = topic.displayname;
-                        post.topicfamily = topic.family;
-                        post.lang = topic.override.language || _c.website.language || "en-ca";
-                    } 
-
-                    next();
-                });
-            } else {
-                next();
-            }
-        };
 
         let doMedia = next => {
             if (fields.includes('media') && post.media) {
@@ -648,9 +617,7 @@ class ContentLib {
         };
 
         doTopic(() => {
-            doMedia(() => {
-                done();
-            })
+            done();
         })
     }
 
@@ -750,8 +717,6 @@ class ContentLib {
                         post.name = post.name;
                     }
 
-                    post.url = post.alleditions.reduce((acc, cur) => acc.slug + "/" + cur.slug) + "/" + post.name;
-
                     if (
                         !post.alleditions || !post.alleditions[0] || !post.author || !post.media || 
                         !post.title[0] || !post.subtitle[0] || !post.content[0]
@@ -777,6 +742,7 @@ class ContentLib {
             post.publishedOn = new Date();
             post.publishedAt = Date.now();
             post.date = new Date();
+            post.url = post.alleditions.reduce((acc, cur) => acc.slug + "/" + cur.slug) + "/" + post.name;
 
             db.update(_c, 'content', { _id : post._id }, post, () => {
                 db.remove(_c, 'autosave', { contentid : post._id }, () => {
@@ -909,14 +875,13 @@ class ContentLib {
         if (type == "populartopics") {
             const pipeline = [
                 { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
-                { $group : { _id : "$topic", published : { $sum : 1 } } },
-                { $lookup : { from : "topics", as : "fulltopic", localField : '_id', foreignField : '_id' } },
+                { $group : { _id : "$editions", published : { $sum : 1 } } },
+                { $lookup : { from : "editions", as : "alleditions", localField : '_id', foreignField : '_id' } },
                 { $sort : { published : -1 } },
                 { $project : { 
-                    _id : 0, 
-                    topicname : { $arrayElemAt : ["$fulltopic.displayname", 0]}, 
-                    topicslug : { $arrayElemAt : ["$fulltopic.completeSlug", 0]}, 
-                    published : 1 
+                    _id : 0, published : 1,
+                    "alleditions.displayname" : 1,
+                    "alleditions.slug" : 1
                 } },
                 { $limit : 10 }
             ];
