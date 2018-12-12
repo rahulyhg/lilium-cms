@@ -15,10 +15,16 @@ class HeaderUserDropdown extends Component {
         } 
 
         this.maybeClose_bound = this.maybeClose.bind(this);
+        this.avatarImgNode = undefined;
     }
 
     componentDidMount() {
         document.addEventListener('navigate', this.close.bind(this));
+        document.addEventListener('profilePicChanged', e => {
+            if (e.detail && e.detail.url) {
+                this.avatarImgNode.src = e.detail.url;
+            }
+        });
     }
 
     maybeClose(ev) {
@@ -41,7 +47,7 @@ class HeaderUserDropdown extends Component {
         return (
             <div class="header-bar-avatar-wrapper" ref={x => (this.el = x)}>
                 <div onClick={this.open.bind(this)}>
-                    <img src={liliumcms.session.avatarURL} class="header-bar-avatar" />
+                    <img src={liliumcms.session.avatarURL} class="header-bar-avatar" ref={node => { this.avatarImgNode = node; }} />
                 </div>
 
                 { this.state.open ? (
