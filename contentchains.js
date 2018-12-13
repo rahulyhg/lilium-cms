@@ -13,10 +13,32 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     createdOn : 1,
     lastModified : 1,
     media: { $arrayElemAt: ['$media', 0] },
+    
     'articles._id': 1,
     'articles.title': 1,
     'articles.date': 1
-}
+};
+
+const CHAIN_DEEP_PROJECTION = {
+    title : 1,
+    subtitle : 1,
+    slug : 1,
+    presentation : 1,
+    status : 1,
+    lastModified : 1,
+
+    'featuredimage' : '$media.sizes.facebook.url',
+
+    'articles._id': 1,
+    'articles.title': 1,
+    'articles.subtitle': 1,
+    'articles.facebookmedia' : 1,
+    'articles.date': 1,
+
+    'alleditions._id' : 1,
+    'alleditions.displayname' : 1,
+    'alleditions.slug' : 1
+};
 
 class ContentChains {
     constructor() {
@@ -44,7 +66,7 @@ class ContentChains {
     }
 
     handleStatusChange(_c, id, callback) {
-        this.deepFetch(_c, id, cc => {
+        this.deepFetch(_c, { _id : db.mongoID(id) }, cc => {
             
         });
     }
@@ -65,20 +87,34 @@ class ContentChains {
         });
     }
 
-    deepFetch(_c, chainid, send) {
+    deepFetch(_c, $match, send) {
         db.join(_c, 'contentchains', [ 
-            { 
-                $match : { _id : db.mongoID(chainid) }
-            }, { 
-                $limit : 1
-            }, {
+            { $match }, 
+            { $limit : 1 }, 
+            {
                 $lookup : {
                     from : "uploads",
                     localField : "media",
                     foreignField : "_id",
                     as : "media"
                 }
-            }
+            }, {
+                $lookup : {
+                    from : "editions",
+                    as : "alleditions",
+                    foreignField : "_id",
+                    localField : "editions"
+                }
+            }, {
+                $lookup : {
+                    from : "content",
+                    as : "articles",
+                    foreignField : "_id",
+                    localField : "serie"
+                }
+            }, 
+            { $unwind : "$media" }, 
+            { $project : CHAIN_DEEP_PROJECTION }
         ], (item) => {
             send(item[0]);
         });
@@ -140,7 +176,7 @@ class ContentChains {
         if (levels[0] == "bunch") {
             this.bunchLivevar(...arguments);
         } else if (levels[0] == "deep") {
-            this.deepFetch(cli._c, levels[1], (item) => {
+            this.deepFetch(cli._c, { _id : db.mongoID(levels[1]) }, (item) => {
                 sendback(item);
             });
         } else if (levels[0] == "search") {
@@ -286,7 +322,7 @@ class ContentChains {
     }
 
     generateChain(_c, strID, callback) {
-        this.deepFetch(_c, strID, df => {
+        this.deepFetch(_c, { _id : db.mongoID(strID) }, df => {
             articleLib.batchFetch(_c, df.articles.map(x => db.mongoID(x)), articles => {
                 let id = df._id;
                 let extra = {
