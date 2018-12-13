@@ -87,6 +87,10 @@ class EndPoints {
         return registeredEndpoints[site] && typeof registeredEndpoints[site][method][endpoint] !== 'undefined';
     };
 
+    hasWild(site, method) {
+        return registeredEndpoints[site] && registeredEndpoints[site][method]["*"];
+    }
+
     execute(endpoint, method, cli) {
         const site = cli.routeinfo.configname;
         if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
