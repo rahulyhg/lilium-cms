@@ -253,12 +253,21 @@ class ContentChains {
             });
         } else if (path == "live") {
             let updatedData = cli.postdata.data;
-            updatedData.status = "live";
 
-            this.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
-                cli.sendJSON({ success: true });
+            db.findUnique(cli._c, 'contentchains', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, chain) => {
+                if (!chain) {
+                    return cli.throwHTTP(404, 'Content chain not found', true);
+                }
 
-                this.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
+                updatedData.status = "live";
+                updatedData.slug = require('slug')(chain.title).toLowerCase();
+
+                this.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
+                    cli.sendJSON({ success: true });
+
+                    this.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
+
+                    });
                 });
             });
         } else if (path == "unpublish") {
