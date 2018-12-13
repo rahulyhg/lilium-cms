@@ -291,7 +291,7 @@ class PopularTopics extends Component {
                     <ChartGraph nowrap={true} chart={{
                         type : 'pie',
                         data : {
-                            labels : this.state.stats.map(t => t.topicname),
+                            labels : this.state.stats.map(t => t.alleditions[t.alleditions.length - 1].displayname),
                             datasets : [
                                 { 
                                     data : this.state.stats.map(x => x.published),   
@@ -308,7 +308,7 @@ class PopularTopics extends Component {
                             maintainAspectRatio : false,
                             tooltips: {
                                 callbacks: {
-                                    title : (tooltipItem, data) => this.state.stats[tooltipItem[0].index].topicname + " @" + this.state.stats[tooltipItem[0].index].topicslug
+                                    title : (tooltipItem, data) => this.state.stats[tooltipItem[0].index].alleditions.reduce((acc, cur) => acc + " > " + cur.displayname, "")
                                 }
                             }
                         }
