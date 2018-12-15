@@ -224,10 +224,10 @@ class ContentLib {
                             pages : pages.length
                         });
                     } else {
-                        require('./article').generateArticle(_c, deepArticle._id, (resp)  => {
+                        this.generateArticle(_c, deepArticle, (resp)  => {
                             cIndex--;
                             nextPage(resp);
-                        }, false, cIndex);
+                        }, cIndex);
                     }
                 };
                 return nextPage();
@@ -602,23 +602,17 @@ class ContentLib {
     fetchDeepFieldsFromDiff(_c, post, deepdiff, done) {        
         const fields = deepdiff.diffs.map( x => x.field );
 
-        let doMedia = next => {
-            if (fields.includes('media') && post.media) {
-                db.findUnique(_c, 'uploads', { _id : post.media }, (err, media) => {
-                    if (media) {
-                        post.facebookmedia = _c.server.protocol + media.sizes.facebook.url;
-                    } 
+        if (fields.includes('media') && post.media) {
+            db.findUnique(_c, 'uploads', { _id : post.media }, (err, media) => {
+                if (media) {
+                    post.facebookmedia = _c.server.protocol + media.sizes.facebook.url;
+                } 
 
-                    next();
-                });
-            } else {
-                next();
-            }
-        };
-
-        doTopic(() => {
+                done();
+            });
+        } else {
             done();
-        })
+        }
     }
 
     update(_c, postid, caller, values, callback) {

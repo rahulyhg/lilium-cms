@@ -236,10 +236,6 @@ var maybeInitBuild = function(cli) {
     }
 }
 
-var preloadCache = function(cli) {
-    require('./cacheInvalidator.js').preloadLatests(cli._c);
-};
-
 var dispatchMagicLink = function(cli) {
     require('./entities.js').sendMagicLinkToEveryone(cli, function() {
         cli.sendJSON({success : true});

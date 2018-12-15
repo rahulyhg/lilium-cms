@@ -2,7 +2,7 @@ const log = require('../log.js');
 const db = require('../includes/db.js');
 const config = require('../config.js');
 const badges = require('../badges.js');
-const articleLib = require('../article.js');
+const articleLib = require('../content.js');
 
 const DECO_COLLECTION = "decorations";
 const ACTION_STATS_COLLECTION = "actionstats";

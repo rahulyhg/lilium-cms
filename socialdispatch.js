@@ -171,7 +171,7 @@ class SocialPost {
 
     static deepFetch(_c, _id, sendback) {
         SocialPost.getSingle(_c, _id, (post) => {
-            require('./article.js').deepFetch(_c, post.postid, (article) => {
+            articleLib.getFull(_c, post.postid, (article) => {
                 post.article = article;
                 sendback(post);
             });

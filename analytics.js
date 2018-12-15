@@ -476,7 +476,7 @@ class StatsBeautifier {
             }
         }
                 
-        const ArticleLib = require('./article');
+        const ArticleLib = require('./content');
         const EntityLib = require('./entities');
 
         let arti = -1;
@@ -485,7 +485,7 @@ class StatsBeautifier {
                 return sendback(stats);
             } 
 
-            ArticleLib.deepFetch(_c, stats.toppages[arti].name, (deeparticle) => {
+            ArticleLib.getFull(_c, undefined, (deeparticle) => {
                 if (deeparticle) {
                     deeparticle.content = undefined;
                     deeparticle.images = undefined;
@@ -497,7 +497,7 @@ class StatsBeautifier {
 
                 stats.toppages[arti].article = deeparticle;
                 nextArticle();
-            });
+            }, { name : stats.toppages[arti].name });
         };
 
         nextArticle();

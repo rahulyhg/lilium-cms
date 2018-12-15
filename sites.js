@@ -538,7 +538,7 @@ var Sites = function () {
                                     cli.redirect(cli._c.server.url + "admin/sites/", false);
                                 }); 
                             } else {
-                                require('./includes.wpSQL.js').transfer(existingSite, dat, function(err) {
+                                require('./includes/wpSQL.js').transfer(existingSite, dat, function(err) {
                                     if (err) {
                                         cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
                                     } else {
