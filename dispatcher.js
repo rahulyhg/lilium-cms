@@ -35,10 +35,10 @@ var Dispatcher = function () {
 
         } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
             Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
+        } else if (Endpoints.hasWild(cli._c.id, 'GET') && Endpoints.execute("*", 'GET', cli)) {
+            // noOp
         } else if (cli.routeinfo.isStatic) {
             HTMLServer.serveStatic(cli);
-        } else if (Endpoints.hasWild(cli._c.id, 'GET')) {
-            Endpoints.execute("*", 'GET', cli);
         } else {
             HTMLServer.serveClient(cli);
         }

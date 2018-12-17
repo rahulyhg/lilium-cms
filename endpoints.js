@@ -94,7 +94,7 @@ class EndPoints {
     execute(endpoint, method, cli) {
         const site = cli.routeinfo.configname;
         if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
-            registeredEndpoints[site][method][endpoint](cli);
+            return registeredEndpoints[site][method][endpoint](cli);
         } else {
             throw new Error("[EndPointException - Not Found : " + method + "/" + endpoint + "]");
         }

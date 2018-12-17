@@ -152,7 +152,7 @@ class ContentLib {
         });
     }
 
-    generateOrFallback(_c, slug, sendback) {
+    generateOrFallback({_c}, slug, sendback) {
         db.findUnique(_c, 'content', { $or : [{name:slug}, {aliases:slug}] }, (err, post) => {
             if (!post) {
                 sendback(false);
