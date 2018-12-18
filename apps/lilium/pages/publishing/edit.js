@@ -317,7 +317,7 @@ class PublishingSidebar extends Component {
             return null;
         }
         
-        const timeAgo = getTimeAgo(Date.now() - new Date(this.props.history[0].at).getTime()).toString();
+        const timeAgo = this.props.history[0] && getTimeAgo(Date.now() - new Date(this.props.history[0].at).getTime()).toString();
         
         return (
             <div>
@@ -327,10 +327,10 @@ class PublishingSidebar extends Component {
 
                     <div id="sidebar-info">
                         <div>
-                            <span id="word-count"><b>Word Count</b>: <span>{this.state.post.wordcount}</span></span>
+                            <span id="word-count"><b>Word Count</b>: <span>{this.state.post.wordcount || 0}</span></span>
                         </div>
                         {
-                            this.props.history && this.props.history[0] ?(
+                            timeAgo ? (
                                 <div>
                                     <span className="last-modified-interval"><b>Last Modified</b>: <span>{timeAgo}</span></span>
                                 </div>
@@ -574,7 +574,6 @@ export default class EditView extends Component {
             const missingFields = [];
             if (!this.coldState.post.title[0])      { missingFields.push("a title");  }
             if (!this.coldState.post.subtitle[0])   { missingFields.push("a subtitle");  } 
-            if (!this.coldState.post.topic)         { missingFields.push("a topic");  } 
             if (!this.coldState.post.author)        { missingFields.push("an author");  } 
             if (!this.coldState.post.media)         { missingFields.push("a featured image");  } 
 
