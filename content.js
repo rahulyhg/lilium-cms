@@ -526,9 +526,12 @@ class ContentLib {
     parseSpecialValues(v) {
         v.date && (v.date = new Date(v.date));
         v.author && (v.author = db.mongoID(v.author));
-        v.topic && (v.topic = db.mongoID(v.topic));
         v.media && (v.media = db.mongoID(v.media));
         v.sponsoredBoxLogo && (v.sponsoredBoxLogo = db.mongoID(v.sponsoredBoxLogo));
+
+        if (v.editions) {
+            v.editions = v.editions.map(ed => db.mongoID(ed));
+        }
 
         if (v.topic == null || typeof v.topic == "undefined") {
             delete v.topic;
@@ -546,7 +549,7 @@ class ContentLib {
                     { $lookup : LOOKUPS.editions }, 
                     { $project : { fulltopic : 1, name : 1, title : 1 } }
                 ], article => {
-                    const url = article[0].alleditions.reduce((acc, cur) => acc.slug + "/" + cur.slug) + "/" + article[0].name
+                    const url = "/" + article[0].alleditions.map(x => x.slug).join('/') + "/" + article[0].name
                     db.update(_c, 'content', { _id : postid }, { 
                         $set : { name, url },
                         $addToSet : { aliases : article[0].name }
@@ -567,7 +570,7 @@ class ContentLib {
                             if (url) {
                                 callback(
                                     undefined, 
-                                    _c.server.protocol + _c.server.url + "/" + url
+                                    _c.server.protocol + _c.server.url + url
                                 );
                             } else {
                                 callback(undefined, name);
@@ -712,7 +715,7 @@ class ContentLib {
                     }
 
                     if (
-                        !post.alleditions || !post.alleditions[0] || !post.author || !post.media || 
+                        !post.editions || post.editions.length == 0 || !post.author || !post.media || 
                         !post.title[0] || !post.subtitle[0] || !post.content[0]
                     ) {
                         return sendback({ error : "Missing fields", code : 401 });
@@ -732,13 +735,15 @@ class ContentLib {
                 return sendback(err);
             } 
 
-            post.status = "published";
-            post.publishedOn = new Date();
-            post.publishedAt = Date.now();
-            post.date = new Date();
-            post.url = post.alleditions.reduce((acc, cur) => acc.slug + "/" + cur.slug) + "/" + post.name;
+            const updated = {
+                status : "published",
+                publishedOn : new Date(),
+                publishedAt : Date.now(),
+                date : new Date(),
+                url : "/" + post.alleditions.map(x => x.slug).join('/') + "/" + post.name
+            };
 
-            db.update(_c, 'content', { _id : post._id }, post, () => {
+            db.update(_c, 'content', { _id : post._id }, updated, () => {
                 db.remove(_c, 'autosave', { contentid : post._id }, () => {
                     this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
                         this.updateActionStats(_c, post, score => {
