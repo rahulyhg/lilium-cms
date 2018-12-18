@@ -69,7 +69,8 @@ class Metrics {
     }
 
     push(metric, item) {
-        METRICS[metric].push(item);
+        METRICS[metric].values.push(item);
+        METRICS[metric].value++
     }
 
     pushAvg(metric, value) {

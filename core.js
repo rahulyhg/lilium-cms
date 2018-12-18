@@ -281,7 +281,7 @@ const gracefullyCrash = (err) => {
     hooks.fire('crash', err);
 
     log('Core', 'Contacting handler to request a crash to all handles', 'info');
-    metrics.push(err);
+    metrics.push('errors', err);
 };
 
 const bindCrash = () => {
