@@ -252,12 +252,24 @@ class FileLogic {
 
             extra.theme = cTheme;
             extra.minify = true;
-            extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
             extra.url = _c.server.url;
 
-            const readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
-            const layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || layout.lml3);
-            const savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
+            try {
+                extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
+            } catch (err) {}
+
+            let readPath;
+            let layoutPath;
+            let savePath;
+
+            if (cTheme.contexts[ctxName]) {
+                readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
+                layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || layout.lml3);
+            } else {
+                readPath = _c.server.base + "flowers/" + cTheme.uName + "/lml/" + _c.env + ".lml3";
+            }
+
+            savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
 
             if (extra.topic && extra.topic.override) {
                 extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
@@ -266,26 +278,33 @@ class FileLogic {
             log('FileLogic', 'Compiling theme LML3 with context ' + contextname, 'info')
             LML3.compile(_c, readPath, extra, (ctn) => {
                 if (nolayout) {
-                    // return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, cdned => {
-                        return done(ctn);
-                    // });
+                    return done(ctn);
                 }
 
                 log('FileLogic', 'Adding template to LML3 theme compilation', 'info')
                 extra.contentHTML = ctn;
-                LML3.compile(_c, layoutPath, extra, (fHtml) => {
-                    require('./cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minimize(fHtml), _c, cdned => {
-                        fileserver.createDirIfNotExists(savePath, () => {
-                            const handle = FileServer.getOutputFileHandle(savePath, 'w+');
-                            FileServer.writeToFile(handle, cdned, () => {
-                                handle.close();
-                                handle.destroy();
 
-                                done(cdned);
-                            });
-                        }, false);
+                const next = cdned => {
+                    fileserver.createDirIfNotExists(savePath, () => {
+                        const handle = FileServer.getOutputFileHandle(savePath, 'w+');
+                        FileServer.writeToFile(handle, cdned, () => {
+                            handle.close();
+                            handle.destroy();
+
+                            done(cdned);
+                        });
+                    }, false);
+                }
+
+                if (layoutPath) {
+                    LML3.compile(_c, layoutPath, extra, (fHtml) => {
+                        require('./cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minimize(fHtml), _c, cdned => {
+                            next(cdned);
+                        });
                     });
-                });
+                } else {
+                    next(ctn);
+                }
             });
         });
     };

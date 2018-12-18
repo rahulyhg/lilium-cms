@@ -223,7 +223,6 @@ class Entities {
 
     adminPOST(cli) {
         cli.touch('entities.handlePOST');
-        console.log(cli.routeinfo.path);
         
         if (cli.routeinfo.path[1] == 'me') {
             if (cli.routeinfo.path[2] == "updateOneField") {
@@ -270,8 +269,6 @@ class Entities {
         } else if (cli.routeinfo.path[2] == "revoke") {
             cli.hasRightOrRefuse('revoke-access') && this.revoke(db.mongoID(cli.routeinfo.path[3]), () => { cli.sendJSON({ ok : 1 }) });
         } else if (cli.routeinfo.path[2] == 'mustUpdatePassword') {
-            console.log('Mustupdatepassword hit');
-            
             if (cli.hasRightOrRefuse('manage-entities')) {
                 const _id = db.mongoID(cli.routeinfo.path[3]);
                 db.update(_c.default(), 'entities', { _id }, { mustupdatepassword: true }, (err, r) => {
@@ -873,13 +870,11 @@ class Entities {
 
             db.join(cli._c, 'content', [
                 { $match : { status : "published", author : db.mongoID(cli.userinfo.userid) } },
-                { $group : { _id : "$topic", posts : { $sum : 1 } } },
-                { $lookup : { from : "topics", as : "topic", localField : '_id', foreignField : '_id' } },
-                { $project : { _id : 0, posts : 1, topic : "$topic.displayname", topicslug : "$topic.completeSlug" } },
-                { $sort : { posts : -1 } },
-                { $unwind : "$topic" },
-                { $unwind : "$topicslug" },
-            ], topics => {
+                { $group : { _id : "$editions", posts : { $sum : 1 } } },
+                { $lookup : { from : "editions", as : "editions", localField : '_id', foreignField : '_id' } },
+                { $project : { _id : 0, posts : 1, editions : "$editions" } },
+                { $sort : { posts : -1 } }
+            ], editions => {
                 db.join(cli._c, 'content', [
                     { $match : { 
                         status : "published", 
@@ -893,9 +888,9 @@ class Entities {
                     { $project : { day : "$_id", published : 1, _id : 0 } }
                 ], activity => {
                     sendback({
-                        totalposts : topics.reduce((acc, cur) => acc + cur.posts, 0),
+                        totalposts : editions.reduce((acc, cur) => acc + cur.posts, 0),
 
-                        topics, activity
+                        editions, activity
                     });
                 });
             });

@@ -1,19 +1,18 @@
 import { h, Component } from 'preact';
 import { setPageCommands } from '../../layout/lys';
+import { getTimeAgo } from '../../widgets/timeago';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
+import { EditionPicker } from '../../widgets/editionpicker';
 import { getSession } from '../../data/cache';
 import { navigateTo } from '../../routing/link';
 import { castNotification } from '../../layout/notifications';
+import { Spinner } from '../../layout/loading';
 import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
 import Modal from '../../widgets/modal';
-
 import dateFormat from 'dateformat';
-import { getTimeAgo } from '../../widgets/timeago';
-
 import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink } from '../../lib/publishing';
-
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
@@ -168,6 +167,7 @@ class PublishingActions extends Component {
                     { color : "blue", text : "Publish", work : this.props.actions.validate.bind(this)  },
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Destroy", work : this.props.actions.destroy.bind(this) }
                 );
             } else if (status == "published") {
@@ -178,6 +178,7 @@ class PublishingActions extends Component {
                 dropacts.push(
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Unpublish", work : this.props.actions.unpublish.bind(this) }
                 );
             } else if (status == "reviewing") {
@@ -189,6 +190,7 @@ class PublishingActions extends Component {
                     { color : "blue", text : "Accept and publish", work : this.props.actions.validate.bind(this)  },
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Refuse submission", work : this.props.actions.refuse.bind(this) }
                 );
             }
@@ -314,12 +316,30 @@ class PublishingSidebar extends Component {
         if (!this.state.post) {
             return null;
         }
-
+        
+        const timeAgo = this.props.history[0] && getTimeAgo(Date.now() - new Date(this.props.history[0].at).getTime()).toString();
+        
         return (
             <div>
                 <b style={styles.sidebarTitle}>Manage</b>
                 <div style={{ padding : 10 }}>
                     <PublishingActions post={this.state.post} actions={this.props.actions} />
+
+                    <div id="sidebar-info">
+                        <div>
+                            <span id="word-count"><b>Word Count</b>: <span>{this.state.post.wordcount || 0}</span></span>
+                        </div>
+                        {
+                            timeAgo ? (
+                                <div>
+                                    <span className="last-modified-interval"><b>Last Modified</b>: <span>{timeAgo}</span></span>
+                                </div>
+                            ) : null
+                        }
+                        <div>
+                            <span id="status"><b>Status</b>: <span>{this.state.post.status}</span></span>
+                        </div>
+                    </div>
                 </div>
 
                 <b style={styles.sidebarTitle}>Activity</b>
@@ -464,6 +484,7 @@ export default class EditView extends Component {
             validate : this.validate.bind(this),
             triggerAuthorChange : this.triggerAuthorChange.bind(this),
             triggerSlugChange : this.triggerSlugChange.bind(this),
+            triggerPreviewLinkChange : this.triggerPreviewLinkChange.bind(this),
             commitchanges : this.commitchanges.bind(this),
             unpublish : this.unpublish.bind(this),
             refuse : this.refuse.bind(this)
@@ -475,6 +496,7 @@ export default class EditView extends Component {
         this.stage = {};
 
         this.socketArticleUpdateEvent_bound = this.socketArticleUpdateEvent.bind(this);
+        this.onPageKeyPress = this.onPageKeyPress.bind(this);
     }
 
     componentDidMount() {
@@ -484,6 +506,10 @@ export default class EditView extends Component {
 
     componentWillUnmount() {
         unbindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound);
+    }
+
+    onPageKeyPress(ev) {
+        console.log(ev);
     }
 
     socketArticleUpdateEvent(ev) {
@@ -548,7 +574,6 @@ export default class EditView extends Component {
             const missingFields = [];
             if (!this.coldState.post.title[0])      { missingFields.push("a title");  }
             if (!this.coldState.post.subtitle[0])   { missingFields.push("a subtitle");  } 
-            if (!this.coldState.post.topic)         { missingFields.push("a topic");  } 
             if (!this.coldState.post.author)        { missingFields.push("an author");  } 
             if (!this.coldState.post.media)         { missingFields.push("a featured image");  } 
 
@@ -776,6 +801,13 @@ export default class EditView extends Component {
         });
     }
 
+    editionChanged(name, value) {
+        this.edits[name] = value;
+        const post = this.state.post;
+        post.editions = value;
+
+        this.setState({ post });
+    }
 
     fieldChanged(name, value) {
         this.edits[name] = value;
@@ -795,6 +827,8 @@ export default class EditView extends Component {
         ].reduce((prev, cur) => prev + cur, 0);
 
         tempdiv.innerHTML = "";
+
+        this.save();
     }
 
     imageChanged(name, image) {
@@ -841,6 +875,30 @@ export default class EditView extends Component {
             updatingSlug : true,
             updatingAuthor : false
         });        
+    }
+
+    triggerPreviewLinkChange(done) {
+         getNewPreviewLink(this.state.post._id, (err, { previewkey }, r) => {
+            if (!err) {
+                const post = this.state.post;
+                post.previewkey = previewkey;
+
+                this.setState({ post })
+
+                castNotification({
+                    type : "success",
+                    title : "Preview link",
+                    message : "The old preview links are no longer available."
+                });
+            } else {
+                castNotification({
+                    type : "warning",
+                    title : "Could not invalidate preview link"
+                })         
+            }
+
+            done && done(); 
+        });
     }
 
     updateAuthor() {
@@ -891,26 +949,6 @@ export default class EditView extends Component {
         } else if (field == "author") {
             this.edits.author = value;
             this.save();
-        } else if (field == "previewkey") {
-            getNewPreviewLink(this.state.post._id, (err, { previewkey }, r) => {
-                if (!err) {
-                    const post = this.state.post;
-                    post.previewkey = previewkey;
-
-                    this.setState({ post })
-
-                    castNotification({
-                        type : "success",
-                        title : "Preview link",
-                        message : "The old preview links are no longer available."
-                    });
-                } else {
-                    castNotification({
-                        type : "warning",
-                        title : "Could not invalidate preview link"
-                    })         
-                }
-            });
         }
     }
 
@@ -926,23 +964,37 @@ export default class EditView extends Component {
         if (this.state.loading) {
             return (
                 <div style={{ textAlign : 'center', paddingTop : 150 }}>
-                    <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
+                    <Spinner centered />
                 </div>
             )
         }
 
         return (
-            <div>
+            <div class="publishing-page-flex">
                 <div class="publishing-edit-section">
-                    <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} style={{ fontFamily : '"Oswald", sans-serif', background : "transparent", fontSize : 32, border : "none", borderBottom : "1px solid #DDD", padding : "3px 0px", textAlign : 'center' }} />
-                    <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" style={{ background : "transparent", border : "none", padding : "5px 0px", marginBottom : 10, textAlign : 'center' }} />
+                    <div class="publishing-bigtitle-wrap">
+                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} />
+                    </div>
+
+                    <div class="publishing-subtitle-wrap">
+                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" />
+                    </div>
                     
                     <div style={{ margin: "auto", maxWidth: 1200 }}>
                         <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} />
                     </div>
 
-                    <div class="publishing-card nopad">
-                        <TopicPicker onChange={this.topicChanged.bind(this)} name="topic" initialValue={this.state.post.topic || undefined} placeholder="Select a topic" />
+                    <div class="card publishing-card">
+                        <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
+                    </div>
+
+                    <div class="card publishing-card nopad">
+                        <EditionPicker initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.editionChanged.bind(this)} />
+                    </div>      
+
+                    <div className="card publishing-card" id="seo">
+                        <TextField name='seotitle' placeholder='SEO Optimised Title' onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seotitle} />
+                        <TextField name='seosubtitle' placeholder='SEO Optimized Subtitle' onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seosubtitle} />
                     </div>
 
                     <div class="card publishing-card">
@@ -954,10 +1006,6 @@ export default class EditView extends Component {
 
                     <div class="card publishing-card">
                         <PublishingSponsoredSection fieldChanged={this.fieldChanged.bind(this)} post={this.state.post} />
-                    </div>
-
-                    <div class="card publishing-card">
-                        <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
 
                     <div class="card publishing-card nopad">

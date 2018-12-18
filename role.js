@@ -1,6 +1,5 @@
 var config = require('./config.js');
 var filelogic = require('./filelogic.js');
-var formBuilder = require('./formBuilder.js');
 var conf = require('./config.js');
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
@@ -98,21 +97,13 @@ var Role = function () {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
             if (cli.method == 'POST') {
 
-                var form = formBuilder.handleRequest(cli);
-                var response = formBuilder.validate(form, true);
                 if (cli.hasRight('admin')) {
-                    if (response.success) {
-                        var data = prepareRoleForDB(cli);
-                        db.update(conf.default(), 'roles', {
-                            _id: id
-                        }, data, function (err, r) {
-                            cli.refresh();
-                        });
-                    } else {
-                        cli.sendJSON({
-                            form: response
-                        });
-                    }
+                    var data = prepareRoleForDB(cli);
+                    db.update(conf.default(), 'roles', {
+                        _id: id
+                    }, data, function (err, r) {
+                        cli.refresh();
+                    });
                 } else {
                     cli.sendJSON({
                         success: false,
@@ -175,41 +166,6 @@ var Role = function () {
                 }
             });
         }
-    }
-
-    this.form = function () {
-        formBuilder.createForm('role_create', {
-                fieldWrapper: {
-                    tag: 'div',
-                    cssPrefix: 'role-field-'
-                },
-                cssClass: 'role-form',
-                dependencies: [],
-                async: true
-            })
-            .add('displayname', 'text', {
-                displayname: "Display Name",
-            })
-            .add('name', 'text', {
-                displayname: "Name slug",
-            })
-            .add('rights', 'stack', {
-                displayname: "User Rights",
-                scheme: {
-                    columns: [{
-                        fieldName: 'rights',
-                        dataType: 'text',
-                        displayname: "Name"
-                    }, ]
-                }
-            })
-            .add('Create', 'submit', {
-                displayname: "Create Role"
-            });
-    }
-
-    this.setup = function() {
-
     }
 
     this.loadRolesInCache = (done) => {

@@ -2,7 +2,6 @@ const log = require('./log')
 const filelogic = require('./filelogic')
 const db = require('./includes/db')
 const config = require('./config')
-const formbuilder = require('./formBuilder')
 
 const DR_COLLECTION = "datareaderreports";
 const NETWORK_TABLE = ["entities", "cakepops", "fix", "decorations", "feed", "roles"];
@@ -193,96 +192,6 @@ class DataReader {
         }
     }
 
-    form() {
-        formbuilder.createForm('datareader_report', {
-            formWrapper : {
-                tag : 'div',
-                class : 'row',
-                id : 'datareader_report', 
-                inner : true
-            },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add("title", "text", {
-            displayname : "Title"
-        })
-        .add("description", "text", {
-            displayname : "Description"
-        })
-        .add('site', 'liveselect', {
-            endpoint: 'datareader.sites',
-            select : {
-                value : 'name',
-                displayname : 'displayname'
-            },
-            empty : {
-                displayname : " - Current site - "
-            },
-            displayname: "Queried website"
-        })
-        .add('maincollection', 'select', {
-            displayname : "Queried collection",
-            datasource : [
-                { displayName : "Content / Articles", name : "content" },
-                { displayName : "Cakepops", name : "cakepops" },
-                { displayName : "Chains", name : "contentchains" },
-                { displayName : "Reports", name : "datareaderreports" },
-                { displayName : "Decorations / Badges", name : "decorations" },
-                { displayName : "Entities", name : "entities" },
-                { displayName : "What's up Feed", name : "feed" },
-                { displayName : "Tickets", name : "fix" },
-                { displayName : "Content history", name : "history" },
-                { displayName : "Email templates", name : "mailtemplates" },
-                { displayName : "Search queries", name : "searches" },
-                { displayName : "Styled pages", name : "styledpages" },
-                { displayName : "Topics", name : "topics" },
-                { displayName : "Uploads", name : "uploads" }
-            ]
-        })  
-        .add('ag-title', 'title', {
-            displayname : "Aggregation"
-        })
-        .add('aggregation', 'stack', {
-            scheme : {
-                columns : [
-                    { fieldName : "method", dataType : "select", displayname : "Method", dataSource : [
-                        { name : "$match",   displayname : "Match" },
-                        { name : "$project", displayname : "Projection" },
-                        { name : "$sort",    displayname : "Order / Sort" },
-                        { name : "$regex",   displayname : "Regular Expression" },
-                        { name : "$lookup",  displayname : "Join lookup" },
-                        { name : "$unwind",  displayname : "Unwind lookup" },
-                        { name : "$group",   displayname : "Group" },
-                        { name : "$limit",   displayname : "Limit results" },
-                        { name : "$skip",    displayname : "Skip results" }
-                    ] },
-                    { fieldName : "operator", dataType : "text", displayname : "Operator / Field" },
-                    { fieldName : "value", dataType : "text", displayname : "Value" }
-                ]
-            }
-        })
-        .add('projection', 'text', {
-            displayname : "Projection"
-        })
-        .add('tabletitles', 'text', {
-            displayname : "Projection display names"
-        })
-        .add("actions", 'buttonset', {
-            buttons : [
-                {
-                    name : "save",
-                    displayname : "Save",
-                    type : "button",
-                    classes : ["btn-save"]
-                }, {
-                    name : "generate",
-                    displayname : "Generate",
-                    type : "button",
-                    classes : ["btn-preview"]
-                }
-            ]
-        })
-    }
 }
 
 module.exports = new DataReader();

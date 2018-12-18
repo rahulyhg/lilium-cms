@@ -5,9 +5,9 @@
   "main": "index.prod.js",
   "scripts": {
     "test": "node gardener.js crash-on-error",
-    "build": "",
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.prod.js",
     "dev": "node gardener.js dev",
-    "pm2" : "node pm2.prod.js",
+    "pm2": "node pm2.prod.js",
     "start": "node index.prod.js"
   },
   "repository": {
@@ -78,11 +78,14 @@
     "canvas": "^2.0.0-alpha.12",
     "chart.js": "^2.7.2",
     "checksum": "latest",
+    "cross-env": "^5.2.0",
     "crypto-js": "latest",
     "dateformat": "latest",
     "deep-diff": "latest",
+    "dependency-tree": "^6.3.0",
     "diff": "^3.5.0",
     "diff-match-patch": "^1.0.4",
+    "emitter": "0.0.5",
     "entities": "latest",
     "flatpickr": "^4.5.1",
     "fs": "latest",
@@ -165,6 +168,6 @@
     "webpack": "^4.26.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10",
-    "webpack-node-externals": "latest"
+    "webpack-node-externals": "^1.7.2"
   }
 }

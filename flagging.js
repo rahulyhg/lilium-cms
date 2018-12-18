@@ -26,7 +26,7 @@ const LIVEVAR_PROJECT = {
     "article.isSponsored"   : 1,
     "article.status"        : 1,
     "article.nsfw"          : 1,
-    "article.topicslug"     : 1,
+    "article.editions"      : 1,
     "article.name"          : 1,
     "article.facebookmedia" : 1,
     "article.author"        : 1,

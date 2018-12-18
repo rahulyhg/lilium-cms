@@ -52,8 +52,6 @@ const parseText = (txt, domain, cdndomain, cb, ignoreHTML) => {
     }
 };
 
-
-
 class ContentDeliveryNetwork {
     parseOne(_c, string, skipValidation) {
         if (skipValidation || (_c.content && _c.content.cdn && _c.content.cdn.domain)) {

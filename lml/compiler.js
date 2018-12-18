@@ -471,7 +471,7 @@ class LMLTagParser {
             if (lmllib.isRegistered(libname)) {
                 ctx.lib[libname] = lmllib.pulloutLib(libname, ctx);
             } else {
-                log('LML', 'Tried to inblude unregistered library : ' + libname, 'warn');
+                log('LML', 'Tried to include unregistered library : ' + libname, 'warn');
             }
         }
     };
