@@ -3,6 +3,7 @@ var entities = require('./entities.js');
 var db = require('./includes/db.js');
 var log = require('./log.js');
 var sharedcache = require('./sharedcache.js');
+var metrics = require('./metrics');
 
 var UserSesh = function (token) {
     this.data = new Object();
@@ -80,6 +81,7 @@ var Sessions = function () {
             }
 
             if (injected) {
+                metrics.plus('authreq');
                 cb(true);
             } else {
                 db.findUnique(cli._c, "sessions", {token : id}, function(err, sesh) {
@@ -92,6 +94,7 @@ var Sessions = function () {
                             seshToUserInfo(cli);
                             sharedcache.session(id, 'add', sesh);
 
+                            metrics.plus('authreq');
                             cb(true);
                         } else {
                             cb(false);

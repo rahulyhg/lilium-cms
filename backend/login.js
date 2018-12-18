@@ -6,6 +6,7 @@ const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 const log = require('../log.js');
 const api = require('../api.js');
+const metrics = require('../metrics');
 const twoFactor = require('../twoFactor');
 
 const loginSuccess = (cli, userObj, cb) => {
@@ -107,6 +108,7 @@ class Login {
                                 loginSuccess(cli, userObj);
                             });
                         } else {
+                            metrics.plus('failedauth');
                             hooks.fire('user_login_failed', cli);
                             log("Auth", "Login attempt failed with user " + usr + " due to invalid 2FA token", "warn");
                             cli.sendJSON({ error: 'credentials', message: (_c.default().env == 'prod') ? 'Login failed' : 'Invalid 2FA Token', success : false })
@@ -118,6 +120,7 @@ class Login {
                         });
                     }
                 } else {
+                    metrics.plus('failedauth');
                     hooks.fire('user_login_failed', cli);
                     log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
                     cli.sendJSON({ error : "credentials", message: 'Login Failed', success : false })

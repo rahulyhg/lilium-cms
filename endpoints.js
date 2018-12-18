@@ -1,6 +1,7 @@
 const hooks = require('./hooks.js');
 const config = require('./config.js'); 
 const log = require('./log.js');
+const metrics = require('./metrics');
 
 // Schema : { SITE_ID : { METHOD : { ENDPOINT : Object } } }
 const registeredEndpoints = {};
@@ -39,6 +40,7 @@ class EndPoints {
             return;
         }        
 
+        metrics.setDeep('endpointsreq', method + "/" + endpoint, 0);
         log('Endpoint', "Registering endpoint " + method + "@" + endpoint + " for website with id " + site, 'info');
         if (site && site != '*') {
             if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
@@ -92,6 +94,7 @@ class EndPoints {
     }
 
     execute(endpoint, method, cli) {
+        metrics.plusDeep('endpointsreq', method + "/" + endpoint);
         const site = cli.routeinfo.configname;
         if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
             return registeredEndpoints[site][method][endpoint](cli);

@@ -4,6 +4,7 @@ var cli = require('./clientobject.js');
 var sessionManager = require('./session.js');
 var log = require('./log.js');
 var db = require('./includes/db.js');
+var metrics = require('./metrics');
 var hooks = require('./hooks.js');
 var sites = require('./sites.js');
 var livevars = require('./livevars.js');
@@ -45,6 +46,7 @@ LiliumSocket.prototype.join = function (groupName) {
 };
 
 LiliumSocket.prototype.hit = function(param) {
+    metrics.plus('socketevents');
     var ls = this.liliumsocket;
     var sid = ls.sid;
     var uid = ls.clientId;
@@ -80,6 +82,8 @@ LiliumSocket.prototype.hit = function(param) {
 };
 
 LiliumSocket.prototype.disconnect = function () {
+    metrics.minus('loggedinusers');
+    metrics.plus('socketevents');
     var ls = this.liliumsocket;
     var sid = ls.sid;
     var uid = ls.clientId;
@@ -119,6 +123,7 @@ LiliumSocket.prototype.disconnect = function () {
 };
 
 LiliumSocket.prototype.notificationInteraction = function (notifId) {
+    metrics.plus('socketevents');
     var ls = this.liliumsocket;
     var id = db.mongoID(notifId);
     var userId = db.mongoID(ls.clientId);
@@ -151,6 +156,7 @@ LiliumSocket.prototype.notificationInteraction = function (notifId) {
 };
 
 LiliumSocket.prototype.notificationView = function () {
+    metrics.plus('socketevents');
     var ls = this.liliumsocket;
     ls.session.data.newNotifications = 0;
     // Bypass session manager taking only a cli
@@ -164,16 +170,19 @@ LiliumSocket.prototype.notificationView = function () {
 };
 
 LiliumSocket.prototype.broadcast = function (emission) {
+    metrics.plus('socketevents');
     var ls = this.liliumsocket;
 };
 
 LiliumSocket.prototype.alert = function () {
+    metrics.plus('socketevents');
     this.broadcast.emit('message', {
         username: this.username
     });
 };
 
 LiliumSocket.prototype.error = function (err) {
+    metrics.plus('socketevents');
     log('Socket', 'Error with socket : ' + err.message, 'err');
     log('Stacktrace', err.stack, 'err');
 };
@@ -201,6 +210,8 @@ var Notification = function () {
                         session.sessionId = sessionId;
                         new LiliumSocket(socket, session).bind();
 
+                        metrics.plus('loggedinusers');
+                        metrics.plus('socketevents');
                         for (var i = 0; i < namespaces.length; i++) {
                             require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
                                 id: session.data._id,
@@ -256,6 +267,7 @@ var Notification = function () {
                 
                 log('Notifications', 'Emit "'+(difftype||"notification")+'" to socket id ' + split[1] + " of " + split[0], 'live')
                 require('./inbound.js').io().of(split[0]).to(sockets[i]).emit(difftype || 'notification', notification);
+                metrics.plus('socketevents');
             }
         });
     };
@@ -325,10 +337,12 @@ var Notification = function () {
     };
 
     this.emitToWebsite = function (siteid, data, type) {
+        metrics.plus('socketevents');
         require('./inbound.js').io().of(idToNamespace[siteid]).emit(type || 'notification', data);
     };
 
     this.messageNotif = function(user, msg, type) {
+        metrics.plus('socketevents');
         sharedcache.getSocketID(user, function(sockets) {
             for (var i = 0; i < sockets.length; i++) {
                 var split = sockets[i].split('#');
@@ -427,6 +441,7 @@ var Notification = function () {
     };
 
     this.broadcast = function (data, msgType) {
+        metrics.plus('socketevents');
         for (var i = 0; i < namespaces.length; i++) {
             require('./inbound.js').io().of(namespaces[i]).emit(msgType || 'message', data);
         }

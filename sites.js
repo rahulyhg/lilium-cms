@@ -21,6 +21,7 @@ var sitemap = require('./sitemap.js');
 var analytics = require('./analytics.js');
 var adslib = require('./ads');
 var roles = require('./role');
+var metrics = require('./metrics');
 var V4DevServer = require('./v4devserver');
 
 var networkInfo = require('./network/info.js');
