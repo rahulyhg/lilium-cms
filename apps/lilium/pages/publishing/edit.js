@@ -3,6 +3,7 @@ import { setPageCommands } from '../../layout/lys';
 import { getTimeAgo } from '../../widgets/timeago';
 import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
+import { EditionPicker } from '../../widgets/editionpicker';
 import { getSession } from '../../data/cache';
 import { navigateTo } from '../../routing/link';
 import { castNotification } from '../../layout/notifications';
@@ -801,6 +802,13 @@ export default class EditView extends Component {
         });
     }
 
+    editionChanged(name, value) {
+        this.edits[name] = value;
+        const post = this.state.post;
+        post.editions = value;
+
+        this.setState({ post });
+    }
 
     fieldChanged(name, value) {
         this.edits[name] = value;
@@ -963,7 +971,7 @@ export default class EditView extends Component {
         }
 
         return (
-            <div>
+            <div class="publishing-page-flex">
                 <div class="publishing-edit-section">
                     <div class="publishing-bigtitle-wrap">
                         <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} />
@@ -981,9 +989,9 @@ export default class EditView extends Component {
                         <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
 
-                    <div class="publishing-card nopad">
-                        <TopicPicker onChange={this.topicChanged.bind(this)} name="topic" initialValue={this.state.post.topic || undefined} placeholder="Select a topic" />
-                    </div>
+                    <div class="card publishing-card nopad">
+                        <EditionPicker initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.editionChanged.bind(this)} />
+                    </div>      
 
                     <div className="card publishing-card" id="seo">
                         <TextField name='seotitle' placeholder='SEO Optimised Title' onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seotitle} />

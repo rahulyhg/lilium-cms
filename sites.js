@@ -137,7 +137,7 @@ var SiteInitializer = function (conf, siteobj) {
             log('Database', 'Creating collections', 'info');
             
         	var collectionsNames = [
-		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview", "topics",
+		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview", 
         		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history", "searches",
 		        "lilium", "uploads", "cachedFiles", "dfp", "secrets", "conversations", "communications",
 		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges", "styledpages"
@@ -238,6 +238,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var loadTheme = function(cb) {
+        log('Sites', "About to load the theme files for " + conf.website.sitetitle, 'info');
         themes.initializeSite(conf, function() {
             cb();
         });
@@ -267,6 +268,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var initEvents = function(cb) {
+        log('Sites', "Initializing events", 'info');
         if (!isElder) { return cb(); }
         events.init(conf, cb);
     };
@@ -301,7 +303,7 @@ var SiteInitializer = function (conf, siteobj) {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
                     initEvents(function() {
-
+                        log('Sites', 'Initializing email senders', 'info');
                         if (/*isElder &&*/ conf.emails) {
                             mail.setSender(conf.id, {
                                 user : conf.emails.senderemail,
@@ -315,7 +317,17 @@ var SiteInitializer = function (conf, siteobj) {
                         }
 
                         if (isElder) {
+                            log('Sites', "Loading polling for elder child", 'info');
                             analytics.pollRealtime(conf);
+                        }
+
+                        if (isElder) {
+                            log('Sites', 'V4 will load all older URL in cache front', 'info');
+                            const V4 = require('./v4');
+                            const v4 = new V4();
+                            v4.dumpV3UrlInFront(conf, () => {
+                                log('Sites', 'Old URLs will now redirect to new version', 'success');
+                            });
                         }
 
                         loadVarious(function() {
@@ -526,7 +538,7 @@ var Sites = function () {
                                     cli.redirect(cli._c.server.url + "admin/sites/", false);
                                 }); 
                             } else {
-                                require('./includes.wpSQL.js').transfer(existingSite, dat, function(err) {
+                                require('./includes/wpSQL.js').transfer(existingSite, dat, function(err) {
                                     if (err) {
                                         cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
                                     } else {

@@ -53,11 +53,8 @@ const registeredLibraries = {
         const conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
         return require('./vocab.js').getDico(conf.website.language);
     },
-    forms: function (context) {
-        return require('./formBuilder.js');
-    },
     article: function (context) {
-        return require('./article.js');
+        return require('./content.js');
     },
     plugins: function (context) {
         return require('./plugins.js');

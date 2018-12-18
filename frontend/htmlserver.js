@@ -2,9 +2,9 @@ var fileserver = require('../fileserver.js');
 var filelogic = require('../filelogic.js');
 var sharedcache = require("../sharedcache.js");
 var styledpages = require('../styledpages.js');
+var editions = require('../editions');
 var _conf = require('../config.js');
-var article = require('../article.js');
-var topics = require('../topics.js');
+var articleLib = require('../content.js');
 var ipevents = require('../ipevents.js');
 var db = require('../includes/db');
 var noop = function() {};
@@ -53,7 +53,7 @@ class BotResponder {
             status : "published"
         }, (err, article) => {
             if (article) {
-                const permalink = "/" + article.topicslug + "/" + article.name;
+                const permalink = article.url; 
                 log('BotResponder', 'Redirected to ' + permalink, 'info');
                 return cli.redirect(permalink, true);
             } else {
@@ -112,8 +112,8 @@ class HTMLServer {
                         styledpages.serveOrFallback(cli, function() {
                             log('HTMLServer', "Styledpages fellback", 'details');
 
-                            topics.serveOrFallback(cli, function() {
-                                log('HTMLServer', "Topics fellback", 'details');
+                            editions.serveOrFallback(cli, function() {
+                                log('HTMLServer', "Editions fellback", 'details');
 
                                 var name = cli.routeinfo.path[cli.routeinfo.path.length - 1];
                                 var pageIndex = -1;
@@ -122,47 +122,41 @@ class HTMLServer {
                                     name = cli.routeinfo.path[cli.routeinfo.path.length - 2];
                                 }
 
-                                article.generateFromName(cli, name, function(success, details) {
+                                articleLib.generateOrFallback(cli, name, function(success, redirection) {
                                     if (success) {
-                                        if (details) {
-                                            if (details.realName) {
-                                                cli.redirect(cli._c.server.url + "/" + details.realName, true);
-                                            } else if (details.realURL) {
-                                                cli.redirect(details.realURL, true);
-                                            } else {
-                                                cli.throwHTTP(500, "Error in HTMLServer");
-                                            }
+                                        if (redirection) {
+                                            log('HTMLServer', 'Article generated with redirection from cli', 'details');
+                                            cli.redirect(redirection);
                                         } else {
+                                            log('HTMLServer', 'Article generated from cli', 'details');
                                             cli.routeinfo.isStatic = true;
                                             fileserver.pipeFileToClient(cli, filename + '.html', function () {
                                                 cli.touch('htmlserver.serveClient.callback');
                                             });
                                         }
+                                    } else if (that.botresponder.isBot(cli.request.headers["user-agent"])) {
+                                        that.botresponder.handle(cli);
                                     } else {
-                                        if (that.botresponder.isBot(cli.request.headers["user-agent"])) {
-                                            that.botresponder.handle(cli);
-                                        } else {
-                                            log('HTMLServer', '404 => ' + cli._c.server.url + cli.routeinfo.fullpath + " from " + cli.ip + " with agent " + cli.request.headers["user-agent"], 'warn');
-                                            var cachekey = "404_html_" + cli._c.uid;
+                                        log('HTMLServer', '404 => ' + cli._c.server.url + cli.routeinfo.fullpath + " from " + cli.ip + " with agent " + cli.request.headers["user-agent"], 'warn');
+                                        var cachekey = "404_html_" + cli._c.uid;
     
-                                            sharedcache.get(cachekey, function(html) {
-                                                if (html) {
+                                        sharedcache.get(cachekey, function(html) {
+                                            if (html) {
+                                                cli.response.writeHead(404, {"content-type" : "text/html"});
+                                                cli.response.end(html);
+                                            } else {
+                                                filelogic.renderThemeLML(cli, '404', '404.html', {}, function(content) {
                                                     cli.response.writeHead(404, {"content-type" : "text/html"});
-                                                    cli.response.end(html);
-                                                } else {
-                                                    filelogic.renderThemeLML(cli, '404', '404.html', {}, function(content) {
-                                                        cli.response.writeHead(404, {"content-type" : "text/html"});
-                                                        cli.response.end(content);
+                                                    cli.response.end(content);
             
-                                                        var setobj = {};
-                                                        setobj[cachekey] = content;
-                                                        sharedcache.set(setobj);
-                                                    });
-                                                }
+                                                    var setobj = {};
+                                                    setobj[cachekey] = content;
+                                                    sharedcache.set(setobj);
+                                                });
+                                            }
     
-                                                // ipevents.push(cli._c, cli.ip, 404, cli.request.url, {agent : cli.request.headers["user-agent"]});
-                                            });
-                                        }
+                                            // ipevents.push(cli._c, cli.ip, 404, cli.request.url, {agent : cli.request.headers["user-agent"]});
+                                        });
                                     }
                                 }, true, pageIndex)
                             });

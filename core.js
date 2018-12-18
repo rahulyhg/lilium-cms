@@ -6,6 +6,8 @@ const V4 = require('./v4');
 
 global.require_template = require('./templaterequire');
 
+const v4 = new V4();
+
 class Core {
     constructor() {
         log('Core', 'Lilium core object was created', 'success');
@@ -48,7 +50,6 @@ class Core {
                 sharedcache : require('./sharedcache'),
                 socialdispatch : require('./socialdispatch'),
                 themes : require('./themes'),
-                topics : require('./topics'),
                 various : require('./various')
             };
 
@@ -122,7 +123,7 @@ const loadEndpoints = () => {
     endpoints.init();
     endpoints.register('*', 'lilium', 'GET', (cli) => {
         cli.userinfo && cli.userinfo.loggedin ? 
-            V4.serveV4Index(cli) :
+            v4.serveV4Index(cli) :
             cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login?to=" + cli.routeinfo.fullpath);
     });
 

@@ -1,6 +1,6 @@
 const db = require('./includes/db.js');
 const endpoints = require('./endpoints.js');
-const article = require('./article.js');
+const articleLib = require('./content.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
 const log = require('./log.js');
@@ -17,7 +17,7 @@ class Amp {
         let articleName = cli.routeinfo.path[cli.routeinfo.path.length - 1];
 
         // Will try to find the article in the database
-        article.deepFetch(cli._c, articleName, (article) => {this.handleArticle(cli, article);}, false, {status : "published"});
+        articleLib.deepFetch(cli._c, articleName, (article) => {this.handleArticle(cli, article);}, false, {status : "published"});
     }
 
     handleArticle(cli, article) {

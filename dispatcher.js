@@ -35,6 +35,8 @@ var Dispatcher = function () {
 
         } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
             Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
+        } else if (Endpoints.hasWild(cli._c.id, 'GET') && Endpoints.execute("*", 'GET', cli)) {
+            // noOp
         } else if (cli.routeinfo.isStatic) {
             HTMLServer.serveStatic(cli);
         } else {
@@ -55,6 +57,8 @@ var Dispatcher = function () {
             } else {
                 if (Endpoints.isRegistered(cli._c.id, cli.routeinfo.path[0], 'PUT')) {
                     Endpoints.execute(cli.routeinfo.path[0], 'PUT', cli);
+                } else if (Endpoints.hasWild(cli._c.id, 'PUT')) {
+                    Endpoints.execute("*", 'PUT', cli);
                 } else {
                     cli.throwHTTP(404, undefined, true);
                 }
@@ -75,6 +79,8 @@ var Dispatcher = function () {
             } else {
                 if (Endpoints.isRegistered(cli._c.id, cli.routeinfo.path[0], 'DELETE')) {
                     Endpoints.execute(cli.routeinfo.path[0], 'DELETE', cli);
+                } else if (Endpoints.hasWild(cli._c.id, 'DELETE')) {
+                    Endpoints.execute("*", 'DELETE', cli);
                 } else {
                     cli.throwHTTP(404, undefined, true);
                 }
@@ -95,6 +101,8 @@ var Dispatcher = function () {
             } else {
                 Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
             }
+        } else if (Endpoints.hasWild(cli._c.id, 'POST')) {
+            Endpoints.execute("*", 'POST', cli);
         } else {
             log("Dispatcher", "Endpoint not registered : " + cli.routeinfo.path[0]);
             cli.throwHTTP(403, undefined, true);

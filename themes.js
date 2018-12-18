@@ -287,40 +287,21 @@ var Themes = function () {
 
     this.initializeSite = function (conf, cb) {
         that.getThemesDirList(conf, function (themes) {
-            db.findToArray(conf.id, 'themes', {
+            db.findUnique(conf.id, 'themes', {
                 'active': true
-            }, function (err, results) {
-                var remove = function () {            
-                    db.remove(conf, 'themes', {$or : [{'active':false}, {'active': null}]}, function () {
-                        db.insert(conf, 'themes', themes, function (err) {
-                            cb();
-                        });
-                    }, false);
-                };
+            }, (err, theme) => {
+                if (!theme) {
+                    log('Theme', 'No theme registered for website ' + conf.website.sitetitle, 'err');
+                    log('Theme', 'Trying to fallback to any theme present', 'info');
 
-                if (results.length == 0) {
-                    for (var i in themes) {
-                        if (themes[i].uName == conf.website.flower) {
-                            themes[i].active = true;
-
-                            themes.splice(i, 1);
-
-                            that.enableTheme(conf, conf.website.flower, remove);
-                            break;
-                        }
+                    const info = themes[0]
+                    if (info) {
+                        that.enableTheme(conf, info.uName, () => cb(), {});
+                    } else {
+                        log('Theme', '[FATAL] No theme found in /flowers directory', 'err');
                     }
                 } else {
-                    var curt = results[0]
-                    for (var j in themes) {
-                        if (curt.uName == themes[j].uName) {
-                            themes[j].active = true;
-                            themes.splice(j, 1);
-                            that.enableTheme(conf, curt.uName, function() {
-                                remove();
-                            }, curt.settings);
-                            return;
-                        }
-                    }
+                    that.enableTheme(conf, theme.uName, () => cb(), theme.settings);
                 }
             });
         });

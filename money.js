@@ -64,9 +64,7 @@ module.exports = class Money {
             // Request pending articles
             db.networkJoin('content', [
                 { $match : { author : contractorid, paymentstatus : "pending", status : "published" } },
-                { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" } },
-                { $unwind : "$fulltopic" },
-                { $project : { headline : { $arrayElemAt : [ "$title", 0 ] }, worth : 1, topicslug : "$fulltopic.completeSlug", name : 1 } }
+                { $project : { headline : { $arrayElemAt : [ "$title", 0 ] }, worth : 1, url : 1, name : 1 } }
             ], (posts, dbposts) => {
                 // Generate invoice
                 db.join(mainsite, 'contractorinvoices', [{ $sort : { _id : -1 }}, { $project : {number : 1} }, { $limit : 1} ], arr => {

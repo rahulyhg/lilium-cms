@@ -117,12 +117,6 @@ class DevTools {
                     }, {displayname : 1, slug : 1, username : 1}, undefined, undefined, true);
                     break;
 
-                case "topics":
-                    db.findToArray(cli._c, 'topics', {}, (err, arr) => {
-                        cb(arr);
-                    }, {displayname : 1, slug : 1}, undefined, undefined, true);
-                    break;
-
                 default: 
                     cb([]);
             }
@@ -241,10 +235,6 @@ var maybeInitBuild = function(cli) {
         require('./build').initialBuild(() => { cli.sendJSON({ done : 1 }); });
     }
 }
-
-var preloadCache = function(cli) {
-    require('./cacheInvalidator.js').preloadLatests(cli._c);
-};
 
 var dispatchMagicLink = function(cli) {
     require('./entities.js').sendMagicLinkToEveryone(cli, function() {
@@ -452,19 +442,13 @@ var handleWordpressContent = function(_c, articles, done) {
 
                     article.author = undefined;
                     db.findUnique(require('./config').default(), 'entities', {}, (err, author) => {
-                        db.findUnique(_c, 'topics', { completeSlug : article.topicslug }, (err, topic) => {
-                            if (topic) {
-                                article.topic = topic._id;
-                            }
-        
-                            if (author) {
-                                article.author = author._id;
-                                article.createdBy = author._id;
-                            }
-        
-                            log('Wordpress', 'Inserted new article with title : ' + article.title[0], 'detail');
-                            db.insert(_c, 'content', article, () => nextPost());
-                        }, {_id : -1});           
+                        if (author) {
+                            article.author = author._id;
+                            article.createdBy = author._id;
+                        }
+    
+                        log('Wordpress', 'Inserted new article with title : ' + article.title[0], 'detail');
+                        db.insert(_c, 'content', article, () => nextPost());
                     }, {_id : -1})          
                 })
             } else {

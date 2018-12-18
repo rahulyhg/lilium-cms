@@ -13,7 +13,7 @@ const dictionary = {
     weekbefore : "Semaine d'avant",
     lastmonth : "Mois dernier",
     monthbefore : "Mois d'avant",
-    populartopics : "Sujets populaires",
+    populartopics : "Éditions populaires",
     populartopicssub : "Basées sur les articles publiés dans les 30 derniers jours",
     yesterdaytoppost : "Le top article d'hier",
     hits : "lectures",
