@@ -506,6 +506,10 @@
             "endpoint" : "staffing",
             "support" : ["admin_post", "livevar", "admin_delete", "admin_put"]
         }, {
+            "module" : "metrics.js",
+            "endpoint" : "metrics",
+            "support" : ["livevar"]
+        }, {
             "module" : "entityrelationship.js",
             "endpoint" : "entityrelationship",
             "support" : ["admin_post", "livevar", "setup"]

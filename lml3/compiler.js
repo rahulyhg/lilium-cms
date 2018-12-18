@@ -1,4 +1,5 @@
 const log = require('../log.js');
+const metrics = require('../metrics');
 
 // Documentation : https://docs.google.com/document/d/1CNue3XC7tBQbr1BnBQaQUxkKCPF6qidOW7lgvZe3ets/edit?usp=sharing
 const LMLConst = {
@@ -198,6 +199,7 @@ class LML3 {
         this.preload(lml3file.preload, context, () => {
             lml3file.compile(context.o, context, context.extra.vocab);
             log('LML3', 'Compiled file in ' + (new Date() - now) + "ms", 'detail');
+            metrics.plus('lml3compile');
             done(context.markupbuffer.getMarkup());
         });
     }

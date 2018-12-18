@@ -3,6 +3,8 @@ const hooks = require('./hooks.js');
 const db = require('./includes/db.js');
 const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./v4');
+const OS = require('os');
+const metrics = require('./metrics');
 
 global.require_template = require('./templaterequire');
 
@@ -17,6 +19,7 @@ class Core {
         log('Core', 'Initializing Lilium', 'lilium');
         loadEnv();
         bindCrash();
+        initMetrics();
 
         const inbound = require('./inbound.js')
         inbound.createServer(true);
@@ -278,6 +281,7 @@ const gracefullyCrash = (err) => {
     hooks.fire('crash', err);
 
     log('Core', 'Contacting handler to request a crash to all handles', 'info');
+    metrics.push(err);
 };
 
 const bindCrash = () => {
@@ -466,6 +470,45 @@ const loadScriptMode = () => {
         return true;
     }
 };
+
+const initMetrics = () => {
+    metrics.create('requests', 'Requests', 'requests', 'count');
+    metrics.create('requestspers', 'Requests per second', 'req/s', 'count');
+    metrics.create('dbcalls', 'Database calls', 'calls', 'count');
+    metrics.create('loggedinusers', 'Logged-in users', 'users', 'count');
+    metrics.create('socketevents', 'Socket events', 'events', 'count');
+    metrics.create('authreq', 'Authenticated requests', 'requests', 'count');
+    metrics.create('errors', 'Errors', 'errors', 'array');
+    metrics.create('ram', 'RAM', 'mb', 'count');
+    metrics.create('cpu', 'CPU', '%', 'count');
+    metrics.create('failedauth', 'Failed logins', 'logins', 'count');
+    metrics.create('lml3compile', 'LML3 file compiled', 'files', 'count');
+    metrics.create('evlooplag', 'Event loop lag', 'ms', 'count');
+    metrics.create('httplatency', 'HTTP Laency', 'ms', 'avg');
+    metrics.create('articles', 'Total articles', 'articles', 'count');
+    metrics.create('entities', 'Total entities', 'entities', 'count');
+    metrics.create('endpointsreq', 'Request per endpoints', 'requests', 'deep');
+
+    queryMetrics();
+};
+
+const queryMetrics = () => {
+    setInterval(() => {
+        metrics.set('ram', process.memoryUsage().heapUsed / 1024 / 1024);
+    }, 2000);
+
+    setInterval(() => {
+        metrics.reset('requestspers');
+
+        setImmediate(() => {
+            const now = Date.now();
+
+            setImmediate(() => {
+                metrics.set('evlooplag', Date.now() - now);
+            });
+        });
+    }, 1000);
+}
 
 const loadEnv = () => {
     log("Core", "Loading Lilium environment variables", "info");
