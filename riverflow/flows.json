@@ -100,7 +100,7 @@
             "id": "editions",
             "v": "editions",
             "lys" : "editions,topics,categories,category",
-            "faicon": "fa-tags",
+            "faicon": "fa-book-open",
             "displayname": "Editions",
             "priority": 274,
             "rights": ["manage-editions"],
