@@ -67,6 +67,7 @@ class Core {
             loadLiveVars();
             loadGlobalPetals();
             loadLMLLibs();
+            loadAudiences();
             loadBackendSearch();
             
             loadVocab(() => {
@@ -89,6 +90,7 @@ class Core {
                                         notifyAdminsViaEmail();
                                         executeRunScript();
                                         initSchedulingTasks();
+                                        initLocalcast();
                 
                                         log('Core', 'Firing initialized signal', 'info');
                                         hooks.fire('init');
@@ -241,6 +243,12 @@ const makeBuild = (cb) => {
     });
 };
 
+const loadAudiences = () => {
+    if (!isElder) { return; }
+
+    require('./audiences').preload();
+};
+
 const loadRoles = (cb) => {
     const entities = require('./entities.js');
     entities.registerRole({
@@ -289,6 +297,10 @@ const bindCrash = () => {
         process.on('uncaughtException', gracefullyCrash);
     }
 };
+
+const initLocalcast = () => { 
+    require('./localcast').init();
+}
 
 const loadStandardInput = () => {
     const stdin = process.openStdin();
