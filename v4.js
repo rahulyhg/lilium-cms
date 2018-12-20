@@ -37,7 +37,7 @@ class V4 {
     }
 
     updateV3Redirection(v3url, url) {
-        cachefront.setUR(v3url, undefined, undefined, undefined, () => { }, {
+        cachefront.setURL(v3url, undefined, undefined, undefined, () => { }, {
             status : 301,
             headers : {
                 Location : url
