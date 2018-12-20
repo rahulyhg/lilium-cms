@@ -1,6 +1,6 @@
 const configlib = require('./config');
 const db = require('./includes/db');
-
+const xxh = require('xxhashjs')
 const sharedcache = require('./sharedcache');
 const localcast = require('./localcast');
 
@@ -25,29 +25,42 @@ const AUDIENCES_COLLECTION = 'audiences';
 
 const ALLOWED_TARGETING_FIELDS = ["culture"];
 
+// { 'hashed_params': <Audience Object> }
+let CACHED_RESPONSES = {};
+
 class LiliumAudiences {
     GET(cli) {
         const cultureString = cli.routeinfo.params.culture;
         if (cultureString) {
+            
+            const hashedParams = xxh.h64(cultureString, 0xAAAA).toString(16);
+            const precachedAudience = CACHED_RESPONSES[hashedParams];
+            if (precachedAudience) {
+                return cli.sendJSON(precachedAudience);
+            }
+
             const cultures = cultureString.split(',').map(x => x.split('-'));
             const langAudiences = this.audiences[cli._c.id].filter(a => cultures.find(c => c[0] == a.targeting.t_language));
 
+            let res;
             if (langAudiences.length == 1) {
-                cli.sendJSON({ a : langAudiences[0] })
+                res = { audience : langAudiences[0] };
             } else if (langAudiences.length == 0) {
                 const finalAudience = this.audiences[cli._c.id].find(a => cultures.find(c => c[1] && c[1] == a.targeting.t_country));
-
-                cli.sendJSON({ a : finalAudience || this.audiences[cli._c.id].default });
+                res = { audience : finalAudience || this.audiences[cli._c.id].default };
             } else {
                 const finalAudience = langAudiences.find(a => cultures.find(c => c[1] && c[1] == a.targeting.t_country));
-
-                cli.sendJSON({ a : finalAudience || langAudiences[0] });
+                res = { audience : finalAudience || langAudiences[0] };
             }
 
-            return;
+            if (!res.audience.default) {
+                CACHED_RESPONSES[hashedParams] = res;
+            }
+
+            return cli.sendJSON(res);
         }
            
-        cli.sendJSON({ a : this.audiences[cli._c.id].default });
+        cli.sendJSON({ audience : this.audiences[cli._c.id].default });
     }
 
     adminPOST(cli) {
@@ -76,6 +89,7 @@ class LiliumAudiences {
     refreshAudiences() {
         configlib.eachSync(_c => {
             db.findToArray(_c, AUDIENCES_COLLECTION, {}, (err, audiences) => {
+                CACHED_RESPONSES = {};
                 this.audiences[_c.id] = audiences;
                 this.audiences[_c.id].default = audiences.find(a => a.default) || audiences[0];
             });
