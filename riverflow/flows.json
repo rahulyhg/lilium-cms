@@ -409,6 +409,10 @@
             "endpoint" : "flagging",
             "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"]
         }, {
+            "module" : "languages.js",
+            "endpoint" : "languages",
+            "support" : ["admin_post", "admin_delete", "livevar"]
+        }, {
             "module" : "themes.js",
             "endpoint" : "themes",
             "support" : ["admin_post", "livevar"]
