@@ -411,7 +411,7 @@
         }, {
             "module" : "audiences.js",
             "endpoint" : "audiences",
-            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
+            "support" : ["get", "admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
             "module" : "languages.js",
             "endpoint" : "languages",
