@@ -2,14 +2,14 @@
     "env": "dev",
     "allowAnonymousPOST": true,
     "info": {
-        "project": "Narcity Media",
-        "version": "0.9.2 BETA",
+        "project": "Lilium CMS V4 tests",
+        "version": "4.0.1 EARLY",
         "author": "Erik Desjardins"
     },
     "emails": {
-        "senderemail": "erik.desjardins@gmail.com",
-        "senderpass": "hAdh378Lhd3Shu398hfSo1h28fHsjhe8h2fUshd",
-        "senderfrom": "Liliumtest"
+        "senderemail": "",
+        "senderpass": "",
+        "senderfrom": ""
     },
     "data": {
         "host": "localhost",
@@ -33,7 +33,7 @@
         "base": "/usr/share/lilium/lilium-cms/",
         "html": "/usr/share/lilium/html/liliumtest",
         "protocol": "",
-        "url": "//lilium.narcity.com",
+        "url": "//localhost:8080",
         "port": "8080",
         "postMaxLength": "1024",
         "fileMaxSize": "3000000000"
@@ -96,7 +96,7 @@
     },
     "vendor": {
         "productname": "Lilium CMS",
-        "version": "0.9.2 BETA",
+        "version": "4.0.1 EARLY",
         "infourl": "http://liliumcms.com/info"
     },
     "id": "lilium.narcity.com",
@@ -194,7 +194,7 @@
             "port": 5514
         },
         "loaded": true,
-        "familysize": 1,
+        "familysize": 2,
         "cacheport": 17209,
         "realtimeport": 17210,
         "useUDS": true
