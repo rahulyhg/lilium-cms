@@ -200,7 +200,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var update = function(conf, done) {
-        if (!isElder) { return done(); }
+        if (!isElder || global.__TEST) { return done(); }
 
         log('Sites', "Checking for updates");
         var versions = require('./versions.json');

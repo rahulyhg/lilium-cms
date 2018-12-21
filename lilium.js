@@ -22,6 +22,10 @@ class LiliumCMS {
             log();
             log('Developer', 'With love; enjoy. <3', 'lilium');
             log();
+
+            if (global.__START_TESTS) {
+                global.__START_TESTS(this, core);
+            }
         });
 
         return this;

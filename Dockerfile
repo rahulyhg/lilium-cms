@@ -30,7 +30,7 @@ COPY . .
 
 EXPOSE 8080
 WORKDIR /usr/share/lilium/lilium-cms/tests
-RUN ./run.sh
+RUN ./runDocker.sh
 
 #RUN mongo liliumtestdatabase --quiet --eval 'db.dropDatabase();'
 #RUN mongo liliumtestdatabase --quiet --eval "db.dropUser('liliumtest');"

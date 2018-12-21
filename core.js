@@ -13,6 +13,7 @@ const v4 = new V4();
 class Core {
     constructor() {
         log('Core', 'Lilium core object was created', 'success');
+        this.isElder = isElder;
     }
     
     makeEverythingSuperAwesome(readyToRock) {
@@ -60,7 +61,7 @@ class Core {
 
             loadCurrencies();
             maybeRunCAIJ();
-            loadHooks(readyToRock);
+            loadHooks(() => readyToRock(this));
             loadEndpoints();
             loadStandardInput();
             loadImageSizes();

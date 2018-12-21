@@ -100,6 +100,11 @@ class GardenerCluster extends ProcessManager {
                 });
 
                 cluster.on('exit', (worker, code, signal) => {
+                    if (global.__TEST) {
+                        log('Network', '[FATAL] Lilium instance crashed in test mode', 'err');
+                        return this.onExit();
+                    }
+
                     if (worker == this.caijProc) {
                         this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash"})
                         return this.caijProc.on('message', this.broadcast.bind(this));
