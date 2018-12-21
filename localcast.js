@@ -22,7 +22,7 @@ class LocalCast {
     messageReceived(m) {
         var type = m.type;
         var hks = hooks[type];
-        hsk && hsk.forEach(ftc => ftc(m));
+        hks && hks.forEach(ftc => ftc(m));
     };
 
     hook(h,c) { this.bind(h,c); }
