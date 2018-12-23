@@ -99,7 +99,7 @@
         "version": "4.0.1 EARLY",
         "infourl": "http://liliumcms.com/info"
     },
-    "id": "lilium.narcity.com",
+    "id": "localhost:8080",
     "uid": "026364313312884136",
     "jsonfile": "default.json",
     "default": true,
