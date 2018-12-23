@@ -126,27 +126,11 @@ var SiteInitializer = function (conf, siteobj) {
                         db.createIndex(conf, "content", {date : -1}, function() {
                             db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
                                 log('Database', 'Created indices', 'success');
-                                createCollections();
+                                done();
                             });
                         });
                     });
                 });
-            });
-        };
-
-        var createCollections = function() {
-            log('Database', 'Creating collections', 'info');
-            
-        	var collectionsNames = [
-		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview", 
-        		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history", "searches",
-		        "lilium", "uploads", "cachedFiles", "dfp", "secrets", "conversations", "communications",
-		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges", "styledpages"
-        	];
-
-            db.createCollections(conf, collectionsNames, function() {
-                log('Database', 'Database initialization finished', 'lilium');
-                done();
             });
         };
 
