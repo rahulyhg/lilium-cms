@@ -1,6 +1,7 @@
 const BAR_PADDING = "[] xxx%".length;
 const LEVEL_TO_COLOR = {
     ">" : "\x1b[34m",
+    "#" : "\x1b[36m",
     "+" : "\x1b[32m",
     "-" : "\x1b[33m",
     "x" : "\x1b[31m",
@@ -19,13 +20,17 @@ class Logger {
         global[name] = this.log.bind(this);
     }
 
+    addOps(ops) {
+        this.totalOps += ops;
+    }
+
     init() {
         this.out.write("\n".repeat(this.out.rows));
         this.log("Starting up");
     }
 
-    finishedOp() {
-        this.op++;
+    skipOps(skipped) {
+        this.op += skipped;
         this.log();
     }
 
@@ -45,9 +50,13 @@ class Logger {
         return `\x1b[45m\x1b[37m${"█".repeat(eqNum)}${" ".repeat(barAvailableSpace - eqNum)} \x1b[1m${percent}%\x1b[0m`;
     }
 
-    log(text, level = ">", inc) {
+    clearBar() {
         this.out.clearLine();
         this.out.cursorTo(0);
+    }
+
+    log(text, level = ">", inc) {
+        this.clearBar();
         inc && this.op++;
 
         text && this.out.write(LEVEL_TO_COLOR[level] + "[" + level + "] " + text + LEVEL_TO_COLOR.reset + "\n");

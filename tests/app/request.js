@@ -1,40 +1,46 @@
 const requestLib = require('request');
 
 class Request {
-    static get defaultOption() {
+    static get defaultOptions() {
         return {
             
         };
     }
 
     constructor(displayname, opt = {}) {
-        this.options = Request.defaultOptions.assign(opt);
+        this.displayname = displayname;
+        this.options = Object.assign(Request.defaultOptions, opt);
     }
 
     to(method, url) {
         this.method = method;
         this.url = url;
+        return this;
     }
 
     as(user) {
         this.user = user;
+        return this;
     }
 
-    withRole(role) {
-        this.role = role;
+    withRight(right) {
+        this.right = right;
+        return this;
     }
 
     expect(predicate) {
         this.predicate = predicate;
+        return this;
     }
 
     setPostData(data) {
         this.data = data;
+        return this;
     }
 
     send(then) {
         const req = {
-            url : this.url,
+            url : "http://localhost:8080" + this.url,
             method : this.method,
             headers : {}
         };
@@ -45,16 +51,18 @@ class Request {
         }
 
         this.user && (req.headers["x-as"] = this.user);
-        this.role && (req.headers["x-role"] = this.role);
+        this.right && (req.headers["x-right"] = this.right);
 
-        requestLib(method, (err, data, r) => {
+        l(`[${this.displayname}] Sending ${this.method} request to ${this.url}`, '#');
+        requestLib(req, (err, r, body) => {
+            l(`[${r.statusCode}] Response from Lilium request to ${this.method} ${this.url}`, '>', true);
+
             if (this.predicate) {
-                then(this.predicate(err, data, r));
+                then(this.predicate(err, r, body));
             } else {
-                then(r.status == 200);
+                then(r.statusCode == 200);
             }
         });
     }
 }
-
 module.exports = Request;
