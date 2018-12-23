@@ -38,8 +38,8 @@ Log.setLevels = function(lvls) {
 }
 
 var LogDev = function(sender, message, level) {
-    if (level == "warn" || level == "err") {
-        Log(sender, message, level);
+    if (global.l && (level == "warn" || level == "err")) {
+        global.l(`${sender} - ${message}`, level == "err" ? "x" : "-");
     }
 }
 

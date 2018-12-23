@@ -99,12 +99,7 @@ class GardenerCluster extends ProcessManager {
                     log('Network', 'Worker ' + worker.process.pid + ' is online', 'success');
                 });
 
-                cluster.on('exit', (worker, code, signal) => {
-                    if (global.__TEST) {
-                        log('Network', '[FATAL] Lilium instance crashed in test mode', 'err');
-                        return this.onExit();
-                    }
-
+                !global.__TEST && cluster.on('exit', (worker, code, signal) => {
                     if (worker == this.caijProc) {
                         this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash"})
                         return this.caijProc.on('message', this.broadcast.bind(this));
@@ -164,6 +159,10 @@ class GardenerCluster extends ProcessManager {
     broadcast(m) {
         if (m == "updateAndRestart") {
             return this.updateAndRestart();
+        }
+
+        if (m == "testsFinished" && global.__TEST) {
+            return this.onExit();
         }
 
         var senderpid = m.sender;
