@@ -28,3 +28,5 @@ mongo liliumtestdatabase --quiet --eval "db.dropUser('liliumtest');"
 echo 
 echo "> All done!"
 echo
+
+exit 0
