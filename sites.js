@@ -650,7 +650,7 @@ var Sites = function () {
                         siteInfo.jsonfile = files[fileIndex];
 
                         if (!siteInfo.server.base) {
-                            siteInfo.server.base = liliumroot;
+                            siteInfo.server.base = liliumroot + "/";
                         }
                         if (!siteInfo.server.html) {
                             siteInfo.server.html = require('path').join(liliumroot, "html");
