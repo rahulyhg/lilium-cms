@@ -292,7 +292,7 @@ const gracefullyCrash = (err) => {
 
     if (global.__TEST) {
         log('Core', 'Test mode will force Lilium to exit', 'warn');
-        process.exit(1);
+        require('./localcast').fatal(err);
     }
 };
 
