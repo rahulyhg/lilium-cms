@@ -19,7 +19,7 @@ class Runner {
                 currentTest.run((success, failedTask, failedIndex) => {
                     this.stats[success ? "success" : "errors"]++;
                     if (failedTask) {
-                        this.errors.push(failedTask);
+                        this.errors.push({test : currentTest, task : failedTask, index : failedIndex});
                     }
 
                     currentTest.cleanUp(() => {
@@ -42,10 +42,11 @@ class Runner {
             l("All done!", '#', true);
 
             l("Successful tests : " + this.stats.success, "+");
-            if (this.stats.errors == 0) {
+            if (this.stats.errors.length == 0) {
                 l("No errors during any of the tests", '+');
             } else {
-                l("There were " + this.state.erros + " during the tests", '-');
+                l("There were " + this.stats.errors + " error during the tests : ", '-');
+                this.errors.forEach(err => l("  => " + err.test.name + ", task #" + (err.index+1) + " : " + err.task.displayname, 'x'));
             }
 
             logger.clearBar();

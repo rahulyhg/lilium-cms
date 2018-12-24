@@ -1,0 +1,206 @@
+{
+    "env": "dev",
+    "caij": true,
+    "allowAnonymousPOST": true,
+    "quiz": true,
+    "dataserver": {
+        "port": 19805,
+        "active": true,
+        "facebook": {
+            "token": "EAAU3ppMrRokBAOCLZBaIrsCZCXZCn2XJN9L52jzEsuw4vXqaas4bEziDlyvaOQ0XUaDOp5C1ZBkwdqo1gcCVWskvTXiVEvHthwPCP7UKkF76MRkZBdnGZCycavD1ThZC9Qr7q5FEmtsU5xTlZBLQUPOshn1THb4giETDK3QZCfmWaJoMPOlx4Rf93wrmEr3PS1vcZD",
+            "v": "2.12"
+        }
+    },
+    "polemos": {
+        "devserver" : {
+            "domain": "localhost",
+            "port": 9999,
+            "active": true
+        }
+    },
+    "v4devserver": {
+        "domain": "localhost",
+        "port": 9999,
+        "active": false
+    },
+    "locals": {
+        "port": 10733,
+        "active": true,
+        "facebook": {
+            "token": "EAAaEmDyZAU9gBAISXc0LLuuhSRLPwhEOmlRDu9G7FG7rrHU56GKkN3iQaMEZBeLUZAFfn6nAEuR2sN7DngAarUpMEQ7AVdZCYB3i9nsFjDVwRmw6R3oAeWkD5N89ocTo6S7wYZAQV3kwwj7ivXs1KxaH9TPnXZABHJRoI6FJLBIveLH6CNvOLPtOxQos1ITKUZD",
+            "v": "2.12"
+        }
+    },
+    "info": {
+        "project": "Narcity",
+        "version": "0.9.2 BETA",
+        "author": "Erik Desjardins"
+    },
+    "emails": {
+        "senderemail": "",
+        "senderpass": "",
+        "senderfrom": "Narcity Media | Lilium"
+    },
+    "data": {
+        "host": "localhost",
+        "port": "27017",
+        "user": "narcity",
+        "pass": "qfoe8huki23kqwedkas9uihj",
+        "use": "narcity"
+    },
+    "paths": {
+        "admin": "admin",
+        "login": "login",
+        "livevars": "livevars",
+        "themes": "flowers",
+        "mail": "mail",
+        "themesInfo": "info.json",
+        "plugins": "plugins",
+        "pluginsInfo": "info.json",
+        "uploads": "uploads"
+    },
+    "server": {
+        "base": "/usr/share/lilium/lilium-cms/",
+        "html": "/usr/share/lilium/html/narcity",
+        "protocol": "http:",
+        "url": "//narcity.localhost:8080",
+        "port": "8080",
+        "postMaxLength": "1024",
+        "fileMaxSize": "3000000"
+    },
+    "signature": {
+        "publichash": "300da60969c40d4491da8cb9341b9bce9aa29da88d457de8aa3ce24576bd899e",
+        "privatehash": "8067de5b0c3efd797325110ce7110f216f66a4df1d7759aa4d2fd9d2a52e4580"
+    },
+    "beta": {
+        "test": true,
+        "text": "Hello, World!"
+    },
+    "usability": {
+        "admin": {
+            "loginIfNotAuth": true
+        },
+        "home": {
+            "keepInRAM": false
+        }
+    },
+    "stripe": {
+        "publickey": "",
+        "secretkey": ""
+    },
+    "sendgrid": {
+        "apikey": ""
+    },
+    "MIMES": {
+        "": "text/html; charset=utf-8",
+        ".html": "text/html; charset=utf-8",
+        ".htm": "text/html",
+        ".css": "text/css",
+        ".js": "text/javascript",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".bmp": "image/bmp",
+        ".gif": "image/gif",
+        ".swf": "application/x-shockwave-flash",
+        ".lml": "application/x-lilium-markup",
+        ".xml": "text/xml; charset=utf-8"
+    },
+    "supported_pictures": [
+        ".jpg",
+        ".jpeg",
+        ".bmp",
+        ".png",
+        ".gif"
+    ],
+    "website": {
+        "sitetitle": "Narcity",
+        "catchline": "Narcity is about connecting people to their city. Narcity is the leading millennial publisher in North America creating content by and for today's generation living in major urban areas. We give you the best of your city through food, travel, news and lifestyle articles & videos daily.",
+        "language": "en-ca"
+    },
+    "login": {
+        "wallpaper": "//www.mtlblog.com/uploads/7141355408d7cf45d01aa62099352622dfe5b102.jpg"
+    },
+    "admin": {
+        "csspath": "static/admin.css",
+        "jspath": "static/admin.js"
+    },
+    "vendor": {
+        "productname": "Lilium CMS",
+        "version": "0.9.2 BETA",
+        "infourl": "http://liliumcms.com/info"
+    },
+    "id": "narcity.localhost:8080",
+    "uid": "903459634772207",
+    "wordpress": {},
+    "jsonfile": "narcity.localhost:8080.json",
+    "compilekey": "lml85004999907449567606368408224773",
+    "timezoneplacedisplay": "",
+    "timezoneplace": "-73.8524761_45.56028",
+    "contentadsnip": [],
+    "lickstatscombos": [],
+    "dfp-incontentprop": [],
+    "taxes": [],
+    "content": {
+        "cdn": {
+            "domain": "//narcity.localhost:8080",
+            "company": "",
+            "key": "",
+            "secret": ""
+        }
+    },
+    "google": {
+        "apikey": "AIzaSyDJSHs4gZcJiogAQwplci45aHgHyhEIZUs",
+        "jsonfilepath": ""
+    },
+    "analytics": {
+        "serviceaccount": "google-analytics-for-lilium@lilium-cms.iam.gserviceaccount.com",
+        "jsonkeypath": "/usr/share/lilium/keys/analyticskey.json",
+        "accountid": "UA-54434926-1",
+        "siteviewid": "90686041"
+    },
+    "dfp": {
+        "client_id": "",
+        "client_secret": "",
+        "redirect_url": "",
+        "scope": "",
+        "code": "",
+        "access_token": "",
+        "refresh_token": "",
+        "version": "",
+        "network_code": "",
+        "app_name": "",
+        "fan": ""
+    },
+    "social": {
+        "facebook": {
+            "appid": "1468563456738953",
+            "token": "1468563456738953|msHIDk4oXM39w7QKr22N4Y1qTAM",
+            "privtoken": "EAAU3ppMrRokBAKlf8rrZCuOMhOazXzPV7FLYoZAIazO2qe0tVBcMFiNPIZCdiVehrG2JI9Dn3Y0m3VaiYn9EzZC8ZCLEXZCtmdGJn84ZCsABZA4CvZCxPrC3Sc1Q7IbZBTY0YkeHVFe4maVEnSxUDWKkrfTNG9mgXfVzfRimVjjhVGGpHoZBdzbARvxapy2Os5J7wgZD",
+            "apiversion": "2.10"
+        },
+        "instagram": {
+            "accounts": "narcitycanada,narcityquebec"
+        }
+    },
+    "posts": {
+        "backend": {
+            "dateformat": ""
+        }
+    },
+    "chartbeat": {
+        "api_key": "427b79d605ffec5268ccfd8490bc2c7e",
+        "configuid": "57714",
+        "host": "narcity.com",
+        "section": ""
+    },
+    "adserver": {
+        "publicaddr": "",
+        "privateaddr": "",
+        "bridgeaddr": "",
+        "keyone": "",
+        "keytwo": ""
+    },
+    "timezone": "America/Toronto",
+    "darkskykey": ""
+}
