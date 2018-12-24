@@ -649,6 +649,13 @@ var Sites = function () {
                         var keyname = sitename.replace('//', '').replace(/\s/g, '/');
                         siteInfo.jsonfile = files[fileIndex];
 
+                        if (!siteInfo.server.base) {
+                            siteInfo.server.base = liliumroot;
+                        }
+                        if (!siteInfo.server.html) {
+                            siteInfo.server.html = require('path').join(liliumroot, "html");
+                        }
+
                         config.registerConfigs(keyname, siteInfo);
                         if (sitename == 'default') {
                             var urlbase = siteInfo.server.url.replace('//', '').replace(/\s/g, '/');

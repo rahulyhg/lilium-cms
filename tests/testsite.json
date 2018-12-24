@@ -30,8 +30,8 @@
         "uploads": "uploads"
     },
     "server": {
-        "base": "/usr/share/lilium/lilium-cms/",
-        "html": "/usr/share/lilium/html/liliumtest",
+        "base": "",
+        "html": "",
         "protocol": "",
         "url": "//localhost:8080",
         "port": "8080",
