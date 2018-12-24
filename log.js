@@ -45,7 +45,7 @@ var LogDev = function(sender, message, level) {
 
 LogDev.setLevels = () => {};
 
-if (false && global.__TEST) {
+if (global.__TEST && !global.__CI) {
     module.exports = LogDev;
 } else {
     module.exports = Log;
