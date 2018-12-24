@@ -51,7 +51,7 @@ class Logger {
     }
 
     clearBar() {
-        if (!global._CI) {
+        if (!global.__CI) {
             this.out.clearLine();
             this.out.cursorTo(0);
         }
@@ -62,7 +62,7 @@ class Logger {
         inc && this.op++;
 
         text && this.out.write(LEVEL_TO_COLOR[level] + "[" + level + "] " + text + LEVEL_TO_COLOR.reset + "\n");
-        !global.CI && this.out.write(this.makeProgressBar())
+        !global.__CI && this.out.write(this.makeProgressBar())
     }
 }
 
