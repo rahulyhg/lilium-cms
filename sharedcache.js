@@ -187,7 +187,7 @@ class SharedCache {
         let helloObject = {};
         helloObject["HelloFrom" + gdinfo.instanceNumber()] = "Hello ! I am instance number " + gdinfo.instanceNumber();
         this.set(helloObject, () => {
-            log('SharedCache', "Said hello to Shared Memory module");
+            log('SharedCache', "Said hello to Shared Memory module from instance " + gdinfo.instanceNumber());
         });
     }
 }

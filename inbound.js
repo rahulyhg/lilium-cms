@@ -25,6 +25,10 @@ class Inbound {
         return true; 
     }
 
+    handleTestReq(req, resp) {
+        this.handleReq(req, resp);
+    }
+
     handleReq(req, resp) {
         metrics.plus('requests');
         metrics.plus('requestspers');
@@ -70,7 +74,12 @@ class Inbound {
             log('Inbound', 'Creating HTTP server');
 
             const _http = require('http')
-            this.server = _http.createServer((req, resp) => this.handleReq(req, resp));
+            if (global.__TEST) {
+                this.server = _http.createServer((req, resp) => this.handleTestReq(req, resp));
+            } else {
+                this.server = _http.createServer((req, resp) => this.handleReq(req, resp));
+            }
+
             startAfterCreation && this.start();
             log('Inbound', 'Stacking requests until ready');
 

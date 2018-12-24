@@ -1,52 +1,54 @@
-var db = require('./includes/db.js');
-var log = require('./log.js');
-var hooks = {};
+const db = require('./includes/db.js');
+const hooks = {};
 
-var LocalCast = function() {
-    
-};
+class LocalCast {
+    isElderChild() {
+        return process.env.instancenum == 0 || typeof process.env.parent == "undefined";
+    }
 
-LocalCast.prototype.isElderChild = function() {
-    return process.env.instancenum == 0 || typeof process.env.parent == "undefined";
-};
+    clustered() {
+        return process.env.parent == "gardener";
+    }
 
-LocalCast.prototype.clustered = process.env.parent == "gardener";
+    broadcast(type, payload, sendback) {
+        process.send && process.send({
+            type : type,
+            payload : payload,
+            sender : process.pid,
+            sendback : sendback || false
+        });
+    };
 
-LocalCast.prototype.broadcast = function(type, payload, sendback) {
-    if (!this.clustered) return;
+    messageReceived(m) {
+        var type = m.type;
+        var hks = hooks[type];
+        hks && hks.forEach(ftc => ftc(m));
+    };
 
-    process.send({
-        type : type,
-        payload : payload,
-        sender : process.pid,
-        sendback : sendback || false
-    });
-};
-
-LocalCast.prototype.messageReceived = function(m) {
-    var type = m.type;
-    var hks = hooks[type];
-    if (hks) {
-        for (var i = 0; i < hks.length; i++) {
-            hks[i](m);
+    hook(h,c) { this.bind(h,c); }
+    bind(hookname, callback) {
+        if (!hooks[hookname]) {
+            hooks[hookname] = [];
         }
-    }
-};
 
-LocalCast.prototype.hook = LocalCast.prototype.bind = function(hookname, callback) {
-    if (!hooks[hookname]) {
-        hooks[hookname] = [];
+        hooks[hookname].push(callback);
     }
 
-    hooks[hookname].push(callback);
+    init() {
+        process.on('message', this.messageReceived);
+        
+        if (this.isElderChild()) {
+            log('Localcast', 'Elder child speaking', 'lilium');
+        }
+
+        this.hook('hello', msg => {
+            log('Localcast', 'Process ' + process.pid + ' received hello message from ' + msg.from, 'success');
+        });
+
+        this.broadcast('hello', { from : process.pid }, () => {
+            log('Localcast', 'Broadcast hello message from process ' + process.pid, 'info');
+        });
+    };
 }
-
-LocalCast.prototype.init = function() {
-    process.on('message', this.messageReceived);
-    
-    if (this.isElderChild()) {
-        log('Localcast', 'Elder child speaking', 'lilium');
-    }
-};
 
 module.exports = new LocalCast();

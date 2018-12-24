@@ -186,7 +186,7 @@ var Themes = function () {
                 var settings = createOrUpdateThemeForm(config);
                 log('Themes', 'Updating database entry for site : ' + config.id);
 
-                db.findAndModify(config, 'themes', {
+                db.update(config, 'themes', {
                     uName: uName
                 }, info, function (err, doc) {
                     log('Themes', 'Enabling theme ' + info.uName);

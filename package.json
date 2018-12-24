@@ -4,7 +4,8 @@
   "description": "Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.",
   "main": "index.prod.js",
   "scripts": {
-    "test": "node gardener.js crash-on-error",
+    "test": "cd ./tests && ./runNpm.sh",
+    "ci": "cd ./tests && ./runCI.sh && exit 0",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.prod.js",
     "dev": "node gardener.js dev",
     "pm2": "node pm2.prod.js",

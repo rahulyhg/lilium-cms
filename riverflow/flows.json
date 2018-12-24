@@ -100,7 +100,7 @@
             "id": "editions",
             "v": "editions",
             "lys" : "editions,topics,categories,category",
-            "faicon": "fa-tags",
+            "faicon": "fa-book-open",
             "displayname": "Editions",
             "priority": 274,
             "rights": ["manage-editions"],
@@ -409,6 +409,14 @@
             "endpoint" : "flagging",
             "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"]
         }, {
+            "module" : "audiences.js",
+            "endpoint" : "audiences",
+            "support" : ["get", "admin_post", "admin_put", "admin_delete", "livevar"]
+        }, {
+            "module" : "languages.js",
+            "endpoint" : "languages",
+            "support" : ["admin_post", "admin_delete", "livevar"]
+        }, {
             "module" : "themes.js",
             "endpoint" : "themes",
             "support" : ["admin_post", "livevar"]
@@ -474,10 +482,6 @@
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
             "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
-        }, {
-            "module" : "docs.js",
-            "endpoint" : "docs",
-            "support" : ["get"]
         }, {
             "module" : "cdn.js",
             "endpoint" : "cdn",

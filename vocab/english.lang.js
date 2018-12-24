@@ -32,6 +32,7 @@ const dictionary = {
     mailtemplates : "Mail templates",
     publishingcontent : "Publishing",
     topics : "Topics",
+    editions : "Editions",
     contentchains : "Content chains",
     styledpages : "Styled pages",
     crew : "Crew",

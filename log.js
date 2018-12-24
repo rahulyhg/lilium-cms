@@ -37,4 +37,16 @@ Log.setLevels = function(lvls) {
     Log.levels = lvls;
 }
 
-module.exports = Log;
+var LogDev = function(sender, message, level) {
+    if (global.l && (level == "warn" || level == "err")) {
+        global.l(`${sender} - ${message}`, level == "err" ? "x" : "-");
+    }
+}
+
+LogDev.setLevels = () => {};
+
+if (false && global.__TEST) {
+    module.exports = LogDev;
+} else {
+    module.exports = Log;
+}
