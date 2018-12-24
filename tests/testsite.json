@@ -1,6 +1,7 @@
 {
     "env": "dev",
     "allowAnonymousPOST": true,
+    "caij" : true,
     "info": {
         "project": "Lilium CMS V4 tests",
         "version": "4.0.1 EARLY",

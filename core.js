@@ -289,6 +289,11 @@ const gracefullyCrash = (err) => {
 
     log('Core', 'Contacting handler to request a crash to all handles', 'info');
     metrics.push('errors', err);
+
+    if (global.__TEST) {
+        log('Core', 'Test mode will force Lilium to exit', 'warn');
+        process.exit(1);
+    }
 };
 
 const bindCrash = () => {
