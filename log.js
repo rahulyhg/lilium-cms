@@ -43,9 +43,15 @@ var LogDev = function(sender, message, level) {
     }
 }
 
-LogDev.setLevels = () => {};
+var LogCI = function(sender, message, level) {
+    console.log(`[${pid}][${sender}] ${message}`);
+}
 
-if (global.__TEST && !global.__CI) {
+LogDev.setLevels = LogCI.setLevels = () => {};
+
+if (global.__CI) {
+    module.exports = LogCI;
+} else if (global.__TEST) {
     module.exports = LogDev;
 } else {
     module.exports = Log;

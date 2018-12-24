@@ -13,12 +13,19 @@ class SockFallback {
 }
 
 const getUDS = () => {
-    return net.connect(gdconf.useUDS ? {
-        path : __dirname + "/network/sharedmemory.sock"
+    const conn = net.connect(gdconf.useUDS ? {
+        path : liliumroot + "/network/sharedmemory.sock"
     } : {
         port : gdconf.cacheport,
         host : "localhost"
     });
+
+    conn.on('error', err => {
+        log('SharedCache', 'Could not connect to shared memory server', 'err');
+        require('./localcast').fatal(err);
+    });
+
+    return conn;
 }
 
 class SharedCache {

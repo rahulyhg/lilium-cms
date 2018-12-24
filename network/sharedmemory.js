@@ -1,4 +1,5 @@
 const log = require('../log.js');
+const fs = require('fs');
 const net = require('net');
 
 const mem = {
@@ -217,21 +218,33 @@ class SharedMemory {
     onError(err) {
         log('SharedMem', err, 'err');
         log('SharedMem', err.stack, 'warn');
+
+        if (global.__TEST) {
+            log('SharedMem', 'Early exit from Shared Memory due to test mode', 'err');
+            process.exit(1);
+        }
     }
 
     bind() {
-        this.gdconf = require('../sites/default').network;
+        this.gdconf = require(liliumroot + '/sites/default').network || {};
         if (this.gdconf.useUDS) {
-            log('SharedMem', "Removing old UDS file");
+            log('SharedMem', "Removing old UDS file", 'info');
             try {
-                require('fs').unlinkSync(__dirname + "/sharedmemory.sock");
-            } catch (ex) {
-
-            }
+                fs.unlinkSync(__dirname + "/sharedmemory.sock");
+            } catch (err) { log("SharedMem", "No UDS file found", 'info') }
         }
 
         this.server = net.createServer(this.onConnect); 
+
         process.on('uncaughtException', this.onError);
+        process.on('exit', () => {
+            this.server && this.server.close();
+            log('SharedMem', 'Cleaning up sharedmemory sock file', 'info');
+            try {
+                fs.unlinkSync(__dirname + "/sharedmemory.sock");
+            } catch (err) { log('SharedMem', 'Did not remove UDS file', 'info') }
+        });
+
         this.server.listen(!this.gdconf.useUDS ? {
             port : this.gdconf.cacheport,
             host : "localhost",
@@ -239,7 +252,7 @@ class SharedMemory {
         } : {
             path : __dirname + "/sharedmemory.sock"
         }, () => {
-            log("SharedMem", "Listening incoming connections", "info");
+            log("SharedMem", "Listening to incoming connections", "info");
         })
     }
 }
