@@ -92,7 +92,8 @@ var DB = function() {
 	this.initDatabase = function(conf, callback) {
 		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, client) {
             if (!client || err) {
-                log('Database', '[FATAL] Could not connect to database.', 'err');
+                log('Database', 'Could not connect to database.', 'err');
+                require('../localcast').fatal(new Error("Could not connect to database"));
                 return;
             }
 			client.db(conf.data.use).collection('lilium', {}, function(err, c) {
