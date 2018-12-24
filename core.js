@@ -75,27 +75,25 @@ class Core {
                 loadPlugins(() => {
                     loadRoles(() => {
                         precompile(() => {
-                            loadDocs(() => {
-                                redirectIfInit(resp, () => {
-                                    makeBuild(() => {
-                                        loadGitHub();
-                                        loadFrontend();
-                                        require('./riverflow/riverflow.js').loadFlows();
+                            redirectIfInit(resp, () => {
+                                makeBuild(() => {
+                                    loadGitHub();
+                                    loadFrontend();
+                                    require('./riverflow/riverflow.js').loadFlows();
 
-                                        inbound.handleQueue();
+                                    inbound.handleQueue();
                 
-                                        loadCacheInvalidator();
+                                    loadCacheInvalidator();
                 
-                                        log('Lilium', 'Starting inbound server', 'info');
-                                        loadNotifications();
-                                        notifyAdminsViaEmail();
-                                        executeRunScript();
-                                        initSchedulingTasks();
-                                        initLocalcast();
+                                    log('Lilium', 'Starting inbound server', 'info');
+                                    loadNotifications();
+                                    notifyAdminsViaEmail();
+                                    executeRunScript();
+                                    initSchedulingTasks();
+                                    initLocalcast();
                 
-                                        log('Core', 'Firing initialized signal', 'info');
-                                        hooks.fire('init');
-                                    });
+                                    log('Core', 'Firing initialized signal', 'info');
+                                    hooks.fire('init');
                                 });
                             });
                         });
@@ -455,17 +453,6 @@ const redirectIfInit = (resp, cb) => {
     } else {
         cb();
     }
-};
-
-const loadDocs = (cb) => {
-    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-        return cb();
-    }
-
-    const docs = require('./docs.js');
-    docs.compileDirectory(() => {
-        docs.compileIndex(cb);
-    });
 };
 
 const loadVocab = (done) => {
