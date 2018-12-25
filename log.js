@@ -48,7 +48,7 @@ var LogDev = function(sender, message, level) {
 }
 
 var LogCI = function(sender, message, level) {
-    console.log(`[${pid}][${sender}] ${message}`);
+    console.log(message);
 }
 
 LogDev.setLevels = LogCI.setLevels = () => {};
