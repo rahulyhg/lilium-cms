@@ -1,5 +1,8 @@
 const log = require('../log.js');
+const fs = require('fs');
 const net = require('net');
+const pathlib = require('path');
+const localcast = require('../localcast');
 
 const mem = {
     roles: {},
@@ -217,29 +220,51 @@ class SharedMemory {
     onError(err) {
         log('SharedMem', err, 'err');
         log('SharedMem', err.stack, 'warn');
+
+        if (global.__TEST) {
+            log('SharedMem', 'Early exit from Shared Memory due to test mode', 'err');
+            localcast.fatal(err);
+        }
+    }
+
+    getSockPath() {
+        return pathlib.join(liliumroot, 'network', 'sharedmemory.sock');
     }
 
     bind() {
-        this.gdconf = require('../sites/default').network;
-        if (this.gdconf.useUDS) {
-            log('SharedMem', "Removing old UDS file");
-            try {
-                require('fs').unlinkSync(__dirname + "/sharedmemory.sock");
-            } catch (ex) {
+        this.gdconf = require(liliumroot + '/sites/default').network || {};
+        const sockpath = this.getSockPath();
 
-            }
+        if (this.gdconf.useUDS) {
+            log('SharedMem', "Removing old UDS file", 'info');
+            try {
+                fs.unlinkSync(sockpath);
+            } catch (err) { log("SharedMem", "No UDS file found", 'info') }
         }
 
         this.server = net.createServer(this.onConnect); 
+
         process.on('uncaughtException', this.onError);
+        process.on('exit', () => {
+            this.server && this.server.close();
+            log('SharedMem', 'Cleaning up sharedmemory sock file', 'info');
+            try {
+                fs.unlinkSync(sockpath);
+            } catch (err) { log('SharedMem', 'Did not remove UDS file', 'info') }
+        });
+
         this.server.listen(!this.gdconf.useUDS ? {
             port : this.gdconf.cacheport,
             host : "localhost",
             exclusive : true
         } : {
-            path : __dirname + "/sharedmemory.sock"
+            path : sockpath
         }, () => {
-            log("SharedMem", "Listening incoming connections", "info");
+            if (this.gdconf.useUDS) {
+                log('SharedMem', "Sock file created at " + sockpath, 'info');
+            }
+
+            log("SharedMem", "Listening to incoming connections", "info");
         })
     }
 }

@@ -6,6 +6,12 @@ class LocalCast {
         return process.env.instancenum == 0 || typeof process.env.parent == "undefined";
     }
 
+    fatal(err = {}) {
+        this.broadcast('fatal', { err, stack : err.stack }, () => {
+
+        });
+    }
+
     clustered() {
         return process.env.parent == "gardener";
     }

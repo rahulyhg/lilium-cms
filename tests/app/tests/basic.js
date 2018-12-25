@@ -4,8 +4,8 @@ const Test = require('../test');
 class BasicTest extends Test {
     constructor(logger) {
         super('Basic Lilium requests', [
-            new Request().to('GET', '/'),
-            new Request().to('GET', '/login')
+            new Request("Requesting to slash without params").to('GET', '/'),
+            new Request("Requesting login page").to('GET', '/login')
         ], logger);
     }
 }

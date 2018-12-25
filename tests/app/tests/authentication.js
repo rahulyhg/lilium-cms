@@ -64,14 +64,13 @@ class AuthenticationTest extends Test {
                 psw : this.twoFaUser.plaintextpwd
             }).expect((err, r, body) => !body.success));
 
-            this.addTask(new Request("Valid credentials with valid 2FA token").to('POST', '/login').setPostData({ 
+            this.addTask(new Request("Valid credentials with valid 2FA token, should receive lmlsid cookie").to('POST', '/login').setPostData({ 
                 usr : this.twoFaUser.username,
                 psw : this.twoFaUser.plaintextpwd,
                 token2fa : otplib.authenticator.generate(
                     base32Encode(Buffer.from(this.twoFaUser._id.toString() + configLib.default().signature.privatehash), 'RFC4648').substring(0, 32)
                 )
-            }).expect((err, r, body) => body.success));
-
+            }).expect((err, r, body) => body.success && r.headers["set-cookie"] && r.headers["set-cookie"][0] && r.headers["set-cookie"][0].startsWith("lmlsid") ));
 
             super.prepare(then);
         });

@@ -2,6 +2,7 @@ const log = require('./log.js');
 const net = require('net');
 const gdinfo = require('./network/info.js');
 const gdconf = require('./sites/default').network;
+const sockpath = require('./network/sharedmemory').getSockPath();
 const noop = () => {};
 
 class SockFallback {
@@ -13,12 +14,21 @@ class SockFallback {
 }
 
 const getUDS = () => {
-    return net.connect(gdconf.useUDS ? {
-        path : __dirname + "/network/sharedmemory.sock"
+    log('SharedCache', 'Connecting to ' + sockpath, 'info');
+    const conn = net.connect(gdconf.useUDS ? {
+        path : sockpath
     } : {
         port : gdconf.cacheport,
         host : "localhost"
     });
+
+    conn.on('error', err => {
+        log('SharedCache', 'Could not connect to shared memory server', 'err');
+        const error = new Error(err.toString());
+        require('./localcast').fatal(error);
+    });
+
+    return conn;
 }
 
 class SharedCache {
