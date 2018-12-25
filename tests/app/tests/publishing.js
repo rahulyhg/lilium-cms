@@ -18,7 +18,7 @@ class PublicationTest extends Test {
             { roles : ["author", "editor"], displayname : "Edity McEditor" },
             { roles : ["contractor", "contributor"], displayname : "Contry McContributor" }
         ], ([ authorUser, editorUser, contractorUser ]) => {
-            this.addTask(new Request("Article create from author").to('POST', '/publishing/new').setPostData({
+            this.addTask(new Request("Article create from author").to('POST', '/admin/publishing/new').setPostData({
                 headline : loremipsum()
             }).as(authorUser._id).expect((err, r, body) => body && body._id));
 

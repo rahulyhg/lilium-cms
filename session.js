@@ -74,19 +74,29 @@ var Sessions = function () {
 
         sharedcache.getSession(id, function(curSesh) {
             if (this.__TEST) {
-                cli.session = {
-                    loggedin : true, 
-                    data : {
-                        roles : [cli.request.headers["x-right"]], rights : [cli.request.headers["x-right"]],
-                        _id : db.mongoID(cli.request.headers["x-as"]), logintime : Date.now(),
-                        displayname : "Lilium Test user", admin : cli.request.headers["x-right"] == "admin",
-                        god : cli.request.headers["x-right"] == "lilium", user : db.mongoID(cli.request.headers["x-as"]),
-                        username : "lilium-test-user",
-                    }
-                };
+                if (cli.request.headers["x-as"]) {
+                    return require('./entities').fetchFromDB(cli._c, db.mongoID(cli.request.headers["x-as"]), userObj => {
+                        that.createSessionInCli(cli, userObj, () => {
+                            seshToUserInfo(cli);
 
-                seshToUserInfo(cli);
-                injected = true;
+                            cb(true);
+                        });
+                    });
+                } else {
+                    cli.session = {
+                        loggedin : true, 
+                        data : {
+                            roles : [cli.request.headers["x-right"]], rights : [cli.request.headers["x-right"]],
+                            _id : db.mongoID(cli.request.headers["x-as"]), logintime : Date.now(),
+                            displayname : "Lilium Test user", admin : cli.request.headers["x-right"] == "admin",
+                            god : cli.request.headers["x-right"] == "lilium", user : db.mongoID(cli.request.headers["x-as"]),
+                            username : "lilium-test-user",
+                        }
+                    };
+
+                    seshToUserInfo(cli);
+                    injected = true;
+                }
             } else if (curSesh && cli.routeinfo.configname == curSesh.data.site) {
                 cli.session = curSesh;
                 seshToUserInfo(cli);

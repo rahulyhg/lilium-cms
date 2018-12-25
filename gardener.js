@@ -177,8 +177,8 @@ class GardenerCluster extends ProcessManager {
             return this.updateAndRestart();
         }
 
-        if (m == "testsFinished" && global.__TEST) {
-            return this.onExit();
+        if (m.ev == "testsFinished" && global.__TEST) {
+            return this.onExit(m.code);
         }
 
         if (m == "fatal" || m.type == "fatal") {

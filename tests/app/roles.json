@@ -1,0 +1,15 @@
+[
+    { "name" : "admin", "displayname" : "admin", "power" : 5, "pluginID" : false, "rights" : [ "dash", "admin" ] },
+    { "name" : "lilium", "displayname" : "lilium", "power" : 1, "pluginID" : false, "rights" : [ "dash", "admin" ] },
+    { "name" : "advertiser", "displayname" : "Advertiser", "power" : 3000, "pluginID" : "advertiser", "rights" : [ "dash", "advertisement" ] },
+    { "name" : "production", "displayname" : "Production", "power" : 2900, "pluginID" : "advertiser", "rights" : [ "dash", "production", "sponsoredcontent", "list-campaigns", "edit-campaigns", "ponglinks" ] },
+    { "name" : "editor", "displayname" : "Editor", "power" : 4500, "pluginID" : false, "rights" : [ "dash", "publish", "preferences", "upload", "list-uploads", "list-articles", "", "", "edit-all-articles", "destroy-articles", "publish-articles", "create-articles", "editor", "list-secrets", "edit-secrets", "manage-categories", "manage-personas", "list-categories", "author" ] },
+    { "name" : "developer", "displayname" : "Developer", "power" : 9999, "rights" : [ "dash", "publish", "preferences", "upload", "list-uploads", "list-all-articles", "develop", "list-entities", "create-entities", "edit-all-articles", "destroy-articles", "styled-pages", "styledpages" ] },
+    { "name" : "author", "displayname" : "Author", "power" : 5000, "pluginID" : false, "rights" : [ "dash", "publish", "preferences", "upload", "list-uploads", "dashboard", "list-articles", "publish-articles", "create-articles", "publish", "author", "list-secrets", "list-categories" ] },
+    { "name" : "contributor", "displayname" : "Contributor", "power" : 6000, "rights" : [ "dash", "preferences", "upload", "list-uploads", "dashboard", "list-articles", "create-articles", "list-categories", "create-articles", "contributor" ], "description" : "This role has no description." },
+    { "name" : "stylist", "displayname" : "Stylist", "power" : 5000, "rights" : [ "styledpages", "stylist" ] },
+    { "name" : "contractor", "displayname" : "Contractor", "power" : 7000, "rights" : [ "contractor" ] },
+    { "name" : "contractor-manager", "displayname" : "Contractor manager", "power" : 1000, "rights" : [ "contractor-manager", "manage-contractors", "dash", "dashboard" ] },
+    { "name" : "hr", "displayname" : "Human Resources", "rights" : [ "list-entities", "create-entities", "edit-entities", "revoke-access" ] },
+    { "name" : "analyst", "displayname" : "Analyst", "power" : 2000, "rights" : [ "analyst" ] }
+]
