@@ -1,6 +1,8 @@
 const log = require('../log.js');
 const fs = require('fs');
 const net = require('net');
+const pathlib = require('path');
+const localcast = require('../localcast');
 
 const mem = {
     roles: {},
@@ -221,16 +223,22 @@ class SharedMemory {
 
         if (global.__TEST) {
             log('SharedMem', 'Early exit from Shared Memory due to test mode', 'err');
-            process.exit(1);
+            localcast.fatal(err);
         }
+    }
+
+    getSockPath() {
+        return pathlib.join(liliumroot, 'network', 'sharedmemory.sock');
     }
 
     bind() {
         this.gdconf = require(liliumroot + '/sites/default').network || {};
+        const sockpath = this.getSockPath();
+
         if (this.gdconf.useUDS) {
             log('SharedMem', "Removing old UDS file", 'info');
             try {
-                fs.unlinkSync(__dirname + "/sharedmemory.sock");
+                fs.unlinkSync(sockpath);
             } catch (err) { log("SharedMem", "No UDS file found", 'info') }
         }
 
@@ -241,7 +249,7 @@ class SharedMemory {
             this.server && this.server.close();
             log('SharedMem', 'Cleaning up sharedmemory sock file', 'info');
             try {
-                fs.unlinkSync(__dirname + "/sharedmemory.sock");
+                fs.unlinkSync(sockpath);
             } catch (err) { log('SharedMem', 'Did not remove UDS file', 'info') }
         });
 
@@ -250,8 +258,12 @@ class SharedMemory {
             host : "localhost",
             exclusive : true
         } : {
-            path : __dirname + "/sharedmemory.sock"
+            path : sockpath
         }, () => {
+            if (this.gdconf.useUDS) {
+                log('SharedMem', "Sock file created at " + sockpath, 'info');
+            }
+
             log("SharedMem", "Listening to incoming connections", "info");
         })
     }

@@ -2,6 +2,7 @@ const log = require('./log.js');
 const net = require('net');
 const gdinfo = require('./network/info.js');
 const gdconf = require('./sites/default').network;
+const sockpath = require('./network/sharedmemory').getSockPath();
 const noop = () => {};
 
 class SockFallback {
@@ -13,8 +14,9 @@ class SockFallback {
 }
 
 const getUDS = () => {
+    log('SharedCache', 'Connecting to ' + sockpath, 'info');
     const conn = net.connect(gdconf.useUDS ? {
-        path : liliumroot + "/network/sharedmemory.sock"
+        path : sockpath
     } : {
         port : gdconf.cacheport,
         host : "localhost"
@@ -22,7 +24,8 @@ const getUDS = () => {
 
     conn.on('error', err => {
         log('SharedCache', 'Could not connect to shared memory server', 'err');
-        require('./localcast').fatal(err);
+        const error = new Error(err.toString());
+        require('./localcast').fatal(error);
     });
 
     return conn;

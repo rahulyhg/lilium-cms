@@ -1,11 +1,6 @@
 var nameMaxLength = 18;
 var pid = process.pid;
 
-var separator = "";
-for (var i = 0; i < nameMaxLength; i++) {
-    separator += " ";
-}
-
 var levels = {
     none : "\x1b[0m",
     err : "\x1b[31m",
@@ -17,6 +12,7 @@ var levels = {
     lilium : "\x1b[35m"
 }
 
+var logname = process.pid;
 var Log = function (sender, message, level) {
     level = level || "none";
     if (!Log.levels.includes(level)) return;
@@ -25,7 +21,12 @@ var Log = function (sender, message, level) {
     if (message) {
         var spacing = nameMaxLength - sender.length;
         const now = new Date();
-        console.log("\x1b[2m["+pid+"]["+(now.getTime() - global.__STARTUPSTAMP)+"ms]\x1b[0m"+color+"[" + now.toLocaleTimeString() + " - \x1b[1m" + sender + "\x1b[0m" + color + "]" + (spacing > 0 ? separator.substr(0, spacing) : '') + message + levels.none);
+        console.log(
+            "\x1b[2m\x1b[1m[" + logname + "]\x1b[0m" + color + 
+            "[" + now.toLocaleTimeString() + " - " + sender + "\x1b[0m" + color + "]" + 
+            (spacing > 0 ? " ".repeat(spacing) : '') + 
+            message + levels.none
+        );
     } else {
         console.log('');
     }
@@ -36,6 +37,9 @@ Log.levels = ["none", "err", "success", "warn", "info", "detail", "live", "liliu
 Log.setLevels = function(lvls) {
     Log.levels = lvls;
 }
+
+Log.setName = name => { logname = name.substring(0, 5).toUpperCase(); };
+Log.getName = () => logname;
 
 var LogDev = function(sender, message, level) {
     if (global.l && (level == "warn" || level == "err")) {
@@ -48,6 +52,8 @@ var LogCI = function(sender, message, level) {
 }
 
 LogDev.setLevels = LogCI.setLevels = () => {};
+LogDev.setName = LogCI.setName = Log.setName;
+LogDev.getName = LogCI.getName = Log.getName;
 
 if (global.__CI) {
     module.exports = LogCI;
