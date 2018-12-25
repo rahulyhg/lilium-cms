@@ -42,19 +42,17 @@ var SiteInitializer = function (conf, siteobj) {
             fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
                 fileserver.createDirIfNotExists(conf.server.html + "/amp", function(nextvalid) {
                     fileserver.createDirIfNotExists(conf.server.html + "/api", function(nextvalid) {
-                        fileserver.createDirIfNotExists(conf.server.html + "/lmldoc", function(nextvalid) {
-                            if (valid && nextvalid) {
-                                log('FileServer',
-                                    'HTML Directory was validated at : ' +
-                                    conf.server.html,
-                                    'success'
-                                );
-                            } else {
-                                log('FileServer', 'Error validated html directories', 'err');
-                            }
+                        if (valid && nextvalid) {
+                            log('FileServer',
+                                'HTML Directory was validated at : ' +
+                                conf.server.html,
+                                'success'
+                            );
+                        } else {
+                            log('FileServer', 'Error validated html directories', 'err');
+                        }
                 
-                            done();
-                        }, true);
+                        done();
                     }, true);
                 }, true);
             }, true);
@@ -126,27 +124,11 @@ var SiteInitializer = function (conf, siteobj) {
                         db.createIndex(conf, "content", {date : -1}, function() {
                             db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
                                 log('Database', 'Created indices', 'success');
-                                createCollections();
+                                done();
                             });
                         });
                     });
                 });
-            });
-        };
-
-        var createCollections = function() {
-            log('Database', 'Creating collections', 'info');
-            
-        	var collectionsNames = [
-		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview", 
-        		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history", "searches",
-		        "lilium", "uploads", "cachedFiles", "dfp", "secrets", "conversations", "communications",
-		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges", "styledpages"
-        	];
-
-            db.createCollections(conf, collectionsNames, function() {
-                log('Database', 'Database initialization finished', 'lilium');
-                done();
             });
         };
 
@@ -200,7 +182,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var update = function(conf, done) {
-        if (!isElder) { return done(); }
+        if (!isElder || global.__TEST) { return done(); }
 
         log('Sites', "Checking for updates");
         var versions = require('./versions.json');
@@ -664,6 +646,13 @@ var Sites = function () {
                     fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
                         var keyname = sitename.replace('//', '').replace(/\s/g, '/');
                         siteInfo.jsonfile = files[fileIndex];
+
+                        if (!siteInfo.server.base) {
+                            siteInfo.server.base = liliumroot + "/";
+                        }
+                        if (!siteInfo.server.html) {
+                            siteInfo.server.html = require('path').join(liliumroot, "html");
+                        }
 
                         config.registerConfigs(keyname, siteInfo);
                         if (sitename == 'default') {

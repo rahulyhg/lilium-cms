@@ -10,5 +10,6 @@ p(`\x1b[1m\x1b[35m
 
 
                            Lilium CMS v4 - Running Gardener and CAIJ    
-                                                             
+
+                             ${global.__TEST ? "LOADING LILIUM BEFORE RUNNING TESTS..." : ""}                            
 \x1b[0m`);

@@ -4,7 +4,7 @@ const cluster = require('cluster');
 const RedisServer = require('redis-server');
 const fs = require('fs');
 const log = require('./log.js');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 
 const garden = {};
 
@@ -31,24 +31,36 @@ class ProcessManager {
         redisserver = new RedisServer(REDIS_SERVER_LOCAL_PORT);
     }
 
-    onExit() {
+    onExit(code = 0) {
         log();
         log("Network", "----------------------------------------------", "lilium");
-        log('Network', 'Killing data server process', 'lilium');
-        dataServerProcess && dataServerProcess.kill("SIGHUP");
-
-        log('Network', 'Killing shared memory process', 'lilium');
-        sharedMemoryProcess && sharedMemoryProcess.kill("SIGHUP");
-
         log('Network', 'Killing CAIJ process', 'lilium');
-        this.caijProc && this.caijProc.kill("SIGHUP");
+        if (this.caijProc) {
+            process.kill(this.caijProc.process.pid, "SIGKILL");
+            log('Network', 'Killed CAIJ process', 'lilium');
+        }
 
         const pids = Object.keys(garden);
         log('Network', 'Killing Lilium processes with PIDs : ' + pids.join(', '), 'lilium');
-        pids.forEach(pid => garden[pid].kill("SIGHUP"));
+        pids.forEach(pid => process.kill(pid, "SIGKILL"));
+
+        log('Network', 'Killing data server process', 'lilium');
+        if (dataServerProcess) {
+            process.kill(dataServerProcess.process.pid, "SIGKILL"); 
+            log('Network', 'Killed data server', 'lilium');
+        }
+
+        log('Network', 'Killing shared memory process', 'lilium');
+        if (sharedMemoryProcess) { 
+            process.kill(sharedMemoryProcess.process.pid, "SIGKILL"); 
+            log('Network', 'Killed shared memory server', 'lilium');
+        }
 
         log('Network', 'Gracefully terminated Lilium process', 'success');
-        process.exit();
+
+        console.log("Sending exit code " + code);
+        process.exitCode = code;
+        process.exit(code);
     }
 
     fireupInitialServer() {
@@ -65,6 +77,7 @@ class GardenerCluster extends ProcessManager {
     start() {
         if (cluster.isMaster) {
             require('./masthead.js');
+            log.setName("GRDNR");
             log('Network', 'Loading network config', 'lilium');
 
             super.start();
@@ -83,12 +96,12 @@ class GardenerCluster extends ProcessManager {
                 io.adapter(redis());
     
                 log('Network', "Starting CAIJ", 'lilium');
-                this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash"})
+                this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash", logname : "JNTOR"})
                 this.caijProc.on('message', this.broadcast.bind(this));
 
                 log('Network', 'Starting ' + lmlinstances + ' processes', 'lilium');
                 for (let i = 0; i < lmlinstances; i++) {
-                    const chld = cluster.fork({instancenum : i, parent : "gardener"});
+                    const chld = cluster.fork({instancenum : i, parent : "gardener", logname : "CHLD" + i});
                     chld.instancenum = i;
                     garden[chld.process.pid] = chld;
                     chld.on('message', this.broadcast.bind(this));
@@ -99,9 +112,9 @@ class GardenerCluster extends ProcessManager {
                     log('Network', 'Worker ' + worker.process.pid + ' is online', 'success');
                 });
 
-                cluster.on('exit', (worker, code, signal) => {
+                !global.__TEST && cluster.on('exit', (worker, code, signal) => {
                     if (worker == this.caijProc) {
-                        this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash"})
+                        this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash", logname : "JNTOR"})
                         return this.caijProc.on('message', this.broadcast.bind(this));
                     }
 
@@ -110,7 +123,7 @@ class GardenerCluster extends ProcessManager {
 
                     const pid = worker.process.pid;
                     const dyingChld = garden[pid];
-                    const chld = cluster.fork({instancenum : dyingChld.instancenum, parent : "gardener"});
+                    const chld = cluster.fork({instancenum : dyingChld.instancenum, parent : "gardener", logname : "CHLD" + dyingChld.instancenum});
                     chld.instancenum = dyingChld.instancenum;
                     chld.on('message', this.broadcast.bind(this));
 
@@ -121,6 +134,8 @@ class GardenerCluster extends ProcessManager {
                 }); 
             });
         } else {
+            log.setName(process.env.logname || "CHLDP")
+            log('Gardener', 'Set log name : ' + log.getName(), 'lilium');
             const Lilium = require('./lilium.js');
             const lilium = new Lilium();
             garden[process.id] = lilium.cms();
@@ -130,10 +145,11 @@ class GardenerCluster extends ProcessManager {
     spawnSharedMemory() {
         log('Network', 'Spawning local cache server', 'lilium');
         if (sharedMemoryProcess) {
-            sharedMemoryProcess.kill("SIGHUP");
+            sharedMemoryProcess.kill("SIGKILL");
         }
-        sharedMemoryProcess = spawn("node", [__dirname + "/network/spawn.js"]);
-        sharedMemoryProcess.on('error', err => {
+        sharedMemoryProcess = cluster.fork({ spawn : __dirname + '/network/spawn.js', logname : "SHRDM" })
+
+        !global.__TEST && sharedMemoryProcess.on('error', err => {
             log('Gardener', err, 'err');
         })
     }
@@ -141,16 +157,16 @@ class GardenerCluster extends ProcessManager {
     spawnDataServer() {
         log('Network', 'Spawning dataserver', 'lilium');
         if (dataServerProcess) {
-            dataServerProcess.kill("SIGHUP");
+            dataServerProcess.kill("SIGKILL");
         }
-        dataServerProcess = spawn('node', [__dirname + "/dataserver/spawn.js"]);
+        dataServerProcess = cluster.fork({ spawn : __dirname + '/dataserver/spawn.js', logname : "DATAS" })
     }
 
     updateAndRestart() {
         log('Gardener', 'Restarting instances...', 'Lilium');
         const pids = Object.keys(garden);
-        this.caijProc.kill("SIGHUP")
-        pids.forEach(pid => garden[pid].kill("SIGHUP"));
+        this.caijProc.kill("SIGKILL")
+        pids.forEach(pid => garden[pid].kill("SIGKILL"));
         
         this.spawnSharedMemory();
         this.spawnDataServer();
@@ -159,6 +175,26 @@ class GardenerCluster extends ProcessManager {
     broadcast(m) {
         if (m == "updateAndRestart") {
             return this.updateAndRestart();
+        }
+
+        if (m.ev == "testsFinished" && global.__TEST) {
+            return this.onExit(m.code);
+        }
+
+        if (m == "fatal" || m.type == "fatal") {
+            log("Gardener", "[FATAL] Received fatal error message from child process", "err");
+            log("Gardener", "[FATAL] About to send SIGKILLs to all children process", "err");
+
+            if (m.payload) {
+                console.log("");
+                console.log("More details --- ");
+                console.log("");
+                console.log(m.payload.err.toString());
+                console.log(m.payload.stack || "");
+                console.log("");
+            }
+
+            return this.onExit(1);
         }
 
         var senderpid = m.sender;
@@ -257,10 +293,17 @@ class PM2Cluster extends ProcessManager {
     }
 }
 
-switch (global.psmanager) {
-    case "pm2"     : global.__LILIUMNETWORK = new PM2Cluster(); break;
-    case "cluster" : global.__LILIUMNETWORK = new GardenerCluster(); break;
-    default : log("Gardener", "No process manager defined.", "err"); process.exit(1);
-}
+if (process.env.spawn) {
+    log.setName(process.env.logname || process.pid);
+    log('Gardener', 'Environment variable spawn found, running in spawn mode', 'lilium');
+    log('Gardener', 'Hello from ' + process.env.spawn, 'lilium');
+    require(process.env.spawn);
+} else {
+    switch (global.psmanager) {
+        case "pm2"     : global.__LILIUMNETWORK = new PM2Cluster(); break;
+        case "cluster" : global.__LILIUMNETWORK = new GardenerCluster(); break;
+        default : log("Gardener", "No process manager defined.", "err"); process.exit(1);
+    }
 
-global.__LILIUMNETWORK.start();
+    global.__LILIUMNETWORK.start();
+}

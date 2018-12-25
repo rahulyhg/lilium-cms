@@ -31,20 +31,23 @@
             display: block;
             padding: 10px 20px;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.2s;
     
             i {
                 margin-right: 10px;
                 display: inline-block;
+                text-align: center;
                 width: 18px;
             }
 
             &:hover {
                 background: rgba(0,0,0,0.2);
+                transition: none;
             }
 
             &.selected {
                 background: rgba(0,0,0,0.3);
+                transition: all 0.2s;
             }
         }
     }

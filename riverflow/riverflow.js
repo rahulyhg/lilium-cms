@@ -50,7 +50,7 @@ class Riverflow {
     registerFlow(flow) {
         log("Riverflow", "Creating flow for river " + flow.endpoint);
 
-        let river = require(config.default().server.base + flow.module);
+        let river = require(liliumroot + "/" + flow.module);
         river.handles = {};
         flow.overrides = river.overrides || {};
         
@@ -97,8 +97,7 @@ class Riverflow {
             return;
         }
 
-        let flowsPath = config.default().server.base + "riverflow/flows.json";
-        const Modules = require(flowsPath);
+        const Modules = require("./flows");
         
         log('Riverflow', "Loading " + Modules.rivers.length + " rivers");
         Modules.rivers.forEach(river => this.registerFlow(river));

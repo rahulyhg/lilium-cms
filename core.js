@@ -13,6 +13,7 @@ const v4 = new V4();
 class Core {
     constructor() {
         log('Core', 'Lilium core object was created', 'success');
+        this.isElder = isElder;
     }
     
     makeEverythingSuperAwesome(readyToRock) {
@@ -60,39 +61,39 @@ class Core {
 
             loadCurrencies();
             maybeRunCAIJ();
-            loadHooks(readyToRock);
+            loadHooks(() => readyToRock(this));
             loadEndpoints();
             loadStandardInput();
             loadImageSizes();
             loadLiveVars();
             loadGlobalPetals();
             loadLMLLibs();
+            loadAudiences();
             loadBackendSearch();
             
             loadVocab(() => {
                 loadPlugins(() => {
                     loadRoles(() => {
                         precompile(() => {
-                            loadDocs(() => {
-                                redirectIfInit(resp, () => {
-                                    makeBuild(() => {
-                                        loadGitHub();
-                                        loadFrontend();
-                                        require('./riverflow/riverflow.js').loadFlows();
+                            redirectIfInit(resp, () => {
+                                makeBuild(() => {
+                                    loadGitHub();
+                                    loadFrontend();
+                                    require('./riverflow/riverflow.js').loadFlows();
 
-                                        inbound.handleQueue();
+                                    inbound.handleQueue();
                 
-                                        loadCacheInvalidator();
+                                    loadCacheInvalidator();
                 
-                                        log('Lilium', 'Starting inbound server', 'info');
-                                        loadNotifications();
-                                        notifyAdminsViaEmail();
-                                        executeRunScript();
-                                        initSchedulingTasks();
+                                    log('Lilium', 'Starting inbound server', 'info');
+                                    loadNotifications();
+                                    notifyAdminsViaEmail();
+                                    executeRunScript();
+                                    initSchedulingTasks();
+                                    initLocalcast();
                 
-                                        log('Core', 'Firing initialized signal', 'info');
-                                        hooks.fire('init');
-                                    });
+                                    log('Core', 'Firing initialized signal', 'info');
+                                    hooks.fire('init');
                                 });
                             });
                         });
@@ -241,6 +242,12 @@ const makeBuild = (cb) => {
     });
 };
 
+const loadAudiences = () => {
+    if (!isElder) { return; }
+
+    require('./audiences').preload();
+};
+
 const loadRoles = (cb) => {
     const entities = require('./entities.js');
     entities.registerRole({
@@ -282,6 +289,11 @@ const gracefullyCrash = (err) => {
 
     log('Core', 'Contacting handler to request a crash to all handles', 'info');
     metrics.push('errors', err);
+
+    if (global.__TEST) {
+        log('Core', 'Test mode will force Lilium to exit', 'warn');
+        require('./localcast').fatal(err);
+    }
 };
 
 const bindCrash = () => {
@@ -289,6 +301,10 @@ const bindCrash = () => {
         process.on('uncaughtException', gracefullyCrash);
     }
 };
+
+const initLocalcast = () => { 
+    require('./localcast').init();
+}
 
 const loadStandardInput = () => {
     const stdin = process.openStdin();
@@ -442,17 +458,6 @@ const redirectIfInit = (resp, cb) => {
     } else {
         cb();
     }
-};
-
-const loadDocs = (cb) => {
-    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-        return cb();
-    }
-
-    const docs = require('./docs.js');
-    docs.compileDirectory(() => {
-        docs.compileIndex(cb);
-    });
 };
 
 const loadVocab = (done) => {

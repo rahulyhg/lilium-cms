@@ -50,6 +50,16 @@ module.exports = class V4DevServer {
                             test: /[\\/]node_modules[\\/]/,
                             name: 'vendors',
                             chunks: 'all'
+                        },
+                        pages : {
+                            test: /[\\/]pages[\\/]/,
+                            name: 'pages',
+                            chunks : 'initial'
+                        },
+                        layout : {
+                            test: /[\\/]layout[\\/]/,
+                            name: 'layout',
+                            chunks : 'initial'
                         }
                     }
                 }
