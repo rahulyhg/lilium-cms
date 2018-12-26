@@ -50,4 +50,17 @@ const createRandomUser = (assignation = {}, then) => {
     });
 }; 
 
-module.exports = { createRandomUsers, cleanCollections };
+const createRandomEdition = (assignation = {}, then) => {
+    const edition = Object.assign({
+        active : true,
+        displayname : "Test edition",
+        slug : "test-edition",
+        level : 0
+    }, assignation);
+
+    db.insert(configLib.default(), 'editions', edition, () => {
+        then(edition);
+    });
+}
+
+module.exports = { createRandomUsers, cleanCollections, createRandomEdition };

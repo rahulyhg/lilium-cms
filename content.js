@@ -547,7 +547,7 @@ class ContentLib {
                 db.join(_c, 'content', [
                     { $match : { _id : postid } },
                     { $lookup : LOOKUPS.editions }, 
-                    { $project : { fulltopic : 1, name : 1, title : 1 } }
+                    { $project : { fulltopic : 1, name : 1, title : 1, alleditions : 1 } }
                 ], article => {
                     const url = "/" + article[0].alleditions.map(x => x.slug).join('/') + "/" + article[0].name
                     db.update(_c, 'content', { _id : postid }, { 
