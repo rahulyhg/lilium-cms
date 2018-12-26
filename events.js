@@ -24,7 +24,7 @@ var createObject = function(conf, cat, type, user, xtra) {
 };
 
 Events.prototype.init = function(conf, cb) {
-    db.createCollection(conf.id, 'events', cb || noOp);
+    cb && cb();
 };
 
 Events.prototype.register = Events.prototype.r = function(conf, category, type, user, extra, cb) {
