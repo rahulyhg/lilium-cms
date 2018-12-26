@@ -14,7 +14,12 @@ class Request {
 
     to(method, url) {
         this.method = method;
-        this.url = url;
+
+        if (typeof url == "function") {
+            this.makeURL = url;
+        } else {
+            this.url = url;
+        }
         return this;
     }
 
@@ -40,27 +45,33 @@ class Request {
 
     send(then) {
         const req = {
-            url : "http://localhost:8080" + this.url,
+            url : "http://localhost:8080" + (this.url || (this.makeURL ? this.makeURL() : "") || "/"),
             method : this.method,
-            headers : {}
+            headers : {},
+            json : true
         };
 
         if (this.data) {
-            req.json = true;
             req.body = this.data;
         }
 
         this.user && (req.headers["x-as"] = this.user);
         this.right && (req.headers["x-right"] = this.right);
 
-        l(`[${this.displayname}] Sending ${this.method} request to ${this.url}`, '#');
+        l(this.displayname, '#'); 
+        l(`Sending ${this.method} request to ${req.url}`, '#');
         requestLib(req, (err, r, body) => {
-            l(`[${r.statusCode}] Response from Lilium request to ${this.method} ${this.url}`, '>', true);
-
-            if (this.predicate) {
-                then(this.predicate(err, r, body));
+            if (err) {
+                l(`Error handling request ${err}`, '-');
+                then(false);                 
             } else {
-                then(r.statusCode == 200);
+                l(`[${r.statusCode}] Response from Lilium request to ${this.method} ${req.url}`, '>', true);
+
+                if (this.predicate) {
+                    then(this.predicate(err, r, body));
+                } else {
+                    then(r.statusCode == 200);
+                }
             }
         });
     }
