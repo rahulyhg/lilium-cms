@@ -181,6 +181,15 @@ class GardenerCluster extends ProcessManager {
             return this.onExit(m.code);
         }
 
+        if (m.type == "output") {
+            if (m.payload.clear) {
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+            }
+
+            return process.stdout.write(`${log.levelColors[m.payload.level] || log.levelColors.none}[${m.payload.sender}] ${m.payload.message}`.substring(0, process.stdout.columns - 2) + log.levelColors.none);
+        }
+
         if (m == "fatal" || m.type == "fatal") {
             log("Gardener", "[FATAL] Received fatal error message from child process", "err");
             log("Gardener", "[FATAL] About to send SIGKILLs to all children process", "err");
