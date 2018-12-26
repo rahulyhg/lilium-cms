@@ -6,8 +6,13 @@ global.liliumroot = require('path').join(__dirname, '..', '..');
 
 cluster.isMaster && console.log('> Waiting for Lilium...');
 global.__START_TESTS = (lilium, core) => {
+    global.__TEST_BLOCK_LOG = true;
+
     if (core.isElder) {
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
         console.log('> Compiling tests');
+
         const Runner = require('./runner');
         const runner = new Runner();
 

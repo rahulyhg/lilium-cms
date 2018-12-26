@@ -42,8 +42,10 @@ Log.setName = name => { logname = name.substring(0, 5).toUpperCase(); };
 Log.getName = () => logname;
 
 var LogDev = function(sender, message, level) {
-    if (global.l && (level == "warn" || level == "err")) {
-        global.l(`${sender} - ${message}`, level == "err" ? "x" : "-");
+    if (!global.__TEST_BLOCK_LOG && sender && message) {
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        process.stdout.write(`[${logname}][${sender}] ${message}`.substring(0, process.stdout.columns - 2));
     }
 }
 
