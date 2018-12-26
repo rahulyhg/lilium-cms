@@ -99,7 +99,6 @@ class AdsLib {
     }
 
     setup() {
-        config.getAllSites().forEach(site => db.createCollection(site, 'ads', () => {}));
     }
 }
 

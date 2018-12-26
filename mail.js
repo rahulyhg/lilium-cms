@@ -76,7 +76,6 @@ class MailTemplate {
 class MailController {
     constructor() {
         require('./config.js').eachSync((conf) => {
-            db.createCollection(conf, 'mailtemplates');
         });
     }
 

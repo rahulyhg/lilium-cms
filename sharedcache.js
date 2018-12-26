@@ -14,7 +14,6 @@ class SockFallback {
 }
 
 const getUDS = () => {
-    log('SharedCache', 'Connecting to ' + sockpath, 'info');
     const conn = net.connect(gdconf.useUDS ? {
         path : sockpath
     } : {

@@ -238,20 +238,18 @@ class PongLinks {
             log('Ponglinks', 'Elder process is storing links', 'info');
             const sites = require('./config').getAllSites();
             sites.forEach(site => {
-                db.createCollections(site, ['ponglinks', 'pongclicks'], () => {
-                    db.findToArray(site, 'ponglinks', {}, (err, arr) => {
-                        const set = {};
-                        log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
-                        arr.forEach(x => {
-                            if (x.versions) {
-                                x.versions.forEach(v => {
-                                    set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
-                                });
-                            }
-                        });
-
-                        sharedcache.set(set);
+                db.findToArray(site, 'ponglinks', {}, (err, arr) => {
+                    const set = {};
+                    log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
+                    arr.forEach(x => {
+                        if (x.versions) {
+                            x.versions.forEach(v => {
+                                set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
+                            });
+                        }
                     });
+
+                    sharedcache.set(set);
                 });
             });
         }

@@ -474,8 +474,6 @@ class SocialDispatch {
 
     setup() {
         if (networkinfo.isElderChild()) {
-            db.createCollection(config.default(), ACCOUNTS_COLLECTION, () => {});
-
             const fbdata = [];
             const REQUEST_COOLDOWN = 10; // ms 
             const Q_PARAM = "&q=";
@@ -519,13 +517,11 @@ class SocialDispatch {
                     regionid : x.region_id
                 }});
 
-                db.createCollection(config.default(), FBTARGET_COLLECTION, () => {
-                    db.createIndex(config.default(), FBTARGET_COLLECTION, {name : "text", country_name : "text", key : 1}, () => {
-                        db.remove(config.default(), FBTARGET_COLLECTION, {}, () => {
-                            db.insert(config.default(), FBTARGET_COLLECTION, fbmap, () => {
-                                sharedcache.set({["fbcitykeys"] : fbmap}, () => {
-                                    log('SDispatch', `Stored ${fbmap.length} geolocation Facebook keys`, 'lilium');
-                                });               
+                db.createIndex(config.default(), FBTARGET_COLLECTION, {name : "text", country_name : "text", key : 1}, () => {
+                    db.remove(config.default(), FBTARGET_COLLECTION, {}, () => {
+                        db.insert(config.default(), FBTARGET_COLLECTION, fbmap, () => {
+                            sharedcache.set({["fbcitykeys"] : fbmap}, () => {
+                                log('SDispatch', `Stored ${fbmap.length} geolocation Facebook keys`, 'lilium');
                             });               
                         });               
                     });               
