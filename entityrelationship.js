@@ -100,9 +100,6 @@ class ERModule {
     }
 
     setup(that) {
-        db.createCollection(config.default(), COLLECTION_NAME, () => {
-            log('EntityRel', 'Validated database collection');
-        });
     }
 }
 

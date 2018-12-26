@@ -39,10 +39,8 @@ VariousWrap.prototype.get = VariousWrap.prototype.find = function(selector, cb, 
 
 var Various = function() {};
 Various.prototype.init = function(conf, done) {
-    db.createCollection(conf, 'various', function() {
-        db.createIndex(conf, 'various', { type : "text" }, function() {
-            done && done();
-        });
+    db.createIndex(conf, 'various', { type : "text" }, function() {
+        done && done();
     });
 };
 

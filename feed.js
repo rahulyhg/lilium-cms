@@ -8,7 +8,6 @@ const noop = require('./noop.js');
 
 class LMLFeed {
     setup() {
-        db.createCollection(config.default(), 'feed', noop);
     }
 
     adminGET(cli) {

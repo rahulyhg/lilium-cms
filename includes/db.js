@@ -58,37 +58,6 @@ var DB = function() {
 		});
 	};
 
-	this.createCollection = this.createCollections = function(conf, col, callback) {
-        if (typeof col === 'object') {
-            var colIndex = 0;
-            var colMax = col.length;
-            var results = { err : [], res : [] };
-
-            var ins = function() {
-                if (colIndex < colMax) {
-		            _conns[conf.id || conf].createCollection(col[colIndex], {}, function(err, res) {
-                        err && results.err.push(err);
-                        res && results.res.push(res);
-                        colIndex++;
-                        
-                        ins();
-                    });
-                } else {
-                    log('Database', 'Created ' + results.res.length + ' collections with ' + results.err.length + ' errors', 'lilium');
-                    results.err.forEach(e => {
-                        log('Database', e, 'warn');
-                    });
-
-                    callback && callback();
-                }
-            };
-
-            ins();
-        } else {
-		    _conns[conf.id || conf].createCollection(col, {}, callback);
-        }
-	};
-
 	this.initDatabase = function(conf, callback) {
 		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, client) {
             if (!client || err) {
@@ -113,6 +82,11 @@ var DB = function() {
 			callback(!err);
 		});
 	};
+
+    this.createCollection = this.createCollections = function(_, __, done) {
+        log('Database', '[DEPRECATED] A call to createCollection wad made, but the method is deprecated', 'warn');
+        done && done();
+    }
 
 	var formatMongoString = function(conf) {
 		return 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" +
