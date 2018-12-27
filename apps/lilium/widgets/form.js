@@ -210,15 +210,24 @@ export class TextField extends FormField {
 }
 
 export class StackBox extends FormField {
+    static get singleSchema() {
+        return {
+            single : true,
+            fields : [{
+                type : 'text',
+            }]
+        }
+    }
+
     constructor(props) {
         super(props);
 
-        this.state = {
-            values : Array.from(this.value || []).map(x => ({ 
-                text : x, 
-                _formid : Math.random().toString() + Math.random().toString() 
-            }))
-        };
+        this.state.schema = props.schema || StackBox.singleSchema;
+
+        this.state.values = Array.from(this.value || []).map(x => ({ 
+            value : x, 
+            _formid : Math.random().toString() + Math.random().toString() 
+        }));
     }
 
     componentWillReceiveProps(props) {
@@ -226,7 +235,7 @@ export class StackBox extends FormField {
             this.value = props.value;
             this.setState({
                 values : Array.from(props.value || []).map(x => ({ 
-                    text : x, 
+                    value : x, 
                     _formid : Math.random().toString() + Math.random().toString() 
                 }))
             });
@@ -234,11 +243,11 @@ export class StackBox extends FormField {
     }
 
     onChange() {
-        this.changed(this.state.values.map(x => x.text));
+        this.changed(this.state.values.map(x => x.value));
     }
 
-    appendFromBox(text) {
-        const obj = { text, _formid : Math.random().toString() }
+    appendFromBox(value) {
+        const obj = { value, _formid : Math.random().toString() }
         this.setState({ values : [...this.state.values, obj] }, () => {
             this.onChange();
         });
@@ -246,7 +255,7 @@ export class StackBox extends FormField {
 
     textEdited(index, value) {
         const newValues = [...this.state.values];
-        newValues[index].text = value;
+        newValues[index].value = value;
         this.setState({ values : newValues }, () => {
             this.onChange();
         });
@@ -295,6 +304,12 @@ export class StackBox extends FormField {
         });
     }
 
+    makeSchemaInputFields() {
+        let fields = [];
+
+        return fields;
+    }
+
     render() {
         return (
             <div class="stack-box">
@@ -303,13 +318,18 @@ export class StackBox extends FormField {
                     {
                         this.state.values.map((valueObj, index) => (
                             <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={valueObj._formid}
-                                                index={index} lastInList={index == this.state.values.length - 1} initialValue={valueObj.text}
-                                                moveItemDown={this.moveItemDown.bind(this)} moveItemUp={this.moveItemUp.bind(this)} />
+                                index={index} lastInList={index == this.state.values.length - 1} initialValue={valueObj.value}
+                                moveItemDown={this.moveItemDown.bind(this)} fields={this.state.schema.fields} moveItemUp={this.moveItemUp.bind(this)} />
                         ))
                     }
                 </div>
                 <div class="stackbox-input-add">
-                    <TextField onKeyPress={this.handleInputBoxKeyPress.bind(this)} placeholderType="inside" placeholder="Provide a value and press Enter" />
+                    { this.state.schema.single ? (
+                        <TextField 
+                            onKeyPress={this.handleInputBoxKeyPress.bind(this)} 
+                            placeholderType="inside" 
+                            placeholder="Provide a value and press Enter" />
+                    ) : ( this.makeSchemaInputFields())}
                 </div>
             </div>
         )
