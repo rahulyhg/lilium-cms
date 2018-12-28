@@ -210,11 +210,13 @@ export class TextField extends FormField {
 }
 
 export class StackBox extends FormField {
-    static get singleSchema() {
+    static singleSchema(name, displayname) {
         return {
             single : true,
             fields : [{
                 type : 'text',
+                name : name, 
+                displayname : displayname || name
             }]
         }
     }
@@ -222,12 +224,14 @@ export class StackBox extends FormField {
     constructor(props) {
         super(props);
 
-        this.state.schema = props.schema || StackBox.singleSchema;
+        this.state.schema = props.schema || StackBox.singleSchema(props.name, props.placeholder);
 
         this.state.values = Array.from(this.value || []).map(x => ({ 
             value : x, 
             _formid : Math.random().toString() + Math.random().toString() 
         }));
+
+        this.state.pendingvalues = {};
     }
 
     componentWillReceiveProps(props) {
@@ -304,10 +308,36 @@ export class StackBox extends FormField {
         });
     }
 
-    makeSchemaInputFields() {
-        let fields = [];
+    typeToField(field) {
+        switch (field.type) {
+            case "text": {
+                return (<TextField />);
+            }; break;
 
-        return fields;
+            case "select": {
+                return (<SelectField options={field.options || []} />);
+            }; break;
+
+            default:
+                
+        }
+    }
+
+    multiFieldChanged(name, value) {
+        const pendingvalues = this.state.pendingvalues;
+        pendingvalues[name] = value;
+        
+        this.setState({ pendingvalues });
+    }
+
+    appendMulti() {
+        const appendee = {...this.state.pendingvalues};
+        const values = [...this.state.values, appendee];
+        this.setState({ values, pendingvalues : {} });
+    }
+
+    makeSchemaInputFields() {
+        return [...this.state.schema.fields.map(x => this.typeToField(x)), (<div class="stackbox-multi-add-btn"><ButtonWorker theme="white" type="fill" text="Append" sync={true} work={this.appendMulti.bind(this)} /></div>)];
     }
 
     render() {
@@ -329,7 +359,10 @@ export class StackBox extends FormField {
                             onKeyPress={this.handleInputBoxKeyPress.bind(this)} 
                             placeholderType="inside" 
                             placeholder="Provide a value and press Enter" />
-                    ) : ( this.makeSchemaInputFields())}
+                    ) : ( 
+                        
+                        <div class="stackbox-multi-input">{this.makeSchemaInputFields()}</div>
+                    )}
                 </div>
             </div>
         )

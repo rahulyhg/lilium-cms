@@ -363,16 +363,36 @@ textarea {
 .stack-box-list {
     border : 1px solid @grayBorderColor;
     box-shadow: @softshadow;
+    background: @whiteish;
 }
 
 .stackbox-input-add {
     margin-top: 10px;
+
+    .stackbox-multi-input {
+        display: flex;
+
+        .field-wrap {
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+
+        .stackbox-multi-add-btn {
+            flex: 0 0 80px;
+            .button-worker {
+                margin-right: 0px;
+            }
+        }
+    }
 }
 
 .stackbox-entry {
     display: flex;
     padding: 10px;
-    border-bottom: 1px solid @grayBorderColor;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid @grayBorderColor;
+    }
 
     .classic-field {
         border: none;
