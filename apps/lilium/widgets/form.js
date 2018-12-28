@@ -308,18 +308,30 @@ export class StackBox extends FormField {
         });
     }
 
-    typeToField(field) {
+    updatePendingValue(name, value) {
+        const pendingvalues = this.state.pendingvalues;
+        pendingvalues[name] = value;
+        this.setState({ pendingvalues });
+    }
+
+    static typeToField(field, value, onchange) {
         switch (field.type) {
-            case "text": {
-                return (<TextField />);
-            }; break;
+            case "text": 
+                return (<TextField 
+                    placeholder={field.displayname} 
+                    placeholderType="inside" 
+                    initialValue={value} 
+                    name={field.name} 
+                    onChange={onchange} 
+                />);
 
-            case "select": {
-                return (<SelectField options={field.options || []} />);
-            }; break;
-
-            default:
-                
+            case "select": 
+                return (<SelectField 
+                    options={[{text:" - " + field.displayname + " - ", value : ""}, ...(field.options || [])]} 
+                    name={field.name} 
+                    initialValue={value || ""} 
+                    onChange={onchange} 
+                />);
         }
     }
 
@@ -331,13 +343,14 @@ export class StackBox extends FormField {
     }
 
     appendMulti() {
-        const appendee = {...this.state.pendingvalues};
-        const values = [...this.state.values, appendee];
-        this.setState({ values, pendingvalues : {} });
+        const obj = { value : {...this.state.pendingvalues}, _formid : Math.random().toString() }
+        this.setState({ values : [...this.state.values, obj], pendingvalues : {} }, () => {
+            this.onChange();
+        });
     }
 
     makeSchemaInputFields() {
-        return [...this.state.schema.fields.map(x => this.typeToField(x)), (<div class="stackbox-multi-add-btn"><ButtonWorker theme="white" type="fill" text="Append" sync={true} work={this.appendMulti.bind(this)} /></div>)];
+        return [...this.state.schema.fields.map(x => StackBox.typeToField(x, this.state.pendingvalues[x.name], this.updatePendingValue.bind(this))), (<div class="stackbox-multi-add-btn"><ButtonWorker theme="white" type="fill" text="Append" sync={true} work={this.appendMulti.bind(this)} /></div>)];
     }
 
     render() {
@@ -349,7 +362,7 @@ export class StackBox extends FormField {
                         this.state.values.map((valueObj, index) => (
                             <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={valueObj._formid}
                                 index={index} lastInList={index == this.state.values.length - 1} initialValue={valueObj.value}
-                                moveItemDown={this.moveItemDown.bind(this)} fields={this.state.schema.fields} moveItemUp={this.moveItemUp.bind(this)} />
+                                moveItemDown={this.moveItemDown.bind(this)} schema={this.state.schema} moveItemUp={this.moveItemUp.bind(this)} />
                         ))
                     }
                 </div>
@@ -360,7 +373,6 @@ export class StackBox extends FormField {
                             placeholderType="inside" 
                             placeholder="Provide a value and press Enter" />
                     ) : ( 
-                        
                         <div class="stackbox-multi-input">{this.makeSchemaInputFields()}</div>
                     )}
                 </div>
@@ -378,6 +390,12 @@ StackBox.StackField = class StackField extends Component {
         this.props.onChange(this.props.index, value);
     }
 
+    onMultiChanged(name, value) {
+        const cur = this.props.initialValue || {};
+        cur[name] = value;
+        this.props.onChange(this.props.index, cur);
+    }
+
     selfdestruct() {
         this.props.onDelete(this.props.index);
     }
@@ -393,7 +411,15 @@ StackBox.StackField = class StackField extends Component {
     render() {
         return (
             <div class="stackbox-entry">
-                <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+                { this.props.schema.single ? (
+                    <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+                ) : (
+                    <div class="stackbox-entry-multiple">
+                        { this.props.schema.fields.map(x => 
+                            StackBox.typeToField(x, this.props.initialValue ? this.props.initialValue[x.name] : "", this.onMultiChanged.bind(this))
+                        ) }
+                    </div>
+                ) }
 
                 <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
                 <div onClick={this.moveUp.bind(this)} class={"stackbox-up " + (this.props.index == 0 ? "disabled" : "")}><i className="far fa-chevron-up"></i></div>
