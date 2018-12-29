@@ -8,40 +8,25 @@ class EditionSectionDropDown extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            open : props.open,
-            editions : props.section.editions,
-            section : props.section
+            open : false,
+            selectedLevel : props.selectedLevel || 0
         };
     }
 
     componentWillReceiveProps(props) {
-        this.setState({ editions : props.section.editions, section : props.section }); 
+        this.setState({ selectedLevel : props.selectedLevel }); 
     }
 
-    editionClicked(ed) {
-        this.props.editionClicked(this.state.section.level, ed);
+    levelClicked(level) {
+        this.props.levelClicked(level);
     }
 
     render() {
         return (
             <div>
                 <div class="section-header">
-                    <b>{this.state.section.displayname}</b>
-                </div>
-                <div>
-                    { this.state.open ? this.state.editions.map(ed => (
-                        <div onClick={this.editionClicked.bind(this, ed)}>
-                            <div class="edition-select-box-wrap">
-                                <div class="edition-select-box">
-                                    {ed.checked ? <i class="fa far-check"></i> : null}
-                                </div>
-                            </div>
-                            <div class="edition-item-details">
-                                <div class="edition-display-name">{ed.displayname}</div>
-                                <small class="edition-display-slug">{ed.slug}</small>
-                            </div>
-                        </div>
-                    )) : null }
+                    <b>{this.props.sections[this.state.selectedLevel].displayname}</b>
+                    <i class="far fa-chevron-down"></i>
                 </div>
             </div>
         )
@@ -53,14 +38,18 @@ export default class EditionPage extends Component {
         super(props);
         this.state = {
             loading : true
-        }
+        };
     }
 
     componentDidMount() {
         API.get('/editions/all', {}, (err, data) => {
-            this.setState({ levels : data.levels, sections : data.sections, loading : false });
+            this.setState({ levels : data.levels, sections : data.sections, selectedLevel : 0, loading : false });
         });
     }
+
+    changeLevel(selectedLevel) {
+        this.setState({ selectedLevel })
+    }   
 
     render() {
         if (this.state.loading) {
@@ -68,9 +57,9 @@ export default class EditionPage extends Component {
         }
 
         return (
-            <div>
+            <div class="editions-management">
                 <div class="editions-sidebar">
-                    { this.state.levels.map(section => ( <EditionSectionDropDown section={section} /> )) }
+                    <EditionSectionDropDown levelClicked={this.changeLevel.bind(this)} sections={this.state.sections} level={this.state.selectedLevel} />
                 </div>
                 <div class="editions-editview">
                     
