@@ -37,6 +37,10 @@ const EditionList = props => (
     </div>
 );
 
+class EditionEdit extends Component {
+
+}
+
 export default class EditionPage extends Component {
     constructor(props) {
         super(props);
@@ -93,7 +97,15 @@ export default class EditionPage extends Component {
                         editions={this.state.levels[this.state.selectedLevel].editions} />
                 </div>
                 <div class="editions-editview">
-                    <p>{this.state.selectedEditions.map(x => x.displayname).join(', ')}</p>
+                    { this.state.selectedEditions.length == 0 ? (
+                        <div class="template-viewer">
+                            <div class="template-message">
+                                <i class="fal fa-books"></i>
+                                <h3>Edition manager</h3>
+                                <p>Use the sidebar to select editions.</p>
+                            </div>
+                        </div>
+                    ) : <EditionEdit editions={this.state.selectedEditions} /> }
                 </div>
             </div>
         );
