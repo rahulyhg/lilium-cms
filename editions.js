@@ -21,6 +21,10 @@ function updatePostsAfterMerge(_c, then, now, done) {
     db.find(_c, 'content', { editions : then._id }, [], (err, cur) => processOnePost(cur));
 }
 
+function fieldToRef(field, value) {
+    return field == "icon" || field == "featuredimage" ? db.mongoID(value) : value;
+}
+
 class EditionController {
     adminPOST(cli) {
         const act = cli.routeinfo.path[2];
@@ -94,7 +98,40 @@ class EditionController {
     }
 
     adminPUT(cli) {
+        if (cli.hasRightOrRefuse('manage-editions')) {
+            if (cli.routeinfo.path[2] == "nativefield") {
+                cli.readPostData(payload => {
+                    payload.value = fieldToRef(payload.name, payload.value);
 
+                    db.update(cli._c, 'editions', { _id : db.mongoID(cli.routeinfo.path[3]) }, {
+                        [`lang.${cli.routeinfo.path[4]}.${payload.name}`] : payload.value
+                    }, (err, r) => {
+                        if (err) {
+                            cli.throwHTTP(500, err, true);
+                        } else {
+                            cli.sendJSON(r)
+                        }
+                    });
+                });
+            } else if (cli.routeinfo.path[2] == "editionfield") {
+                cli.readPostData(payload => {
+                    payload.value = fieldToRef(payload.name, payload.value);
+
+                    db.update(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, {
+                        [`lang.${cli.routeinfo.path[3]}.${payload.name}`] : payload.value
+                    }, (err, r) => {
+                        if (err) {
+                            cli.throwHTTP(500, err, true);
+                        } else {
+                            cli.sendJSON(r)
+                        }
+                    });
+
+                });
+            } else {
+                cli.throwHTTP(404, undefined, true);
+            }
+        }
     }
 
     adminDELETE(cli) {
@@ -135,6 +172,7 @@ class EditionController {
                         "editions._id" : 1,
                         "editions.slug" : 1,
                         "editions.displayname" : 1,
+                        "editions.lang" : 1
                     } },
                     { $sort : { level : 1 } }
                 ], levels => {
