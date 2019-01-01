@@ -65,7 +65,13 @@ const handleTopicCursor = (_c, col, cur, done) => {
             lang : {
                 en : {
                     displayname : topic.displayname,
-                    slug : topic.slug
+                    slug : topic.slug,
+                    description : topic.description || ""
+                },
+                fr : {
+                    displayname : topic.displayname,
+                    slug : topic.slug,
+                    description : topic.description || ""
                 }
             },
             level : topic.family.length - 1
