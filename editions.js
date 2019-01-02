@@ -50,6 +50,29 @@ class EditionController {
                     }
                 });
             });
+        } else if (act == "duplicate") {
+            const toDup = db.mongoID(cli.routeinfo.path[3]);
+            db.findUnique(cli._c, 'editions', { _id : toDup }, (err, original) => {
+                if (err) {
+                    cli.throwHTTP(500, err.toString(), true);
+                } else if (!original) {
+                    cli.throwHTTP(404, undefined, true);
+                } else {
+                    original.displayname += " (copy)";
+                    original.slug += "-" + Math.random().toString(16).substring(2);
+
+                    Object.keys(original.lang).forEach(lang => {
+                        original.lang[lang].displayname = original.displayname;
+                        original.lang[lang].slug = original.slug;
+                    });
+
+                    db.insert(cli._c, 'editions', original, (err, r) => {
+                        err ? cli.throwHTTP(500, err, true) : cli.sendJSON({
+                            _id : original._id
+                        });
+                    });
+                }
+            }, { _id : 0 });
         } else if (act == "automergesimilar") {
             db.aggregate(cli._c, 'editions', [ 
                 { $match : { active : true } },
