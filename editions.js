@@ -128,6 +128,20 @@ class EditionController {
                     });
 
                 });
+            } else if (cli.routeinfo.path[2] == "mergelanguages") {
+                const _id = db.mongoID(cli.routeinfo.path[3]);
+                db.findUnique(cli._c, 'editions', { _id }, (err, edition) => {
+                    if (!edition) {
+                        return cli.throwHTTP(404, undefined, true);
+                    }
+
+                    cli.readPostData(payload => {
+                        edition.lang[payload.mergeInto] = edition.lang[payload.mergeFrom];
+                        db.update(cli._c, 'editions', { _id }, edition, (err, r) => {
+                            err ? cli.throwHTTP(500, err, true) : cli.sendJSON(r);
+                        });
+                    });
+                });
             } else {
                 cli.throwHTTP(404, undefined, true);
             }
