@@ -1,9 +1,12 @@
 import { h, Component } from 'preact';
-import { TextField, ButtonWorker, MediaPickerField, SelectField } from '../../widgets/form';
+import { TextField, ButtonWorker, MediaPickerField, SelectField, CheckboxField } from '../../widgets/form';
 import { TextEditor } from '../../widgets/texteditor';
 import { Spinner } from '../../layout/loading';
 import { castNotification } from '../../layout/notifications';
 import Modal from '../../widgets/modal';
+
+import { ConflictOverlay } from './conflictoverlay';
+import { registerOverlay, castOverlay } from '../../overlay/overlaywrap';
 
 import API from '../../data/api';
 
@@ -126,6 +129,56 @@ class EditionEdit extends Component {
         }
     }
 
+    prepareChangeLevel(done) {
+        if (this.stage.newLevelConfirm && this.stage.newLevel) {
+            API.post('/editions/changelevel', {
+                originallevel : this.props.level,
+                newlevel : this.stage.newLevel,
+                _ids : this.props.editions.map(x => x._id)
+            }, (err, json, r) => {
+                if (json) {
+                    if (json.changed) {
+                        castNotification({
+                            title : 'Level changed', 
+                            message : "No conflict were found, so the level was automatically changed.",
+                            type : 'success'
+                        });
+
+                        this.props.onLevelChange(this.stage.newLevel);
+
+                        done();
+                    } else {
+                        castNotification({
+                            title : 'Conflicts found', 
+                            message : "Multiple edition combinations using the selected editions are assigned to multiple articles. Please review them before switching level.",
+                            type : 'info'
+                        });
+
+                        done();
+                        castOverlay('conflict-level', {
+                            groups : json.groups,
+                            editions : this.props.all,
+                            originallevel : this.props.level,
+                            newlevel : this.stage.newLevel,
+                            _ids : this.props.editions.map(x => x._id)
+                        });
+                    }
+
+                    this.setState({ modal_changeLevel : false });
+                    this.stage = {};
+                }
+            });
+        } else {
+            castNotification({
+                title : 'Change level', 
+                message : "You need to select a new level and confirm that you understand the risks.",
+                type : 'warning'
+            });
+
+            done();
+        }
+    }
+
     duplicateSingle(done) {
         API.post('/editions/duplicate/' + this.props.editions[0]._id, {}, (err, json, r) => {
             if (json && json._id) {
@@ -212,13 +265,13 @@ class EditionEdit extends Component {
                             <ButtonWorker sync theme="red" type="outline" text="Delete edition" work={() => this.setState({ modal_deleteEdition : true })} />
                             <ButtonWorker sync theme="white" type="outline" text="Duplicate edition" work={() => this.duplicateSingle()} />
                             <ButtonWorker sync theme="white" type="outline" text="Merge languages" work={() => this.setState({ modal_mergeLanguage : true })} />
-                            <ButtonWorker sync theme="white" type="outline" text="Change level" />
+                            <ButtonWorker sync theme="white" type="outline" text="Change level" work={() => this.setState({ modal_changeLevel : true })} />
                         </div>
                     ) : (
                         <div>
                             <h3>Manage multiple editions</h3>
                             <ButtonWorker sync theme="red" type="outline" text="Delete editions"  work={() => this.setState({ modal_deleteEdition : true })} />
-                            <ButtonWorker sync theme="white" type="outline" text="Change level" />
+                            <ButtonWorker sync theme="white" type="outline" text="Change level" work={() => this.setState({ modal_changeLevel : true })} />
                         </div>
                     ) }
                 </div>
@@ -241,12 +294,42 @@ class EditionEdit extends Component {
 
                     <ButtonWorker theme="red" type="fill" text="Delete edition" work={this.deleteEdition.bind(this)} />
                 </Modal>
+
+                <Modal title="Change level" visible={this.state.modal_changeLevel} onClose={() => this.setState({ modal_changeLevel : false })}>
+                    <h3>Warning</h3>
+
+                    <p>
+                        Updating an edition level is a fairly complicated task that requires a lot of manual input. 
+                        Since changing the level of an edition affects <b>all articles</b> using the edition, 
+                        it is recommended to create a new edition and reassign old articles instead.
+                    </p>
+
+                    <p>
+                        All articles assigned with the selected edition(s) will be updated, and <b>URLs will be modified</b>. 
+                        This will cause all URL specific features such as <b>Facebook shares</b> to be reset. 
+                    </p>
+
+                    <SelectField options={
+                        this.props.allLevels.filter((x, i) => i != this.props.level).map((lvl, i) => ({
+                            value : lvl.level, displayname : lvl.displayname
+                        }))
+                    } name="change-level-select" onChange={(name, value) => { this.stage.newLevel = value }} />
+
+                    <CheckboxField placeholder="I understand the risks" onChange={(name, value) => this.stage.newLevelConfirm = value} />
+                    <ButtonWorker type="outline" theme="blue" text="Change level" work={this.prepareChangeLevel.bind(this)} />
+                </Modal>
             </div>
         );
     }
 }
 
 export default class EditionPage extends Component {
+    static componentDidRegister() {
+        registerOverlay('conflict-level', ConflictOverlay, {
+            title : 'Resolve conflicts'
+        });
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -304,6 +387,15 @@ export default class EditionPage extends Component {
         });
     }
 
+    onLevelChange(level) {
+        API.get('/editions/all', {}, (err, data) => this.setState({
+            levels : data.levels,
+            sections : data.sections,
+            selectedEditions : [],
+            selectedLevel : parseInt(level)
+        }));
+    }
+
     render() {
         if (this.state.loading) {
             return (<Spinner centered />)
@@ -339,12 +431,16 @@ export default class EditionPage extends Component {
                         <EditionEdit 
                             onDelete={this.onDelete.bind(this)}
                             onDup={this.onDup.bind(this)}
+                            onLevelChange={this.onLevelChange.bind(this)}
 
+                            all={this.state.levels}
                             level={this.state.selectedLevel} 
+                            allLevels={this.state.sections}
                             languages={this.state.languages} 
                             theme={this.state.theme} 
                             editions={this.state.selectedEditions} 
                             allEditions={this.state.levels[this.state.selectedLevel].editions} /> 
+
                     ) }
                 </div>
             </div>
