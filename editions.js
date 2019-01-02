@@ -27,6 +27,10 @@ function fieldToRef(field, value) {
 
 class EditionController {
     adminPOST(cli) {
+        if (!cli.hasRight('manage-editions')) {
+            return cli.refuse();
+        }
+
         const act = cli.routeinfo.path[2];
 
         if (act == "merge") {
@@ -73,6 +77,33 @@ class EditionController {
                     });
                 }
             }, { _id : 0 });
+        } else if (act == "changelevel") {
+            const ids = cli.postdata.data._ids.map(x => db.mongoID(x));
+            if (cli.routeinfo.path[3] == "commit") {
+                // Get all update rules
+                // Update editions in database
+                // Go through all articles using rules
+                // Callback
+            } else {
+                // Find all articles with current ids at current level
+                // Send all combinations to change to client
+                // Wait for update rules
+                db.aggregate(cli._c, 'content', [
+                    { $match : { ["editions." + cli.postdata.data.originallevel] : { $in : ids } } },
+                    { $group : { _id : "$editions", count : { $sum : 1 } } },
+                    { $sort : { count : -1 } }
+                ], groups => {
+                    if (groups.length == 0) {
+                        db.update(cli._c, 'editions', { _id : { $in : ids } }, {
+                            level : parseInt(cli.postdata.data.newlevel)
+                        }, () => {
+                            cli.sendJSON({ changed : true })
+                        });
+                    } else {
+                        cli.sendJSON({ groups, changed : false });
+                    }
+                });
+            }
         } else if (act == "automergesimilar") {
             db.aggregate(cli._c, 'editions', [ 
                 { $match : { active : true } },
