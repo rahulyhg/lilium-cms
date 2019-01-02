@@ -55,11 +55,51 @@ class EditionEdit extends Component {
     makeThemeField(field, editions) {
         const FieldClass = this.fieldClassFromType(field.type);
 
-        return (<FieldClass name={field.name} placeholder={field.displayname} {...field.props} />);
+        const initValue = editions.every(
+            x => x.lang[this.state.language][field.name] == editions[0].lang[this.state.language][field.name]
+        ) ? editions[0].lang[this.state.language][field.name] : MULTIPLE_VALUE_STRING;
+
+        return (<FieldClass 
+            onChange={this.editionFieldChanged.bind(this)} 
+            initialValue={initValue || ""} 
+            name={field.name} 
+            placeholder={field.displayname} 
+            {...field.props} 
+        />);
     }
 
     changeLanguage(language) {
         this.setState({ language });
+    }
+
+    editionFieldChanged(name, value) {
+        if (!value.includes(MULTIPLE_VALUE_STRING)) {
+            value = value._id || value;
+            const payload = {
+                ids : this.props.editions.map(x => x._id),
+
+                name, value 
+            };
+
+            const url = `/editions/editionfield/${this.state.language}`;
+            API.put(url, payload, (err, json, r) => {
+                this.props.editions.forEach(ed => ed.lang[this.state.language][name] = value);
+                log('Edition', 'Saved field ' + name + ' of ' + this.props.editions.length + ' editions with language ' + this.state.language, 'success');
+            });
+        }
+    }
+
+    nativeFieldChanged(name, value) {
+        value = value._id || value;
+        const payload = {
+            name, value 
+        };
+
+        const url = `/editions/nativefield/${this.props.editions[0]._id}/${this.state.language}`;
+        API.put(url, payload, (err, json, r) => {
+            this.props.editions[0].lang[this.state.language][name] = value;
+            log('Edition', 'Saved field ' + name + ' of edition ' + this.props.editions[0]._id + ' with language ' + this.state.language, 'success');
+        });
     }
 
     render() {
@@ -73,11 +113,11 @@ class EditionEdit extends Component {
                 { this.props.editions.length == 1 ? (
                     <div class="card">
                         <h3>Native settings</h3>
-                        <TextField placeholder="Display name" name="displayname" initialValue={this.props.editions[0].displayname} />
-                        <TextField placeholder="URL slug" name="slug" initialValue={this.props.editions[0].slug} />
-                        <TextEditor placeholder="Description" name="description" content={this.props.editions[0].description || ""} />
-                        <MediaPickerField placeholder="Icon" name="icon" initialValue={this.props.icon} size="small" />
-                        <MediaPickerField placeholder="Featured image" name="featuredimage" initialValue={this.props.featuredimage} />
+                        <TextField onChange={this.nativeFieldChanged.bind(this)} placeholder="Display name" name="displayname" initialValue={this.props.editions[0].lang[this.state.language].displayname} />
+                        <TextField onChange={this.nativeFieldChanged.bind(this)} placeholder="URL slug" name="slug" initialValue={this.props.editions[0].lang[this.state.language].slug} />
+                        <TextEditor onChange={this.nativeFieldChanged.bind(this)} placeholder="Description" name="description" content={this.props.editions[0].lang[this.state.language].description || ""} />
+                        <MediaPickerField onChange={this.nativeFieldChanged.bind(this)} placeholder="Icon" name="icon" initialValue={this.props.editions[0].lang[this.state.language].icon} size="small" />
+                        <MediaPickerField onChange={this.nativeFieldChanged.bind(this)} placeholder="Featured image" name="featuredimage" initialValue={this.props.editions[0].lang[this.state.language].featuredimage} />
                     </div>
                 ) : (
                     <div class="card">
