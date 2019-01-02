@@ -1,11 +1,16 @@
 import { h, Component } from 'preact';
-import { TextField, ButtonWorker, MediaPickerField } from '../../widgets/form';
+import { TextField, ButtonWorker, MediaPickerField, SelectField } from '../../widgets/form';
 import { TextEditor } from '../../widgets/texteditor';
 import { Spinner } from '../../layout/loading';
+import Modal from '../../widgets/modal';
 
 import API from '../../data/api';
 
 const MULTIPLE_VALUE_STRING = "[Multiple values]";
+const DEFAULT_LANGUAGES = [
+    { code : "en", displayname : "English" },
+    { code : "fr", displayname : "Français" }
+];
 
 const EditionSectionDropDown = props => props.open ? (
     <div class="section-picker-open">
@@ -44,8 +49,10 @@ class EditionEdit extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            language : "en"
+            language : props.languages[0].code 
         };
+
+        this.stage = {};
     }
 
     fieldClassFromType(type) {
@@ -84,7 +91,7 @@ class EditionEdit extends Component {
             const url = `/editions/editionfield/${this.state.language}`;
             API.put(url, payload, (err, json, r) => {
                 this.props.editions.forEach(ed => ed.lang[this.state.language][name] = value);
-                log('Edition', 'Saved field ' + name + ' of ' + this.props.editions.length + ' editions with language ' + this.state.language, 'success');
+                log('Edition', 'Saved edition field ' + name + ' of ' + this.props.editions.length + ' editions with language ' + this.state.language, 'success');
             });
         }
     }
@@ -98,16 +105,35 @@ class EditionEdit extends Component {
         const url = `/editions/nativefield/${this.props.editions[0]._id}/${this.state.language}`;
         API.put(url, payload, (err, json, r) => {
             this.props.editions[0].lang[this.state.language][name] = value;
-            log('Edition', 'Saved field ' + name + ' of edition ' + this.props.editions[0]._id + ' with language ' + this.state.language, 'success');
+            log('Edition', 'Saved native field ' + name + ' of edition ' + this.props.editions[0]._id + ' with language ' + this.state.language, 'success');
         });
+    }
+
+    mergeLanguages(done) {
+        const { mergeInto, mergeFrom } = this.stage;
+
+        if (mergeInto && mergeFrom) {
+            this.stage = {};
+            this.props.editions[0].lang[mergeInto] = {...this.props.editions[0].lang[mergeFrom]};
+
+            API.put('/editions/mergelanguages/' + this.props.editions[0]._id, { mergeInto, mergeFrom }, () => {
+                this.setState({ modal_mergeLanguage : false });
+                done();
+            });
+        } else {
+            done();
+        }
     }
 
     render() {
         return (
             <div class="manage-editions">
                 <div class="edition-language-picker">
-                    <div onClick={this.changeLanguage.bind(this, 'en')} class={"edition-lang-pick " + (this.state.language == "en" ? "selected" : "")}>English</div>
-                    <div onClick={this.changeLanguage.bind(this, 'fr')} class={"edition-lang-pick " + (this.state.language == "fr" ? "selected" : "")}>Français</div>
+                    { this.props.languages.map(lang => (
+                        <div onClick={this.changeLanguage.bind(this, lang.code)} class={"edition-lang-pick " + (this.state.language == lang.code ? "selected" : "")}>
+                            {lang.displayname}
+                        </div>
+                    )) }
                 </div>
 
                 { this.props.editions.length == 1 ? (
@@ -122,7 +148,7 @@ class EditionEdit extends Component {
                 ) : (
                     <div class="card">
                         <h3>Native settings</h3>
-                        <p>Native fields of multiple editions cannot be edited at the same time.</p>
+                        <p>Multiple native fields cannot be edited at the same time.</p>
                     </div>
                 ) }
 
@@ -140,18 +166,28 @@ class EditionEdit extends Component {
                         <div>
                             <h3>Manage edition</h3>
                             <ButtonWorker theme="red" type="outline" text="Delete edition" />
-                            <ButtonWorker theme="white" type="outline" text="Duplicate edition" />
-                            <ButtonWorker theme="white" type="outline" text="Change level" />
+                            <ButtonWorker sync theme="white" type="outline" text="Duplicate edition" />
+                            <ButtonWorker sync theme="white" type="outline" text="Merge languages" work={() => this.setState({ modal_mergeLanguage : true })} />
+                            <ButtonWorker sync theme="white" type="outline" text="Change level" />
                         </div>
                     ) : (
                         <div>
                             <h3>Manage multiple editions</h3>
                             <ButtonWorker theme="red" type="outline" text="Delete editions" />
-                            <ButtonWorker theme="white" type="outline" text="Merge editions" />
-                            <ButtonWorker theme="white" type="outline" text="Change level" />
+                            <ButtonWorker sync theme="white" type="outline" text="Merge editions" />
+                            <ButtonWorker sync theme="white" type="outline" text="Change level" />
                         </div>
                     ) }
                 </div>
+
+                <Modal title="Merge languages" visible={this.state.modal_mergeLanguage} onClose={ () => this.setState({ modal_mergeLanguage : false }) }>
+                    <p>Merge language </p>
+                    <SelectField initialValue={this.state.language} name="merge-language-from" options={this.props.languages.map(x => ({ displayname : x.displayname, value : x.code }))} onChange={(name, value) => this.stage.mergeFrom = value} />
+                    <p>into</p>
+                    <SelectField name="merge-language-into" options={this.props.languages.map(x => ({ displayname : x.displayname, value : x.code }))} onChange={(name, value) => this.stage.mergeInto = value} />
+                    
+                    <ButtonWorker theme="blue" type="fill" text="Merge" work={this.mergeLanguages.bind(this)}  />
+                </Modal>
             </div>
         );
     }
@@ -174,6 +210,7 @@ export default class EditionPage extends Component {
 
                 levels : data.levels, 
                 sections : data.sections, 
+                languages : [...DEFAULT_LANGUAGES],
                 selectedLevel : 0, 
                 loading : false 
             }));
@@ -226,7 +263,7 @@ export default class EditionPage extends Component {
                             </div>
                         </div>
                     ) : (
-                        <EditionEdit theme={this.state.theme} editions={this.state.selectedEditions} /> 
+                        <EditionEdit languages={this.state.languages} theme={this.state.theme} editions={this.state.selectedEditions} /> 
                     ) }
                 </div>
             </div>
