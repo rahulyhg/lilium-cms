@@ -126,6 +126,22 @@ class EditionEdit extends Component {
         }
     }
 
+    duplicateSingle(done) {
+        API.post('/editions/duplicate/' + this.props.editions[0]._id, {}, (err, json, r) => {
+            if (json && json._id) {
+                castNotification({
+                    title : "Edition duplicated",
+                    message : "The edition was successfully duplicated, and is now selected.",
+                    type : 'success'
+                });
+
+                this.props.onDup(json && json._id);
+            } else {
+
+            }
+        });
+    }
+
     deleteEdition(done) {
         const { deleteReplaceWith } = this.stage;
 
@@ -194,7 +210,7 @@ class EditionEdit extends Component {
                         <div>
                             <h3>Manage edition</h3>
                             <ButtonWorker sync theme="red" type="outline" text="Delete edition" work={() => this.setState({ modal_deleteEdition : true })} />
-                            <ButtonWorker sync theme="white" type="outline" text="Duplicate edition" />
+                            <ButtonWorker sync theme="white" type="outline" text="Duplicate edition" work={() => this.duplicateSingle()} />
                             <ButtonWorker sync theme="white" type="outline" text="Merge languages" work={() => this.setState({ modal_mergeLanguage : true })} />
                             <ButtonWorker sync theme="white" type="outline" text="Change level" />
                         </div>
@@ -276,6 +292,18 @@ export default class EditionPage extends Component {
         }));
     }
 
+    onDup(newid) {
+        API.get('/editions/all', {}, (err, data) => {
+            const newed = data.levels[this.state.selectedLevel].editions.find(x => x._id == newid)
+            newed.selected = true;
+            this.setState({
+                levels : data.levels,
+                sections : data.sections,
+                selectedEditions : [newed]
+            });
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return (<Spinner centered />)
@@ -310,6 +338,7 @@ export default class EditionPage extends Component {
                     ) : (
                         <EditionEdit 
                             onDelete={this.onDelete.bind(this)}
+                            onDup={this.onDup.bind(this)}
 
                             level={this.state.selectedLevel} 
                             languages={this.state.languages} 
