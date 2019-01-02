@@ -138,6 +138,7 @@ class EditionEdit extends Component {
                 this.props.editions[0].removed = true;
                 this.setState({ modal_deleteEdition : false });
                 done();
+                this.props.onDelete();
 
                 if (json && json.nModified) {
                     castNotification({
@@ -201,7 +202,6 @@ class EditionEdit extends Component {
                         <div>
                             <h3>Manage multiple editions</h3>
                             <ButtonWorker sync theme="red" type="outline" text="Delete editions"  work={() => this.setState({ modal_deleteEdition : true })} />
-                            <ButtonWorker sync theme="white" type="outline" text="Merge editions" />
                             <ButtonWorker sync theme="white" type="outline" text="Change level" />
                         </div>
                     ) }
@@ -268,6 +268,14 @@ export default class EditionPage extends Component {
         this.setState({ selectedLevel, draweropen : false, selectedEditions : [] })
     }
 
+    onDelete() {
+        API.get('/editions/all', {}, (err, data) => this.setState({
+            levels : data.levels,
+            sections : data.sections,
+            selectedEditions : []
+        }));
+    }
+
     render() {
         if (this.state.loading) {
             return (<Spinner centered />)
@@ -300,7 +308,14 @@ export default class EditionPage extends Component {
                             </div>
                         </div>
                     ) : (
-                        <EditionEdit level={this.state.selectedLevel} languages={this.state.languages} theme={this.state.theme} editions={this.state.selectedEditions} allEditions={this.state.levels[this.state.selectedLevel].editions} /> 
+                        <EditionEdit 
+                            onDelete={this.onDelete.bind(this)}
+
+                            level={this.state.selectedLevel} 
+                            languages={this.state.languages} 
+                            theme={this.state.theme} 
+                            editions={this.state.selectedEditions} 
+                            allEditions={this.state.levels[this.state.selectedLevel].editions} /> 
                     ) }
                 </div>
             </div>
