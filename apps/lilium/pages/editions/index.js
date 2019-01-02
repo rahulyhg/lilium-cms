@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { TextField, ButtonWorker, MediaPickerField, SelectField } from '../../widgets/form';
 import { TextEditor } from '../../widgets/texteditor';
 import { Spinner } from '../../layout/loading';
+import { castNotification } from '../../layout/notifications';
 import Modal from '../../widgets/modal';
 
 import API from '../../data/api';
@@ -125,6 +126,32 @@ class EditionEdit extends Component {
         }
     }
 
+    deleteEdition(done) {
+        const { deleteReplaceWith } = this.stage;
+
+        if (deleteReplaceWith) {
+            this.stage = {};
+
+            API.delete('/editions/replacewith/' + deleteReplaceWith, {
+                toDelete : this.props.editions.map(x => x._id)
+            }, (err, json, r) => {
+                this.props.editions[0].removed = true;
+                this.setState({ modal_deleteEdition : false });
+                done();
+
+                if (json && json.nModified) {
+                    castNotification({
+                        title : "Edition removed",
+                        message : json.nModified + " articles were edited and will use a new edition instead of this one.",
+                        type : 'success'
+                    });
+                }
+            });
+        } else {
+            done();
+        }
+    }
+
     render() {
         return (
             <div class="manage-editions">
@@ -165,7 +192,7 @@ class EditionEdit extends Component {
                     { this.props.editions.length == 1 ? (
                         <div>
                             <h3>Manage edition</h3>
-                            <ButtonWorker theme="red" type="outline" text="Delete edition" />
+                            <ButtonWorker sync theme="red" type="outline" text="Delete edition" work={() => this.setState({ modal_deleteEdition : true })} />
                             <ButtonWorker sync theme="white" type="outline" text="Duplicate edition" />
                             <ButtonWorker sync theme="white" type="outline" text="Merge languages" work={() => this.setState({ modal_mergeLanguage : true })} />
                             <ButtonWorker sync theme="white" type="outline" text="Change level" />
@@ -173,7 +200,7 @@ class EditionEdit extends Component {
                     ) : (
                         <div>
                             <h3>Manage multiple editions</h3>
-                            <ButtonWorker theme="red" type="outline" text="Delete editions" />
+                            <ButtonWorker sync theme="red" type="outline" text="Delete editions"  work={() => this.setState({ modal_deleteEdition : true })} />
                             <ButtonWorker sync theme="white" type="outline" text="Merge editions" />
                             <ButtonWorker sync theme="white" type="outline" text="Change level" />
                         </div>
@@ -187,6 +214,16 @@ class EditionEdit extends Component {
                     <SelectField name="merge-language-into" options={this.props.languages.map(x => ({ displayname : x.displayname, value : x.code }))} onChange={(name, value) => this.stage.mergeInto = value} />
                     
                     <ButtonWorker theme="blue" type="fill" text="Merge" work={this.mergeLanguages.bind(this)}  />
+                </Modal>
+
+                <Modal title="Delete edition" visible={this.state.modal_deleteEdition} onClose={ () => this.setState({ modal_deleteEdition : false }) }>
+                    <p>Deleting an edition is irreversible, and will require you to select an edition to replace this one in case it was assigned to one or many articles.</p>
+                    <h3>Replace edition with</h3>
+                    <SelectField name="delete-edition-replace" options={
+                        this.props.allEditions.map(x => ({ displayname : x.displayname, value : x._id }))
+                    } onChange={(name, value) => this.stage.deleteReplaceWith = value} />
+
+                    <ButtonWorker theme="red" type="fill" text="Delete edition" work={this.deleteEdition.bind(this)} />
                 </Modal>
             </div>
         );
@@ -263,7 +300,7 @@ export default class EditionPage extends Component {
                             </div>
                         </div>
                     ) : (
-                        <EditionEdit languages={this.state.languages} theme={this.state.theme} editions={this.state.selectedEditions} /> 
+                        <EditionEdit level={this.state.selectedLevel} languages={this.state.languages} theme={this.state.theme} editions={this.state.selectedEditions} allEditions={this.state.levels[this.state.selectedLevel].editions} /> 
                     ) }
                 </div>
             </div>

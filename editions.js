@@ -149,7 +149,35 @@ class EditionController {
     }
 
     adminDELETE(cli) {
-        
+        if (cli.hasRightOrRefuse('manage-editions')) {
+            if (cli.routeinfo.path[2] == "replacewith") {
+                const replaceWith = db.mongoID(cli.routeinfo.path[3]);
+
+                cli.readPostData(payload => {
+                    if (!payload || !payload.toDelete) {
+                        return cli.throwHTTP(400, undefined, true);
+                    }
+
+                    const ids = payload.toDelete.map(x => db.mongoID(x));
+                    db.findUnique(cli._c, 'editions', { _id : ids[0] }, (err, edition) => {
+                        if (!edition) {
+                            return cli.throwHTTP(404, undefined, true);
+                        }
+
+                        const level = edition.level;
+                        db.update(cli._c, 'editions', { _id : { $in : ids } }, { active : false }, () => {
+                            db.update(cli._c, 'content', { ["editions." + level] : { $in : ids } }, {
+                                ["editions." + level] : replaceWith
+                            }, (err, r) => {
+                                err ? cli.throwHTTP(500, err, true) : cli.sendJSON(r);
+                            });
+                        });
+                    });
+                });
+            } else {
+                cli.throwHTTP(404, undefined, true);
+            }
+        }
     }
 
     serveOrFallback(cli, sendback) {
