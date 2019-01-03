@@ -21,8 +21,16 @@ function updatePostsAfterMerge(_c, then, now, done) {
     db.find(_c, 'content', { editions : then._id }, [], (err, cur) => processOnePost(cur));
 }
 
+function fieldToRef(field, value) {
+    return field == "icon" || field == "featuredimage" ? db.mongoID(value) : value;
+}
+
 class EditionController {
     adminPOST(cli) {
+        if (!cli.hasRight('manage-editions')) {
+            return cli.refuse();
+        }
+
         const act = cli.routeinfo.path[2];
 
         if (act == "merge") {
@@ -46,6 +54,107 @@ class EditionController {
                     }
                 });
             });
+        } else if (act == "create") {
+            const { displayname, slug, level } = cli.postdata.data;
+            if (!displayname || !slug) {
+                return cli.throwHTTP(400, undefined, true);
+            }
+    
+            const edition = {
+                displayname, slug, level, 
+                active : true, lang : {}
+            };
+
+            const langconf = {
+                displayname, slug, content : "", 
+                icon : null, featuredimage : null
+            };
+
+            edition.lang.en = edition.lang.fr = langconf;
+
+            db.insert(cli._c, 'editions', edition, () => {
+                cli.sendJSON({ edition });
+            });
+        } else if (act == "section") {
+            const { displayname } = cli.postdata.data;
+
+            if (!displayname) {
+                return cli.throwHTTP(400, undefined, true);
+            }
+    
+            db.aggregate(cli._c, 'sections', [
+                { $sort : { level : -1 } },
+                { $limit : 1 }
+            ], arr => {
+                const level = arr[0].level + 1;
+                const section = { displayname, level };
+                db.insert(cli._c, 'sections', section, () => {
+                    cli.sendJSON({ section })
+                });
+            });
+        } else if (act == "duplicate") {
+            const toDup = db.mongoID(cli.routeinfo.path[3]);
+            db.findUnique(cli._c, 'editions', { _id : toDup }, (err, original) => {
+                if (err) {
+                    cli.throwHTTP(500, err.toString(), true);
+                } else if (!original) {
+                    cli.throwHTTP(404, undefined, true);
+                } else {
+                    original.displayname += " (copy)";
+                    original.slug += "-" + Math.random().toString(16).substring(2);
+
+                    Object.keys(original.lang).forEach(lang => {
+                        original.lang[lang].displayname = original.displayname;
+                        original.lang[lang].slug = original.slug;
+                    });
+
+                    db.insert(cli._c, 'editions', original, (err, r) => {
+                        err ? cli.throwHTTP(500, err, true) : cli.sendJSON({
+                            _id : original._id
+                        });
+                    });
+                }
+            }, { _id : 0 });
+        } else if (act == "changelevel") {
+            const ids = cli.postdata.data._ids.map(x => db.mongoID(x));
+            if (cli.routeinfo.path[3] == "commit") {
+                db.update(cli._c, 'editions', { _id : { $in : ids } }, { level : parseInt(cli.postdata.data.newlevel) }, () => {
+                    let i = -1;
+                    const nextgroup = () => {
+                        const group = cli.postdata.data.groups[++i];
+
+                        if (group) {
+                            db.update(cli._c, 'content', 
+                                { editions : group.ids.map(x => db.mongoID(x)) }, 
+                                { editions : group.newassoc.map(x => db.mongoID(x)) }, 
+                            (err, r) => {
+                                log('Edition', `Updating assigned posts [${i}/${cli.postdata.data.groups.length}]`, 'detail');
+                                setImmediate(() => nextgroup());
+                            });
+                        } else {
+                            cli.sendJSON({ done : 1 });
+                        }
+                    };
+
+                    setImmediate(() => nextgroup());
+                });
+            } else {
+                db.aggregate(cli._c, 'content', [
+                    { $match : { ["editions." + cli.postdata.data.originallevel] : { $in : ids } } },
+                    { $group : { _id : "$editions", count : { $sum : 1 } } },
+                    { $sort : { count : -1 } }
+                ], groups => {
+                    if (groups.length == 0) {
+                        db.update(cli._c, 'editions', { _id : { $in : ids } }, {
+                            level : parseInt(cli.postdata.data.newlevel)
+                        }, () => {
+                            cli.sendJSON({ changed : true })
+                        });
+                    } else {
+                        cli.sendJSON({ groups, changed : false });
+                    }
+                });
+            }
         } else if (act == "automergesimilar") {
             db.aggregate(cli._c, 'editions', [ 
                 { $match : { active : true } },
@@ -94,11 +203,101 @@ class EditionController {
     }
 
     adminPUT(cli) {
+        if (cli.hasRightOrRefuse('manage-editions')) {
+            if (cli.routeinfo.path[2] == "nativefield") {
+                cli.readPostData(payload => {
+                    payload.value = fieldToRef(payload.name, payload.value);
 
+                    const upd = {
+                        [`lang.${cli.routeinfo.path[4]}.${payload.name}`] : payload.value
+                    };
+
+                    if (cli.routeinfo.path[4] == "en" && (payload.name == "displayname" || payload.name == "slug")) {
+                        upd[payload.name] = payload.value;
+                    }
+
+                    db.update(cli._c, 'editions', { _id : db.mongoID(cli.routeinfo.path[3]) }, upd, (err, r) => {
+                        if (err) {
+                            cli.throwHTTP(500, err, true);
+                        } else {
+                            cli.sendJSON(r)
+                        }
+                    });
+                });
+            } else if (cli.routeinfo.path[2] == "section") {
+                const level = parseInt(cli.routeinfo.path[3]);
+                cli.readPostData(payload => {
+                    db.update(cli._c, 'sections', { level }, { displayname : payload.displayname }, () => {
+                        cli.sendJSON({ level, displayname : payload.displayname });
+                    });
+                });
+            } else if (cli.routeinfo.path[2] == "editionfield") {
+                cli.readPostData(payload => {
+                    payload.value = fieldToRef(payload.name, payload.value);
+
+                    const upd = {
+                        [`lang.${cli.routeinfo.path[3]}.${payload.name}`] : payload.value
+                    };
+
+                    db.update(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, upd, (err, r) => {
+                        if (err) {
+                            cli.throwHTTP(500, err, true);
+                        } else {
+                            cli.sendJSON(r)
+                        }
+                    });
+
+                });
+            } else if (cli.routeinfo.path[2] == "mergelanguages") {
+                const _id = db.mongoID(cli.routeinfo.path[3]);
+                db.findUnique(cli._c, 'editions', { _id }, (err, edition) => {
+                    if (!edition) {
+                        return cli.throwHTTP(404, undefined, true);
+                    }
+
+                    cli.readPostData(payload => {
+                        edition.lang[payload.mergeInto] = edition.lang[payload.mergeFrom];
+                        db.update(cli._c, 'editions', { _id }, edition, (err, r) => {
+                            err ? cli.throwHTTP(500, err, true) : cli.sendJSON(r);
+                        });
+                    });
+                });
+            } else {
+                cli.throwHTTP(404, undefined, true);
+            }
+        }
     }
 
     adminDELETE(cli) {
-        
+        if (cli.hasRightOrRefuse('manage-editions')) {
+            if (cli.routeinfo.path[2] == "replacewith") {
+                const replaceWith = db.mongoID(cli.routeinfo.path[3]);
+
+                cli.readPostData(payload => {
+                    if (!payload || !payload.toDelete) {
+                        return cli.throwHTTP(400, undefined, true);
+                    }
+
+                    const ids = payload.toDelete.map(x => db.mongoID(x));
+                    db.findUnique(cli._c, 'editions', { _id : ids[0] }, (err, edition) => {
+                        if (!edition) {
+                            return cli.throwHTTP(404, undefined, true);
+                        }
+
+                        const level = edition.level;
+                        db.update(cli._c, 'editions', { _id : { $in : ids } }, { active : false }, () => {
+                            db.update(cli._c, 'content', { ["editions." + level] : { $in : ids } }, {
+                                ["editions." + level] : replaceWith
+                            }, (err, r) => {
+                                err ? cli.throwHTTP(500, err, true) : cli.sendJSON(r);
+                            });
+                        });
+                    });
+                });
+            } else {
+                cli.throwHTTP(404, undefined, true);
+            }
+        }
     }
 
     serveOrFallback(cli, sendback) {
@@ -135,9 +334,20 @@ class EditionController {
                         "editions._id" : 1,
                         "editions.slug" : 1,
                         "editions.displayname" : 1,
+                        "editions.lang" : 1
                     } },
                     { $sort : { level : 1 } }
                 ], levels => {
+                    if (levels.length != sections.length) {
+                        for (let i = levels.length; i < sections.length; i++) {
+                            levels.push({
+                                section : sections[i],
+                                level : i,
+                                editions : []
+                            })
+                        }
+                    }
+
                     done({ levels, sections });
                 });
             });
@@ -148,29 +358,3 @@ class EditionController {
 }
 
 module.exports = new EditionController();
-
-/*
- * A section has multiple editions, a name, and a lebel index
- * An article has an array of editions
- *
- * Section {
- *   _id : ObjectId,
- *   index : Number, index 0
- *   displayname : {
- *     lang_code : String, 
- *     ...
- *   }
- * }
- *
- * Edition {
- *   _id : ObjectId,
- *   displayname : {
- *     lang_code : String,
- *     ...
- *   },
- *   slug : {
- *     lang_code : String
- *   }
- * }
- *
- */
