@@ -54,6 +54,29 @@ class EditionController {
                     }
                 });
             });
+        } else if (act == "create") {
+            const { displayname, slug, level } = cli.postdata.data;
+            if (!displayname || !slug) {
+                return cli.throwHTTP(400, undefined, true);
+            }
+    
+            const edition = {
+                displayname, slug, level, 
+                active : true, lang : {}
+            };
+
+            const langconf = {
+                displayname, slug, content : "", 
+                icon : null, featuredimage : null
+            };
+
+            edition.lang.en = edition.lang.fr = langconf;
+
+            db.insert(cli._c, 'editions', edition, () => {
+                cli.sendJSON({ edition });
+            });
+        } else if (act == "section") {
+
         } else if (act == "duplicate") {
             const toDup = db.mongoID(cli.routeinfo.path[3]);
             db.findUnique(cli._c, 'editions', { _id : toDup }, (err, original) => {

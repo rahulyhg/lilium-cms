@@ -339,6 +339,8 @@ export default class EditionPage extends Component {
             draweropen : false,
             selectedEditions : []
         };
+
+        this.stage = {};
     }
 
     componentDidMount() {
@@ -398,6 +400,30 @@ export default class EditionPage extends Component {
         }));
     }
 
+    createEdition(done) {
+        const { displayname, slug } = this.stage;
+        if (displayname && slug) {
+            API.post('/editions/create', { displayname, slug, level : this.state.selectedLevel }, (err, json, r) => {
+                if (json && json.edition) {
+                    const levels = this.state.levels;
+                    levels[this.state.selectedLevel].editions.push(json.edition);
+                    this.setState({ levels, selectedEditions : [json.edition], modal_createEdition : false });
+
+                    done();
+                } else {
+                    castNotification({
+                        type : 'error', 
+                        title : 'Could not create edition'
+                    });                    
+
+                    done();
+                }
+            });
+        } else {
+            done();
+        }
+    }
+
     render() {
         if (this.state.loading) {
             return (<Spinner centered />)
@@ -427,6 +453,10 @@ export default class EditionPage extends Component {
                                 <i class="fal fa-books"></i>
                                 <h3>Edition manager</h3>
                                 <p>Use the sidebar to select editions.</p>
+                                <div>
+                                    <ButtonWorker sync={true} work={() => this.setState({ modal_createEdition : true })} text="Create edition" />
+                                    <ButtonWorker sync={true} work={() => this.setState({ modal_renameLevel : true })} text="Rename level" />
+                                </div>
                             </div>
                         </div>
                     ) : (
@@ -442,9 +472,16 @@ export default class EditionPage extends Component {
                             theme={this.state.theme} 
                             editions={this.state.selectedEditions} 
                             allEditions={this.state.levels[this.state.selectedLevel].editions} /> 
-
                     ) }
                 </div>
+
+                <Modal visible={this.state.modal_createEdition} title="Create edition" onClose={() => this.setState({ modal_createEdition : false })}>
+                    <TextField placeholder="Display name" onChange={(_, value) => this.stage.displayname = value} />
+                    <TextField placeholder="URL slug" onChange={(_, value) => this.stage.slug = value} />
+
+                    <p>The new edition will be created under <b>level {this.state.selectedLevel+1}</b>.</p>
+                    <ButtonWorker theme="blue" type="outline" text="Create edition" work={this.createEdition.bind(this)} />
+                </Modal>
             </div>
         );
     }
