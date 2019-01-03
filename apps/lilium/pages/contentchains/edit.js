@@ -1,7 +1,8 @@
 import { Component, h } from "preact";
 import API from "../../data/api";
-import { castNotification } from '../../layout/notifications'
+import { castNotification } from '../../layout/notifications';
 import { TextField, ButtonWorker } from "../../widgets/form";
+import { EditionPicker } from '../../widgets/editionpicker';
 import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
 import { Picker } from "../../layout/picker";
@@ -57,17 +58,20 @@ export class EditContentChain extends Component {
     }
 
     updateValues(name, val) {
-        this.state.chain[name] = val;
+        const chain = {...this.state.chain}
+        chain[name] = val;
 
         const payload = {};
         payload[name] = val;
-        API.post('/chains/edit/' + this.state.chain._id, payload, (err, data, r) => {
+        API.post('/chains/edit/' + chain._id, payload, (err, data, r) => {
             if (r.status == 200) {
                 castNotification({
                     title: 'Modifications saved',
                     message: 'Your modifications to the content chain were saved',
                     type: 'success'
-                })
+                });
+
+                this.setState({ chain });
             } else {
                 castNotification({
                     title: 'Error while saving content chain data on the server',
@@ -129,9 +133,9 @@ export class EditContentChain extends Component {
             return (
                 <div id="content-chain-edit">
                     <h1>Edit Content Chain</h1>
-                    <TextField name='title' placeholder='title' initialValue={this.state.chain.title} onChange={this.updateValues.bind(this)} />
-                    <TextField name='subtitle' placeholder='subtitle' initialValue={this.state.chain.subtitle} onChange={this.updateValues.bind(this)} />
-                    <TextEditor name='presentation' placeholder='presentation' content={this.state.chain.presentation} onChange={this.updateValues.bind(this)} />
+                    <TextField name='title' placeholder='Headline' initialValue={this.state.chain.title} onChange={this.updateValues.bind(this)} />
+                    <TextField name='subtitle' placeholder='Subtitle' initialValue={this.state.chain.subtitle} onChange={this.updateValues.bind(this)} />
+                    <TextEditor name='presentation' placeholder='Presentation' content={this.state.chain.presentation} onChange={this.updateValues.bind(this)} />
 
                     <h4>Featured Image</h4>
                     <div className="content-chain-featured-image-picker" onClick={this.chooseFeaturedImage.bind(this)} title='Choose a featured image'>
@@ -146,6 +150,12 @@ export class EditContentChain extends Component {
 
                     <h4>Select articles for the content chain</h4>
                     <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
+
+                    <h4>Select an edition for this series</h4>
+                    <div class="card publishing-card nopad">
+                        <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.edition || []} value={this.state.chain.edition} name="edition" />
+                    </div>
+
                     <hr />
                     {
                         this.state.chain.status == 'draft' ? (

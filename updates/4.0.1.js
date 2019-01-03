@@ -46,7 +46,7 @@ let maximumLevel = 0;
 const handleTopicCursor = (_c, col, cur, done) => {
     cur.next((err, topic) => {
         if (!topic) {
-            const sects = new Array(maximumLevel).fill(0).map((x, i) => ({ displayname : "Level " + i, level : i }));
+            const sects = new Array(maximumLevel).fill(0).map((x, i) => ({ displayname : "Level " + (i+1), level : i }));
 
             return db.insert(_c, 'sections', sects, () => {
                 done();
@@ -65,7 +65,13 @@ const handleTopicCursor = (_c, col, cur, done) => {
             lang : {
                 en : {
                     displayname : topic.displayname,
-                    slug : topic.slug
+                    slug : topic.slug,
+                    description : topic.description || ""
+                },
+                fr : {
+                    displayname : topic.displayname,
+                    slug : topic.slug,
+                    description : topic.description || ""
                 }
             },
             level : topic.family.length - 1

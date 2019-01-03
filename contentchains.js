@@ -12,6 +12,7 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     createdBy : 1,
     createdOn : 1,
     lastModified : 1,
+    edition : 1,
     media: { $arrayElemAt: ['$media', 0] },
     
     'articles._id': 1,
@@ -56,7 +57,8 @@ class ContentChains {
             createdOn : new Date(),
             lastModified : new Date(),
             media: undefined,
-            articles : []
+            edition : [],
+            serie : []
         }, data);
     }
 
@@ -82,6 +84,14 @@ class ContentChains {
             delete data.date;
         }
 
+        if (data.edition) {
+            data.edition = data.edition.map(x => db.mongoID(x));
+        }
+
+        if (data.serie) {
+            data.serie = data.serie.map(x => db.mongoID(x));
+        }
+
         db.update(_c, 'contentchains', {_id : db.mongoID(id)}, data, (err) => {
             callback && callback(err);
         });
@@ -103,7 +113,7 @@ class ContentChains {
                     from : "editions",
                     as : "alleditions",
                     foreignField : "_id",
-                    localField : "editions"
+                    localField : "edition"
                 }
             }, {
                 $lookup : {
