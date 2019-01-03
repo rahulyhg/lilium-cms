@@ -113,6 +113,7 @@ export class EditStyledPage extends Component {
 
                     <TextField name='title' autosave={false} placeholder='Title' initialValue={this.state.styledPage.title} onChange={this.updateValues.bind(this)} />
                     <TextField name='slug' autosave={false} placeholder='URL Slug' initialValue={this.state.styledPage.slug} onChange={this.updateValues.bind(this)} />
+                    <TextField name='description' autosave={false} placeholder='Description' initialValue={this.state.styledPage.description} onChange={this.updateValues.bind(this)} />
                     <SelectField name='status' options={EditStyledPage.visibilityOptions} autosave={false} placeholder='Visibility' initialValue={this.state.styledPage.status}
                                 onChange={this.updateValues.bind(this)} />
                     <TextEditor name='content' autosave={false} placeholder='Presentation' content={this.state.styledPage.content} onChange={this.updateValues.bind(this)} />
