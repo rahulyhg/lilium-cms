@@ -76,7 +76,22 @@ class EditionController {
                 cli.sendJSON({ edition });
             });
         } else if (act == "section") {
+            const { displayname } = cli.postdata.data;
 
+            if (!displayname) {
+                return cli.throwHTTP(400, undefined, true);
+            }
+    
+            db.aggregate(cli._c, 'sections', [
+                { $sort : { level : -1 } },
+                { $limit : 1 }
+            ], arr => {
+                const level = arr[0].level + 1;
+                const section = { displayname, level };
+                db.insert(cli._c, 'sections', section, () => {
+                    cli.sendJSON({ section })
+                });
+            });
         } else if (act == "duplicate") {
             const toDup = db.mongoID(cli.routeinfo.path[3]);
             db.findUnique(cli._c, 'editions', { _id : toDup }, (err, original) => {
@@ -316,6 +331,16 @@ class EditionController {
                     } },
                     { $sort : { level : 1 } }
                 ], levels => {
+                    if (levels.length != sections.length) {
+                        for (let i = levels.length; i < sections.length; i++) {
+                            levels.push({
+                                section : sections[i],
+                                level : i,
+                                editions : []
+                            })
+                        }
+                    }
+
                     done({ levels, sections });
                 });
             });

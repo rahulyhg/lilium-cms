@@ -405,6 +405,7 @@ export default class EditionPage extends Component {
         if (displayname && slug) {
             API.post('/editions/create', { displayname, slug, level : this.state.selectedLevel }, (err, json, r) => {
                 if (json && json.edition) {
+                    json.edition.selected = true;
                     const levels = this.state.levels;
                     levels[this.state.selectedLevel].editions.push(json.edition);
                     this.setState({ levels, selectedEditions : [json.edition], modal_createEdition : false });
@@ -418,6 +419,24 @@ export default class EditionPage extends Component {
 
                     done();
                 }
+            });
+        } else {
+            done();
+        }
+    }
+
+    createLevel(done) {
+        const { displayname } = this.stage;
+        if (displayname) {
+            API.post('/editions/section', { displayname }, (err, json, r) => {
+                API.get('/editions/all', {}, (err, data) => this.setState({
+                    levels : data.levels,
+                    sections : data.sections,
+                    selectedEditions : [],
+                    modal_createLevel : false
+                }));
+
+                done();
             });
         } else {
             done();
@@ -456,6 +475,7 @@ export default class EditionPage extends Component {
                                 <div>
                                     <ButtonWorker sync={true} work={() => this.setState({ modal_createEdition : true })} text="Create edition" />
                                     <ButtonWorker sync={true} work={() => this.setState({ modal_renameLevel : true })} text="Rename level" />
+                                    <ButtonWorker sync={true} work={() => this.setState({ modal_createLevel : true })} text="Add level" />
                                 </div>
                             </div>
                         </div>
@@ -481,6 +501,13 @@ export default class EditionPage extends Component {
 
                     <p>The new edition will be created under <b>level {this.state.selectedLevel+1}</b>.</p>
                     <ButtonWorker theme="blue" type="outline" text="Create edition" work={this.createEdition.bind(this)} />
+                </Modal>
+
+                <Modal visible={this.state.modal_createLevel} title="Add Level" onClose={() => this.setState({ modal_createLevel : false })}>
+                    <TextField placeholder="Display name" onChange={(_, value) => this.stage.displayname = value} />
+
+                    <p>The new level will be created at position <b>{this.state.levels.length + 1}</b>.</p>
+                    <ButtonWorker theme="blue" type="outline" text="Add level" work={this.createLevel.bind(this)} />
                 </Modal>
             </div>
         );
