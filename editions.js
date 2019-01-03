@@ -224,6 +224,13 @@ class EditionController {
                         }
                     });
                 });
+            } else if (cli.routeinfo.path[2] == "section") {
+                const level = parseInt(cli.routeinfo.path[3]);
+                cli.readPostData(payload => {
+                    db.update(cli._c, 'sections', { level }, { displayname : payload.displayname }, () => {
+                        cli.sendJSON({ level, displayname : payload.displayname });
+                    });
+                });
             } else if (cli.routeinfo.path[2] == "editionfield") {
                 cli.readPostData(payload => {
                     payload.value = fieldToRef(payload.name, payload.value);

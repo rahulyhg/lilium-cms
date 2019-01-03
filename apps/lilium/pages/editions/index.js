@@ -443,6 +443,25 @@ export default class EditionPage extends Component {
         }
     }
 
+    renameLevel(done) {
+        const { displayname } = this.stage;
+        if (displayname) {
+            API.put('/editions/section/' + this.state.selectedLevel, { displayname }, (err, json, r) => {
+                const levels = this.state.levels;
+                const sections = this.state.sections;
+
+                levels[this.state.selectedLevel].section.displayname = displayname;
+                sections[this.state.selectedLevel].displayname = displayname;
+
+                this.setState({ levels, sections, modal_renameLevel : false });
+
+                done();
+            });
+        } else {
+            done();
+        }
+    }
+
     render() {
         if (this.state.loading) {
             return (<Spinner centered />)
@@ -508,6 +527,11 @@ export default class EditionPage extends Component {
 
                     <p>The new level will be created at position <b>{this.state.levels.length + 1}</b>.</p>
                     <ButtonWorker theme="blue" type="outline" text="Add level" work={this.createLevel.bind(this)} />
+                </Modal>
+
+                <Modal visible={this.state.modal_renameLevel} title="Rename Level" onClose={() => this.setState({ modal_renameLevel : false })}>
+                    <TextField initialValue={this.state.sections[this.state.selectedLevel].displayname} placeholder="Display name" onChange={(_, value) => this.stage.displayname = value} />
+                    <ButtonWorker theme="blue" type="outline" text="Rename level" work={this.renameLevel.bind(this)} />
                 </Modal>
             </div>
         );
