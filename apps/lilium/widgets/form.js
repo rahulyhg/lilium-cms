@@ -485,6 +485,17 @@ export class MediaPickerField extends FormField {
         }
     }
 
+    componentWillReceiveProps(props) {
+        if (props.mediaID || props.initialValue) {
+            const mediaID = props.mediaID || props.initialValue;
+            mediaID != this.state.mediaID && API.get("/uploads/single/" + mediaID, {}, (err, upload) => {
+                upload && this.setState({ mediaID, mediaURL : this.extractImageFromResponse(upload) })
+            });
+        } else if (this.state.mediaID && !props.mediaID && !props.initialValue) {
+            this.setState({ mediaID : undefined, mediaURL : undefined });
+        }
+    }
+
     componentDidMount() {
         if (this.state.mediaID && !this.state.mediaURL) {
             API.get("/uploads/single/" + this.state.mediaID, {}, (err, upload) => {

@@ -12,6 +12,16 @@ module.exports = class V4DevServer {
         const Webpack = require('webpack');
         const WebpackDevServer = require('webpack-dev-server');
 
+        const pagesDir = require('fs').readdirSync(require('path').join(_c.server.base, 'apps', 'lilium', 'pages'));
+        const pagesChunk = {};
+        pagesDir.filter(x => !x.includes('.')).forEach(dir => {
+            pagesChunk[dir] = {
+                name : "page." + dir,
+                test : new RegExp('pages/' + dir),
+                chunks : 'all'
+            };
+        });
+
         const buildconfig = {
             mode : "development",
             module : {
@@ -25,6 +35,7 @@ module.exports = class V4DevServer {
                                 "plugins": [
                                     ["transform-react-jsx", { "pragma":"h" }],
                                     ["transform-class-properties"],
+                                    ["@babel/plugin-syntax-dynamic-import"],
                                     ["@babel/plugin-proposal-object-rest-spread", {
                                         useBuildIns : true
                                     }],
@@ -47,20 +58,21 @@ module.exports = class V4DevServer {
                 splitChunks: {
                     cacheGroups: {
                         vendor: {
-                            test: /[\\/]node_modules[\\/]/,
+                            test: new RegExp("\/node_modules\/"),
                             name: 'vendors',
                             chunks: 'all'
                         },
                         pages : {
-                            test: /[\\/]pages[\\/]/,
+                            test: new RegExp("\/pages\/"),
                             name: 'pages',
                             chunks : 'initial'
                         },
                         layout : {
-                            test: /[\\/]layout[\\/]/,
+                            test: new RegExp("\/layout\/"),
                             name: 'layout',
                             chunks : 'initial'
-                        }
+                        },
+                        // ...pagesChunk
                     }
                 }
             }
