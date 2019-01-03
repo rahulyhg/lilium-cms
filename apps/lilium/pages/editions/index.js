@@ -160,7 +160,9 @@ class EditionEdit extends Component {
                             editions : this.props.all,
                             originallevel : this.props.level,
                             newlevel : this.stage.newLevel,
-                            _ids : this.props.editions.map(x => x._id)
+                            _ids : this.props.editions.map(x => x._id),
+
+                            onFinished : this.props.onLevelChange.bind(this, this.stage.newLevel)
                         });
                     }
 

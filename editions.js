@@ -83,7 +83,26 @@ class EditionController {
                 // Get all update rules
                 // Update editions in database
                 // Go through all articles using rules
-                // Callback
+                db.update(cli._c, 'editions', { _id : { $in : ids } }, { level : parseInt(cli.postdata.data.newlevel) }, () => {
+                    let i = -1;
+                    const nextgroup = () => {
+                        const group = cli.postdata.data.groups[++i];
+
+                        if (group) {
+                            db.update(cli._c, 'content', 
+                                { editions : group.ids.map(x => db.mongoID(x)) }, 
+                                { editions : group.newassoc.map(x => db.mongoID(x)) }, 
+                            (err, r) => {
+                                log('Edition', `Updating assigned posts [${i}/${cli.postdata.data.groups.length}]`, 'detail');
+                                setImmediate(() => nextgroup());
+                            });
+                        } else {
+                            cli.sendJSON({ done : 1 });
+                        }
+                    };
+
+                    setImmediate(() => nextgroup());
+                });
             } else {
                 // Find all articles with current ids at current level
                 // Send all combinations to change to client
