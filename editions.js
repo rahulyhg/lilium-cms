@@ -80,9 +80,6 @@ class EditionController {
         } else if (act == "changelevel") {
             const ids = cli.postdata.data._ids.map(x => db.mongoID(x));
             if (cli.routeinfo.path[3] == "commit") {
-                // Get all update rules
-                // Update editions in database
-                // Go through all articles using rules
                 db.update(cli._c, 'editions', { _id : { $in : ids } }, { level : parseInt(cli.postdata.data.newlevel) }, () => {
                     let i = -1;
                     const nextgroup = () => {
@@ -104,9 +101,6 @@ class EditionController {
                     setImmediate(() => nextgroup());
                 });
             } else {
-                // Find all articles with current ids at current level
-                // Send all combinations to change to client
-                // Wait for update rules
                 db.aggregate(cli._c, 'content', [
                     { $match : { ["editions." + cli.postdata.data.originallevel] : { $in : ids } } },
                     { $group : { _id : "$editions", count : { $sum : 1 } } },
@@ -176,9 +170,15 @@ class EditionController {
                 cli.readPostData(payload => {
                     payload.value = fieldToRef(payload.name, payload.value);
 
-                    db.update(cli._c, 'editions', { _id : db.mongoID(cli.routeinfo.path[3]) }, {
+                    const upd = {
                         [`lang.${cli.routeinfo.path[4]}.${payload.name}`] : payload.value
-                    }, (err, r) => {
+                    };
+
+                    if (cli.routeinfo.path[4] == "en" && (payload.name == "displayname" || payload.name == "slug")) {
+                        upd[payload.name] = payload.value;
+                    }
+
+                    db.update(cli._c, 'editions', { _id : db.mongoID(cli.routeinfo.path[3]) }, upd, (err, r) => {
                         if (err) {
                             cli.throwHTTP(500, err, true);
                         } else {
@@ -190,9 +190,11 @@ class EditionController {
                 cli.readPostData(payload => {
                     payload.value = fieldToRef(payload.name, payload.value);
 
-                    db.update(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, {
+                    const upd = {
                         [`lang.${cli.routeinfo.path[3]}.${payload.name}`] : payload.value
-                    }, (err, r) => {
+                    };
+
+                    db.update(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, upd, (err, r) => {
                         if (err) {
                             cli.throwHTTP(500, err, true);
                         } else {
@@ -301,29 +303,3 @@ class EditionController {
 }
 
 module.exports = new EditionController();
-
-/*
- * A section has multiple editions, a name, and a lebel index
- * An article has an array of editions
- *
- * Section {
- *   _id : ObjectId,
- *   index : Number, index 0
- *   displayname : {
- *     lang_code : String, 
- *     ...
- *   }
- * }
- *
- * Edition {
- *   _id : ObjectId,
- *   displayname : {
- *     lang_code : String,
- *     ...
- *   },
- *   slug : {
- *     lang_code : String
- *   }
- * }
- *
- */
