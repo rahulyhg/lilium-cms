@@ -30,7 +30,7 @@ class CreditCardManager {
         const isCurrencyDefault = !!isDefault;
         const newCC = { number, expiryMonth, expiryYear, cvc, currency, isCurrencyDefault };
         const iv = new Buffer.from(crypto.randomBytes(16));
-        
+
         const info = this.getCCIssuerInfo(number.substring(0, 6));
         if (info) {
             newCC.scheme = info.scheme;
@@ -40,10 +40,20 @@ class CreditCardManager {
         this.ENCRYPTEDFIELDS.forEach(fieldName => {
             newCC[fieldName] = this.aesEncryptor.encryptAES(newCC[fieldName], iv);
         });
-        
+
         newCC.iv = iv;
 
-        db.insert(_c.default(), ccCol, newCC, done);
+        if (isCurrencyDefault) {
+            this.resetCurrencyDefaults((err, r) => {
+                if (!err) {
+                    db.insert(_c.default(), ccCol, newCC, done);
+                } else {
+                    done && done(err);
+                }
+            })
+        } else {
+            db.insert(_c.default(), ccCol, newCC, done);
+        }
     }
 
     updateCreditCard(id, ops, done) {
@@ -52,18 +62,44 @@ class CreditCardManager {
         if (toCipher.length) {
             db.findUnique(_c.default(), ccCol, { _id: db.mongoID(id) }, (err, card) => {
                 if (!err && card) {
-                    toCipher.forEach(fieldName => {
-                        ops[fieldName] = this.aesEncryptor.encryptAES(ops[fieldName], card.iv.buffer);
-                    });
-                    
-                    delete ops._id;
-                    db.update(_c.default(), ccCol, { _id: db.mongoID(id) }, ops, done);
+                    const cipherUpdate = () => {
+                        toCipher.forEach(fieldName => {
+                            ops[fieldName] = this.aesEncryptor.encryptAES(ops[fieldName], card.iv.buffer);
+                        });
+    
+                        delete ops._id;
+    
+                        db.update(_c.default(), ccCol, { _id: db.mongoID(id) }, ops, done);
+                    }
+
+                    if (ops.isCurrencyDefault) {
+                        this.resetCurrencyDefaults(card.currency, err => {
+                            if (err) return done && done(err);
+                            cipherUpdate()
+                        });
+                    } else {
+                        cipherUpdate();
+                    }
                 } else {
                     done && done(err);
                 }
             });
         } else {
             db.update(_c.default(), ccCol, { _id: db.mongoID(id) }, ops, done);
+        }
+    }
+
+    /**
+     * Explicitly sets the 'isCurrencyDefault' property for all the cards of the specified currency.
+     * @param {object} currency The currency for which to reset the defaults
+     */
+    resetCurrencyDefaults(currency, done) {
+        if (currency) {
+            db.update(_c.default(), ccCol, { currency }, { isCurrencyDefault: false }, (err, r) => {
+                done && done(err, r);
+            });
+        } else {
+            done && done('Cannot reset isCurrencyDefault property for am undefined currency');
         }
     }
 
