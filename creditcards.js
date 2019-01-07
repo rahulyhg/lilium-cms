@@ -14,22 +14,23 @@ class CreditCardManager {
 
     getCreditCards(done) {
         db.findToArray(_c.default(), ccCol, {}, (err, data) => {
-            const deciphered = [];
             data.forEach(card => {
                 this.ENCRYPTEDFIELDS.forEach(fieldName => {
                     card[fieldName] = this.aesEncryptor.decryptAES(card[fieldName], card.iv.buffer);
                 });
 
                 card.iv = undefined;
-                deciphered.push(card);
             });
 
+            console.log(data);;
+            
             done && done(err, data);
         });
     }
 
-    createCreditCard(number, expiryMonth, expiryYear, cvc, currency, done) {
-        const newCC = { number, expiryMonth, expiryYear, cvc, currency };
+    createCreditCard(number, expiryMonth, expiryYear, cvc, currency, isDefault, done) {
+        const isCurrencyDefault = !!isDefault;
+        const newCC = { number, expiryMonth, expiryYear, cvc, currency, isCurrencyDefault };
         const iv = new Buffer.from(crypto.randomBytes(16));
         
         const info = this.getCCIssuerInfo(number.substring(0, 6));
