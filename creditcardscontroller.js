@@ -22,8 +22,6 @@ class CreditCardController {
         if (cli.hasRightOrRefuse('manage-cc')) {
             if (cli.routeinfo.path[2]) {
                 cli.readPostData(data => {
-                    console.log(data);
-                    
                     this.ccManager.updateCreditCard(cli.routeinfo.path[2], data, (err, r) => {                        
                         log('CreditCardController', `User ${cli.userinfo.user} modified a credit card with _id ${cli.routeinfo.path[2]}`, 'warn');
                         cli.sendJSON({ ok: !err, err });                        

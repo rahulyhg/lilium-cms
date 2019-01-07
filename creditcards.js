@@ -22,8 +22,6 @@ class CreditCardManager {
                 card.iv = undefined;
             });
 
-            console.log(data);;
-            
             done && done(err, data);
         });
     }

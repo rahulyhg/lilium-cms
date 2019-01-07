@@ -46,9 +46,6 @@ export class CreditCardEdit extends Component {
 
             done && done();
         }
-
-        console.log(this.errors);;
-        
     }
 
     fieldEdited(name, val, old, valid) {
@@ -72,8 +69,6 @@ export class CreditCardEdit extends Component {
     }
 
     render(props, state) {
-        console.log(state);
-        
         if (state.cc || state.inserting) {
             return (
                 <div id="credit-card-edit">
