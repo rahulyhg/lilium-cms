@@ -7,4 +7,4 @@ const deptree = dependencyTree({
     nonExistent: [] 
 });
 
-console.log(deptree);
+console.log(JSON.stringify(deptree, undefined, 4));
