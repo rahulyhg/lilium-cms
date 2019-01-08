@@ -103,6 +103,20 @@ class CreditCardManager {
         }
     }
 
+    /**
+     * Returns the default credit card for the given currency, if any. If non is found, returns undefined
+     * @param {string} currency The currency for which to get the default card
+     * @param {callback} done Executed when the database request completes
+     */
+    getDefaultCardByCurrency(currency, done) {
+        this.getCreditCards((err, cards) => {
+            const cur = currency.toUpperCase();
+            const defaultCard = cards.find(c => c.isCurrencyDefault && c.currency == cur);
+
+            done && done(defaultCard);
+        });
+    }
+
     deleteCreditCard(id, done) {
         db.remove(_c.default(), ccCol, { _id: db.mongoID(id) }, done);
     }
