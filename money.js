@@ -93,8 +93,6 @@ module.exports = class Money {
                                 invoice.error = err;
                                 invoice.valid = !err;
         
-                                console.log(stripeinvoice);
-                                
                                 if (stripeinvoice) {
                                     invoice.stripeid = stripeinvoice.id;
                                     invoice.transactionid = stripeinvoice.balance_transaction;
