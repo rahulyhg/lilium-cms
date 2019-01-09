@@ -39,7 +39,20 @@ mongo liliumdefault --quiet --eval "db.createUser({user: 'liliumdefault', pwd: '
 echo "Inserting default roles"
 defaultroles=`cat includes/defaultroles.json`
 roleinsertquery="db.roles.insertMany(${defaultroles})"
+defaultuser=`cat includes/defaultuser.json`
+userinsertquery="db.entities.insert(${defaultuser})"
 mongo liliumdefault --quiet --eval "db.roles.remove({})"
 mongo liliumdefault --quiet --eval "${roleinsertquery}"
+mongo liliumdefault --quiet --eval "db.entities.remove({})"
+mongo liliumdefault --quiet --eval "${userinsertquery}"
+
+echo "All done!"
+echo 
+echo "You can execute : npm run start"
+echo "Lilium dashboard is located at localhost:8080"
+echo 
+echo "Default username : lilium"
+echo "Default password : lilium"
+echo 
 
 exit 0
