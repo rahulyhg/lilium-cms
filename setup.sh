@@ -16,7 +16,7 @@ mkdir sites
 mkdir flowers
 mkdir plugins
 
-echo "Input theme github repo : "
+echo "Input / Paste theme github repo URL : "
 read themeurl
 
 echo "Cloning ${themeurl} in theme directory"
@@ -39,14 +39,31 @@ mongo liliumdefault --quiet --eval "db.createUser({user: 'liliumdefault', pwd: '
 echo "Inserting default roles"
 defaultroles=`cat includes/defaultroles.json`
 roleinsertquery="db.roles.insertMany(${defaultroles})"
-defaultuser=`cat includes/defaultuser.json`
-userinsertquery="db.entities.insert(${defaultuser})"
 mongo liliumdefault --quiet --eval "db.roles.remove({})"
 mongo liliumdefault --quiet --eval "${roleinsertquery}"
+
+echo "Inserting default user lilium"
+defaultuser=`cat includes/defaultuser.json`
+userinsertquery="db.entities.insert(${defaultuser})"
 mongo liliumdefault --quiet --eval "db.entities.remove({})"
 mongo liliumdefault --quiet --eval "${userinsertquery}"
 
-echo "All done!"
+echo "Inserting default edition Uncategorized"
+defaultedition=`cat includes/defaultedition.json`
+editioninsertquery="db.editions.insert(${defaultedition})"
+mongo liliumdefault --quiet --eval "db.editions.remove({})"
+mongo liliumdefault --quiet --eval "${editioninsertquery}"
+
+echo "Inserting default section Category"
+defaultsection=`cat includes/defaultsection.json`
+sectioninsertquery="db.sections.insert(${defaultsection})"
+mongo liliumdefault --quiet --eval "db.sections.remove({})"
+mongo liliumdefault --quiet --eval "${sectioninsertquery}"
+
+echo "Running tests"
+npm run test
+
+echo "  READY TO RUN  "
 echo 
 echo "You can execute : npm run start"
 echo "Lilium dashboard is located at localhost:8080"
