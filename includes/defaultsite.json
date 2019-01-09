@@ -1,0 +1,203 @@
+{
+    "env": "dev",
+    "allowAnonymousPOST": true,
+    "caij" : true,
+    "info": {
+        "project": "My Lilium CMS website",
+        "version": "4.0.1",
+        "author": "You"
+    },
+    "emails": {
+        "senderemail": "",
+        "senderpass": "",
+        "senderfrom": ""
+    },
+    "data": {
+        "host": "localhost",
+        "port": "27017",
+        "user": "liliumdefault",
+        "pass": "liliumdefault",
+        "use":  "liliumdefault"
+    },
+    "paths": {
+        "admin": "admin",
+        "login": "login",
+        "livevars": "livevars",
+        "themes": "flowers",
+        "mail": "mail",
+        "themesInfo": "info.json",
+        "plugins": "plugins",
+        "pluginsInfo": "info.json",
+        "uploads": "uploads"
+    },
+    "server": {
+        "base": "",
+        "html": "",
+        "protocol": "",
+        "url": "//localhost:8080",
+        "port": "8080",
+        "postMaxLength": "1024",
+        "fileMaxSize": "3000000000"
+    },
+    "signature": {
+        "publichash": "300da60969c40d4491da8cb9341b9bce9aa29da88d457de8aa3ce24576bd899e",
+        "privatehash": "8067de5b0c3efd797325110ce7110f216f66a4df1d7759aa4d2fd9d2a52e4580"
+    },
+    "beta": {
+        "test": true,
+        "text": "Hello, Test World!"
+    },
+    "usability": {
+        "admin": {
+            "loginIfNotAuth": true
+        },
+        "home": {
+            "keepInRAM": false
+        }
+    },
+    "stripe": {
+        "publickey": "",
+        "secretkey": ""
+    },
+    "sendgrid": {
+        "apikey": ""
+    },
+    "MIMES": {
+        "": "text/html",
+        ".html": "text/html",
+        ".htm": "text/html",
+        ".css": "text/css",
+        ".js": "text/javascript",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".bmp": "image/bmp",
+        ".gif": "image/gif",
+        ".swf": "application/x-shockwave-flash",
+        ".lml": "application/x-lilium-markup",
+        ".xml": "text/xml; charset=utf-8"
+    },
+    "supported_pictures": [
+        ".jpg",
+        ".jpeg",
+        ".bmp",
+        ".png",
+        ".gif"
+    ],
+    "website": {
+        "sitetitle": "Lilium Test",
+        "language": "en-ca"
+    },
+    "login": {
+        "wallpaper": ""
+    },
+    "admin": {
+        "csspath": "static/admin.css",
+        "jspath": "static/admin.js"
+    },
+    "vendor": {
+        "productname": "Lilium CMS",
+        "version": "4.0.1 EARLY",
+        "infourl": "http://liliumcms.com/info"
+    },
+    "id": "localhost:8080",
+    "uid": "026364313312884136",
+    "jsonfile": "default.json",
+    "default": true,
+    "google": {
+        "apikey": "",
+        "clientid": "",
+        "clientsecret": "",
+        "redirecturl": "",
+        "accesstoken": "",
+        "refreshtoken": "",
+        "jsonfilepath": ""
+    },
+    "dfp": {
+        "client_id": "",
+        "client_secret": "",
+        "redirect_url": "",
+        "scope": "",
+        "code": "",
+        "access_token": "",
+        "refresh_token": "",
+        "version": "",
+        "network_code": "",
+        "app_name": "",
+        "fan": ""
+    },
+    "social": {
+        "facebook": {
+            "appid": "1468563456738953",
+            "token": "1806603152960458|jovEhXIwgp5xmr6syjUrRa8cG-0",
+            "apiversion": "2.6"
+        },
+        "accounts": {
+            "facebook": "",
+            "twitter": "",
+            "googleplus": "",
+            "instagram": "",
+            "youtube": ""
+        }
+    },
+    "posts": {
+        "backend": {
+            "dateformat": ""
+        }
+    },
+    "timezoneplacedisplay": "Montreal, QC, Canada",
+    "timezoneplace": "-73.567256_45.5016889",
+    "chartbeat": {
+        "api_key": "",
+        "configuid": "57714",
+        "host": "narcity.com",
+        "section": ""
+    },
+    "adserver": {
+        "publicaddr": "",
+        "privateaddr": "",
+        "bridgeaddr": "",
+        "keyone": "",
+        "keytwo": ""
+    },
+    "timezone": "America/Toronto",
+    "wptransferring": false,
+    "wordpress": {
+        "originalurl": "https://liliumtest.com",
+        "wpuploadslocaldir": ""
+    },
+    "wptransfer": true,
+    "compilekey": "lml04121243325566248406554054000331222",
+    "contentadsnip": [],
+    "lickstatscombos": [],
+    "dfp-incontentprop": [],
+    "taxes": [],
+    "content": {
+        "adsperp": "",
+        "cdn": {
+            "domain": "",
+            "company": "",
+            "key": "",
+            "secret": ""
+        }
+    },
+    "analytics": {
+        "serviceaccount": "",
+        "jsonkeypath": "",
+        "siteviewid": ""
+    },
+    "network": {
+        "proxy": {
+            "listento": 9090,
+            "speakto": 8080
+        },
+        "localcast": {
+            "port": 5514
+        },
+        "loaded": true,
+        "familysize": 2,
+        "cacheport": 17209,
+        "realtimeport": 17210,
+        "useUDS": true
+    }
+}
