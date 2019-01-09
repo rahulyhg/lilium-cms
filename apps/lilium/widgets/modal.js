@@ -35,7 +35,7 @@ export default class Modal extends Component {
     
     handleKeyUp(ev) {
         if (ev.which == 27 || ev.keyCode == 27) {
-            this.close();
+            this.props.onClose ? this.props.onClose() : this.close();
         }
     }
 
