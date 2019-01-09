@@ -33,32 +33,35 @@ cp includes/defaultsite.json sites/default.json
 
 echo "Creating development database"
 mongo liliumdefault --quiet --eval 'db.dropDatabase();'
-mongo liliumdefault --quiet --eval "db.dropUser('liliumtest');"
+mongo liliumdefault --quiet --eval "db.dropUser('liliumdefault');"
 mongo liliumdefault --quiet --eval "db.createUser({user: 'liliumdefault', pwd: 'liliumdefault', roles: ['readWrite']});"
 
 echo "Inserting default roles"
 defaultroles=`cat includes/defaultroles.json`
 roleinsertquery="db.roles.insertMany(${defaultroles})"
 mongo liliumdefault --quiet --eval "db.roles.remove({})"
-mongo liliumdefault --quiet --eval "${roleinsertquery}"
+mongo liliumdefault --eval "${roleinsertquery}"
 
 echo "Inserting default user lilium"
 defaultuser=`cat includes/defaultuser.json`
 userinsertquery="db.entities.insert(${defaultuser})"
 mongo liliumdefault --quiet --eval "db.entities.remove({})"
-mongo liliumdefault --quiet --eval "${userinsertquery}"
+mongo liliumdefault --eval "${userinsertquery}"
 
 echo "Inserting default edition Uncategorized"
 defaultedition=`cat includes/defaultedition.json`
 editioninsertquery="db.editions.insert(${defaultedition})"
 mongo liliumdefault --quiet --eval "db.editions.remove({})"
-mongo liliumdefault --quiet --eval "${editioninsertquery}"
+mongo liliumdefault --eval "${editioninsertquery}"
 
 echo "Inserting default section Category"
 defaultsection=`cat includes/defaultsection.json`
 sectioninsertquery="db.sections.insert(${defaultsection})"
 mongo liliumdefault --quiet --eval "db.sections.remove({})"
-mongo liliumdefault --quiet --eval "${sectioninsertquery}"
+mongo liliumdefault --eval "${sectioninsertquery}"
+
+echo "Setting current version to 4.0.1"
+mongo liliumdefault --eval 'db.lilium.insert({ "v" : "4.0.1" })';
 
 echo "Running tests"
 npm run test
