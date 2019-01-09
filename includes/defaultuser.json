@@ -1,0 +1,43 @@
+{
+	"username" : "lilium",
+	"shhh" : "94b0e5af2818df258cc6afb86383586e68f071fd36ff780096b13a7a47d8e275",
+	"email" : "youremail@liliumcms.com",
+	"roles" : [
+		"admin",
+		"developer",
+		"author",
+		"lilium"
+	],
+	"jobtitle" : null,
+	"displayname" : "Lilium Admin",
+	"avatarURL" : "/static/media/lmllogo.png",
+	"preferences" : {
+		
+	},
+	"slug" : "lilium-admin",
+	"socialnetworks" : {
+		"facebook" : "",
+		"twitter" : "",
+		"googleplus" : "",
+		"instagram" : ""
+	},
+	"data" : {
+		
+	},
+	"description" : "Lilium Administrator",
+	"sites" : [
+		"localhost:8080"
+	],
+	"firstname" : "Lilium",
+	"lastname" : "Admin",
+	"phone" : "000-000-0000",
+	"welcomed" : true,
+	"totalLogin" : 1,
+	"revoked" : false,
+	"personality" : "",
+	"avatarMini" : "/static/media/lmllogo.png",
+	"reportsto" : "",
+	"mustupdatepassword" : true,
+	"temprevoke" : false
+}
+
