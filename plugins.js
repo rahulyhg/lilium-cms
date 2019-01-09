@@ -116,8 +116,8 @@ class Plugins {
                 }
 
                 try {
-                    var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
-                    var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
+                    var plugindir = require('path').join(liliumroot, "plugins", info.dirName, info.entry);
+                    var pluginInstance = require(plugindir);
 
                     RegisteredPlugins[identifier] = pluginInstance;
 
