@@ -46,7 +46,7 @@ class ContractorHandler {
                     return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/admin/stripeerror");
                 }
 
-                db.update(require(liliumroot + "/config").default(), 'entities', { 
+                db.update(require(liliumroot + "/config").default(), 'entities', {
                     _id : userid 
                 }, { 
                     stripecode : code,
@@ -237,7 +237,7 @@ class ContractorHandler {
                 
                 if (params.filters.number) {
                     const number = parseInt(params.filters.number);
-                    
+
                     conds.push({$match: {
                         $or: [
                             { number: number },

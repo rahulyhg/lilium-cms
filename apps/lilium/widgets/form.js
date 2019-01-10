@@ -819,7 +819,7 @@ export class CheckboxField extends FormField {
     constructor(props) {
         super(props);
 
-        this.value = !!props.initialValue;
+        this.value = !!(props.initialValue || props.value);
         this.state = { checked: this.value };
     }
 
