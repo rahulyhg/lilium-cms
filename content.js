@@ -467,6 +467,12 @@ class ContentLib {
                 return sendback();
             }
 
+            if (post.alleditions) {
+                post.overrides = post.alleditions.reduce((cur, acc) => Object.assign(
+                    cur, acc.lang[post.language || "en"]
+                ), {});
+            }
+
             db.findUnique(config.default(), ENTITY_COLLECTION, { _id : post.author }, (err, author) => {
                 post.fullauthor = author;
                 post.headline = post.title[0];
