@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { TextField, ButtonWorker, MediaPickerField, SelectField, CheckboxField } from '../../widgets/form';
+import { TextField, StackBox, ButtonWorker, MediaPickerField, SelectField, CheckboxField } from '../../widgets/form';
 import { TextEditor } from '../../widgets/texteditor';
 import { Spinner } from '../../layout/loading';
 import { castNotification } from '../../layout/notifications';
@@ -60,7 +60,12 @@ class EditionEdit extends Component {
     }
 
     fieldClassFromType(type) {
-        return TextField;
+        switch (type) {
+            case "text"   : return TextField;
+            case "stack"  : return StackBox;
+            case "select" : return SelectField;
+            case "image"  : return MediaPickerField;
+        }
     }
 
     makeThemeField(field, editions) {
@@ -75,8 +80,7 @@ class EditionEdit extends Component {
             initialValue={initValue || ""} 
             name={field.name} 
             placeholder={field.displayname} 
-            {...field.props} 
-        />);
+            {...field.props} />);
     }
 
     changeLanguage(language) {
@@ -84,7 +88,7 @@ class EditionEdit extends Component {
     }
 
     editionFieldChanged(name, value) {
-        if (!value.includes(MULTIPLE_VALUE_STRING)) {
+        if (!value.includes || !value.includes(MULTIPLE_VALUE_STRING)) {
             value = value._id || value;
             const payload = {
                 ids : this.props.editions.map(x => x._id),

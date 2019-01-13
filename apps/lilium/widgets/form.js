@@ -479,6 +479,10 @@ export class MediaPickerField extends FormField {
     }
 
     extractImageFromResponse(image) {
+        if (!image || image.notfound) {
+            return "";
+        } 
+
         switch (this.state.size) {
             case "small": return image.sizes.square.url;
             default: return image.sizes.facebook.url;
