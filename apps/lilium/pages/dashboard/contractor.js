@@ -83,6 +83,7 @@ class ContractorHistorical extends Component {
                        <div class="" style={{ height: 350, overflowY: 'auto' }}>
                            {
                                this.state.history.map(invoice => (
+                                   
                                    <ContractorHistoricalInvoiceItem invoice={invoice} />
                                ))
                            }
