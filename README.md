@@ -75,15 +75,25 @@ The CMS frontend is located under `/apps/lilium` and is transpiled using Webpack
 
 ### Required dependencies
 **MAC:** 
-`brew install pkg-config cairo libpng jpeg giflib imagemagick`
+`brew install pkg-config cairo libpng jpeg giflib imagemagick redis`
 
 **UBUNTU:**
 `sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick`
 
 The dependencies will be installed automatically during the `npm run setupdev` process. You can however install then manually if you prefer. 
 
+### Localhost connections to MongoDB 
+If mongo still refuses to connect from NodeJS eventhough it works using the terminal cli, you might have to enable or disable authentication from your mongo config file (typically located in `/etc/mongod.conf`, under `security: authentication`). 
+
+This information can be found easily online using search queries such as "Enable MongoDB authentication". 
+
+### MongoDB with `brew`
+On Mac, sometimes the MongoDB service will refuse connections from Lilium for obscure reasons. Our temporary solution it to start a `mongod` instance in a seperate terminal and add the desired parameters including the database path and authentation db. You also get an additional output stream from `mongod`.
+
+There likely is a better solution to make this work with `brew service`, but like mentionned earlier, we don't actively support MacOS nor do we recommend to run Lilium in production on a different OS than Linux. 
+
 ## I want to code, too
-See the [Lilium CMS Wiki](https://github.com/narcitymedia/lilium-cms/wiki) and get started!
+That must mean you're amazing. See the [Lilium CMS Wiki](https://github.com/narcitymedia/lilium-cms/wiki) and get started!
 
 ## Script mode
 It is possible to run a Javascript file in script mode. It will prevent Lilium from loading the listeners, CAIJ and other modules related to networking. The websites and databases will still be loaded on a single thread, and the script passed as an argument will be executed. 
@@ -185,4 +195,4 @@ server {
 This software does not come with a license. 
 
 ## Copyright ##
-© Narcity Media, 2018
+© Narcity Media, 2019
