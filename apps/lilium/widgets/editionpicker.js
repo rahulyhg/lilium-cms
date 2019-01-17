@@ -40,7 +40,7 @@ class EditionLevel extends Component {
     }
 
     searchKeyUp(ev) {
-        if (ev.key == "Enter") {
+        if (ev.key == "Enter" && this.state.editions[0]) {
             this.clickedOn(this.state.editions[0]._id);
         } else {
             const filter = ev.target.value;
