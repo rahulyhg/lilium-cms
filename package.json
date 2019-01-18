@@ -5,6 +5,7 @@
   "main": "index.prod.js",
   "scripts": {
     "test": "cd ./tests && ./runNpm.sh && exit 0",
+    "shell" : "node shell.js",
     "setupdev": "chmod +x ./setup.sh && ./setup.sh",
     "ci": "cd ./tests && ./runCI.sh && exit 0",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.prod.js",
@@ -126,6 +127,7 @@
     "qrcode": "^1.2.0",
     "read-xml": "^3.0.0",
     "readdirp": "latest",
+    "readline-sync": "^1.4.9",
     "redis-server": "latest",
     "simple-encryptor": "latest",
     "slug": "^0.9.2",
