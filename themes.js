@@ -6,7 +6,6 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
-var cli = require('./cli.js');
 var pathLib = require('path');
 
 var ActiveTheme = new Object();

@@ -4,6 +4,7 @@ const db = require('./includes/db.js');
 const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./v4');
 const OS = require('os');
+const ShellServer = require('./cli/server');
 const metrics = require('./metrics');
 
 global.require_template = require('./templaterequire');
@@ -21,6 +22,7 @@ class Core {
         loadEnv();
         bindCrash();
         initMetrics();
+        initShell();
 
         const inbound = require('./inbound.js')
         inbound.createServer(true);
@@ -190,6 +192,13 @@ const loadGlobalPetals = () => {
     Petals.register('adminhead',        _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
     Petals.register('adminsidebar',     _c.default().server.base + 'backend/dynamic/admin/adminsidebar.petal');
     Petals.register('backendsearch',    _c.default().server.base + 'backend/dynamic/admin/backendsearch.petal');
+};
+
+const initShell = () => {
+    if (isElder) {
+        const shellserver = new ShellServer();
+        shellserver.start();
+    }
 };
 
 const loadImageSizes = () => {
