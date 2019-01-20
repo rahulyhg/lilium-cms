@@ -476,6 +476,10 @@ class ContentLib {
             db.findUnique(config.default(), ENTITY_COLLECTION, { _id : post.author }, (err, author) => {
                 post.fullauthor = author;
                 post.headline = post.title[0];
+                if (post.alleditions) {
+                    post.alleditions.sort((a, b) => a.level - b.level);
+                }
+
                 // post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
 
                 hooks.fireSite(_c, 'contentGetFull', {article : post});
@@ -746,7 +750,7 @@ class ContentLib {
                 publishedOn : new Date(),
                 publishedAt : Date.now(),
                 date : new Date(),
-                url : "/" + post.alleditions.map(x => x.slug).join('/') + "/" + post.name
+                url : "/" + post.alleditions.map(x => x.lang[post.language].slug).join('/') + "/" + post.name
             };
 
             db.update(_c, 'content', { _id : post._id }, updated, () => {
@@ -780,8 +784,26 @@ class ContentLib {
                     });
                 });
             });
-
         });
+    }
+
+    refreshURL(_c, fullpost, caller, done) {
+        const url = "/" + fullpost.alleditions.map(x => x.lang[fullpost.language || "en"].slug).join('/') + "/" + fullpost.name;
+        if (fullpost.url != url) {
+            fullpost.aliases = [...(fullpost.aliases || []), fullpost.url];
+            fullpost.url = url;
+
+            db.update(_c, 'content', { _id : fullpost._id }, {
+                url : fullpost.url,
+                aliases : fullpost.aliases
+            }, () => {
+                this.pushHistoryEntryFromDiff(_c, fullpost._id, caller, diff({}, { url, aliases : fullpost.aliases }), 'update', historyentry => {
+                    done(historyentry, { url, aliases : fullpost.aliases });
+                });
+            });
+        } else {
+            done();
+        }
     }
 
     regenerateFromSlug(_c, slug, done) {

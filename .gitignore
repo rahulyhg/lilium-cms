@@ -8,6 +8,7 @@ keys/*
 *.swp
 plugins/*
 flowers/*
+cli/shell.sock
 
 # Less prod file
 apps/lilium/less/_prod*

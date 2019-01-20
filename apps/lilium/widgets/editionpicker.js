@@ -65,7 +65,7 @@ class EditionLevel extends Component {
                     <div class="ep-level-editions">
                         { this.state.editions.length != 0 ? (this.state.editions.map(ed => (
                             <div class={"ep-level-edition " + (this.state.value == ed._id ? "selected" : "")} onClick={this.clickedOn.bind(this, ed._id)}>
-                                {ed.displayname}
+                                {ed.lang[this.props.language].displayname}
                             </div>
                         ))) : (
                             <div class="ep-level-no-edition">
@@ -129,7 +129,7 @@ export class EditionPicker extends Component {
         return (
             <div class="edition-picker" ref={x => (this.el = x)}>
                 { this.state.levels.map((lvl, i) => this.state.value.length >= i ? ( 
-                    <EditionLevel onSelect={this.editionClicked.bind(this)} 
+                    <EditionLevel language={this.props.language} onSelect={this.editionClicked.bind(this)} 
                         editions={lvl.editions} section={lvl.section} value={this.state.value[i]}
                         level={lvl.level} />
                 ) : null )}
