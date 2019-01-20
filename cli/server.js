@@ -42,7 +42,7 @@ class ShellServer {
         });
 
         process.on('exit', () => {
-            this.server && this.server.end();
+            this.server && this.server.close();
         });
     }
 }
