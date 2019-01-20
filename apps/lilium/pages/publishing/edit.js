@@ -406,7 +406,6 @@ class PostDetails extends Component {
     constructor(props) {
         super(props);
 
-        this.state.post = props.post;
         const cachedUsers = {};
         getSession("entities").forEach(x => {
             cachedUsers[x._id] = x;
@@ -414,14 +413,6 @@ class PostDetails extends Component {
         this.cachedUsers = cachedUsers;
 
         this.stage = {};
-    }
-
-    componentWillReceiveProps(props) {
-        if (props.post) {
-            this.setState({
-                post : props.post
-            })
-        }
     }
 
     render() {
@@ -433,32 +424,32 @@ class PostDetails extends Component {
 
                 <div class="detail-list">
                     <div>
-                        Created <b>{getTimeAgo(Date.now() - new Date(this.state.post.createdOn).getTime()).toString()}</b> by <b>{this.cachedUsers[this.state.post.createdBy] ? this.cachedUsers[this.state.post.createdBy].displayname : " an inactive user"}</b>.
+                        Created <b>{getTimeAgo(Date.now() - new Date(this.props.post.createdOn).getTime()).toString()}</b> by <b>{this.cachedUsers[this.props.post.createdBy] ? this.cachedUsers[this.props.post.createdBy].displayname : " an inactive user"}</b>.
                     </div>
-                    { this.state.post.updated ? (
+                    { this.props.post.updated ? (
                         <div>
-                            Updated <b>{getTimeAgo(Date.now() - new Date(this.state.post.updated).getTime()).toString()}</b>.
+                            Updated <b>{getTimeAgo(Date.now() - new Date(this.props.post.updated).getTime()).toString()}</b>.
                         </div>
                     ) : null }
-                    { this.state.post.wordcount ? (
+                    { this.props.post.wordcount ? (
                         <div>
-                            <b>{this.state.post.wordcount} words</b> piece.
+                            <b>{this.props.post.wordcount} words</b> piece.
                         </div>
                     ) : null}
-                    { this.state.post.date && this.state.post.status == "published" ? (
+                    { this.props.post.date && this.props.post.status == "published" ? (
                         <div>
-                            Published <b>{getTimeAgo(Date.now() - new Date(this.state.post.date).getTime()).toString()}</b> by <b>{this.cachedUsers[this.state.post.author] ? this.cachedUsers[this.state.post.author].displayname : " an inactive user"}</b>.
+                            Published <b>{getTimeAgo(Date.now() - new Date(this.props.post.date).getTime()).toString()}</b> by <b>{this.cachedUsers[this.props.post.author] ? this.cachedUsers[this.props.post.author].displayname : " an inactive user"}</b>.
                         </div>
                     ) : null}
-                    { this.state.post.url && this.state.post.status == "published" ? (
+                    { this.props.post.url && this.props.post.status == "published" ? (
                         <div>
-                            URL : <a href={this.state.post.url} target="_blank">{this.state.post.url}</a>
+                            URL : <a href={this.props.post.url} target="_blank">{this.props.post.url}</a>
                         </div>
                     ) : null}
-                    { this.state.post.aliases && this.state.post.aliases.length != 0 ? (
+                    { this.props.post.aliases && this.props.post.aliases.length != 0 ? (
                         <div>
                             <div><b>Alias slugs :</b></div>
-                            {this.state.post.aliases.map(a => (<div>/{a}</div>))}
+                            {this.props.post.aliases.map(a => (<div>{a}</div>))}
                         </div>
                     ) : null}
                 </div>
@@ -761,7 +752,7 @@ export default class EditView extends Component {
 
     commitchanges(done) {
         this.save(() => {
-            refreshPost(this.coldState.post._id, (err, json, r) => {
+            refreshPost(this.coldState.post._id, (err, { historyentry, newstate }, r) => {
                 if (!err) {
                     castNotification({
                         type : "success",
@@ -776,7 +767,14 @@ export default class EditView extends Component {
                     });
                 }
 
-                done && done();
+                if (historyentry && newstate) {
+                    this.setState({
+                        post : {...this.state.post, ...newstate},
+                        history : [historyentry, ...this.state.history],
+                    });
+                } else {
+                    done && done();
+                }
             });
         });
     }
@@ -811,6 +809,10 @@ export default class EditView extends Component {
 
     fieldChanged(name, value) {
         this.edits[name] = value;
+        const post = this.state.post;
+        post[name] = value;
+
+        this.setState({ post });
     }
 
     contentChanged(name, value) {
@@ -835,12 +837,10 @@ export default class EditView extends Component {
         if (image) {
             this.edits.media = image._id;
             this.edits.facebookmedia = image.sizes.facebook.url;
-        }
-    }
+            const post = this.state.post;
+            post.media = image._id;
 
-    topicChanged(name, topic) {
-        if (topic) {
-            this.edits.topic = topic._id;
+            this.setState({ post });
         }
     }
 
@@ -988,8 +988,15 @@ export default class EditView extends Component {
                         <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
 
+                    <div class="card publishing-card">
+                        <SelectField name="language" placeholder="Language" initialValue={this.state.post.language || "en"} value={this.state.post.language || "en"} onChange={this.fieldChanged.bind(this)} options={[
+                            { text : "English", value : "en" },
+                            { text : "Français", value : "fr" }
+                        ]} />
+                    </div>      
+
                     <div class="card publishing-card nopad">
-                        <EditionPicker initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.editionChanged.bind(this)} />
+                        <EditionPicker language={this.state.post.language || "en"} initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.editionChanged.bind(this)} />
                     </div>      
 
                     <div className="card publishing-card" id="seo">
