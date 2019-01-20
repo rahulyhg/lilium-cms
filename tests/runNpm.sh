@@ -1,7 +1,12 @@
 export TEST=true
 
-echo "> Storing old sites, if any, in work directory"
+echo "> Creating old site directory"
 mkdir -p oldsites
+
+echo "> Moving possible old sites in case last test crashed"
+mv oldsites/* ../sites/*
+
+echo "> Storing old sites, if any, in work directory"
 mv ../sites/* oldsites/
 
 echo "> Copying test site config into sites directory"

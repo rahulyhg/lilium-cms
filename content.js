@@ -64,6 +64,7 @@ class ContentLib {
                 hidden : false,
                 updated : new Date(),
                 aliases : [],
+                language : 'en',
                 createdOn : new Date()
             };
 
