@@ -35,7 +35,6 @@ module.exports = class V4DevServer {
                                 "plugins": [
                                     ["transform-react-jsx", { "pragma":"h" }],
                                     ["transform-class-properties"],
-                                    ["@babel/plugin-syntax-dynamic-import"],
                                     ["@babel/plugin-proposal-object-rest-spread", {
                                         useBuildIns : true
                                     }],
@@ -65,7 +64,7 @@ module.exports = class V4DevServer {
                         pages : {
                             test: new RegExp("\/pages\/"),
                             name: 'pages',
-                            chunks : 'initial'
+                            chunks : 'all'
                         },
                         layout : {
                             test: new RegExp("\/layout\/"),

@@ -37,7 +37,7 @@ class CreditCardController {
         if (cli.hasRightOrRefuse('manage-cc')) {
             const data = cli.postdata.data;
             if (data.number && data.expiryMonth && data.expiryYear && data.cvc && data.currency) {
-                this.ccManager.createCreditCard(data.number, data.expiryMonth, data.expiryYear, data.cvc, data.currency, (err, r) => {
+                this.ccManager.createCreditCard(data.number, data.expiryMonth, data.expiryYear, data.cvc, data.currency, !!data.isCurrencyDefault, (err, r) => {
                     log('CreditCardController', `User ${cli.userinfo.user} added a credit card`, 'info');
                     cli.sendJSON({ ok: !err, err, insertedId: r.insertedId });
                 });

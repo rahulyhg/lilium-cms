@@ -32,6 +32,7 @@ export class CreditCard extends Component {
                 numberGroups.push(group);
             }
         }
+
         return (
             <div className="credit-card monospace-font" onClick={props.onClick && props.onClick.bind(this, props._id)}>
                 {

@@ -160,16 +160,18 @@ class ContentController {
                 db.findUnique(cli._c, 'content', { _id }, (err, article) => {
                     if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
                         contentlib.getFull(cli._c, _id, fullpost => {
-                            contentlib.generate(cli._c, fullpost, () => {
-                                contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
-                                cli.sendJSON({ ok : 1 });
+                            contentlib.refreshURL(cli._c, fullpost, db.mongoID(cli.userinfo.userid), (historyentry, newstate) => {
+                                contentlib.generate(cli._c, fullpost, () => {
+                                    contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
+                                    cli.sendJSON({ ok : 1, historyentry, newstate });
 
-                                hooks.fire('article_updated', {
-                                    cli: cli,
-                                    article: article,
-                                    _c : cli._c
-                                });
-                            }, 'all');
+                                    hooks.fire('article_updated', {
+                                        cli: cli,
+                                        article: article,
+                                        _c : cli._c
+                                    });
+                                }, 'all');
+                            });
                         });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');

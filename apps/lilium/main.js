@@ -207,19 +207,21 @@ export class Lilium extends Component {
     }
 
     render() {
-        log('Lilium', 'Rendering Lilium application into DOM', 'lilium');
         // Original state, full screen loading view
         if (this.state.loading) {
+            log('Lilium', 'Rendering Lilium loading overlay', 'lilium');
             return (<LoadingView />);
         }
 
         // Error view incase bootstrapping fails
         if (this.state.error) {
+            log('Lilium', 'Rendering Lilium error overlay', 'lilium');
             return (
-                <div>Error loading Lilium : {this.state.error}</div>
+                <div style={{color:'white'}}>Error loading Lilium : {this.state.error}</div>
             )
         }
 
+        log('Lilium', 'Rendering Lilium application into DOM', 'lilium');
         // Marvelous chaos 
         return (
             <div id="lilium">

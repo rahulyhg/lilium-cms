@@ -6,7 +6,6 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
-var cli = require('./cli.js');
 var pathLib = require('path');
 
 var ActiveTheme = new Object();
@@ -159,7 +158,7 @@ var Themes = function () {
             log('Themes', 'Registering theme with uName ' + uName);
             this.searchDirForThemes(uName, function (info) {
                 if (!info) {
-                    throw new Error("[ThemeException] Could not find any info on theme with uName " + uName);
+                    return callback(new Error("[ThemeException] Could not find any info on theme with uName " + uName));
                 }
 
                 var themedir = config.server.base + config.paths.themes + "/";
@@ -285,23 +284,39 @@ var Themes = function () {
         }
     };
 
-    this.initializeSite = function (conf, cb) {
+    this.initializeSite = function (conf, cb, ignoreSiteTheme) {
         that.getThemesDirList(conf, function (themes) {
             db.findUnique(conf.id, 'themes', {
                 'active': true
             }, (err, theme) => {
-                if (!theme) {
+                if (!theme || ignoreSiteTheme) {
                     log('Theme', 'No theme registered for website ' + conf.website.sitetitle, 'err');
                     log('Theme', 'Trying to fallback to any theme present', 'info');
 
                     const info = themes[0]
                     if (info) {
-                        that.enableTheme(conf, info.uName, () => cb(), {});
+                        that.enableTheme(conf, info.uName, err => {
+                            if (err) {
+                                log('Theme', '[FATAL] Error registering default theme', 'err');
+                                require('./localcast').fatal(err);
+                            } else {
+                                cb()
+                            }
+                        }, {});
                     } else {
                         log('Theme', '[FATAL] No theme found in /flowers directory', 'err');
+                        require('./localcast').fatal(new Error("Lilium requires at least one theme located under /flowers"));
                     }
                 } else {
-                    that.enableTheme(conf, theme.uName, () => cb(), theme.settings);
+                    that.enableTheme(conf, theme.uName, err => {
+                        if (err) {
+                            log('Theme', err.toString(), 'err');
+                            log('Theme', 'Trying to fallback to another theme if any', 'info');
+                            that.initializeSite(conf, cb, true);
+                        } else {
+                            cb();
+                        }
+                    }, theme.settings);
                 }
             });
         });

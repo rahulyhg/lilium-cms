@@ -67,6 +67,7 @@ export class CreditCardsManagement extends Component {
                 const selectedCard = this.state.selectedCard;
                 Object.assign(selectedCard, creditCard);
                 this.setState({ selectedCard });
+                this.resetCurrencyDefault(creditCard.currency, creditCard._id);
                 castNotification({
                     title: 'Credit Card Modified',
                     type: 'success'
@@ -88,6 +89,7 @@ export class CreditCardsManagement extends Component {
                 const creditCards = this.state.creditCards;
                 creditCards.push({ _id: data.insertedId, ...creditCard });
                 this.setState({ creditCards, selectedCard: creditCards[creditCards.length - 1], inserting: false });
+                this.resetCurrencyDefault(creditCard.currency, creditCard._id);
                 castNotification({
                     title: 'Credit Card Created',
                     type: 'success'
@@ -101,6 +103,24 @@ export class CreditCardsManagement extends Component {
 
             done && done();
         });
+    }
+
+    /**
+     * Resets all the isCurrencyDefault fields for the cards of the same currency
+     * as parameter currency.
+     * @param {string} currency The currency for which to reset the defaults
+     * @param {string} excludeId The id of a card to exclude
+     */
+    resetCurrencyDefault(currency, excludeId) {
+        if (currency) {
+            console.log(this.state);
+            
+            const creditCards = this.state.creditCards;
+            creditCards.filter(c => c.currency == currency && c._id != excludeId).forEach(c => c.isCurrencyDefault = false);
+            this.setState({ creditCards });
+
+            console.log(this.state);
+        }
     }
 
     render(props, state) {
