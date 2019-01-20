@@ -771,7 +771,7 @@ export default class EditView extends Component {
                     this.setState({
                         post : {...this.state.post, ...newstate},
                         history : [historyentry, ...this.state.history],
-                    });
+                    }, () => done && done());
                 } else {
                     done && done();
                 }
