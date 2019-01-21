@@ -6,7 +6,6 @@ const log = require('./log.js');
 const Admin = require('./backend/admin.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
-const cli = require('./cli.js');
 const hooks = require('./hooks.js');
 const RegisteredPlugins = new Object();
 
@@ -136,11 +135,9 @@ class Plugins {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
                             try {
                                 pluginInstance.register(_c, info,  () =>{
-                                    cli.cacheClear(undefined, (err) =>{;
-                                        log('Plugins', 'Registered ' + identifier, 'success');
-                                        hooks.fire('pluginregistered', {identifier});
-                                        callback();
-                                    });
+                                    log('Plugins', 'Registered ' + identifier, 'success');
+                                    hooks.fire('pluginregistered', {identifier});
+                                    callback();
                                 });
                             } catch (e) {
                                 log("Plugins", "Error while registering plugin " + identifier + ": " + e.message, 'err');
@@ -171,7 +168,6 @@ class Plugins {
 
                         RegisteredPlugins[identifier] = undefined;
                         delete RegisteredPlugins[identifier];
-                        cli.cacheClear(undefined, callback);
                     });
                 } catch(e) {
                     log('Plugin', e, 'err');
