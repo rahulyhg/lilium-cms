@@ -3,21 +3,19 @@ const log = require('../log');
 
 module.exports = (conf, done) => {
     let next = (cur) => {
-        cur.hasNext((err, hasnext) => {
-            if (hasnext) {
-                cur.next((err, article) => {
-                    article.content = article.content.split("<lml-page></lml-page>");
-                    article.title = new Array(article.content.length).fill(article.title);
-                    article.subtitle = new Array(article.content.length).fill(article.subtitle); 
-
-                    db.update(conf, 'content', {_id : article._id}, {content : article.content, title : article.title, subtitle : article.subtitle}, () => {
-                    log("Update", "Updated article " + article.title, "lilium");
-                        next(cur);
-                    });
-                });
-            } else {
-                done();
+        cur.next((err, article) => {
+            if (!article) {
+                return done();
             }
+
+            article.content = article.content && article.content.split ? article.content.split("<lml-page></lml-page>") : (article.content || []);
+            article.title = new Array(article.content.length).fill(article.title);
+            article.subtitle = new Array(article.content.length).fill(article.subtitle); 
+
+            db.update(conf, 'content', {_id : article._id}, {content : article.content, title : article.title, subtitle : article.subtitle}, () => {
+            log("Update", "Updated article " + article.title, "lilium");
+                next(cur);
+            });
         });
     };
 

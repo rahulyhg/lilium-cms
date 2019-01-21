@@ -1,5 +1,67 @@
 const db = require('../includes/db');
 
+const topicDeepFetch = (conf, _id, send) => {
+    let parents = [];
+    let conds = {_id}
+    let getParents = (done) => {
+        db.findUnique(conf, 'topics', conds, (err, tobj) => {
+            if (!tobj) {
+                done();
+            } else {
+                tobj.hash = require('crypto-js').SHA256(tobj._id).toString(); 
+                parents.unshift(tobj);
+                if (tobj.parent) {
+                    conds = {_id : tobj.parent};
+                    getParents(done);
+                } else  {
+                    done();
+                }
+            }
+        });
+    };
+
+    getParents(() => {
+        let finalTopic = {override : {}};
+        for (let i = 0; i < parents.length; i++) {
+            let curt = parents[i];
+            for (let k in curt) {
+                if (k == "override") {
+                    for (let ok in curt.override) if (curt.override[ok]) {
+                        finalTopic.override[ok] = curt.override[ok];
+                    }
+                } else {
+                    finalTopic[k] = curt[k];
+                }
+            }
+        }
+
+        send(finalTopic, parents.reverse());
+    });
+}
+
+const TOPICS = {};
+const loadAllTopicCombos = (_c, done) => {
+    db.find(_c, 'topics', {}, [], (err, cur) => {
+        const next = () => {
+            cur.next((err, topic) => {
+                if (topic) {
+                    topicDeepFetch(_c, topic._id, fulltopic => {
+                        topic.override = Object.assign(topic.override || {}, fulltopic.override || {});
+                        TOPICS[topic._id.toString()] = topic;
+
+                        log('Update', 'Deep fetched topic ' + topic._id, 'detail');
+                        setImmediate(() => next());
+                    });
+                } else {
+                    done();
+                }
+            });
+        };
+
+        next();
+    });
+};
+
 const handleArticleCursor = (col, cur, done) => {
     cur.next((err, article) => {
         if (!article) {
@@ -7,11 +69,12 @@ const handleArticleCursor = (col, cur, done) => {
             return done();
         }
 
-        if (article.fulltopic) {
-            const v3url = "/" + article.fulltopic.completeSlug + "/" + article.name;
+        if (article.topic) {
+            const v3url = "/" + TOPICS[article.topic.toString()].completeSlug + "/" + article.name;
+            const language = (TOPICS[article.topic.toString()].override.language || "en-ca").substring(0, 2);
 
-            log('Update', "V3 URL : " + v3url, 'detail');
-            col.updateOne({ _id : article._id }, { $set : { v3url, url : v3url, wordcount : article.contractorTotalWords || 0 } }, {}, () => {
+            log('Update', "V3 URL : " + v3url + ' with language ' + language, 'detail');
+            col.updateOne({ _id : article._id }, { $set : { v3url, url : v3url, wordcount : article.contractorTotalWords || 0, language } }, {}, () => {
                 setImmediate(() => handleArticleCursor(col, cur, done));
             });
         } else {
@@ -24,16 +87,7 @@ const handleArticleCursor = (col, cur, done) => {
 const storeV3URL = (_c, next) => {
     db.rawCollection(_c, 'content', {}, (err, col) => {
         log('Update', 'Running content collection aggregate', 'info');
-        col.aggregate([
-            { $match : { status : 'published' } },
-            { $lookup : {
-                from : "topics",
-                as : "fulltopic", 
-                localField : 'topic',
-                foreignField : '_id'
-            } },
-            { $unwind : "$fulltopic" }
-        ], (err, cur) => {
+        col.find({ status : 'published' }, (err, cur) => {
             log('Update', 'About to start the content cursor loop', 'info');
             handleArticleCursor(col, cur, () => {
                 next();
@@ -134,10 +188,12 @@ const parseContentTopics = (_c, next) => {
 };
 
 module.exports = (_c, done) => {
-    storeV3URL(_c, () => {
-        topicsToEditions(_c, () => {
-            parseContentTopics(_c, () => {
-                setImmediate(() => done());
+    loadAllTopicCombos(_c, () => {
+        storeV3URL(_c, () => {
+            topicsToEditions(_c, () => {
+                parseContentTopics(_c, () => {
+                    setImmediate(() => done());
+                });
             });
         });
     });

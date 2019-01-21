@@ -2,8 +2,8 @@
 echo "Detecting OS before installing native dependencies"
 OSuname="$(uname -s)"
 case "${OSuname}" in
-    Linux*)  sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick;;
-    Darwin*) brew install pkg-config cairo libpng jpeg giflib imagemagick;;
+    Linux*)  sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick redis-server;;
+    Darwin*) brew install pkg-config cairo libpng jpeg giflib imagemagick redis;;
 esac
 
 # Install NPM module

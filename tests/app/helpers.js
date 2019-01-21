@@ -55,6 +55,16 @@ const createRandomEdition = (assignation = {}, then) => {
         active : true,
         displayname : "Test edition",
         slug : "test-edition",
+        lang : {
+            en : {
+                slug : 'test-edition', 
+                displayname : 'Test edition'
+            },
+            fr : {
+                slug : 'edition-test',
+                displayname : 'Édition de test'
+            }
+        },
         level : 0
     }, assignation);
 

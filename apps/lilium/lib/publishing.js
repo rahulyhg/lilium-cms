@@ -36,7 +36,7 @@ export function getPostForEdit(postid, send) {
 
 export function refreshPost(postid, done) {
     API.put('/publishing/refresh/' + postid, {}, (err, json, r) => {
-        done(r.status != 200 && !json.ok && r.responseText, { refreshed : json.ok });
+        done(r.status != 200 && !json.ok && r.responseText, json);
     });
 }
 

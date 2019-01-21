@@ -110,7 +110,7 @@ class Plugins {
             log('Plugins', 'Registering plugin with identifier ' + identifier);
             this.searchDirForPlugin(identifier,  (info) =>{
                 if (!info) {
-                    log("PluginException", "Could not find any info on plugin with identifier " + identifier, 'err');
+                    log("PluginException", "Could not find any info on plugin with identifier " + identifier, 'warn');
                     return callback();
                 }
 

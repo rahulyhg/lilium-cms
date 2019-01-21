@@ -46,6 +46,10 @@ class SelectedImage extends Component {
 
     componentWillReceiveProps(props) {        
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
+        if (!props.image || props.image.notfound) {
+            return this.setState({ selected : undefined });
+        }
+
         this.imgtag && this.imgtag.getAttribute('src') != this.makeSrc(props.image) && this.imgtag.removeAttribute('src');
 
         if (props.image) {
@@ -177,12 +181,12 @@ class ImageThumbnail extends Component {
             );
         }
 
-        return (
+        return this.state.image && this.state.image.sizes ? (
             <img onClick={this.clicked.bind(this)} onDblClick={this.doubleclicked.bind(this)} 
                 class={"image-picker-thumb " + (this.state.selected ? "selected" : "")} 
                 src={this.state.image.sizes.thumbnail.url} 
             />
-        )
+        ) : null;
     }
 }
 
