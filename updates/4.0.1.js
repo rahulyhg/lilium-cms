@@ -187,12 +187,38 @@ const parseContentTopics = (_c, next) => {
     });
 };
 
+const createIndices = (_c, next) => {
+    log('Update', 'Dropping already existing text index on content.title', 'info');
+    db.rawCollection(_c, 'content', {}, (err, col) => {
+        log('Update', 'Creating text indexes on tags, title, subtitle, content', 'info');
+        col.dropIndex('title_text', {}, () => {
+            db.createIndex(_c, 'content', {
+                tags: 'text',
+                title: 'text',
+                subtitle: 'text',
+                content: 'text'
+            }, () => {
+                next && next();
+            }, {
+                weights: {
+                    title: 10,
+                    tags: 8,
+                    subtitle: 5,
+                    content: 1
+                }
+            });
+        });
+    });
+};
+
 module.exports = (_c, done) => {
     loadAllTopicCombos(_c, () => {
         storeV3URL(_c, () => {
             topicsToEditions(_c, () => {
                 parseContentTopics(_c, () => {
-                    setImmediate(() => done());
+                    createIndices(_c, () => {
+                        setImmediate(() => done());
+                    });
                 });
             });
         });
