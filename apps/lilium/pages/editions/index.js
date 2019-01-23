@@ -42,8 +42,8 @@ const EditionList = props => (
                 <i class="far fa-check"></i>
             </div>
             <div class="ed-single-text">
-                <b>{ed.displayname}</b>
-                <small>/{"../".repeat(props.level)}{ed.slug}</small>
+                <b>{ed.lang.en.displayname}</b>
+                <small>/{"../".repeat(props.level)}{ed.lang.en.slug}</small>
             </div>
         </div>)) }
     </div>
