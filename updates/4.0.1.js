@@ -115,7 +115,7 @@ const handleTopicCursor = (_c, col, cur, done) => {
             oldtopiccompleteslug : topic.completeSlug,
             oldtopicfamily : topic.family,
             displayname : topic.displayname,
-            slug : topic.slug,
+            slugs : [topic.slug],
             lang : {
                 en : {
                     displayname : topic.displayname,

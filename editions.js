@@ -61,7 +61,7 @@ class EditionController {
             }
     
             const edition = {
-                displayname, slug, level, 
+                displayname, slugs : [slug], level, 
                 active : true, lang : {}
             };
 
@@ -101,11 +101,12 @@ class EditionController {
                     cli.throwHTTP(404, undefined, true);
                 } else {
                     original.displayname += " (copy)";
-                    original.slug += "-" + Math.random().toString(16).substring(2);
+                    original.slugs = [];
 
                     Object.keys(original.lang).forEach(lang => {
                         original.lang[lang].displayname = original.displayname;
-                        original.lang[lang].slug = original.slug;
+                        original.lang[lang].slug = original.lang[lang].slug + "-" + Math.random().toString(16).substring(2);
+                        original.slugs.push(original.lang[lang].slug);
                     });
 
                     db.insert(cli._c, 'editions', original, (err, r) => {
@@ -159,7 +160,7 @@ class EditionController {
             db.aggregate(cli._c, 'editions', [ 
                 { $match : { active : true } },
                 { $group : { 
-                    _id : { displayname : "$displayname", level : "$level" }, 
+                    _id : { displayname : "$lang.en.slug", level : "$level" }, 
                     total : { $sum : 1 }, 
                     parent : { $first : "$_id" },
                     mergees : { $push : "$_id" }
@@ -208,20 +209,22 @@ class EditionController {
                 cli.readPostData(payload => {
                     payload.value = fieldToRef(payload.name, payload.value);
 
-                    const upd = {
-                        [`lang.${cli.routeinfo.path[4]}.${payload.name}`] : payload.value
-                    };
+                    db.findUnique(cli._c, 'editions', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, ed) => {
+                        const newed = {
+                            [`lang.${cli.routeinfo.path[4]}.${payload.name}`] : payload.value
+                        };
 
-                    if (cli.routeinfo.path[4] == "en" && (payload.name == "displayname" || payload.name == "slug")) {
-                        upd[payload.name] = payload.value;
-                    }
-
-                    db.update(cli._c, 'editions', { _id : db.mongoID(cli.routeinfo.path[3]) }, upd, (err, r) => {
-                        if (err) {
-                            cli.throwHTTP(500, err, true);
-                        } else {
-                            cli.sendJSON(r)
+                        if (payload.name == "slug") {
+                            newed.slugs = Array.from(new Set(Object.keys(ed.lang).map(l => ed.lang[l].slug)));
                         }
+
+                        db.update(cli._c, 'editions', { _id : db.mongoID(cli.routeinfo.path[3]) }, newed, (err, r) => {
+                            if (err) {
+                                cli.throwHTTP(500, err, true);
+                            } else {
+                                cli.sendJSON(r)
+                            }
+                        });
                     });
                 });
             } else if (cli.routeinfo.path[2] == "section") {
@@ -332,8 +335,7 @@ class EditionController {
                         level : "$_id", 
                         "section" : 1,
                         "editions._id" : 1,
-                        "editions.slug" : 1,
-                        "editions.displayname" : 1,
+                        "editions.slugs" : 1,
                         "editions.lang" : 1
                     } },
                     { $sort : { level : 1 } }
