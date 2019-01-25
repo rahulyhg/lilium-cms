@@ -129,6 +129,8 @@ var LiveVariables = function() {
 
     this.handleRequest = function(cli) {
         metrics.plusDeep('endpointsreq', "livevar/" + cli.routeinfo.path[2]);
+        hooks.fireSite(cli._c, 'livevar_handled', cli);
+
         if (cli.routeinfo.path[1] == "v4") {
             // LIVE VARIABLE V4
             let params = cli.routeinfo.params.p;
@@ -136,11 +138,16 @@ var LiveVariables = function() {
                 params = JSON.parse(params);
             } catch (error) { params = { error }; }
 
-            RegisteredLiveVariables[cli.routeinfo.path[2]] ? RegisteredLiveVariables[cli.routeinfo.path[2]].callback(
-                cli, cli.routeinfo.path.splice(3), params, 
-            resp => {
-                cli.sendJSON(resp);
-            }) : cli.throwHTTP(404, undefined, true);
+            try {
+                RegisteredLiveVariables[cli.routeinfo.path[2]] ? RegisteredLiveVariables[cli.routeinfo.path[2]].callback(
+                    cli, cli.routeinfo.path.splice(3), params, 
+                resp => {
+                    cli.sendJSON(resp);
+                }) : cli.throwHTTP(404, undefined, true);
+            } catch (err) {
+                log('Livevar', 'Live variable request crashed', 'err');
+                cli.crash(err);
+            }
         } else {
             // LEGACY LIVE VARIABLE HANDLING LOGIC
             try {

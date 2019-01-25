@@ -10,6 +10,7 @@ var db = require('./includes/db.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
 var log = require('./log.js');
+const hooks = require('./hooks');
 const mediaUpload = require('./mediaUpload');
 
 var Handler = function () {
@@ -252,12 +253,18 @@ var Handler = function () {
     this.handle = function (cli) {
         cli.touch('handler.handle');
 
-        if (cli.request.url.startsWith('/admin/mediaUpload') && cli.method == 'POST') {
-            handleMediaUpload(cli);
-        } else if (cli.request.url.startsWith('/api') /*&& cli.method == "OPTIONS"*/) {
-            handleAPI(cli);
-        } else {
-            parseMethod(cli);
+        hooks.fire('request_handled', cli);
+        try {
+            if (cli.request.url.startsWith('/admin/mediaUpload') && cli.method == 'POST') {
+                handleMediaUpload(cli);
+            } else if (cli.request.url.startsWith('/api') /*&& cli.method == "OPTIONS"*/) {
+                handleAPI(cli);
+            } else {
+                parseMethod(cli);
+            }
+        } catch (err) {
+            log('Handler', 'Handler could not fulfill request', 'err');
+            cli.crash(err);
         }
     };
 };
