@@ -188,10 +188,10 @@ const parseContentTopics = (_c, next) => {
 };
 
 const createIndices = (_c, next) => {
-    log('Update', 'Dropping already existing text index on content.title', 'info');
     db.rawCollection(_c, 'content', {}, (err, col) => {
-        log('Update', 'Creating text indexes on tags, title, subtitle, content', 'info');
+        log('Update', 'Dropping already existing text index on content.title', 'info');
         col.dropIndex('title_text', {}, () => {
+            log('Update', 'Creating text indexes on tags, title, subtitle, content', 'info');
             db.createIndex(_c, 'content', {
                 tags: 'text',
                 title: 'text',
@@ -201,10 +201,10 @@ const createIndices = (_c, next) => {
                 next && next();
             }, {
                 weights: {
-                    title: 10,
-                    tags: 8,
-                    subtitle: 5,
-                    content: 1
+                    content: 16,
+                    title: 12,
+                    subtitle: 6,
+                    tags: 4
                 }
             });
         });
