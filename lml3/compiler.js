@@ -172,8 +172,6 @@ class LML3 {
     }
 
     compile(_c, abspath, extra, done, ___notsafe) {
-        // log('LML3', "Loading LML3 file : " + abspath, 'info');
-
         if (_c.env == "dev" && !___notsafe) {
             require.cache[abspath] = undefined;
 

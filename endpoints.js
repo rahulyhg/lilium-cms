@@ -65,8 +65,13 @@ class EndPoints {
     };
 
     executeContextual(endpoint, method, cli, extra) {
-        const ed = contextualEndpoints[cli._c.id][method][endpoint];
-        ed && ed(cli, extra);
+        try {
+            const ed = contextualEndpoints[cli._c.id][method][endpoint];
+            ed && ed(cli, extra);
+        } catch (err) {
+            log('Endpoint', 'Contextual endpoint crashed', 'err');
+            cli.crash(err);
+        }
     };
 
     contextualIsRegistered(site, endpoint, method) {
@@ -97,9 +102,16 @@ class EndPoints {
         metrics.plusDeep('endpointsreq', method + "/" + endpoint);
         const site = cli.routeinfo.configname;
         if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
-            return registeredEndpoints[site][method][endpoint](cli);
+            try {
+                hooks.fireSite(cli._c, 'endpoint_executed', cli);
+                hooks.fire('endpoint_executed', cli);
+                return registeredEndpoints[site][method][endpoint](cli);
+            } catch (err) {
+                log('Endpoint', 'Request to endpoint crashed', 'err');
+                return cli.crash(err);
+            }
         } else {
-            throw new Error("[EndPointException - Not Found : " + method + "/" + endpoint + "]");
+            cli.throwHTTP(404, undefined, true);
         }
     };
 

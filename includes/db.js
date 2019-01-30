@@ -317,10 +317,10 @@ var DB = function() {
         });
     }
 
-	this.createIndex = function(conf, coln, fields, cb) {
+	this.createIndex = function(conf, coln, fields, cb, params = {}) {
         log("Database", "Creating index for collection " + coln + "@" + (conf.id || conf));
 		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
-			col.createIndex(fields, {}, function(err, results) {
+			col.createIndex(fields, params, function(err, results) {
 				cb(err, results);
 			});
 		});

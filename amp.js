@@ -17,94 +17,102 @@ class Amp {
         let articleName = cli.routeinfo.path[cli.routeinfo.path.length - 1];
 
         // Will try to find the article in the database
-        articleLib.deepFetch(cli._c, articleName, (article) => {this.handleArticle(cli, article);}, false, {status : "published"});
+        articleLib.getFull(
+            cli._c, 
+            undefined, 
+            article => this.handleArticle(cli, article), 
+            {
+                name : articleName, 
+                status : "published"
+            }
+        );
     }
 
     handleArticle(cli, article) {
         // Article is undefined if nothing was found
-        if (!article || !article.authors || !article.authors[0] || !article.title || !article.title[0] || !article.topic) {
+        if (!article || !article.fullauthor || !article.alleditions || !article.deepmedia) {
             return cli.throwHTTP(404, undefined, true);
         }
 
-        let articleContent = article.content.shift();
+        try {
+            let articleContent = article.content.shift();
 
-        article.content.forEach((page, index) => {
-            if (article.title[index+1].indexOf(article.title[0]) == -1) {
-                articleContent += `<h3 class="page-sep">${article.title[index+1]}</h3>`
+            article.content.forEach((page, index) => {
+                if (article.title[index+1].indexOf(article.title[0]) == -1) {
+                    articleContent += `<h3 class="page-sep">${article.title[index+1]}</h3>`
+                }
+
+                if (article.subtitle[index+1].indexOf(article.subtitle[0]) == -1) {
+                    articleContent += `<h4 class="page-sep-sub">${article.subtitle[index+1]}</h4>`
+                }
+
+                articleContent += page;
+            });
+
+            article.title = article.title[0];
+            article.subtitle = article.subtitle[0];
+
+            log('AMP', 'Preparing for parsing content');
+            /* Modify content according to AMP guidelines */
+
+            // Featured image
+            if (!article.deepmedia) {
+                article.deepmedia = [{sizes : {facebook : {url : ""}}}];
+            } else if (!article.deepmedia.sizes.facebook) {
+                article.deepmedia.sizes.facebook = article.deepmedia.sizes.content;
             }
 
-            if (article.subtitle[index+1].indexOf(article.subtitle[0]) == -1) {
-                articleContent += `<h4 class="page-sep-sub">${article.subtitle[index+1]}</h4>`
-            }
-
-            articleContent += page;
-        });
-
-        article.title = article.title[0];
-        article.subtitle = article.subtitle[0];
-
-        log('AMP', 'Preparing for parsing content');
-        /* Modify content according to AMP guidelines */
-
-        // Featured image
-        if (!article.featuredimage[0]) {
-            article.featuredimage = [{sizes : {facebook : {url : ""}}}];
-        } else if (!article.featuredimage[0].sizes.facebook) {
-            article.featuredimage[0].sizes.facebook = article.featuredimage[0].sizes.content;
-        }
-
-        article.featuredimage[0].sizes.facebook.url = article.featuredimage[0].sizes.facebook.url.replace (
-            cli._c.server.url, 
-            cli._c.content.cdn.domain
-        );
-        
-        // Avatar URL
-        if (article.authors[0].avatarURL) {
-            article.authors[0].avatarURL = article.authors[0].avatarURL.replace(
+            article.deepmedia.sizes.facebook.url = article.deepmedia.sizes.facebook.url.replace (
                 cli._c.server.url, 
                 cli._c.content.cdn.domain
             );
-        } else {
-            article.authors[0].avatarURL = cli._c.server.protocol + cli._c.content.cdn.domain + "/static/media/lmllogo.png";
-        }
-        
-        // Sponsored Logo
-        if (article.sponsoredBoxLogoURL) {
-            article.sponsoredBoxLogoURL = article.sponsoredBoxLogoURL.replace(
-                cli._c.server.url, 
-                cli._c.content.cdn.domain
-            );
-        }
-
-        this.parseAMPContent(cli, article, articleContent, (err, amp) => {
-            if (err) {
-                return cli.throwHTTP(500, undefined, true);
+            
+            // Avatar URL
+            if (article.fullauthor.avatarURL) {
+                article.fullauthor.avatarURL = article.fullauthor.avatarURL.replace(
+                    cli._c.server.url, 
+                    cli._c.content.cdn.domain
+                );
+            } else {
+                article.fullauthor.avatarURL = cli._c.server.protocol + cli._c.content.cdn.domain + "/static/media/lmllogo.png";
+            }
+            
+            // Sponsored Logo
+            if (article.sponsoredBoxLogoURL) {
+                article.sponsoredBoxLogoURL = article.sponsoredBoxLogoURL.replace(
+                    cli._c.server.url, 
+                    cli._c.content.cdn.domain
+                );
             }
 
-            article.content = amp;
+            this.parseAMPContent(cli, article, articleContent, (err, amp) => {
+                if (err) {
+                    return cli.throwHTTP(500, undefined, true);
+                }
 
-            let language = cli._c.website.language;
-            if (article.topic && article.topic.override && article.topic.override.language) {
-                language = article.topic.override.language;
-            }
+                article.content = amp;
 
+                let language = article.language || "en"; 
 
-            log('AMP', "Generating AMP page from LML for article : " + article.title);
-            filelogic.renderThemeLML3(cli, 'amp', 'amp/' + article.name + '.html', {
-                config : cli._c,
-                article, language 
-            }, (filecontent) => {
-                log("AMP", "Generated AMP page for article : " + article.title);
-                cli.response.writeHead(200);
-                cli.response.end(filecontent);
+                log('AMP', "Generating AMP page from LML for article : " + article.title, 'info');
+                filelogic.renderThemeLML3(cli, 'amp', 'amp/' + article.name + '.html', {
+                    config : cli._c,
+                    article, language 
+                }, (filecontent) => {
+                    log("AMP", "Generated AMP page for article : " + article.title);
+                    cli.response.writeHead(200);
+                    cli.response.end(filecontent);
 
-                const filepath = cli._c.server.html + "/amp/" + article.name + ".html";
-                fileserver.dumpToFile(filepath, filecontent, () => {
-                    hooks.fireSite(cli._c, "ampGenerated", { article, filepath });
-                    log("AMP", "Cached file written");
-                }, 'utf8');
-            }, true);
-        });
+                    const filepath = cli._c.server.html + "/amp/" + article.name + ".html";
+                    fileserver.dumpToFile(filepath, filecontent, () => {
+                        hooks.fireSite(cli._c, "ampGenerated", { article, filepath });
+                        log("AMP", "Cached file written");
+                    }, 'utf8');
+                }, true);
+            });
+        } catch (ex) {
+            cli.crash(ex);
+        }
     };
 
     parseAMPContent(cli, article, articleContent, cb) {
@@ -278,7 +286,7 @@ class Amp {
                     cb(undefined, articleContent);
                 });
             });
-        });
+        }, true);
     }
 }
 module.exports = new Amp();

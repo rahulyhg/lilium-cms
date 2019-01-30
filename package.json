@@ -5,7 +5,7 @@
   "main": "index.prod.js",
   "scripts": {
     "test": "cd ./tests && ./runNpm.sh && exit 0",
-    "shell" : "node shell.js",
+    "shell": "node shell.js",
     "setupdev": "chmod +x ./setup.sh && ./setup.sh",
     "ci": "cd ./tests && ./runCI.sh && exit 0",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.prod.js",
