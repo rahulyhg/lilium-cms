@@ -5,6 +5,20 @@ const dictionary = {
     // General
     emailAddress: "Address email",
     password: 'Mot de passe',
+    article: {
+        statusses: {
+            allStatusses: 'Tous les statuts',
+            draft: 'Brouillon',
+            published: 'Publié',
+            reviewing: 'En revue',
+            backToDraft: 'Retourné au brouillon'
+        }
+    },
+    anyone: 'Tout le monde',
+
+    // BigList
+    filters: 'Filtres',
+    emptyMessage: 'Aucun élément ne correspond aux filtres sélectionnés',
 
     // Dashboard
     publishing : "Publications",
@@ -77,7 +91,13 @@ const dictionary = {
     twoFactorAuth: 'Authentification à deux facteurs',
     enter6digits: 'Entrerz le nombre à 6 chiffres',
     activate2FA: 'Activer 2FA pour mon compte',
-    deactivate2FA: 'Désactiver 2FA'
+    deactivate2FA: 'Désactiver 2FA',
+
+    // Publishing
+    createArticle: 'Créer un article',
+    searchByTitle: 'Recherche par titre',
+    searchByAuthor: 'Autheur',
+    searchByStatus: 'Statut'
 }
 
 const extendedDictionary = { 

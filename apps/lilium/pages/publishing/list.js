@@ -59,7 +59,7 @@ class PostListItemAdd extends Component {
             <div onClick={this.onClick.bind(this)} class="flex-row publishing-list-item publishing-create-article">
                 <div class="flex-col article-list-image-wrapper gray-background"></div>
                 <div class="flex-col article-list-title">
-                    <b>Create new article</b>
+                    <b>{_v('createArticle')}</b>
                 </div>
             </div>
         )
@@ -84,15 +84,14 @@ export default class ListView extends Component {
     static get TOOLBAR_CONFIG() {
         return {
             id : "publishingListTb",
-            title : "Filters",
             fields : [
-                { type : "text", name : "search", title : "Search by title" },
-                { type : "select", name : "status", title : "Status", options : [
+                { type : "text", name : "search", title : _v('searchByTitle') },
+                { type : "select", name : "status", title : _v('searchByStatus'), options : [
                     { value : "", text : "All statuses" },
-                    { value : "draft", text : "Draft" },
-                    { value : "published", text : "Published" },
-                    { value : "reviewing", text : "Pending review" },
-                    { value : "deleted", text : "Set back to draft" }
+                    { value : "draft", text : _v('article.statusses.draft') },
+                    { value : "published", text : _v('article.statusses.published') },
+                    { value : "reviewing", text : _v('article.statusses.reviewing') },
+                    { value : "deleted", text : _v('article.statusses.backToDraft') }
                 ] }
             ]
         };
@@ -104,9 +103,9 @@ export default class ListView extends Component {
         toolbarconfigs.fields.push({
             type : "select",
             name : "author",
-            title : "Author",
+            title : _v('searchByAuthor'),
             options : [
-                { value : "", text : "Anyone" }, 
+                { value : "", text : _v('anyone') }, 
                 { value : liliumcms.session._id, text : "Me" }, 
                 ...users.map(u => { return { value : u._id, text : u.displayname } })
             ]

@@ -172,7 +172,7 @@ class BigListNullComponent {
 class BigListEmptyTemplate {
     render() {
         return (<div class="big-list-empty-template">
-            <b>Nothing was found using the current filters.</b>
+            <b>{_v('emptyMessage')}</b>
         </div>);
     }
 }
@@ -192,7 +192,7 @@ export class BigListToolBarBuilder {
     get defaultOptions() {
         return {
             fields : [],
-            title : "Filters"
+            title : _v("filters")
         };
     }
 

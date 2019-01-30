@@ -5,6 +5,19 @@ const dictionary = {
     // General
     emailAddress: 'Email Address',
     password: 'Password',
+    article: {
+        statusses: {
+            allStatusses: 'All Statusses',
+            draft: 'Draft',
+            published: 'Published',
+            reviewing: 'Pending Review',
+            backToDraft: 'Set Back to Draft'
+        }
+    },
+    anyone: 'Anyone',
+
+    // BigList
+    filters: 'Filters',
 
     // Dashboard
     publishing : "Publishing",
@@ -77,7 +90,13 @@ const dictionary = {
     twoFactorAuth: 'Two Factor Authentication',
     enter6digits: 'Enter the 6 digits code',
     activate2FA: 'Activate 2FA for my account',
-    deactivate2FA: 'Deactivate 2FA'
+    deactivate2FA: 'Deactivate 2FA',
+
+    // Publishing
+    createArticle: 'Create New Article',
+    searchByTitle: 'Search by Title',
+    searchByAuthor: 'Author',
+    searchByStatus: 'Status'
 }
 
 const extendedDictionary = { 
@@ -111,10 +130,6 @@ const extendedDictionary = {
         </div>
     )
 }
-
-const presentation2FA = () =­­> (
-    <p></p>
-)
 
 const datetime = {
     dayNames: [
