@@ -264,7 +264,7 @@ class FileLogic {
 
             if (cTheme.contexts[ctxName]) {
                 readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
-                layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || layout.lml3);
+                layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || "layout.lml3");
             } else {
                 readPath = _c.server.base + "flowers/" + cTheme.uName + "/lml/" + _c.env + ".lml3";
             }

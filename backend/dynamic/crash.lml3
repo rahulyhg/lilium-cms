@@ -1,0 +1,119 @@
+const fs = require('fs');
+
+const settings = {
+
+};
+
+const compile = (o, context, v) => {
+
+    const error = context.extra.error;
+    const firstLine = error.stack.split('\n')[1];
+
+    let crashedCode = "";
+    let crashedFile = "";
+
+    if (firstLine) {
+        const afterClosure = firstLine.split('(')[1];
+        const fileSynt = afterClosure ? afterClosure.substring(0, afterClosure.length - 1) : "";
+        const filesplit = fileSynt.split(':');
+        
+        if (
+            filesplit[0] && 
+            !filesplit[0].includes('node_modules') &&
+            filesplit[0].startsWith('/')
+        ) {
+            try {
+                log('Crash', 'Loading crashed code from file ' + filesplit[0], 'info');
+                const code = ["", ...fs.readFileSync(filesplit[0]).toString().split('\n')];
+                let line = parseInt(filesplit[1]);
+                code[line] += " 💥💥💥";
+
+                let from = line - 7;
+                if (from < 0) { from = 0; }
+
+                crashedCode = code.splice(from, 15).map((x, i) => (from + i) + " " + x).join('\n');
+                crashedFile = filesplit[0];
+            } catch (err) { 
+                log('Crash', 'Could not display crashed code ' + err, 'err');
+            }
+        }
+    }
+
+
+o(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
+    <style>
+        html, body { 
+            padding: 0; 
+            margin: 0; 
+            background: #333; 
+            color: #DDD; 
+            font-family: "Nunito Sans", sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: normal;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            text-align: center;
+            font-weight: normal;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+        }
+
+        .stack-trace pre {
+            margin: 0;
+            background: rgba(0,0,0,0.2);
+            padding: 40px;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-top: 40px;
+            animation: slow-spin 60s linear;
+        }
+
+        @keyframes slow-spin {
+            from { transform: rotateZ(0deg); }
+            to   { transform: rotateZ(360deg); }
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>Lilium Crash</title>
+</head>
+<body>
+    <center>
+        <img src="/static/media/lmllogo.png" class="logo" />
+    </center>
+    <h1>Lilium Crash</h1>
+    <h2>${context.extra.error.toString()}</h2>
+
+    <div class="stack-trace">
+        <pre>
+${context.extra.error.stack}
+        </pre>
+    </div>
+
+    ${crashedCode ? `<div class="stack-trace">
+        <h3>${crashedFile}</h3>
+        <pre>
+${crashedCode}
+        </pre>
+    </div>` : ''}
+
+</body>
+</html>`);
+}
+
+module.exports = { settings, compile };

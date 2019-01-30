@@ -214,22 +214,23 @@ class ClientObject {
         this.response.end();
     };
 
-    crash  (ex) {
-        log('ClientObject', 'Crash handled with error : ' + ex);
+    crash(ex = {}) {
+        log('ClientObject', 'Crash handled with error : ' + ex, 'info');
 
-        if (false && this._c && this._c.env == "prod") {
-            log('ClientObject', 'Sending 500');
-            return this.throwHTTP(500, 'Lilium Internal Server Error', true);
-        }
-
-        try {
-            var errFilePath = this._c.server.base + "/backend/dynamic/error.lml";
-            this.routeinfo.isStatic = true;
-
-            require('./filelogic.js').executeLMLNoCache(this, errFilePath, ex);
-        } catch (ex) {
-            log('ClientObject', 'Could not handle crash : ' + ex);
-            this.response.end();
+        if (this._c && this._c.env == "prod") {
+            log('ClientObject', 'Sending 500', 'info');
+            console.log(ex.stack);
+            this.throwHTTP(500, 'Lilium Internal Server Error', true);
+        } else {
+            log('ClientObject', 'Compiling LML3 crash page', 'info');
+            require('./lml3/compiler').compile(
+                this._c, 
+                require('path').join(liliumroot, 'backend', 'dynamic', 'crash.lml3'),
+                { error : ex },
+            markup => {
+                this.response.writeHead(500, { 'Content-Type' : 'text/html' });
+                this.response.end(markup);
+            });
         }
     };
 
