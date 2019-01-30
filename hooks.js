@@ -28,11 +28,11 @@ class Hooks {
     }
 
     getHooksFor(eventName) {
-        return events[eventName] || {};
+        return events[eventName] || [];
     }
 
     getSiteHooksFor(_c, name) {
-        return siteevents[_c.id] && siteevents[_c.id][name];
+        return siteevents[_c.id] ? siteevents[_c.id][name] : [];
     }
 
     debug() {

@@ -139,6 +139,15 @@ export default class CommentDevTool extends Component {
                         <MultiSelectBox options={MULTISELECTBOX_OPTIONS} placeholder='Select a few things' onChange={(name, value) => {}} />
                         <SelectField options={SELECTBOX_OPTIONS} placeholder="Select one thing" onChange={(name, value) => castNotification({ title : "New value selected", message : value })} />
                         <StackBox placeholder="Create multiple things" onChange={(name, value) => castNotification({ title : "Stack box values count : " + value.length })} />
+                        <StackBox placeholder="Create multiple things using multiple fields" onChange={(name, value) => castNotification({ title : "Stack boxes values count : " + value.length })} schema={{ fields : [
+                            { type : "text", name : 'text-field-1', displayname : 'Text field' },
+                            { type : "select", name : 'select-field-1', displayname : 'Select field', 
+                                options : [ 
+                                    { text : "Option 1", value : "opt1" }, 
+                                    { text : "Option 2", value : "opt2" } 
+                                ]
+                            }
+                        ] }} />
                         <DatePicker placeholder="Select your birthday" initialValue={new Date()} onChange={(name, value) => castNotification({ title : "Your birthday", message : dateformat(new Date(value), 'mmmm dd') })} />
                     </div>
 

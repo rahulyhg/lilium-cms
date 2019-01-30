@@ -37,25 +37,28 @@ class FormField extends Component {
         const oldValue = typeof oValue != "undefined" ? oValue : this.value;
         this.value = this.props.format ? this.props.format(value) : value;
         this.valid = this.props.validate ? this.props.validate(this.value) : true;
-        this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
 
         if (this.autosave) {
             this.savedTimeout && clearTimeout(this.savedTimeout);
-            this.setState({ saving : true });
+            this.setState({ saving : true }, () => {
+                API[this.savemethod](this.endpoint, { 
+                    [this.fieldkey] : this.props.name, [this.valuekey] : this.value 
+                }, (err, resp, r) => {
+                    if (!err && Math.floor(r.status / 200) == 1) {
+                        this.setState({ saving : false, saved : true }, () => {
+                            this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
+                        });
 
-            API[this.savemethod](this.endpoint, { 
-                [this.fieldkey] : this.props.name, [this.valuekey] : this.value 
-            }, (err, resp, r) => {
-                if (!err && Math.floor(r.status / 200) == 1) {
-                    this.setState({ saving : false, saved : true });
-
-                    this.savedTimeout = setTimeout(() => {
-                        this.setState({ saved : false, saveerror : false })
-                    }, 3000);
-                } else {
-                    this.setState({ saving : false, saveerror : true });
-                }
-            })
+                        this.savedTimeout = setTimeout(() => {
+                            this.setState({ saved : false, saveerror : false })
+                        }, 3000);
+                    } else {
+                        this.setState({ saving : false, saveerror : true });
+                    }
+                })
+            });
+        } else {
+            this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue, this.valid);
         }
     }
 
@@ -207,15 +210,28 @@ export class TextField extends FormField {
 }
 
 export class StackBox extends FormField {
+    static singleSchema(name, displayname) {
+        return {
+            single : true,
+            fields : [{
+                type : 'text',
+                name : name, 
+                displayname : displayname || name
+            }]
+        }
+    }
+
     constructor(props) {
         super(props);
 
-        this.state = {
-            values : Array.from(this.value || []).map(x => ({ 
-                text : x, 
-                _formid : Math.random().toString() + Math.random().toString() 
-            }))
-        };
+        this.state.schema = props.schema || StackBox.singleSchema(props.name, props.placeholder);
+
+        this.state.values = Array.from(this.value || []).map(x => ({ 
+            value : x, 
+            _formid : Math.random().toString() + Math.random().toString() 
+        }));
+
+        this.state.pendingvalues = {};
     }
 
     componentWillReceiveProps(props) {
@@ -223,7 +239,7 @@ export class StackBox extends FormField {
             this.value = props.value;
             this.setState({
                 values : Array.from(props.value || []).map(x => ({ 
-                    text : x, 
+                    value : x, 
                     _formid : Math.random().toString() + Math.random().toString() 
                 }))
             });
@@ -231,11 +247,11 @@ export class StackBox extends FormField {
     }
 
     onChange() {
-        this.changed(this.state.values.map(x => x.text));
+        this.changed(this.state.values.map(x => x.value));
     }
 
-    appendFromBox(text) {
-        const obj = { text, _formid : Math.random().toString() }
+    appendFromBox(value) {
+        const obj = { value, _formid : Math.random().toString() }
         this.setState({ values : [...this.state.values, obj] }, () => {
             this.onChange();
         });
@@ -243,7 +259,7 @@ export class StackBox extends FormField {
 
     textEdited(index, value) {
         const newValues = [...this.state.values];
-        newValues[index].text = value;
+        newValues[index].value = value;
         this.setState({ values : newValues }, () => {
             this.onChange();
         });
@@ -292,6 +308,51 @@ export class StackBox extends FormField {
         });
     }
 
+    updatePendingValue(name, value) {
+        const pendingvalues = this.state.pendingvalues;
+        pendingvalues[name] = value;
+        this.setState({ pendingvalues });
+    }
+
+    static typeToField(field, value, onchange) {
+        switch (field.type) {
+            case "text": 
+                return (<TextField 
+                    placeholder={field.displayname} 
+                    placeholderType="inside" 
+                    initialValue={value} 
+                    name={field.name} 
+                    onChange={onchange} 
+                />);
+
+            case "select": 
+                return (<SelectField 
+                    options={[{text:" - " + field.displayname + " - ", value : ""}, ...(field.options || [])]} 
+                    name={field.name} 
+                    initialValue={value || ""} 
+                    onChange={onchange} 
+                />);
+        }
+    }
+
+    multiFieldChanged(name, value) {
+        const pendingvalues = this.state.pendingvalues;
+        pendingvalues[name] = value;
+        
+        this.setState({ pendingvalues });
+    }
+
+    appendMulti() {
+        const obj = { value : {...this.state.pendingvalues}, _formid : Math.random().toString() }
+        this.setState({ values : [...this.state.values, obj], pendingvalues : {} }, () => {
+            this.onChange();
+        });
+    }
+
+    makeSchemaInputFields() {
+        return [...this.state.schema.fields.map(x => StackBox.typeToField(x, this.state.pendingvalues[x.name], this.updatePendingValue.bind(this))), (<div class="stackbox-multi-add-btn"><ButtonWorker theme="white" type="fill" text="Append" sync={true} work={this.appendMulti.bind(this)} /></div>)];
+    }
+
     render() {
         return (
             <div class="stack-box">
@@ -300,13 +361,20 @@ export class StackBox extends FormField {
                     {
                         this.state.values.map((valueObj, index) => (
                             <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={valueObj._formid}
-                                                index={index} lastInList={index == this.state.values.length - 1} initialValue={valueObj.text}
-                                                moveItemDown={this.moveItemDown.bind(this)} moveItemUp={this.moveItemUp.bind(this)} />
+                                index={index} lastInList={index == this.state.values.length - 1} initialValue={valueObj.value}
+                                moveItemDown={this.moveItemDown.bind(this)} schema={this.state.schema} moveItemUp={this.moveItemUp.bind(this)} />
                         ))
                     }
                 </div>
                 <div class="stackbox-input-add">
-                    <TextField onKeyPress={this.handleInputBoxKeyPress.bind(this)} placeholderType="inside" placeholder="Provide a value and press Enter" />
+                    { this.state.schema.single ? (
+                        <TextField 
+                            onKeyPress={this.handleInputBoxKeyPress.bind(this)} 
+                            placeholderType="inside" 
+                            placeholder="Provide a value and press Enter" />
+                    ) : ( 
+                        <div class="stackbox-multi-input">{this.makeSchemaInputFields()}</div>
+                    )}
                 </div>
             </div>
         )
@@ -320,6 +388,12 @@ StackBox.StackField = class StackField extends Component {
 
     onChange(name, value) {
         this.props.onChange(this.props.index, value);
+    }
+
+    onMultiChanged(name, value) {
+        const cur = this.props.initialValue || {};
+        cur[name] = value;
+        this.props.onChange(this.props.index, cur);
     }
 
     selfdestruct() {
@@ -337,7 +411,15 @@ StackBox.StackField = class StackField extends Component {
     render() {
         return (
             <div class="stackbox-entry">
-                <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+                { this.props.schema.single ? (
+                    <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+                ) : (
+                    <div class="stackbox-entry-multiple">
+                        { this.props.schema.fields.map(x => 
+                            StackBox.typeToField(x, this.props.initialValue ? this.props.initialValue[x.name] : "", this.onMultiChanged.bind(this))
+                        ) }
+                    </div>
+                ) }
 
                 <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
                 <div onClick={this.moveUp.bind(this)} class={"stackbox-up " + (this.props.index == 0 ? "disabled" : "")}><i className="far fa-chevron-up"></i></div>
@@ -397,9 +479,24 @@ export class MediaPickerField extends FormField {
     }
 
     extractImageFromResponse(image) {
+        if (!image || image.notfound) {
+            return "";
+        } 
+
         switch (this.state.size) {
             case "small": return image.sizes.square.url;
             default: return image.sizes.facebook.url;
+        }
+    }
+
+    componentWillReceiveProps(props) {
+        if (props.mediaID || props.initialValue) {
+            const mediaID = props.mediaID || props.initialValue;
+            mediaID != this.state.mediaID && API.get("/uploads/single/" + mediaID, {}, (err, upload) => {
+                upload && this.setState({ mediaID, mediaURL : this.extractImageFromResponse(upload) })
+            });
+        } else if (this.state.mediaID && !props.mediaID && !props.initialValue) {
+            this.setState({ mediaID : undefined, mediaURL : undefined });
         }
     }
 
@@ -421,7 +518,6 @@ export class MediaPickerField extends FormField {
                 }
             }
         }), res => {
-            console.log(res);
             if (res && res[ImagePicker.slug]) {
                 const image = res[ImagePicker.slug];
                 this.changed(image, this.state.mediaURL);
@@ -727,7 +823,7 @@ export class CheckboxField extends FormField {
     constructor(props) {
         super(props);
 
-        this.value = !!props.initialValue;
+        this.value = !!(props.initialValue || props.value);
         this.state = { checked: this.value };
     }
 

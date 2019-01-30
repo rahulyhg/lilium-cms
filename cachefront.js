@@ -4,9 +4,9 @@ const sharedcache = require('./sharedcache');
 const CACHE_KEY = "cf_";
 
 class CacheFront {
-    setURL(url, data, ctype, expiry, done) {
+    setURL(url, data, ctype, expiry, done, extra = {}) {
         sharedcache.set({
-            [CACHE_KEY + url] : { data, expiry, ctype }
+            [CACHE_KEY + url] : { data, expiry, ctype, ...extra }
         }, done);
     }
 

@@ -17,12 +17,13 @@ const dictionary = {
     weekbefore : "Semaine d'avant",
     lastmonth : "Mois dernier",
     monthbefore : "Mois d'avant",
-    populartopics : "Sujets populaires",
+    populartopics : "Éditions populaires",
     populartopicssub : "Basées sur les articles publiés dans les 30 derniers jours",
     yesterdaytoppost : "Le top article d'hier",
     hits : "lectures",
     publishedon : "Publié le ",
     hitsbyurl : "Lectures par URL",
+    nostats: 'Aucune statistiques à montrer',
 
     // Menus
     comments : "Commentaires",
@@ -35,6 +36,7 @@ const dictionary = {
     mailtemplates : "Courriels",
     publishingcontent : "Contenu",
     topics : "Sujets",
+    editions : "Éditions",
     contentchains : "Chaines de contenu",
     styledpages : "Pages stylées",
     crew : "Équipe",

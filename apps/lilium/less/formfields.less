@@ -189,7 +189,7 @@
 
 #lilium div.mce-fullscreen {
     position: fixed;
-    top: 50px;
+    top: 60px;
     left: 30px;
     z-index: @z_fullScreeMce;
 }
@@ -363,20 +363,50 @@ textarea {
 .stack-box-list {
     border : 1px solid @grayBorderColor;
     box-shadow: @softshadow;
+    background: @whiteish;
 }
 
 .stackbox-input-add {
     margin-top: 10px;
+
+    .stackbox-multi-input {
+        display: flex;
+
+        .field-wrap {
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+
+        .stackbox-multi-add-btn {
+            flex: 0 0 80px;
+            .button-worker {
+                margin-right: 0px;
+            }
+        }
+    }
 }
 
 .stackbox-entry {
     display: flex;
     padding: 10px;
-    border-bottom: 1px solid @grayBorderColor;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid @grayBorderColor;
+    }
 
     .classic-field {
         border: none;
         background: transparent;
+    }
+
+    .stackbox-entry-multiple {
+        flex-grow: 1;
+        display: flex;
+
+        .field-wrap  {
+            flex-grow: 1;
+            margin-bottom: 0px;
+        }
     }
 
     .stackbox-up, .stackbox-down, .stackboxex {

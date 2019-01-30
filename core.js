@@ -3,18 +3,26 @@ const hooks = require('./hooks.js');
 const db = require('./includes/db.js');
 const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./v4');
+const OS = require('os');
+const ShellServer = require('./cli/server');
+const metrics = require('./metrics');
 
 global.require_template = require('./templaterequire');
+
+const v4 = new V4();
 
 class Core {
     constructor() {
         log('Core', 'Lilium core object was created', 'success');
+        this.isElder = isElder;
     }
     
     makeEverythingSuperAwesome(readyToRock) {
         log('Core', 'Initializing Lilium', 'lilium');
         loadEnv();
         bindCrash();
+        initMetrics();
+        initShell();
 
         const inbound = require('./inbound.js')
         inbound.createServer(true);
@@ -36,7 +44,6 @@ class Core {
                 endpoints : require('./endpoints'),
                 livevars : require('./livevars'),
                 API : require('./api'),
-                formBuilder : require('./formBuilder'),
                 imageResizer : require('./imageResizer'),
                 LML3 : require('./lml3/compiler'),
                 LML2 : require('./lml'),
@@ -49,8 +56,6 @@ class Core {
                 sharedcache : require('./sharedcache'),
                 socialdispatch : require('./socialdispatch'),
                 themes : require('./themes'),
-                topics : require('./topics'),
-                utils : require('./utils'),
                 various : require('./various')
             };
 
@@ -58,41 +63,39 @@ class Core {
 
             loadCurrencies();
             maybeRunCAIJ();
-            loadHooks(readyToRock);
+            loadHooks(() => readyToRock(this));
             loadEndpoints();
             loadStandardInput();
             loadImageSizes();
             loadLiveVars();
             loadGlobalPetals();
             loadLMLLibs();
+            loadAudiences();
             loadBackendSearch();
             
             loadVocab(() => {
                 loadPlugins(() => {
                     loadRoles(() => {
                         precompile(() => {
-                            loadDocs(() => {
-                                redirectIfInit(resp, () => {
-                                    makeBuild(() => {
-                                        loadGitHub();
-                                        loadFrontend();
-                                        require('./riverflow/riverflow.js').loadFlows();
+                            redirectIfInit(resp, () => {
+                                makeBuild(() => {
+                                    loadGitHub();
+                                    loadFrontend();
+                                    require('./riverflow/riverflow.js').loadFlows();
 
-                                        inbound.handleQueue();
+                                    inbound.handleQueue();
                 
-                                        loadCacheInvalidator();
-                                        scheduleGC();
+                                    loadCacheInvalidator();
                 
-                                        log('Lilium', 'Starting inbound server', 'info');
-                                        loadNotifications();
-                                        notifyAdminsViaEmail();
-                                        executeRunScript();
-                                        initSchedulingTasks();
+                                    log('Lilium', 'Starting inbound server', 'info');
+                                    loadNotifications();
+                                    notifyAdminsViaEmail();
+                                    executeRunScript();
+                                    initSchedulingTasks();
+                                    initLocalcast();
                 
-                                        log('Core', 'Firing initialized signal', 'info');
-                                        hooks.fire('init');
-                                    });
-                                
+                                    log('Core', 'Firing initialized signal', 'info');
+                                    hooks.fire('init');
                                 });
                             });
                         });
@@ -126,7 +129,7 @@ const loadEndpoints = () => {
     endpoints.init();
     endpoints.register('*', 'lilium', 'GET', (cli) => {
         cli.userinfo && cli.userinfo.loggedin ? 
-            V4.serveV4Index(cli) :
+            v4.serveV4Index(cli) :
             cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login?to=" + cli.routeinfo.fullpath);
     });
 
@@ -191,6 +194,13 @@ const loadGlobalPetals = () => {
     Petals.register('backendsearch',    _c.default().server.base + 'backend/dynamic/admin/backendsearch.petal');
 };
 
+const initShell = () => {
+    if (isElder) {
+        const shellserver = new ShellServer();
+        shellserver.start();
+    }
+};
+
 const loadImageSizes = () => {
     const imageSize = require('./imageSize.js');
 
@@ -241,6 +251,12 @@ const makeBuild = (cb) => {
     });
 };
 
+const loadAudiences = () => {
+    if (!isElder) { return; }
+
+    require('./audiences').preload();
+};
+
 const loadRoles = (cb) => {
     const entities = require('./entities.js');
     entities.registerRole({
@@ -281,6 +297,12 @@ const gracefullyCrash = (err) => {
     hooks.fire('crash', err);
 
     log('Core', 'Contacting handler to request a crash to all handles', 'info');
+    metrics.push('errors', err);
+
+    if (global.__TEST) {
+        log('Core', 'Test mode will force Lilium to exit', 'warn');
+        require('./localcast').fatal(err);
+    }
 };
 
 const bindCrash = () => {
@@ -288,6 +310,10 @@ const bindCrash = () => {
         process.on('uncaughtException', gracefullyCrash);
     }
 };
+
+const initLocalcast = () => { 
+    require('./localcast').init();
+}
 
 const loadStandardInput = () => {
     const stdin = process.openStdin();
@@ -321,21 +347,6 @@ const loadCacheInvalidator = () => {
     const cacheInvalidator = require('./cacheInvalidator.js');
     cacheInvalidator.init(() => {
         log("CacheInvalidator", 'Ready to invalidate cached files', 'success');
-    });
-};
-
-const scheduleGC = () => {
-    log('GC', 'Scheduling temporary file collection', 'info');
-    const scheduler = require('./scheduler.js');
-    scheduler.schedule('GCcollecttmp', {
-        every: {
-            secondCount: 1000 * 60 * 60
-        }
-    }, () => {
-        const GC = require('./gc.js');
-        GC.clearTempFiles(() => {
-            log("GC", "Scheduled temporary files collection done", 'success');
-        });
     });
 };
 
@@ -458,17 +469,6 @@ const redirectIfInit = (resp, cb) => {
     }
 };
 
-const loadDocs = (cb) => {
-    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-        return cb();
-    }
-
-    const docs = require('./docs.js');
-    docs.compileDirectory(() => {
-        docs.compileIndex(cb);
-    });
-};
-
 const loadVocab = (done) => {
     const vocab = require('./vocab.js');
     vocab.preloadDicos(done);
@@ -484,6 +484,45 @@ const loadScriptMode = () => {
         return true;
     }
 };
+
+const initMetrics = () => {
+    metrics.create('requests', 'Requests', 'requests', 'count');
+    metrics.create('requestspers', 'Requests per second', 'req/s', 'count');
+    metrics.create('dbcalls', 'Database calls', 'calls', 'count');
+    metrics.create('loggedinusers', 'Logged-in users', 'users', 'count');
+    metrics.create('socketevents', 'Socket events', 'events', 'count');
+    metrics.create('authreq', 'Authenticated requests', 'requests', 'count');
+    metrics.create('errors', 'Errors', 'errors', 'array');
+    metrics.create('ram', 'RAM', 'mb', 'count');
+    metrics.create('cpu', 'CPU', '%', 'count');
+    metrics.create('failedauth', 'Failed logins', 'logins', 'count');
+    metrics.create('lml3compile', 'LML3 file compiled', 'files', 'count');
+    metrics.create('evlooplag', 'Event loop lag', 'ms', 'count');
+    metrics.create('httplatency', 'HTTP Laency', 'ms', 'avg');
+    metrics.create('articles', 'Total articles', 'articles', 'count');
+    metrics.create('entities', 'Total entities', 'entities', 'count');
+    metrics.create('endpointsreq', 'Request per endpoints', 'requests', 'deep');
+
+    queryMetrics();
+};
+
+const queryMetrics = () => {
+    setInterval(() => {
+        metrics.set('ram', process.memoryUsage().heapUsed / 1024 / 1024);
+    }, 2000);
+
+    setInterval(() => {
+        metrics.reset('requestspers');
+
+        setImmediate(() => {
+            const now = Date.now();
+
+            setImmediate(() => {
+                metrics.set('evlooplag', Date.now() - now);
+            });
+        });
+    }, 1000);
+}
 
 const loadEnv = () => {
     log("Core", "Loading Lilium environment variables", "info");

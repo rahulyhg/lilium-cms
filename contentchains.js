@@ -1,7 +1,7 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
 const filelogic = require('./filelogic.js');
-const articleLib = require('./article.js');
+const articleLib = require('./content.js');
 
 const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     title : 1,
@@ -12,11 +12,34 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     createdBy : 1,
     createdOn : 1,
     lastModified : 1,
+    edition : 1,
     media: { $arrayElemAt: ['$media', 0] },
+    
     'articles._id': 1,
     'articles.title': 1,
     'articles.date': 1
-}
+};
+
+const CHAIN_DEEP_PROJECTION = {
+    title : 1,
+    subtitle : 1,
+    slug : 1,
+    presentation : 1,
+    status : 1,
+    lastModified : 1,
+
+    'featuredimage' : '$media.sizes.facebook.url',
+
+    'articles._id': 1,
+    'articles.title': 1,
+    'articles.subtitle': 1,
+    'articles.facebookmedia' : 1,
+    'articles.date': 1,
+
+    'alleditions._id' : 1,
+    'alleditions.displayname' : 1,
+    'alleditions.slug' : 1
+};
 
 class ContentChains {
     constructor() {
@@ -34,7 +57,8 @@ class ContentChains {
             createdOn : new Date(),
             lastModified : new Date(),
             media: undefined,
-            articles : []
+            edition : [],
+            serie : []
         }, data);
     }
 
@@ -44,7 +68,7 @@ class ContentChains {
     }
 
     handleStatusChange(_c, id, callback) {
-        this.deepFetch(_c, id, cc => {
+        this.deepFetch(_c, { _id : db.mongoID(id) }, cc => {
             
         });
     }
@@ -60,25 +84,47 @@ class ContentChains {
             delete data.date;
         }
 
+        if (data.edition) {
+            data.edition = data.edition.map(x => db.mongoID(x));
+        }
+
+        if (data.serie) {
+            data.serie = data.serie.map(x => db.mongoID(x));
+        }
+
         db.update(_c, 'contentchains', {_id : db.mongoID(id)}, data, (err) => {
             callback && callback(err);
         });
     }
 
-    deepFetch(_c, chainid, send) {
+    deepFetch(_c, $match, send) {
         db.join(_c, 'contentchains', [ 
-            { 
-                $match : { _id : db.mongoID(chainid) }
-            }, { 
-                $limit : 1
-            }, {
+            { $match }, 
+            { $limit : 1 }, 
+            {
                 $lookup : {
                     from : "uploads",
                     localField : "media",
                     foreignField : "_id",
                     as : "media"
                 }
-            }
+            }, {
+                $lookup : {
+                    from : "editions",
+                    as : "alleditions",
+                    foreignField : "_id",
+                    localField : "edition"
+                }
+            }, {
+                $lookup : {
+                    from : "content",
+                    as : "articles",
+                    foreignField : "_id",
+                    localField : "serie"
+                }
+            }, 
+            { $unwind : "$media" }, 
+            { $project : CHAIN_DEEP_PROJECTION }
         ], (item) => {
             send(item[0]);
         });
@@ -140,7 +186,7 @@ class ContentChains {
         if (levels[0] == "bunch") {
             this.bunchLivevar(...arguments);
         } else if (levels[0] == "deep") {
-            this.deepFetch(cli._c, levels[1], (item) => {
+            this.deepFetch(cli._c, { _id : db.mongoID(levels[1]) }, (item) => {
                 sendback(item);
             });
         } else if (levels[0] == "search") {
@@ -177,7 +223,7 @@ class ContentChains {
                     items[0].articles.forEach(article => { article.title = article.title[0] } );
                     sendback({ items });
                 } else {
-                    cli.throwHTTP(404, 'Content chain not found', true);
+                    sendback({ items: [] });
                 }
             });
         } else if (levels[0] == "searchContent") {
@@ -253,12 +299,21 @@ class ContentChains {
             });
         } else if (path == "live") {
             let updatedData = cli.postdata.data;
-            updatedData.status = "live";
 
-            this.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
-                cli.sendJSON({ success: true });
+            db.findUnique(cli._c, 'contentchains', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, chain) => {
+                if (!chain) {
+                    return cli.throwHTTP(404, 'Content chain not found', true);
+                }
 
-                this.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
+                updatedData.status = "live";
+                updatedData.slug = require('slug')(chain.title).toLowerCase();
+
+                this.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
+                    cli.sendJSON({ success: true });
+
+                    this.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
+
+                    });
                 });
             });
         } else if (path == "unpublish") {
@@ -277,7 +332,7 @@ class ContentChains {
     }
 
     generateChain(_c, strID, callback) {
-        this.deepFetch(_c, strID, df => {
+        this.deepFetch(_c, { _id : db.mongoID(strID) }, df => {
             articleLib.batchFetch(_c, df.articles.map(x => db.mongoID(x)), articles => {
                 let id = df._id;
                 let extra = {
@@ -288,7 +343,7 @@ class ContentChains {
 
                 let landingPath = _c.server.html + "/" + df.slug + ".html";
                 filelogic.renderThemeLML(_c, 'chain', landingPath, extra, callback);
-            });
+            }, '_id');
         });
     }
 }

@@ -2,6 +2,7 @@ const db = require(liliumroot + "/includes/db");
 const sharedcache = require(liliumroot + "/sharedcache");
 const mailLib = require(liliumroot + "/mail");
 const Stripe = require('stripe');
+const cc = require('./creditcards');
 const LML3 = require(liliumroot + '/lml3/compiler');
 
 // Singleton
@@ -64,9 +65,7 @@ module.exports = class Money {
             // Request pending articles
             db.networkJoin('content', [
                 { $match : { author : contractorid, paymentstatus : "pending", status : "published" } },
-                { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" } },
-                { $unwind : "$fulltopic" },
-                { $project : { headline : { $arrayElemAt : [ "$title", 0 ] }, worth : 1, topicslug : "$fulltopic.completeSlug", name : 1 } }
+                { $project : { headline : { $arrayElemAt : [ "$title", 0 ] }, worth : 1, url : 1, name : 1 } }
             ], (posts, dbposts) => {
                 // Generate invoice
                 db.join(mainsite, 'contractorinvoices', [{ $sort : { _id : -1 }}, { $project : {number : 1} }, { $limit : 1} ], arr => {
@@ -85,58 +84,67 @@ module.exports = class Money {
                         generatedBy : requester
                     };
 
-                    const source = this.getConfig().source[currency] || this.getConfig().source.default;
-                    this.sendStripePayoutRequest(numberplusone, contractor.stripeuserid, total * 100, currency, source, (err, stripeinvoice) => {
-                        invoice.error = err;
-                        invoice.valid = !err;
-
-                        if (stripeinvoice) {
-                            invoice.stripeid = stripeinvoice.id;
-                            invoice.transactionid = stripeinvoice.balance_transaction;
-                            invoice.destinationid = stripeinvoice.destination;
-                            invoice.transferid = stripeinvoice.transfer;
-                        }
-
-                        db.insert(mainsite, 'contractorinvoices', invoice, () => {
-                            const sites = Object.keys(dbposts);
-                            let siteindex = -1;
-                            
-                            const handleSite = () => {
-                                if (++siteindex == sites.length) {
-                                    return done && done();
+                    cc.getDefaultCardByCurrency(currency, source => {
+                        if (source) {
+                            source.exp_year = source.expiryYear;
+                            source.exp_month = source.expiryMonth;
+                            source.object = 'card';
+                            this.sendStripePayoutRequest(numberplusone, contractor.stripeuserid, total * 100, currency, source, (err, stripeinvoice) => {
+                                invoice.error = err;
+                                invoice.valid = !err;
+        
+                                if (stripeinvoice) {
+                                    invoice.stripeid = stripeinvoice.id;
+                                    invoice.transactionid = stripeinvoice.balance_transaction;
+                                    invoice.destinationid = stripeinvoice.destination;
+                                    invoice.transferid = stripeinvoice.transfer;
+                                    invoice.eta = stripeinvoice.arrival_date;
                                 }
-
-                                const siteid = sites[siteindex];
-                                db.update(siteid, 'content', { _id : { $in : dbposts[siteid].map(x => x._id) } }, {
-                                    paymentstatus : "paid"
-                                }, (err, r) => {
-                                    if (r && r.modifiedCount != 0 && invoice.valid) {
-                                        db.findUnique(require(liliumroot + '/config').default(), 'entities', { _id : contractorid }, (err, contractor) => {
-                                            if (contractor && contractor.email) {
-                                                require(liliumroot + "/lml3/compiler").compile(
-                                                    require(liliumroot + '/config').fetchConfig(siteid), 
-                                                    liliumroot + "/backend/dynamic/invoice.lml3",
-                                                    { invoice, contractor },
-                                                    markup => {
-                                                        mailLib.triggerHook(require(liliumroot + '/config').fetchConfig(siteid), 'send_invoice_to_contractor', contractor.email, {
-                                                            contractor,
-                                                            invoice,
-                                                            markup
-                                                        }, () => {
-                                                            log('Contractor', 'Contractor was notified via email', 'success');
-                                                        });
+        
+                                db.insert(mainsite, 'contractorinvoices', invoice, () => {
+                                    const sites = Object.keys(dbposts);
+                                    let siteindex = -1;
+                                    
+                                    const handleSite = () => {
+                                        if (++siteindex == sites.length) {
+                                            return done && done();
+                                        }
+        
+                                        const siteid = sites[siteindex];
+                                        db.update(siteid, 'content', { _id : { $in : dbposts[siteid].map(x => x._id) } }, {
+                                            paymentstatus : "paid"
+                                        }, (err, r) => {
+                                            if (r && r.modifiedCount != 0 && invoice.valid) {
+                                                db.findUnique(require(liliumroot + '/config').default(), 'entities', { _id : contractorid }, (err, contractor) => {
+                                                    if (contractor && contractor.email) {
+                                                        require(liliumroot + "/lml3/compiler").compile(
+                                                            require(liliumroot + '/config').fetchConfig(siteid), 
+                                                            liliumroot + "/backend/dynamic/invoice.lml3",
+                                                            { invoice, contractor },
+                                                            markup => {
+                                                                mailLib.triggerHook(require(liliumroot + '/config').fetchConfig(siteid), 'send_invoice_to_contractor', contractor.email, {
+                                                                    contractor,
+                                                                    invoice,
+                                                                    markup
+                                                                }, () => {
+                                                                    log('Contractor', 'Contractor was notified via email', 'success');
+                                                                });
+                                                            }
+                                                        );
                                                     }
-                                                );
+                                                });
                                             }
+        
+                                            handleSite();
                                         });
-                                    }
-
+                                    };
+        
                                     handleSite();
                                 });
-                            };
-
-                            handleSite();
-                        });
+                            });
+                        } else {
+                            throw 'Will not attempt to make Stripe payout because noe default credit card was found for currency ' + currency;
+                        }
                     });
                 });
             });

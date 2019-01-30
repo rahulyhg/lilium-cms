@@ -4,7 +4,6 @@ var livevars = require('./livevars.js');
 var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');
 var analytics = require('./analytics.js');
-var formbuilder = require('./formBuilder.js');
 var db = require('./includes/db.js');
 var fs = require('fs');
 var Precompiler = require('./precomp.js');
@@ -13,7 +12,6 @@ var hooks = require('./hooks.js');
 var themes = require('./themes.js');
 var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
-var templateBuilder = require('./templateBuilder.js');
 var buildLib = require('./build');
 var events = require('./events.js');
 var various = require('./various.js');
@@ -23,6 +21,7 @@ var sitemap = require('./sitemap.js');
 var analytics = require('./analytics.js');
 var adslib = require('./ads');
 var roles = require('./role');
+var metrics = require('./metrics');
 var V4DevServer = require('./v4devserver');
 
 var networkInfo = require('./network/info.js');
@@ -43,19 +42,17 @@ var SiteInitializer = function (conf, siteobj) {
             fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
                 fileserver.createDirIfNotExists(conf.server.html + "/amp", function(nextvalid) {
                     fileserver.createDirIfNotExists(conf.server.html + "/api", function(nextvalid) {
-                        fileserver.createDirIfNotExists(conf.server.html + "/lmldoc", function(nextvalid) {
-                            if (valid && nextvalid) {
-                                log('FileServer',
-                                    'HTML Directory was validated at : ' +
-                                    conf.server.html,
-                                    'success'
-                                );
-                            } else {
-                                log('FileServer', 'Error validated html directories', 'err');
-                            }
+                        if (valid && nextvalid) {
+                            log('FileServer',
+                                'HTML Directory was validated at : ' +
+                                conf.server.html,
+                                'success'
+                            );
+                        } else {
+                            log('FileServer', 'Error validated html directories', 'err');
+                        }
                 
-                            done();
-                        }, true);
+                        done();
                     }, true);
                 }, true);
             }, true);
@@ -127,27 +124,11 @@ var SiteInitializer = function (conf, siteobj) {
                         db.createIndex(conf, "content", {date : -1}, function() {
                             db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
                                 log('Database', 'Created indices', 'success');
-                                createCollections();
+                                done();
                             });
                         });
                     });
                 });
-            });
-        };
-
-        var createCollections = function() {
-            log('Database', 'Creating collections', 'info');
-            
-        	var collectionsNames = [
-		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview", "topics",
-        		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history", "searches",
-		        "lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations", "communications",
-		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges", "styledpages"
-        	];
-
-            db.createCollections(conf, collectionsNames, function() {
-                log('Database', 'Database initialization finished', 'lilium');
-                done();
             });
         };
 
@@ -201,7 +182,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var update = function(conf, done) {
-        if (!isElder) { return done(); }
+        if (!isElder || global.__TEST) { return done(); }
 
         log('Sites', "Checking for updates");
         var versions = require('./versions.json');
@@ -240,9 +221,9 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var loadTheme = function(cb) {
+        log('Sites', "About to load the theme files for " + conf.website.sitetitle, 'info');
         themes.initializeSite(conf, function() {
-            if (!isElder) { return cb(); }
-            templateBuilder.precompThemeFiles(conf, cb);
+            cb();
         });
     };
 
@@ -270,6 +251,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var initEvents = function(cb) {
+        log('Sites', "Initializing events", 'info');
         if (!isElder) { return cb(); }
         events.init(conf, cb);
     };
@@ -304,8 +286,7 @@ var SiteInitializer = function (conf, siteobj) {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
                     initEvents(function() {
-                        templateBuilder.init(conf);
-
+                        log('Sites', 'Initializing email senders', 'info');
                         if (/*isElder &&*/ conf.emails) {
                             mail.setSender(conf.id, {
                                 user : conf.emails.senderemail,
@@ -319,7 +300,17 @@ var SiteInitializer = function (conf, siteobj) {
                         }
 
                         if (isElder) {
+                            log('Sites', "Loading polling for elder child", 'info');
                             analytics.pollRealtime(conf);
+                        }
+
+                        if (isElder) {
+                            log('Sites', 'V4 will load all older URL in cache front', 'info');
+                            const V4 = require('./v4');
+                            const v4 = new V4();
+                            v4.dumpV3UrlInFront(conf, () => {
+                                log('Sites', 'Old URLs will now redirect to new version', 'success');
+                            });
                         }
 
                         loadVarious(function() {
@@ -530,7 +521,7 @@ var Sites = function () {
                                     cli.redirect(cli._c.server.url + "admin/sites/", false);
                                 }); 
                             } else {
-                                require('./includes.wpSQL.js').transfer(existingSite, dat, function(err) {
+                                require('./includes/wpSQL.js').transfer(existingSite, dat, function(err) {
                                     if (err) {
                                         cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
                                     } else {
@@ -655,6 +646,13 @@ var Sites = function () {
                     fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
                         var keyname = sitename.replace('//', '').replace(/\s/g, '/');
                         siteInfo.jsonfile = files[fileIndex];
+
+                        if (!siteInfo.server.base) {
+                            siteInfo.server.base = liliumroot + "/";
+                        }
+                        if (!siteInfo.server.html) {
+                            siteInfo.server.html = require('path').join(liliumroot, "html");
+                        }
 
                         config.registerConfigs(keyname, siteInfo);
                         if (sitename == 'default') {

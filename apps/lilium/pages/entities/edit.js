@@ -160,9 +160,9 @@ export default class Entity extends Component {
     render() {
         if (!this.state.loading) {
             return (
-                <div id="entities"> 
-                    <h1>Edit</h1>
-                    <div id="info" style={{ width: '75vw', margin: '0 auto', display: 'flex' }}>
+                <div id="edit-entity">
+                    <h1>{`Editing user @${this.state.entity.username}`}</h1>
+                    <div id="entity-info">
                         <div class="card flex" style={{ alignSelf: "flex-start" }}>
                             <div class="image-wrapper">
                                 <img src={this.state.entity.avatarURL} alt={`${this.state.entity.displayname}'s profile picture`} className="profile-picture" style={{ display: 'block' }} />
@@ -197,7 +197,6 @@ export default class Entity extends Component {
                         </div>
                         <div id="EditFields" style={{ flexGrow: '1', margin: '0px 40px' }}>
                             <TextField name='displayname' initialValue={this.state.entity.displayname} placeholder='Display Name' onChange={this.updateEntity.bind(this)} />
-                            <TextField name='username' initialValue={this.state.entity.username} placeholder='Username' onChange={this.updateEntity.bind(this)} />
                             <TextField name='email' initialValue={this.state.entity.email} placeholder='Email address' type='email' onChange={this.updateEntity.bind(this)} />
                             <TextField name='phone' initialValue={this.state.entity.phone} placeholder='Phone number' type='phone' onChange={this.updateEntity.bind(this)} />
                             <MultiSelectBox name='roles' options={this.state.roles} initialValue={this.state.entity.roles} placeholder='Roles' onChange={this.updateEntity.bind(this)} />

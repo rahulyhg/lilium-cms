@@ -3,13 +3,13 @@ import { getLocal } from '../data/cache';
 import { TabView, Tab } from '../widgets/tabview';
 import { ImagePicker } from './imagepicker';
 import { PlacePicker } from './placepicker';
-import { EmbedPicker } from './embedpicker';
+import { EmbedPicker, embedToComponentCarousel } from './embedpicker';
 
 const PickerMap = {
     [ImagePicker.slug]: ImagePicker,
     [PlacePicker.slug]: PlacePicker,
     [EmbedPicker.slug]: EmbedPicker
-}
+};
 
 const LAST_OPENED_LOCAL_KEY = 'picker.lastopened';
 const AVAILABLE_PICKER_TABS = Object.keys(PickerMap);
@@ -157,14 +157,29 @@ export class Picker extends Component {
         }
     }
 
+    maybeCloseOnClick(ev) {
+        if (ev.target == this.overlayEl) {
+            Picker.dismiss();
+        }
+    }
+
+    tabChanged(tabev) {
+        this.setState({
+            selectedTabIndex : tabev.selectedIndex
+        });
+    }
+
     render(props, state) {
-        const selectedTabIndex = AVAILABLE_PICKER_TABS.indexOf(state.session.tab) || 0;
+        const selectedTabIndex = typeof this.state.selectedTabIndex == "undefined" ? 
+            (AVAILABLE_PICKER_TABS.indexOf(state.session.tab) || 0) :
+            this.state.selectedTabIndex;
+
         if (state.visible) {
             return (
-                <div id="picker-overlay">
+                <div id="picker-overlay" ref={x => (this.overlayEl = x)} onClick={this.maybeCloseOnClick.bind(this)}>
                     <div id="picker-wrapper">
                         <div id="picker" className={state.session.type == 'carousel' && 'carousel-session'}>
-                            <TabView id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex}>
+                            <TabView hidesingletab noshadow id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex} onTabSelected={this.tabChanged.bind(this)}>
                                 {
                                     state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
@@ -215,6 +230,8 @@ class CarouselPreview extends Component {
                 return ImageCarouselPreview;
             case PlacePicker.slug:
                 return MapCarouselPreview;
+            case EmbedPicker.slug:
+                return EmbedCarouselPreview;
             default:
                 return DefaultCarouselPreview;
         }
@@ -233,14 +250,13 @@ class CarouselPreview extends Component {
                             ))
                         ) : (
                             <div id="carousel-empty-text">
-                                <p>Elements added to the carousel will appear here</p>
                                 <p>No items in the carousel</p>
                             </div>
                         )
                     }
                 </div>
                 <div id="picker-carousel-actions">
-                    <button className='button fill purple' onClick={Picker.finish.bind(Picker, undefined)}>Add carousel</button>
+                    <button className='button fill purple' onClick={Picker.finish.bind(Picker, undefined)}>Insert carousel in content</button>
                 </div>
             </div>
         )
@@ -267,6 +283,10 @@ const MapCarouselPreview = props => (
     </div>
 );
 
-const  DefaultCarouselPreview = props => (
+const EmbedCarouselPreview = props => {
+    return embedToComponentCarousel(props.el.type, props.el);
+}
+
+const DefaultCarouselPreview = props => (
     <span>Default preview</span>
 );

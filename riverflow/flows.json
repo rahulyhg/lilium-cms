@@ -7,12 +7,6 @@
         "livevar", "setup"
     ],
 
-    "extensions" : [
-        "admin_menu",
-        "admin_sub_menu",
-        "hooks"
-    ],
-
     "menus" : [
         {
             "id": "ponglinks",
@@ -36,17 +30,6 @@
             "absURL": "/comments",
             "section" : "management"
         },
-        {
-            "id": "thedailylilium",
-            "v": "thedailylilium",
-            "lys" : "daily,lilium",
-            "faicon": "fa-newspaper",
-            "displayname": "The Daily Lilium",
-            "priority": 80,
-            "rights": ["dash"],
-            "absURL": "/thedailylilium",
-            "section" : "home"
-        },
         {    
             "id": "paymentdashboard",
             "v": "paymentdashboard",
@@ -64,7 +47,7 @@
             "lys" : "payments,history,contractors",
             "faicon": "fa-history",
             "displayname": "Payments Reports",
-            "priority": 3000,
+            "priority": 3001,
             "rights": ["hr"],
             "absURL": "/paymentshistory",
             "section" : "home"            
@@ -114,16 +97,16 @@
             "section" : "publishing"
         },
         {
-            "id": "articles-topics",
-            "v": "topics",
-            "lys" : "topics,categories,category",
-            "faicon": "fa-tags",
-            "displayname": "Topics",
-            "priority": 273,
-            "rights": ["manage-topics"],
-            "absURL": "/topics",
+            "id": "editions",
+            "v": "editions",
+            "lys" : "editions,topics,categories,category",
+            "faicon": "fa-book-open",
+            "displayname": "Editions",
+            "priority": 274,
+            "rights": ["manage-editions"],
+            "absURL": "/editions",
             "section" : "publishing"
-        }, 
+        },
         {
             "id": "contentchains",
             "v": "contentchains",
@@ -306,6 +289,17 @@
             "section" : "publishing"
         },
         {
+            "id": "thedailylilium",
+            "v": "thedailylilium",
+            "lys" : "daily,lilium",
+            "faicon": "fa-newspaper",
+            "displayname": "The Daily Lilium",
+            "priority": 80,
+            "rights": ["dash"],
+            "absURL": "/thedailylilium",
+            "section" : "home"
+        },
+        {
             "id": "crew",
             "v": "crew",
             "lys" : "crew,people,users",
@@ -370,10 +364,6 @@
             "endpoint" : "ads",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "history.js",
-            "endpoint" : "history",
-            "support" : ["admin_post", "livevar"]
-        }, {
             "module" : "datareader.js",
             "endpoint" : "datareader",
             "support" : ["admin_post", "livevar"]
@@ -404,15 +394,11 @@
         }, {
             "module" : "instagram.js",
             "endpoint" : "instagram",
-            "support" : ["livevar", "setup", "get"]
+            "support" : ["livevar", "get"]
         }, {
             "module" : "fix.js",
             "endpoint" : "fix",
             "support" : ["livevar","admin_post"]
-        }, {
-            "module" : "topics.js",
-            "endpoint" : "topics",
-            "support" : ["admin_post", "admin_put", "livevar"]
         }, {
             "module" : "plugins.js",
             "endpoint" : "plugins",
@@ -421,6 +407,14 @@
             "module" : "flagging.js",
             "endpoint" : "flagging",
             "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"]
+        }, {
+            "module" : "audiences.js",
+            "endpoint" : "audiences",
+            "support" : ["get", "admin_post", "admin_put", "admin_delete", "livevar"]
+        }, {
+            "module" : "languages.js",
+            "endpoint" : "languages",
+            "support" : ["admin_post", "admin_delete", "livevar"]
         }, {
             "module" : "themes.js",
             "endpoint" : "themes",
@@ -488,10 +482,6 @@
             "endpoint" : "styledpages",
             "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
         }, {
-            "module" : "docs.js",
-            "endpoint" : "docs",
-            "support" : ["get"]
-        }, {
             "module" : "cdn.js",
             "endpoint" : "cdn",
             "support" : [],
@@ -503,17 +493,9 @@
             "endpoint" : "publishing",
             "support" : ["admin_post", "admin_put", "admin_delete", "get", "livevar"]
         }, {
-            "module" : "article.js",
-            "endpoint" : "article",
-            "support" : ["admin_post", "api_get", "api_post"]
-        }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
             "support" : ["livevar", "admin_post"]
-        }, {
-            "module" : "article.js",
-            "endpoint" : "content",
-            "support" : ["livevar"]
         }, {
             "module" : "crew.js",
             "endpoint" : "crew",
@@ -527,20 +509,17 @@
             "endpoint" : "staffing",
             "support" : ["admin_post", "livevar", "admin_delete", "admin_put"]
         }, {
+            "module" : "metrics.js",
+            "endpoint" : "metrics",
+            "support" : ["livevar"]
+        }, {
             "module" : "entityrelationship.js",
             "endpoint" : "entityrelationship",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "personas.js",
-            "endpoint" : "persona",
-            "support" : ["admin_post", "livevar"],
-            "hooks" : [
-                { "name" : "post_create_persona", "priority" : 15, "callback" : "postCreatePersona" }
-            ]
-        }, {
             "module" : "role.js",
             "endpoint" : "role",
-            "support" : ["admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "preferences.js",
             "endpoint" : "preferences",
@@ -582,6 +561,10 @@
             "endpoint" : "sites",
             "support" : ["admin_post", "livevar"]
         }, {
+            "module" : "editions.js",
+            "endpoint" : "editions",
+            "support" : ["livevar", "admin_delete", "admin_put", "admin_post"]
+        }, {
             "module" : "session.js",
             "endpoint" : "session",
             "support" : ["livevar"]
@@ -593,6 +576,10 @@
             "module" : "contractorspayments.js",
             "endpoint" : "contractorspayments",
             "support" : ["admin_post", "livevar"]
+        }, {
+            "module" : "contractorspayments.js",
+            "endpoint" : "contractorinvoice",
+            "support" : ["get"]
         }, {
             "module" : "creditcardscontroller.js",
             "endpoint" : "creditcards",

@@ -6,7 +6,6 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
-var cli = require('./cli.js');
 var pathLib = require('path');
 
 var ActiveTheme = new Object();
@@ -159,7 +158,7 @@ var Themes = function () {
             log('Themes', 'Registering theme with uName ' + uName);
             this.searchDirForThemes(uName, function (info) {
                 if (!info) {
-                    throw new Error("[ThemeException] Could not find any info on theme with uName " + uName);
+                    return callback(new Error("[ThemeException] Could not find any info on theme with uName " + uName));
                 }
 
                 var themedir = config.server.base + config.paths.themes + "/";
@@ -186,7 +185,7 @@ var Themes = function () {
                 var settings = createOrUpdateThemeForm(config);
                 log('Themes', 'Updating database entry for site : ' + config.id);
 
-                db.findAndModify(config, 'themes', {
+                db.update(config, 'themes', {
                     uName: uName
                 }, info, function (err, doc) {
                     log('Themes', 'Enabling theme ' + info.uName);
@@ -285,42 +284,39 @@ var Themes = function () {
         }
     };
 
-    this.initializeSite = function (conf, cb) {
+    this.initializeSite = function (conf, cb, ignoreSiteTheme) {
         that.getThemesDirList(conf, function (themes) {
-            db.findToArray(conf.id, 'themes', {
+            db.findUnique(conf.id, 'themes', {
                 'active': true
-            }, function (err, results) {
-                var remove = function () {            
-                    db.remove(conf, 'themes', {$or : [{'active':false}, {'active': null}]}, function () {
-                        db.insert(conf, 'themes', themes, function (err) {
-                            cb();
-                        });
-                    }, false);
-                };
+            }, (err, theme) => {
+                if (!theme || ignoreSiteTheme) {
+                    log('Theme', 'No theme registered for website ' + conf.website.sitetitle, 'err');
+                    log('Theme', 'Trying to fallback to any theme present', 'info');
 
-                if (results.length == 0) {
-                    for (var i in themes) {
-                        if (themes[i].uName == conf.website.flower) {
-                            themes[i].active = true;
-
-                            themes.splice(i, 1);
-
-                            that.enableTheme(conf, conf.website.flower, remove);
-                            break;
-                        }
+                    const info = themes[0]
+                    if (info) {
+                        that.enableTheme(conf, info.uName, err => {
+                            if (err) {
+                                log('Theme', '[FATAL] Error registering default theme', 'err');
+                                require('./localcast').fatal(err);
+                            } else {
+                                cb()
+                            }
+                        }, {});
+                    } else {
+                        log('Theme', '[FATAL] No theme found in /flowers directory', 'err');
+                        require('./localcast').fatal(new Error("Lilium requires at least one theme located under /flowers"));
                     }
                 } else {
-                    var curt = results[0]
-                    for (var j in themes) {
-                        if (curt.uName == themes[j].uName) {
-                            themes[j].active = true;
-                            themes.splice(j, 1);
-                            that.enableTheme(conf, curt.uName, function() {
-                                remove();
-                            }, curt.settings);
-                            return;
+                    that.enableTheme(conf, theme.uName, err => {
+                        if (err) {
+                            log('Theme', err.toString(), 'err');
+                            log('Theme', 'Trying to fallback to another theme if any', 'info');
+                            that.initializeSite(conf, cb, true);
+                        } else {
+                            cb();
                         }
-                    }
+                    }, theme.settings);
                 }
             });
         });

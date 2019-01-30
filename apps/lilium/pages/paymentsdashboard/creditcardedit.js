@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { CreditCard } from './creditcard';
-import { TextField, ButtonWorker, SelectField } from '../../widgets/form';
+import { TextField, ButtonWorker, SelectField, CheckboxField } from '../../widgets/form';
 import { castNotification } from '../../layout/notifications';
 
 export class CreditCardEdit extends Component {
@@ -46,9 +46,6 @@ export class CreditCardEdit extends Component {
 
             done && done();
         }
-
-        console.log(this.errors);;
-        
     }
 
     fieldEdited(name, val, old, valid) {
@@ -91,6 +88,7 @@ export class CreditCardEdit extends Component {
                             <SelectField value={state.cc.currency} initialValue={state.cc.currency} placeholder='Currency' name='currency' onChange={this.fieldEdited.bind(this)}
                                         options={[{ displayname: 'CAD' }, { displayname: 'USD' }]} />
                         </div>
+                        <CheckboxField name='isCurrencyDefault' initialValue={!!state.cc.isCurrencyDefault} value={state.cc.isCurrencyDefault} placeholder='Set as currency default' onChange={this.fieldEdited.bind(this)} />
                         <ButtonWorker text={state.inserting ? 'Create' : 'Save'} theme='purple' type='fill' work={this.saveCreditCard.bind(this)} />
                         {
                             !state.inserting ? (

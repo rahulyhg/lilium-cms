@@ -32,9 +32,9 @@ class FlowHandle {
             case "api_post"    : API.registerApiEndpoint(this.flow.endpoint,     'POST',    this.river[this.flow.overrides.apiPOST || "apiPOST"].bind(this.river));         break;
             case "api_put"     : API.registerApiEndpoint(this.flow.endpoint,     'PUT',     this.river[this.flow.overrides.apiPUT || "apiPUT"].bind(this.river));           break;
             case "api_delete"  : API.registerApiEndpoint(this.flow.endpoint,     'DELETE',  this.river[this.flow.overrides.apiDELETE || "apiDELETE"].bind(this.river));     break;
-            case "setup"       : this.river.setup.apply(this.river);                                                                                                        break;
+            case "setup"       : this.river.setup ? this.river.setup.apply(this.river) : console.log("Missing setup for " + this.flow.endpoint);                                                            break;
 
-            default : log("Riverflow", "Used unknown Riverflow handle " + this.type, "warn"); return this; 
+            default : log("Riverflow", "Used unknown Riverflow handle " + this.type, "warn"); console.log(new Error()); return this; 
         }
 
         log('Riverflow', "Created '" + this.type + "' handle for flow with endpoint : " + this.flow.endpoint);
@@ -50,7 +50,7 @@ class Riverflow {
     registerFlow(flow) {
         log("Riverflow", "Creating flow for river " + flow.endpoint);
 
-        let river = require(config.default().server.base + flow.module);
+        let river = require(liliumroot + "/" + flow.module);
         river.handles = {};
         flow.overrides = river.overrides || {};
         
@@ -97,8 +97,7 @@ class Riverflow {
             return;
         }
 
-        let flowsPath = config.default().server.base + "riverflow/flows.json";
-        const Modules = require(flowsPath);
+        const Modules = require("./flows");
         
         log('Riverflow', "Loading " + Modules.rivers.length + " rivers");
         Modules.rivers.forEach(river => this.registerFlow(river));

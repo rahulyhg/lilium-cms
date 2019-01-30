@@ -2,6 +2,7 @@ const db = require('./includes/db');
 const config = require('./config');
 const filelogic = require('./filelogic');
 const log = require('./log');
+const CDN = require('./cdn');
 const hooks = require('./hooks');
 const notifications = require('./notifications');
 const DeepDiff = require('deep-diff');
@@ -15,12 +16,12 @@ const ENTITY_COLLECTION = 'entities';
 
 const LOOKUPS = {
     media : { from : "uploads", as : "deepmedia", localField : "media", foreignField : "_id" },
-    topic : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" }
+    editions : { from : "editions", as : "alleditions", localField : "editions", foreignField : "_id" }
 };
 
 const PUBLICATION_REPORT_TODAY_PROJECTION = {
     headline : { $arrayElemAt : ["$title", 0] }, subline : { $arrayElemAt : ["$subtitle", 0] }, 
-    date : 1, name : 1, facebookmedia : 1, topicslug : 1, author : 1
+    date : 1, name : 1, facebookmedia : 1, author : 1
 };
 
 const PAST_PUBLISHED_PROJECTION = {
@@ -63,6 +64,7 @@ class ContentLib {
                 hidden : false,
                 updated : new Date(),
                 aliases : [],
+                language : 'en',
                 createdOn : new Date()
             };
 
@@ -75,16 +77,98 @@ class ContentLib {
         }, {reportsto : 1, displayname : 1});
     }
 
+    toPresentables(_c, articles) {
+        return articles.map(x => this.toPresentable(_c, x, true));
+    }
+
+    toPresentable(_c, article, stripContent) {
+        let featuredimages = {};
+        if (article.featuredimage && article.featuredimage[0]) {
+            for (let size in article.featuredimage[0].sizes) {
+                featuredimages[size] = CDN.parseOne(_c, article.featuredimage[0].sizes[size].url);
+            }
+
+            article.featuredimageartist = article.featuredimage[0].artistname;
+            article.featuredimagelink = article.featuredimage[0].artisturl;
+        }
+
+        let topic;
+        if (article.topic) {
+            topic = {
+                id : article.topic._id,
+                displayname : article.topic.displayname,
+                slug : article.topic.slug,
+                completeSlug : article.topic.completeSlug
+            }
+        }
+
+        let author;
+        if (article.authors && article.authors[0]) {
+            author = article.authors[0];
+            author = {
+                id : author._id,
+                displayname : author.displayname,
+                bio : author.description,
+                avatarURL : author.avatarURL,
+                avatarMini : author.avatarMini,
+                slug : author.slug
+            };
+        }
+
+        return {
+            id : article._id.toString(),
+            title : article.title,
+            subtitle : article.subtitle,
+            featuredimageartist : article.featuredimageartist,
+            featuredimagelink : article.featuredimagelink,
+            geolocation : article.geolocation && article.geolocation.split('_'),
+            date : article.date,
+            isPaginated : article.content.length > 1,
+            totalPages : article.content.length,
+            isSponsored : article.isSponsored,
+            useSponsoredBox : article.useSponsoredBox,
+            sponsoredBoxTitle : article.sponsoredBoxTitle,
+            sponsoredBoxURL : article.sponsoredBoxURL,
+            sponsoredBoxLogo : article.sponsoredBoxLogo,
+            sponsoredBoxContent : article.sponsoredBoxContent,
+            slug : article.name,
+            nsfw : article.nsfw,
+            url : article.url,
+
+            content : (stripContent ? undefined : article.content),
+
+            author, topic, featuredimages
+        };
+    }
+
     generateJSON(_c, deepArticle, done) {
         log('Content', 'Creating JSON version of article ' + deepArticle._id, 'detail');
         const filedir = _c.server.html + "/content/"; 
         const fullpath = filedir + deepArticle._id + ".json";
         mkdirp(filedir, () => {
-            fs.writeFile(fullpath, JSON.stringify(require('./article').toPresentable(_c, deepArticle)), { encoding : "utf8" }, () => {
+            fs.writeFile(fullpath, JSON.stringify(this.toPresentable(_c, deepArticle)), { encoding : "utf8" }, () => {
                 log('Content', 'Created JSON version of article ' + deepArticle._id, 'success');
                 done()
             });
         });
+    }
+
+    generateOrFallback({_c}, slug, sendback) {
+        db.findUnique(_c, 'content', { $or : [{name:slug}, {aliases:slug}] }, (err, post) => {
+            if (!post) {
+                sendback(false);
+            } else {
+                if (slug == name) {
+                    this.getFull(_c, post._id, deepArticle => {
+                        this.generate(_c, deepArticle, () => {
+                            sendback(true);
+                        });
+                    });
+                } else {
+                    sendback(true, { url : post.url });
+                }
+            }
+        }, { _id : 1, name : 1 });
     }
 
     generate(_c, deepArticle, cb, pageIndex) {
@@ -98,12 +182,6 @@ class ContentLib {
             return cb && cb(new Error("Cannot generate article without a topic"));
         }
 
-        // Legacy support
-        if (deepArticle.fulltopic) {
-            deepArticle.topic = deepArticle.fulltopic;
-            deepArticle.topicslug = deepArticle.topic.completeSlug;
-            extra.topic = deepArticle.fulltopic;
-        }
         if (deepArticle.deepmedia) {
             deepArticle.featuredimage = [ deepArticle.deepmedia ];
             deepArticle.imagecreditname = deepArticle.deepmedia.artistname;
@@ -111,13 +189,6 @@ class ContentLib {
         }
         if (deepArticle.fullauthor) {
             deepArticle.authors = [deepArticle.fullauthor];
-        }
-
-        if (deepArticle.topic && deepArticle.topic.override && deepArticle.topic.override.language) {
-            extra.language = deepArticle.topic.override.language;
-        }
-        if (deepArticle.topicslug.startsWith('/')) {
-            deepArticle.topicslug = deepArticle.topicslug.slice(1, -1);
         }
 
         deepArticle.content = deepArticle.content.map(x => x.replace(/lml-fb-video/g, 'fb-video').replace(/lml-fb-post/g, 'fb-post'));
@@ -128,7 +199,7 @@ class ContentLib {
         });
 
         let ctx = deepArticle.templatename || (deepArticle.topic && deepArticle.topic.articletemplate) || "article";
-        let filename = deepArticle.topicslug + "/" + deepArticle.name;
+        let filename = deepArticle.name;
 
         deepArticle.headline = deepArticle.title[0];
         deepArticle.headsub = deepArticle.subtitle[0]
@@ -154,10 +225,10 @@ class ContentLib {
                             pages : pages.length
                         });
                     } else {
-                        require('./article').generateArticle(_c, deepArticle._id, (resp)  => {
+                        this.generateArticle(_c, deepArticle, (resp)  => {
                             cIndex--;
                             nextPage(resp);
-                        }, false, cIndex);
+                        }, cIndex);
                     }
                 };
                 return nextPage();
@@ -206,11 +277,11 @@ class ContentLib {
             deepArticle.numberOfPages = 1;
         }
  
-        const asyncHooks = hooks.getSiteHooksFor(_c, 'article_async_render');
+        const asyncHooks = hooks.getSiteHooksFor(_c, 'article_async_render') || [];
         const dom = new JSDOM(deepArticle.content);
     
         let hookIndex = -1;
-        const nextHook = ()  => {
+        const nextHook = () => {
             if (++hookIndex != asyncHooks.length) {
                 let hk = asyncHooks[hookIndex];
                 hk({
@@ -277,7 +348,7 @@ class ContentLib {
                                 lastpublished.push({
                                     headline : article.title[0], subline : article.subtitle[0], 
                                     date : article.date, name : article.name, facebookmedia : article.facebookmedia, 
-                                    topicslug : article.topicslug, author : article.author._id || article.author
+                                    author : article.author._id || article.author, editions : article.editions
                                 });
 
                                 db.join(_c, 'hits', [
@@ -340,9 +411,8 @@ class ContentLib {
             { $skip },
             { $limit },
             { $lookup : LOOKUPS.media },
-            { $lookup : LOOKUPS.topic },
+            { $lookup : LOOKUPS.editions },
             { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
-            { $unwind : { path : "$fulltopic", preserveNullAndEmptyArrays : true } },
             { $project }
         ];
 
@@ -364,27 +434,54 @@ class ContentLib {
         }
     }
 
+    batchFetch(_c, matches, callback, fieldToMatch = "_id") {
+        let index = -1;
+        const posts = [];
+        const next = () => {
+            if (++index == matched.length) {
+                callback(posts);
+            } else {
+                this.getFull(_c, undefined, deeparticle => {
+                    posts.push(deeparticle);
+                }, { [fieldToMatch] : matches[index] });
+            }
+        };
+
+        next();
+    }
+
     getFull(_c, _id, sendback, match = {}, collection = CONTENT_COLLECTION) {
         const $match = match;
-        $match._id = db.mongoID(_id);
+        if (_id) {
+            $match._id = db.mongoID(_id);
+        }
 
         db.join(_c, collection, [
             { $match },
             { $limit : 1 },
             { $lookup : LOOKUPS.media },
-            { $lookup : LOOKUPS.topic },
+            { $lookup : LOOKUPS.editions },
             { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
-            { $unwind : { path : "$fulltopic", preserveNullAndEmptyArrays : true } },
         ], arr => {
             const post = arr[0];
             if (!post) {
                 return sendback();
             }
 
+            if (post.alleditions) {
+                post.overrides = post.alleditions.reduce((cur, acc) => Object.assign(
+                    cur, acc.lang[post.language || "en"]
+                ), {});
+            }
+
             db.findUnique(config.default(), ENTITY_COLLECTION, { _id : post.author }, (err, author) => {
                 post.fullauthor = author;
                 post.headline = post.title[0];
-                post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
+                if (post.alleditions) {
+                    post.alleditions.sort((a, b) => a.level - b.level);
+                }
+
+                // post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
 
                 hooks.fireSite(_c, 'contentGetFull', {article : post});
                 this.fetchSponsoredInformation(_c, post, () => {
@@ -440,9 +537,12 @@ class ContentLib {
     parseSpecialValues(v) {
         v.date && (v.date = new Date(v.date));
         v.author && (v.author = db.mongoID(v.author));
-        v.topic && (v.topic = db.mongoID(v.topic));
         v.media && (v.media = db.mongoID(v.media));
         v.sponsoredBoxLogo && (v.sponsoredBoxLogo = db.mongoID(v.sponsoredBoxLogo));
+
+        if (v.editions) {
+            v.editions = v.editions.map(ed => db.mongoID(ed));
+        }
 
         if (v.topic == null || typeof v.topic == "undefined") {
             delete v.topic;
@@ -457,11 +557,12 @@ class ContentLib {
             if (!existing) {
                 db.join(_c, 'content', [
                     { $match : { _id : postid } },
-                    { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" } },
-                    { $project : { fulltopic : 1, name : 1, title : 1 } }
+                    { $lookup : LOOKUPS.editions }, 
+                    { $project : { fulltopic : 1, name : 1, title : 1, alleditions : 1 } }
                 ], article => {
+                    const url = "/" + article[0].alleditions.map(x => x.slug).join('/') + "/" + article[0].name
                     db.update(_c, 'content', { _id : postid }, { 
-                        $set : { name },
+                        $set : { name, url },
                         $addToSet : { aliases : article[0].name }
                     }, () => {
                         this.pushHistoryEntryFromDiff(_c, postid, caller, diff(
@@ -471,16 +572,16 @@ class ContentLib {
                                 _c : _c,
                                 oldslug : article[0].name,
                                 newslug : name,
-                                oldurl : "/" + article[0].fulltopic[0].completeSlug + "/" + article[0].name,
+                                oldurl : "/" + article[0].url, 
                                 paginated : article[0].title.length > 1
                             });
 
-                            hooks.fireSite(_c, 'article_updated', { article, _c });
+                            hooks.fireSite(_c, 'article_updated', { article : article[0], _c });
 
-                            if (article[0] && article[0].fulltopic[0]) {
+                            if (url) {
                                 callback(
                                     undefined, 
-                                    _c.server.protocol + _c.server.url + "/" + article[0].fulltopic[0].completeSlug + "/" + name
+                                    _c.server.protocol + _c.server.url + url
                                 );
                             } else {
                                 callback(undefined, name);
@@ -500,7 +601,7 @@ class ContentLib {
 
         const pipeline = [
             { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
-            { $lookup : { from : "topics", as : "fulltopic", localField : 'topic', foreignField : '_id' } },
+            { $lookup : LOOKUPS.editions }, 
             { $project : PAST_PUBLISHED_PROJECTION },
             { $group : { _id : { day: {$dayOfYear : "$date"}, year : { $year : "$date" } }, articles : { $push : "$$ROOT" } } },
             { $sort : { _id : 1 } },
@@ -515,42 +616,17 @@ class ContentLib {
     fetchDeepFieldsFromDiff(_c, post, deepdiff, done) {        
         const fields = deepdiff.diffs.map( x => x.field );
 
-        let doTopic = next => {
-            if (fields.includes('topic') && post.topic) {
-                require('./topics').deepFetch(_c, post.topic, topic => {
-                    if (topic) {
-                        post.topicslug = topic.completeSlug;
-                        post.topicdisplay = topic.displayname;
-                        post.topicfamily = topic.family;
-                        post.lang = topic.override.language || _c.website.language || "en-ca";
-                    } 
+        if (fields.includes('media') && post.media) {
+            db.findUnique(_c, 'uploads', { _id : post.media }, (err, media) => {
+                if (media) {
+                    post.facebookmedia = _c.server.protocol + media.sizes.facebook.url;
+                } 
 
-                    next();
-                });
-            } else {
-                next();
-            }
-        };
-
-        let doMedia = next => {
-            if (fields.includes('media') && post.media) {
-                db.findUnique(_c, 'uploads', { _id : post.media }, (err, media) => {
-                    if (media) {
-                        post.facebookmedia = _c.server.protocol + media.sizes.facebook.url;
-                    } 
-
-                    next();
-                });
-            } else {
-                next();
-            }
-        };
-
-        doTopic(() => {
-            doMedia(() => {
                 done();
-            })
-        })
+            });
+        } else {
+            done();
+        }
     }
 
     update(_c, postid, caller, values, callback) {
@@ -640,14 +716,17 @@ class ContentLib {
                         post.date = new Date();
                         post.date = post.date;
                     }
-                    
+
+                    post.seotitle = post.seotitle || post.title[0]
+                    post.seosubtitle = post.seosubtitle || post.subtitle[0]
+
                     if (!post.name) {
-                        post.name = require('slug')(post.title[0]).toLowerCase();
+                        post.name = require('slug')(post.seotitle).toLowerCase();
                         post.name = post.name;
                     }
-        
+
                     if (
-                        !post.topic || !post.author || !post.media || 
+                        !post.editions || post.editions.length == 0 || !post.author || !post.media || 
                         !post.title[0] || !post.subtitle[0] || !post.content[0]
                     ) {
                         return sendback({ error : "Missing fields", code : 401 });
@@ -667,12 +746,15 @@ class ContentLib {
                 return sendback(err);
             } 
 
-            post.status = "published";
-            post.publishedOn = new Date();
-            post.publishedAt = Date.now();
-            post.date = new Date();
+            const updated = {
+                status : "published",
+                publishedOn : new Date(),
+                publishedAt : Date.now(),
+                date : new Date(),
+                url : "/" + post.alleditions.map(x => x.lang[post.language].slug).join('/') + "/" + post.name
+            };
 
-            db.update(_c, 'content', { _id : post._id }, post, () => {
+            db.update(_c, 'content', { _id : post._id }, updated, () => {
                 db.remove(_c, 'autosave', { contentid : post._id }, () => {
                     this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
                         this.updateActionStats(_c, post, score => {
@@ -703,8 +785,26 @@ class ContentLib {
                     });
                 });
             });
-
         });
+    }
+
+    refreshURL(_c, fullpost, caller, done) {
+        const url = "/" + fullpost.alleditions.map(x => x.lang[fullpost.language || "en"].slug).join('/') + "/" + fullpost.name;
+        if (fullpost.url != url) {
+            fullpost.aliases = [...(fullpost.aliases || []), fullpost.url];
+            fullpost.url = url;
+
+            db.update(_c, 'content', { _id : fullpost._id }, {
+                url : fullpost.url,
+                aliases : fullpost.aliases
+            }, () => {
+                this.pushHistoryEntryFromDiff(_c, fullpost._id, caller, diff({}, { url, aliases : fullpost.aliases }), 'update', historyentry => {
+                    done(historyentry, { url, aliases : fullpost.aliases });
+                });
+            });
+        } else {
+            done();
+        }
     }
 
     regenerateFromSlug(_c, slug, done) {
@@ -803,14 +903,13 @@ class ContentLib {
         if (type == "populartopics") {
             const pipeline = [
                 { $match : { status : "published", $and : [{ date : {$gt} }, { date : {$lt} }] } },
-                { $group : { _id : "$topic", published : { $sum : 1 } } },
-                { $lookup : { from : "topics", as : "fulltopic", localField : '_id', foreignField : '_id' } },
+                { $group : { _id : "$editions", published : { $sum : 1 } } },
+                { $lookup : { from : "editions", as : "alleditions", localField : '_id', foreignField : '_id' } },
                 { $sort : { published : -1 } },
                 { $project : { 
-                    _id : 0, 
-                    topicname : { $arrayElemAt : ["$fulltopic.displayname", 0]}, 
-                    topicslug : { $arrayElemAt : ["$fulltopic.completeSlug", 0]}, 
-                    published : 1 
+                    _id : 0, published : 1,
+                    "alleditions.displayname" : 1,
+                    "alleditions.slug" : 1
                 } },
                 { $limit : 10 }
             ];
@@ -879,7 +978,6 @@ class ContentLib {
 
         done && done();
     }
-
 
     getPreview(_c, postid, previewkey, sendback) {
         // this.parseSpecialValues(payload);

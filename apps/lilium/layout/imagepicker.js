@@ -46,6 +46,10 @@ class SelectedImage extends Component {
 
     componentWillReceiveProps(props) {        
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
+        if (!props.image || props.image.notfound) {
+            return this.setState({ selected : undefined });
+        }
+
         this.imgtag && this.imgtag.getAttribute('src') != this.makeSrc(props.image) && this.imgtag.removeAttribute('src');
 
         if (props.image) {
@@ -155,6 +159,10 @@ class ImageThumbnail extends Component {
         this.props.clicked(this.state.image, this);
     }
 
+    doubleclicked() {
+        Picker.accept({ type: ImagePicker.slug, [ImagePicker.slug] : this.state.image });
+    }
+
     render() {
         if (this.state.uploading) {
             return (
@@ -173,12 +181,12 @@ class ImageThumbnail extends Component {
             );
         }
 
-        return (
-            <img onClick={this.clicked.bind(this)} 
+        return this.state.image && this.state.image.sizes ? (
+            <img onClick={this.clicked.bind(this)} onDblClick={this.doubleclicked.bind(this)} 
                 class={"image-picker-thumb " + (this.state.selected ? "selected" : "")} 
                 src={this.state.image.sizes.thumbnail.url} 
             />
-        )
+        ) : null;
     }
 }
 
@@ -251,11 +259,6 @@ export class ImagePicker extends Component {
     render() {
         return (
             <div id="image-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
-                <div>
-                    <b style={ styles.bigtitle }>Lilium gallery</b>
-                    <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
-                </div>
-                
                 <div id="image-picker-flex-wrapper">
                     <div id="image-gallery">
                         <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
@@ -267,6 +270,9 @@ export class ImagePicker extends Component {
                                 <ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageSelected.bind(this)} />
                             ))
                         }
+
+                        <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
+                
                     </div>
 
                     <div id="image-gallery-detail"> 

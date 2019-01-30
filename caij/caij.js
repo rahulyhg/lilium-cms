@@ -58,7 +58,6 @@ class ConsoleArtificialIntelligenceJanitor {
     }
 
     createServer() {
-        require('../network/sharedmemory.js').bind();
         fileserver.deleteFile(__dirname + "/caij.sock", () => {
             this.server = net.createServer(this.incoming.bind(this));
             this.server.on('error', this.error);

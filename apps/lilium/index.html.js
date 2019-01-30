@@ -40,9 +40,11 @@ module.exports = cli => {
 
                 ${
                     fulldevenv ? `
-                        <script src="${buildLocation}/app.bundle.js"></script>
-                        <script src="${buildLocation}/vendors.app.bundle.js"></script>
-                        <script src="${buildLocation}/main.app.bundle.js"></script>
+                        <script async src="${buildLocation}/app.bundle.js"></script>
+                        <script async src="${buildLocation}/vendors.app.bundle.js"></script>
+                        <script async src="${buildLocation}/layout.app.bundle.js"></script>
+                        <script async src="${buildLocation}/pages.app.bundle.js"></script>
+                        <script async src="${buildLocation}/main.app.bundle.js"></script>
                     ` : `
                         <script src="${buildLocation}/main.bundle.js"></script>
                         <script src="${buildLocation}/preact.bundle.js"></script>

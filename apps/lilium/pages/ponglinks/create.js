@@ -83,7 +83,7 @@ export class CreatePonglink extends Component {
 
         API.post('/ponglinks/create', payload, (err, data, r) => {
             if (r.status == 200) {
-                navigateTo('/ponglinks');
+                return navigateTo('/ponglinks');
             } else {
                 castNotification({
                     title: 'Error creating ponglink campaign',
@@ -125,12 +125,12 @@ export class CreatePonglink extends Component {
                         <Version onRemove={this.removeVersion.bind(this)} key={version.id} index={index} identifier={version.identifier} destination={version.destination} update={this.updateVersion.bind(this)} />
                     ))
                 }
-                <ButtonWorker text='Add version' sync={true} work={this.addVersion.bind(this)} />
+                <ButtonWorker text='Add version' theme='blue' type='fill' sync work={this.addVersion.bind(this)} />
 
                 <hr />
                 <div style={{ textAlign:'right' }}>
-                    <ButtonWorker text='Create campaign' theme='blue' type='fill' work={this.save.bind(this)} />
-                    <ButtonWorker text='Cancel' theme='white' type='outline' work={() => dismissOverlay()} />
+                    <ButtonWorker text='Create campaign' theme='purple' type='fill' work={this.save.bind(this)} />
+                    <ButtonWorker text='Cancel' theme='red' type='outline' work={() => dismissOverlay()} />
                 </div>
 
             </div>

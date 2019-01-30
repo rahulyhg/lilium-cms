@@ -1,5 +1,6 @@
 var _c = require('../config.js');
 var log = require('../log.js');
+var metrics = require('../metrics');
 var MongoClient = require('mongodb').MongoClient
 var mongoObjectID = require('mongodb').ObjectID;
 var noop = () => {};
@@ -57,41 +58,11 @@ var DB = function() {
 		});
 	};
 
-	this.createCollection = this.createCollections = function(conf, col, callback) {
-        if (typeof col === 'object') {
-            var colIndex = 0;
-            var colMax = col.length;
-            var results = { err : [], res : [] };
-
-            var ins = function() {
-                if (colIndex < colMax) {
-		            _conns[conf.id || conf].createCollection(col[colIndex], {}, function(err, res) {
-                        err && results.err.push(err);
-                        res && results.res.push(res);
-                        colIndex++;
-                        
-                        ins();
-                    });
-                } else {
-                    log('Database', 'Created ' + results.res.length + ' collections with ' + results.err.length + ' errors', 'lilium');
-                    results.err.forEach(e => {
-                        log('Database', e, 'warn');
-                    });
-
-                    callback && callback();
-                }
-            };
-
-            ins();
-        } else {
-		    _conns[conf.id || conf].createCollection(col, {}, callback);
-        }
-	};
-
 	this.initDatabase = function(conf, callback) {
 		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, client) {
             if (!client || err) {
-                log('Database', '[FATAL] Could not connect to database.', 'err');
+                log('Database', 'Could not connect to database.', 'err');
+                require('../localcast').fatal(new Error("Could not connect to database"));
                 return;
             }
 			client.db(conf.data.use).collection('lilium', {}, function(err, c) {
@@ -112,6 +83,11 @@ var DB = function() {
 		});
 	};
 
+    this.createCollection = this.createCollections = function(_, __, done) {
+        log('Database', '[DEPRECATED] A call to createCollection wad made, but the method is deprecated', 'warn');
+        done && done();
+    }
+
 	var formatMongoString = function(conf) {
 		return 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" +
 			conf.data.host + ":" + conf.data.port + "/" + conf.data.use;
@@ -131,6 +107,7 @@ var DB = function() {
 		cb : End callback with format function(err, cursor)
 	*/
 	this.find = this.query = function(conf, coln, conds, stack, cb, proj) {
+        metrics.plus('dbcalls');
 		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
                 log('Database', 'Error querying collection ' + coln + ' : ' + err, 'err');
@@ -185,6 +162,7 @@ var DB = function() {
     };
 
     this.findUnique = this.findSingle = function(conf, coln, conds, cb, proj) {
+        metrics.plus('dbcalls');
         _conns[conf.id || conf].collection(coln, {}, function(err, col) { 
             var cur = col.find(conds).limit(1).project(proj);
             cur.hasNext(function(err, hasnext) {
@@ -194,6 +172,7 @@ var DB = function() {
     }
 
     this.count = this.length = function(conf, coln, conds, cb) {
+        metrics.plus('dbcalls');
         _conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -218,6 +197,7 @@ var DB = function() {
 	};
 
 	this.findToArray = function(conf, coln, conds, cb, projection, skip, max, fromLastToFirst) {
+        metrics.plus('dbcalls');
 		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -251,6 +231,7 @@ var DB = function() {
 	};
 
 	this.multiLevelFind = function(conf, topLevel, levels, conds, stack, callback) {
+        metrics.plus('dbcalls');
 		var firstNodeCond = levels.shift();
 		this.find(conf, topLevel, conds, stack, function(err, cur) {
 			cur.hasNext(function(err, hasNext) {
@@ -274,6 +255,7 @@ var DB = function() {
 	};
 
 	this.singleLevelFind = function(conf, topLevel, callback) {
+        metrics.plus('dbcalls');
 		this.find(conf, topLevel, {}, {}, function(err, cur) {
 			err ? callback(err) : cur.toArray(function(err, docs) {
 				callback(docs);
@@ -282,6 +264,7 @@ var DB = function() {
 	};
 
     this.save = function(conf, coln, doc, cb) {
+        metrics.plus('dbcalls');
         _conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -297,6 +280,7 @@ var DB = function() {
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
 	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one, operators, getDoc) {
+        metrics.plus('dbcalls');
         _conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -327,6 +311,7 @@ var DB = function() {
 	};
 
     this.increment = function(conf, coln, match, fields, done) {
+        metrics.plus('dbcalls');
         _conns[conf.id].collection(coln, {}, (err, col) => {
             col.updateOne(match, {$inc : fields}).then(done || noop).catch(done || noop);
         });
@@ -342,6 +327,7 @@ var DB = function() {
 	}
 
 	this.findAndModify = function(conf, coln, conds, newVal, cb, upsert, one) {
+        metrics.plus('dbcalls');
 		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -369,6 +355,7 @@ var DB = function() {
 	}
 
 	this.insert = function(conf, coln, docs, cb) {
+        metrics.plus('dbcalls');
 		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -381,6 +368,7 @@ var DB = function() {
 	};
 
 	this.remove = this.delete = function(conf, coln, conds, cb, one) {
+        metrics.plus('dbcalls');
 		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -399,6 +387,7 @@ var DB = function() {
 	};
 
 	this.aggregate = this.join = function(conf, coln, aggregation, cb, unique) {
+        metrics.plus('dbcalls');
 		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -439,6 +428,7 @@ var DB = function() {
 
 	// Will callback cb with a boolean representing the existance of a document
 	this.match = this.exists = function(conf, coln, conds, cb) {
+        metrics.plus('dbcalls');
         _conns[conf.id || conf].collection(coln, {}, function(err, col) {
             col.find(conds).limit(1).hasNext(function(err, hasnext) {
                 cb(hasnext);
@@ -453,6 +443,7 @@ var DB = function() {
     // iterator :   function called on each object with (object, next, cursor)
     //              Calling next(false) will break the loop
     this.paramQuery = function(conf, params, cb) {
+        metrics.plus('dbcalls');
 		_conns[conf.id || conf].collection(coln, params.colparam || {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -494,6 +485,7 @@ var DB = function() {
 
 	// USE CAREFULLY
 	// Will callback cb with a raw mongodb collection object
+    // Will not compute metric
 	this.rawCollection = function(conf, coln, opt, cb) {
 		_conns[conf.id || conf].collection(coln, opt, cb);
 	};

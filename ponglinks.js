@@ -44,12 +44,14 @@ class PongLinks {
     }   
 
     createLink(_c, creatorid, link, done) {
+        console.log('link: ', link);
+        
         const hash = this.hashDestination(JSON.stringify(link));
         const versions = link.versions.map((v, i) => {
             v.identifier = v.identifier.trim().replace(/[\s\&]/g, '_');
-            if (!v.destnation.startsWith('http')) {
+            if (!v.destination.startsWith('http')) {
                 v.destination = "https://" + v.destination.trim();
-            };
+            }
 
             return {
                 destination : v.destination.trim() + (v.destination.includes("?") ? "&" : "?") +
@@ -80,11 +82,13 @@ class PongLinks {
             });
 
             sharedcache.set(set);
+            
+            done && done();
         });
     }
 
     adminPOST(cli) {
-        if (!cli.hasRightOrRefuse('ponglinks')) {            
+        if (cli.hasRightOrRefuse('ponglinks')) {            
             const action = cli.routeinfo.path[2];
             if (action == "create") {
                 this.createLink(cli._c, db.mongoID(cli.userinfo.userid), cli.postdata.data, (err, id)  => cli.sendJSON(err ? { error : err.toString() } : { id }) );
@@ -234,20 +238,18 @@ class PongLinks {
             log('Ponglinks', 'Elder process is storing links', 'info');
             const sites = require('./config').getAllSites();
             sites.forEach(site => {
-                db.createCollections(site, ['ponglinks', 'pongclicks'], () => {
-                    db.findToArray(site, 'ponglinks', {}, (err, arr) => {
-                        const set = {};
-                        log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
-                        arr.forEach(x => {
-                            if (x.versions) {
-                                x.versions.forEach(v => {
-                                    set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
-                                });
-                            }
-                        });
-
-                        sharedcache.set(set);
+                db.findToArray(site, 'ponglinks', {}, (err, arr) => {
+                    const set = {};
+                    log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
+                    arr.forEach(x => {
+                        if (x.versions) {
+                            x.versions.forEach(v => {
+                                set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
+                            });
+                        }
                     });
+
+                    sharedcache.set(set);
                 });
             });
         }

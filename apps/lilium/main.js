@@ -79,6 +79,7 @@ import { URLRenderer } from './routing/urlrenderer';
 import { Picker } from './layout/picker';
 import { LoadingView } from './layout/loading';
 import { OverlayWrap } from './overlay/overlaywrap';
+import { PasswordReset } from './layout/passwordreset';
 import { Lys } from './layout/lys';
 import { LiliumSession } from './data/session';
 import { initiateConnection, bindRealtimeEvent } from './realtime/connection';
@@ -206,19 +207,21 @@ export class Lilium extends Component {
     }
 
     render() {
-        log('Lilium', 'Rendering Lilium application into DOM', 'lilium');
         // Original state, full screen loading view
         if (this.state.loading) {
+            log('Lilium', 'Rendering Lilium loading overlay', 'lilium');
             return (<LoadingView />);
         }
 
         // Error view incase bootstrapping fails
         if (this.state.error) {
+            log('Lilium', 'Rendering Lilium error overlay', 'lilium');
             return (
-                <div>Error loading Lilium : {this.state.error}</div>
+                <div style={{color:'white'}}>Error loading Lilium : {this.state.error}</div>
             )
         }
 
+        log('Lilium', 'Rendering Lilium application into DOM', 'lilium');
         // Marvelous chaos 
         return (
             <div id="lilium">
@@ -226,6 +229,7 @@ export class Lilium extends Component {
                 <LiliumMenu menus={this.state.menus} />
                 <URLRenderer session={this.state.session} />
                 <Lys menus={this.state.menus} session={this.state.session} />
+                <PasswordReset />
                 <NotificationWrapper />
                 <CakepopWrapper />
                 <Picker />

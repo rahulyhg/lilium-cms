@@ -1,6 +1,7 @@
 const hooks = require('./hooks.js')
 const log = require('./log.js')
 const fs = require('fs')
+const metrics = require('./metrics');
 
 class Inbound {
     constructor() {
@@ -24,11 +25,17 @@ class Inbound {
         return true; 
     }
 
+    handleTestReq(req, resp) {
+        this.handleReq(req, resp);
+    }
+
     handleReq(req, resp) {
+        metrics.plus('requests');
+        metrics.plus('requestspers');
         require('./cachefront.js').getURL(req.url, (dat) => {
             if (dat && (!dat.expiry || dat.expiry > Date.now())) {
-                resp.writeHead(200, { "Content-Type" : dat.ctype });
-                resp.end(dat.data);
+                resp.writeHead(dat.status || 200, dat.headers || { "Content-Type" : dat.ctype });
+                dat.data ? resp.end(dat.data) : resp.end();
 
                 return false;
             }
@@ -48,6 +55,9 @@ class Inbound {
     handleQueue() {
         this.ready = true;
         this.initqueue.forEach(cli => this.validate(cli.request, cli.response) && require("./handler.js").handle(cli));
+
+        // Get rid of references to Client objects
+        this.initqueue = [];
     }
 
     start() {
@@ -64,7 +74,12 @@ class Inbound {
             log('Inbound', 'Creating HTTP server');
 
             const _http = require('http')
-            this.server = _http.createServer((req, resp) => this.handleReq(req, resp));
+            if (global.__TEST) {
+                this.server = _http.createServer((req, resp) => this.handleTestReq(req, resp));
+            } else {
+                this.server = _http.createServer((req, resp) => this.handleReq(req, resp));
+            }
+
             startAfterCreation && this.start();
             log('Inbound', 'Stacking requests until ready');
 

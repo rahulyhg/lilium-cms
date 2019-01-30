@@ -26,8 +26,6 @@ export class TabView extends Component {
 
     constructor(props) {
         super(props);
-        console.log('TabView constructor fired');
-        
         props.children.forEach(child => {
             if (child.nodeName.prototype.constructor != Tab) {
                 throw new TypeError('All direct children of Tab must be of type Tab');
@@ -50,6 +48,8 @@ export class TabView extends Component {
     selectTabAtIndex(index) {
         this.setState({ activeTab: this.state.tabs[index], selectedIndex: index });
         storeLocal(TabView.TAB_VIEW_PREFIX + this.props.id, index);
+
+        this.props.onTabSelected && this.props.onTabSelected({ activeTab: this.state.tabs[index], selectedIndex: index });
     }
 
     componentWillReceiveProps(props) {
@@ -59,9 +59,11 @@ export class TabView extends Component {
     }
 
     render() {
+        const singletab = this.props.hidesingletab && this.state.tabs.length == 1;
+
         return (
-            <div className="tabview">
-                <div className="tabs-bar">
+            <div className={"tabview " + (this.props.noshadow ? "noshadow" : "")}>
+                { singletab ? null : (<div className="tabs-bar">
                     {
                         this.state.tabs.map((tab, index) => (
                             <h4 className={`tab-name ${index == this.state.selectedIndex ? 'active' : ''}`} onClick={this.selectTabAtIndex.bind(this, index)}>
@@ -69,8 +71,8 @@ export class TabView extends Component {
                             </h4>
                         ))
                     }
-                </div>
-                <div className="tab-content">
+                </div>) }
+                <div className={"tab-content " + (singletab ? "singletab" : "")}>
                     {
                         this.props.children.map((tab, index) => {
                             return cloneElement(tab, { visible: index == this.state.selectedIndex })

@@ -89,6 +89,9 @@ export default class ProfilePage extends Component {
                         const user = this.state.user;
                         user.avatarURL = picked[ImagePicker.slug].sizes.square.url;
                         this.setState({ user });
+
+                        const ev = new CustomEvent('profilePicChanged', { detail: { url: user.avatarURL } });
+                        document.dispatchEvent(ev);
                     } else {
                         console.log(err);
                         log('ProfilePage', 'Error updating profile picture', 'error');

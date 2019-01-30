@@ -6,7 +6,6 @@ const log = require('./log.js');
 const Admin = require('./backend/admin.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
-const cli = require('./cli.js');
 const hooks = require('./hooks.js');
 const RegisteredPlugins = new Object();
 
@@ -111,13 +110,13 @@ class Plugins {
             log('Plugins', 'Registering plugin with identifier ' + identifier);
             this.searchDirForPlugin(identifier,  (info) =>{
                 if (!info) {
-                    log("PluginException", "Could not find any info on plugin with identifier " + identifier, 'err');
+                    log("PluginException", "Could not find any info on plugin with identifier " + identifier, 'warn');
                     return callback();
                 }
 
                 try {
-                    var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
-                    var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
+                    var plugindir = require('path').join(liliumroot, "plugins", info.dirName, info.entry);
+                    var pluginInstance = require(plugindir);
 
                     RegisteredPlugins[identifier] = pluginInstance;
 
@@ -136,11 +135,9 @@ class Plugins {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
                             try {
                                 pluginInstance.register(_c, info,  () =>{
-                                    cli.cacheClear(undefined, (err) =>{;
-                                        log('Plugins', 'Registered ' + identifier, 'success');
-                                        hooks.fire('pluginregistered', {identifier});
-                                        callback();
-                                    });
+                                    log('Plugins', 'Registered ' + identifier, 'success');
+                                    hooks.fire('pluginregistered', {identifier});
+                                    callback();
                                 });
                             } catch (e) {
                                 log("Plugins", "Error while registering plugin " + identifier + ": " + e.message, 'err');
@@ -171,7 +168,6 @@ class Plugins {
 
                         RegisteredPlugins[identifier] = undefined;
                         delete RegisteredPlugins[identifier];
-                        cli.cacheClear(undefined, callback);
                     });
                 } catch(e) {
                     log('Plugin', e, 'err');

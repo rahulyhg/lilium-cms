@@ -1,91 +1,54 @@
-var _c = require('./config.js');
-var log = require('./log.js');
-var cli = require('./clientobject.js');
-var sessionManager = require('./session.js');
-var log = require('./log.js');
-var db = require('./includes/db.js');
-var hooks = require('./hooks.js');
-var sites = require('./sites.js');
-var livevars = require('./livevars.js');
-var sharedcache = require('./sharedcache.js');
+const _c = require('./config.js');
+const cli = require('./clientobject.js');
+const sessionManager = require('./session.js');
+const db = require('./includes/db.js');
+const metrics = require('./metrics');
+const hooks = require('./hooks.js');
+const sites = require('./sites.js');
+const livevars = require('./livevars.js');
+const sharedcache = require('./sharedcache.js');
 
-var io;
-var sockets = {};
-var groups = {};
-var namespaces = [];
+let io;
+let sockets = {};
+let groups = {};
+let namespaces = [];
+let idToNamespace = {};
 
-var idToNamespace = {};
+class LiliumSocket { 
+    constructor(socket, session) {
+        this.socket = socket;
+        this.session = session;
+        this.clientId = session.data._id;
+        this.config = _c.fetchConfig(session.data.site);
+        this.sid = socket.id;
 
-var LiliumSocket = function (socket, session) {
-    this.socket = socket;
-    this.session = session;
-    this.clientId = session.data._id;
-    this.config = _c.fetchConfig(session.data.site);
-    this.sid = socket.id;
+        this.socket.liliumsocket = this;
+    };
 
-    this.socket.liliumsocket = this;
-};
+    bind() {
+        this.socket.on('join', this.join);
+        this.socket.on('notification-interaction', this.notificationInteraction);
+        this.socket.on('notification-view', this.notificationView);
+        this.socket.on('broadcast', this.broadcast);
+        this.socket.on('disconnect', this.disconnect);
+        this.socket.on('hit', this.hit);
+        this.socket.on('alert', this.alert);
+        this.socket.on('error', this.error);
 
+        return this;
+    }
 
-LiliumSocket.prototype.bind = function () {
-    this.socket.on('join', this.join);
-    this.socket.on('notification-interaction', this.notificationInteraction);
-    this.socket.on('notification-view', this.notificationView);
-    this.socket.on('broadcast', this.broadcast);
-    this.socket.on('disconnect', this.disconnect);
-    this.socket.on('hit', this.hit);
-    this.socket.on('alert', this.alert);
-    this.socket.on('error', this.error);
+    join(groupName) {
+        var ls = this.liliumsocket;
+    }
 
-    return this;
-};
+    hit(param) {
+        metrics.plus('socketevents');
+        var ls = this.liliumsocket;
+        var sid = ls.sid;
+        var uid = ls.clientId;
+        var path = param.path;
 
-LiliumSocket.prototype.join = function (groupName) {
-    var ls = this.liliumsocket;
-};
-
-LiliumSocket.prototype.hit = function(param) {
-    var ls = this.liliumsocket;
-    var sid = ls.sid;
-    var uid = ls.clientId;
-    var path = param.path;
-
-    sharedcache.get("hit_" + sid, data => {
-        if (data) {
-            db.update(ls.config, 'hits', {
-                userid : db.mongoID(uid),
-                path : data.path
-            }, {
-                $set : {
-                    userid : db.mongoID(uid),
-                    path : data.path
-                },
-                $inc : {
-                    timespent : Date.now() - data.at
-                }
-            }, () => {
-
-            }, true, true, true);
-        }
-
-        sharedcache.set({
-            ["hit_" + sid] : {
-                path, at : Date.now()
-            }
-        }, () => {
-            
-        });
-    });
-
-};
-
-LiliumSocket.prototype.disconnect = function () {
-    var ls = this.liliumsocket;
-    var sid = ls.sid;
-    var uid = ls.clientId;
-    
-    var memObj = {};
-    sharedcache.socket(uid, 'remove', sid, function(remainingSessions) {
         sharedcache.get("hit_" + sid, data => {
             if (data) {
                 db.update(ls.config, 'hits', {
@@ -100,82 +63,126 @@ LiliumSocket.prototype.disconnect = function () {
                         timespent : Date.now() - data.at
                     }
                 }, () => {
-    
+
                 }, true, true, true);
             }
-        });
-        /*
-        var sessionCount = remainingSessions.length;
-        for (var i = 0; i < namespaces.length; i++) {
-            require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
-                id: ls.clientId,
-                displayname: ls.session.data.displayname,
-                status : !sessionCount ? 'offline' : 'online',
-                seshCount : sessionCount
+
+            sharedcache.set({
+                ["hit_" + sid] : {
+                    path, at : Date.now()
+                }
+            }, () => {
+                
             });
+        });
+
+    };
+
+    disconnect() {
+        metrics.minus('loggedinusers');
+        metrics.plus('socketevents');
+        var ls = this.liliumsocket;
+        var sid = ls.sid;
+        var uid = ls.clientId;
+        
+        var memObj = {};
+        sharedcache.socket(uid, 'remove', sid, function(remainingSessions) {
+            sharedcache.get("hit_" + sid, data => {
+                if (data) {
+                    db.update(ls.config, 'hits', {
+                        userid : db.mongoID(uid),
+                        path : data.path
+                    }, {
+                        $set : {
+                            userid : db.mongoID(uid),
+                            path : data.path
+                        },
+                        $inc : {
+                            timespent : Date.now() - data.at
+                        }
+                    }, () => {
+        
+                    }, true, true, true);
+                }
+            });
+            /*
+            var sessionCount = remainingSessions.length;
+            for (var i = 0; i < namespaces.length; i++) {
+                require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
+                    id: ls.clientId,
+                    displayname: ls.session.data.displayname,
+                    status : !sessionCount ? 'offline' : 'online',
+                    seshCount : sessionCount
+                });
+            }
+            */
+        });
+    };
+
+    notificationInteraction(notifId) {
+        metrics.plus('socketevents');
+        var ls = this.liliumsocket;
+        var id = db.mongoID(notifId);
+        var userId = db.mongoID(ls.clientId);
+        // Update notification as interacted
+        db.update(ls.config, 'notifications', {
+            _id: id,
+            userID: userId
+        }, {
+            interacted: true
+        }, function (err, res) {
+            // No need for confirmation client side
+        });
+
+        // Find notification in session
+        for (var index in ls.session.data.notifications) {
+            if (ls.session.data.notifications[index]._id == notifId) {
+                ls.session.data.notifications[index].interacted = true;
+                break;
+            }
         }
-        */
-    });
-};
 
-LiliumSocket.prototype.notificationInteraction = function (notifId) {
-    var ls = this.liliumsocket;
-    var id = db.mongoID(notifId);
-    var userId = db.mongoID(ls.clientId);
-    // Update notification as interacted
-    db.update(ls.config, 'notifications', {
-        _id: id,
-        userID: userId
-    }, {
-        interacted: true
-    }, function (err, res) {
-        // No need for confirmation client side
-    });
+        // Bypass session manager taking only a cli
+        var cli = {};
+        cli.session = ls.session;
+        cli._c = {};
+        cli._c.id = ls.session.data.site;
 
-    // Find notification in session
-    for (var index in ls.session.data.notifications) {
-        if (ls.session.data.notifications[index]._id == notifId) {
-            ls.session.data.notifications[index].interacted = true;
-            break;
-        }
-    }
+        // Save it
+        sessionManager.saveSession(cli, function () {});
+    };
 
-    // Bypass session manager taking only a cli
-    var cli = {};
-    cli.session = ls.session;
-    cli._c = {};
-    cli._c.id = ls.session.data.site;
+    notificationView() {
+        metrics.plus('socketevents');
+        var ls = this.liliumsocket;
+        ls.session.data.newNotifications = 0;
+        // Bypass session manager taking only a cli
+        var cli = {};
+        cli.session = ls.session;
+        cli._c = {};
+        cli._c.id = ls.session.data.site;
+        // Save it
+        sessionManager.saveSession(cli, function () {});
 
-    // Save it
-    sessionManager.saveSession(cli, function () {});
-};
+    };
 
-LiliumSocket.prototype.notificationView = function () {
-    var ls = this.liliumsocket;
-    ls.session.data.newNotifications = 0;
-    // Bypass session manager taking only a cli
-    var cli = {};
-    cli.session = ls.session;
-    cli._c = {};
-    cli._c.id = ls.session.data.site;
-    // Save it
-    sessionManager.saveSession(cli, function () {});
+    broadcast(emission) {
+        metrics.plus('socketevents');
+        var ls = this.liliumsocket;
+    };
 
-};
+    alert() {
+        metrics.plus('socketevents');
+        this.broadcast.emit('message', {
+            username: this.username
+        });
+    };
 
-LiliumSocket.prototype.broadcast = function (emission) {
-    var ls = this.liliumsocket;
-};
-
-LiliumSocket.prototype.alert = function () {
-    this.broadcast.emit('message', {
-        username: this.username
-    });
-};
-
-LiliumSocket.prototype.error = function (err) {
-    log('Socket', 'Error with socket : ' + err.message, 'err');
-    log('Stacktrace', err.stack, 'err');
+    error(err) {
+        metrics.plus('socketevents');
+        log('Socket', 'Error with socket : ' + err.message, 'err');
+        log('Stacktrace', err.stack, 'err');
+    };
 };
 
 var Notification = function () {
@@ -201,6 +208,8 @@ var Notification = function () {
                         session.sessionId = sessionId;
                         new LiliumSocket(socket, session).bind();
 
+                        metrics.plus('loggedinusers');
+                        metrics.plus('socketevents');
                         for (var i = 0; i < namespaces.length; i++) {
                             require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
                                 id: session.data._id,
@@ -256,6 +265,7 @@ var Notification = function () {
                 
                 log('Notifications', 'Emit "'+(difftype||"notification")+'" to socket id ' + split[1] + " of " + split[0], 'live')
                 require('./inbound.js').io().of(split[0]).to(sockets[i]).emit(difftype || 'notification', notification);
+                metrics.plus('socketevents');
             }
         });
     };
@@ -325,10 +335,12 @@ var Notification = function () {
     };
 
     this.emitToWebsite = function (siteid, data, type) {
+        metrics.plus('socketevents');
         require('./inbound.js').io().of(idToNamespace[siteid]).emit(type || 'notification', data);
     };
 
     this.messageNotif = function(user, msg, type) {
+        metrics.plus('socketevents');
         sharedcache.getSocketID(user, function(sockets) {
             for (var i = 0; i < sockets.length; i++) {
                 var split = sockets[i].split('#');
@@ -427,6 +439,7 @@ var Notification = function () {
     };
 
     this.broadcast = function (data, msgType) {
+        metrics.plus('socketevents');
         for (var i = 0; i < namespaces.length; i++) {
             require('./inbound.js').io().of(namespaces[i]).emit(msgType || 'message', data);
         }

@@ -22,6 +22,7 @@
 var db = require('./includes/db.js');
 var log = require('./log.js');
 var hooks = require('./hooks.js');
+var metrics = require('./metrics');
 
 var RegisteredLiveVariables = new Object();
 
@@ -127,6 +128,7 @@ var LiveVariables = function() {
     };
 
     this.handleRequest = function(cli) {
+        metrics.plusDeep('endpointsreq', "livevar/" + cli.routeinfo.path[2]);
         if (cli.routeinfo.path[1] == "v4") {
             // LIVE VARIABLE V4
             let params = cli.routeinfo.params.p;
@@ -179,6 +181,8 @@ var LiveVariables = function() {
     this.registerLiveVariable = function(endpoint, func, rights) {
         rights = rights || new Array();
 
+        metrics.setDeep('endpointsreq', "livevar/" + endpoint, 0);
+        log('LiveVariables', 'Registering livevar endpoint : ' + endpoint, 'info');
         if (!RegisteredLiveVariables[endpoint]) {
             RegisteredLiveVariables[endpoint] = createEndpoint(func, rights);
         } else {

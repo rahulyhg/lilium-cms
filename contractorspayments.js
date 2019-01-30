@@ -46,7 +46,7 @@ class ContractorHandler {
                     return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/admin/stripeerror");
                 }
 
-                db.update(require(liliumroot + "/config").default(), 'entities', { 
+                db.update(require(liliumroot + "/config").default(), 'entities', {
                     _id : userid 
                 }, { 
                     stripecode : code,
@@ -65,6 +65,38 @@ class ContractorHandler {
         } else {
             cli.throwHTTP(404);
         }
+    }
+
+    GET(cli) {
+        if (!cli.isLoggedIn || !cli.routeinfo.path[1] || isNaN(cli.routeinfo.path[1])) {
+            return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
+        }
+
+        const $match = { number : parseInt(cli.routeinfo.path[1]) };
+        if (!cli.hasRight('manage-contractors')) {
+            $match.to = db.mongoID(cli.userinfo.userid);
+        }
+
+        db.findUnique(require(liliumroot + "/config").default(), 'contractorinvoices', $match, (err, invoice) => {
+            if (!invoice) {
+                return cli.throwHTTP(404, undefined, true);
+            }
+            
+            db.findUnique(
+                require(liliumroot + "/config").default(), 
+                'entities', 
+                { _id : invoice.to },
+            (err, contractor) => {
+                require(liliumroot + "/lml3/compiler").compile(
+                    cli._c, 
+                    liliumroot + "/backend/dynamic/invoice.lml3",
+                    { invoice, contractor },
+                    markup => {
+                        cli.sendHTML(markup, 200);
+                    }
+                );
+            });
+        });
     }
 
     adminEditArticlePost(cli) {
@@ -95,7 +127,7 @@ class ContractorHandler {
                 return cli.throwHTTP(400, undefined, true);
             }
             
-            if (twoFactor.validate2fa(cli.userinfo.user, dat.secret)) {
+            if (twoFactor.validate2fa(cli.userinfo.userid, dat.secret)) {
                 cli.sendJSON({ working : true });
                 money.dispatchPending(dat.ids, db.mongoID(cli.userinfo.userid), () => {
                     require(liliumroot + "/notifications").notifyUser(
@@ -205,7 +237,7 @@ class ContractorHandler {
                 
                 if (params.filters.number) {
                     const number = parseInt(params.filters.number);
-                    
+
                     conds.push({$match: {
                         $or: [
                             { number: number },

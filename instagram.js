@@ -15,24 +15,6 @@ class LMLInstagram {
         this.intervalJob;
     }
 
-    setup() {
-        log('Instagram', 'Deprecated method setup', 'warn');
-        return;
-
-        if (isElder) {
-            let store = this.storeStats.bind(this);
-            let storeAllWebsites = () => {
-                config.eachSync(_c => {
-                    store(_c);
-                });
-            };
-
-            this.intervalJob = scheduler.schedule('instagram_stats', {
-                every : "hour"
-            }, storeAllWebsites).start();
-        }
-    }
-
     getAccounts(conf) {
         return conf.social && conf.social.instagram && conf.social.instagram.accounts && conf.social.instagram.accounts.split(',');
     }

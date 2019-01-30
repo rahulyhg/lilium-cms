@@ -136,5 +136,10 @@
         "codename" : "Feronia",
         "script" : "MAJOR_4.js",
         "features" : ["V4"]
+    },
+    "4.0.1" : {
+        "codename" : "Feronia",
+        "script" : "4.0.1.js",
+        "features" : ["Editions"]
     }
 }

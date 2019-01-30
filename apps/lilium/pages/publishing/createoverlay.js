@@ -16,7 +16,9 @@ export class CreateOverlay extends Component {
     }
 
     componentDidMount() {
-        this.textbox.focus();
+        setTimeout(() => {
+            this.textbox.focus();
+        }, 100);
     }
 
     submit(headline) {

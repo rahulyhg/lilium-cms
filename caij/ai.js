@@ -177,8 +177,13 @@ class AI {
         log('CAIJ', "Caught an error at process level", 'warn');
         log('CAIJ', err, 'err');
         log("CAIJ", err.stack, 'err');
-        log("CAIJ", "AI is most likely in a fail state, but won't shutdown until done manually", "warn");
 
+        if (global.__TEST) {
+            log('CAIJ', 'Test mode will shut down the process', 'warn');
+            process.exit(1);
+        }
+
+        log("CAIJ", "AI is most likely in a fail state, but won't shutdown until done manually", "warn");
         ai.createInterval();
     }
 
