@@ -7,7 +7,7 @@ class LangDico {
 
     _v(str) {
         const levels = str.split('.');
-        if (levels.length == 1) return this.dictionary[str] || `Unknown key ${str}`;
+        if (levels.length == 1) return this.dictionary[str] || log('Vocab', `Unknown key ${str}, 'warn)`);
 
         // Allow dynamic access with dot notation
         return levels.reduce((prev, curr) => {
