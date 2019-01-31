@@ -14,6 +14,32 @@ const { JSDOM } = require('jsdom');
 const CONTENT_COLLECTION = 'content';
 const ENTITY_COLLECTION = 'entities';
 
+const DIFF_ALLOWED_FIELDS = [
+    "title",
+    "subtitle",
+    "content",
+    "author",
+    "status",
+    "hidden",
+    "updated",
+    "aliases",
+    "media",
+    "nsfw",
+    "date",
+    "isSponsored",
+    "sponsoredCampaignID",
+    "useSponsoredBox",
+    "sponsoredBoxContent",
+    "sponsoredBoxLogo",
+    "sponsoredBoxTitle",
+    "sponsoredBoxURL",
+    "lang",
+    "name",
+    "language",
+    "url",
+    "editions"
+]
+
 const LOOKUPS = {
     media : { from : "uploads", as : "deepmedia", localField : "media", foreignField : "_id" },
     editions : { from : "editions", as : "alleditions", localField : "editions", foreignField : "_id" }
@@ -169,6 +195,20 @@ class ContentLib {
                 }
             }
         }, { _id : 1, name : 1 });
+    }
+
+    addDiffAllowedField(fieldName) {
+        DIFF_ALLOWED_FIELDS.push(fieldName);
+    }
+
+    removeDiffAllowedField(fieldName) {
+        const i = DIFF_ALLOWED_FIELDS.findIndex(x => x == fieldName);
+        if (i != -1) {
+            DIFF_ALLOWED_FIELDS.splice(i, 1);
+            return true;
+        }
+
+        return false;
     }
 
     generate(_c, deepArticle, cb, pageIndex) {
@@ -499,7 +539,8 @@ class ContentLib {
             }
         }).filter(
             (thing, index, self) => index === self.findIndex(t => (t.place === thing.place && t.field == thing.field))
-        );
+        ).filter(x => DIFF_ALLOWED_FIELDS.includes(x.field));
+
 
         if (diffs.length != 0) {
             const entry = {
