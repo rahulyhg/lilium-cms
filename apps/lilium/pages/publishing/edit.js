@@ -43,21 +43,21 @@ class HistoryEntry extends Component {
     createMessage() {
         switch (this.props.entry.type) {
             case "update":
-                return "updated the " + this.props.entry.diffs.map(x => x.field).join(', ');
+                return `${_v('article.historyEntries.updated')} ${this.props.entry.diffs.map(x => x.field).join(', ')}`;
             case "published":
-                return "published this article";
+                return _v('article.historyEntries.published');
             case "unpublished":
-                return "set this article back to draft";
+                return _v('article.historyEntries.unpublished');
             case "submitted":
-                return "sent this article for review";
+                return _v('article.historyEntries.submitted');
             case "refused":
-                return "refused the review";
+                return _v('article.historyEntries.refused');
             case "destroyed":
-                return "destroyed this article";
+                return _v('article.historyEntries.destroyed');
             case "created":
-                return "created this article";
+                return _v('article.historyEntries.created');
             default:
-                return "updated this article";
+                return _v('article.historyEntries.updatedArticle');
         }
     }
 
@@ -69,7 +69,8 @@ class HistoryEntry extends Component {
 
     render() {
         return (
-            <div key={this.props.key} class={"history-entry history-entry-" + this.props.entry.type} style={{ cursor: this.props.entry.hasdiff ? "pointer" : "default" }} onClick={this.clicked.bind(this)}>
+            <div key={this.props.key} class={"history-entry history-entry-" + this.props.entry.type} style={{ cursor: this.props.entry.hasdiff ? "pointer" : "default" }}
+                onClick={this.clicked.bind(this)}>
                 <div class="history-entry-avatar-wrap">
                     <img class="history-entry-avatar" src={this.actor.avatarURL} />
                 </div>
@@ -419,7 +420,7 @@ class PostDetails extends Component {
         return (
             <div class="publication-details-card">
                 <div class="detail-head">
-                    <b>About this article</b>
+                    <b>{_v('aboutArticle')}</b>
                 </div>
 
                 <div class="detail-list">
@@ -973,11 +974,11 @@ export default class EditView extends Component {
             <div class="publishing-page-flex">
                 <div class="publishing-edit-section">
                     <div class="publishing-bigtitle-wrap">
-                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} />
+                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder={_v('pubTitle')} placeholderType="inside" wrapstyle={{ marginBottom: 6 }} />
                     </div>
 
                     <div class="publishing-subtitle-wrap">
-                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" />
+                        <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder={_v('subtitle')} placeholderType="inside" />
                     </div>
                     
                     <div style={{ margin: "auto", maxWidth: 1200 }}>
@@ -985,30 +986,30 @@ export default class EditView extends Component {
                     </div>
 
                     <div class="card publishing-card">
-                        <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
+                        <MediaPickerField name="media" placeholder={_v('featuredImage')} initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
 
                     <div class="card publishing-card">
-                        <SelectField name="language" placeholder="Language" initialValue={this.state.post.language || "en"} value={this.state.post.language || "en"} onChange={this.fieldChanged.bind(this)} options={[
+                        <SelectField name="language" placeholder={_v('language')} initialValue={this.state.post.language || "en"} value={this.state.post.language || "en"} onChange={this.fieldChanged.bind(this)} options={[
                             { text : "English", value : "en" },
                             { text : "Français", value : "fr" }
                         ]} />
                     </div>      
 
                     <div class="card publishing-card nopad">
-                        <EditionPicker language={this.state.post.language || "en"} initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder="Edition" onChange={this.editionChanged.bind(this)} />
+                        <EditionPicker language={this.state.post.language || "en"} initialValue={this.state.post.editions || []} name="editions" value={this.state.post.editions} placeholder={_v('edition')} onChange={this.editionChanged.bind(this)} />
                     </div>      
 
                     <div className="card publishing-card" id="seo">
-                        <TextField name='seotitle' placeholder='SEO Optimised Title' onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seotitle} />
-                        <TextField name='seosubtitle' placeholder='SEO Optimized Subtitle' onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seosubtitle} />
+                        <TextField name='seotitle' placeholder={_v('seoTitle')} onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seotitle} />
+                        <TextField name='seosubtitle' placeholder={_v('seoSubtitle')} onChange={this.fieldChanged.bind(this)} initialValue={this.state.post.seosubtitle} />
                     </div>
 
                     <div class="card publishing-card">
                         <MultitagBox onChange={this.fieldChanged.bind(this)} name='tags' placeholder='Tags' initialValue={this.state.post.tags} />
-                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='sticky' placeholder='Make this article sticky' initialValue={this.state.post.sticky} />
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='sticky' placeholder={_v('makeSticky')} initialValue={this.state.post.sticky} />
                         <CheckboxField onChange={this.fieldChanged.bind(this)} name='nsfw' placeholder='Not safe for work (NSFW)' initialValue={this.state.post.nsfw} />
-                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='hidden' placeholder='Only available via URL' initialValue={this.state.post.hidden} />
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='hidden' placeholder={_v('urlOnly')} initialValue={this.state.post.hidden} />
                     </div>
 
                     <div class="card publishing-card">
@@ -1024,16 +1025,16 @@ export default class EditView extends Component {
                     <PublishingSidebar post={this.state.post} actions={this.actions} history={this.state.history} historyEntryClicked={this.historyEntryClicked.bind(this)} />
                 </div>
 
-                <Modal visible={this.state.updatingSlug} title='Update slug' onClose={ () => this.setState({ updatingSlug : false }) }>
+                <Modal visible={this.state.updatingSlug} title={_v('updateSlug')} onClose={ () => this.setState({ updatingSlug : false }) }>
                     <TextField name='name' placeholder='URL Slug' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.name} />
-                    <ButtonWorker text='Update' work={this.updateSlug.bind(this)} />
+                    <ButtonWorker text={_v('update')} work={this.updateSlug.bind(this)} />
                 </Modal>
 
-                <Modal visible={this.state.updatingAuthor} title='Update author' onClose={ () => this.setState({ updatingAuthor : false }) }>
+                <Modal visible={this.state.updatingAuthor} title={_v('updateAuthor')} onClose={ () => this.setState({ updatingAuthor : false }) }>
                     <SelectField name='author' placeholder='Author' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.author} options={
                         getSession("entities").map(user => ({ value : user._id, displayname : user.displayname }))
                     } />
-                    <ButtonWorker text='Update' work={this.updateAuthor.bind(this)} />
+                    <ButtonWorker text={_v('update')} work={this.updateAuthor.bind(this)} />
                 </Modal>
 
                 <Modal title='Destroy this article?' visible={this.state.destroyModalVisible} onClose={() => { this.setState({ destroyModalVisible: false }) }}>

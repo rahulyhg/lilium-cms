@@ -5,6 +5,14 @@ const dictionary = {
     // General
     emailAddress: 'Email Address',
     password: 'Password',
+    update: 'Update',
+
+    // Publishing
+    createArticle: 'Create New Article',
+    searchByTitle: 'Search by Title',
+    searchByAuthor: 'Author',
+    searchByStatus: 'Status',
+
     article: {
         statusses: {
             allStatusses: 'All Statusses',
@@ -12,9 +20,57 @@ const dictionary = {
             published: 'Published',
             reviewing: 'Pending Review',
             backToDraft: 'Set Back to Draft'
+        },
+        fields: {
+            title: 'Title',
+            subtitle: 'Subtitle',
+            content: 'Content',
+            author: 'Author',
+            status: 'Status',
+            hidden: 'Hidden',
+            updated: 'Updates',
+            aliases: 'aliasses',
+            media: 'Media',
+            nsfw: 'NSFW',
+            date: 'Date',
+            isSponsored: 'Is Sponsored',
+            sponsoredCampaignID: 'Sponsored Campaign ID',
+            useSponsoredBox: 'Use Sponsored Box',
+            sponsoredBoxContent: 'Sponsored Box Content',
+            sponsoredBoxLogo: 'Sponsored Box Logo',
+            sponsoredBoxTitle: 'Sponsored Box Title',
+            sponsoredBoxURL: 'Sponsored Box URL',
+            lang: 'Language',
+            name: 'Slug',
+            language: 'Language',
+            url: 'URL',
+            wordcount: 'Word Count',
+            editions: 'Editions'
+        },
+        historyEntries: {
+            updated: 'updated',
+            published: 'published this article',
+            unpublished: 'set this article back to draft',
+            submitted: 'submitted this article for review',
+            refused: 'refused this article',
+            destroyed: 'destroyed this article',
+            created: 'created this article',
+            updatedArticle: 'updated this article'
         }
     },
     anyone: 'Anyone',
+    aboutArticle: 'About this article',
+    pubTitle: 'Publication Headline',
+    subtitle: 'Subtitle or catchline',
+    featuredImage: 'Featured Image',
+    language: 'Language',
+    edition: 'Edition',
+    seoTitle: 'SEO-Optimized Title',
+    seoSubtitle: 'SEO-Optimized Subtitle',
+    makeSticky: 'Make this article sticky',
+    urlOnly: 'Accessible by URL only',
+    updateSlug: 'Update Slug',
+    updateAuthor: 'Update Author',
 
     // BigList
     filters: 'Filters',
@@ -91,12 +147,6 @@ const dictionary = {
     enter6digits: 'Enter the 6 digits code',
     activate2FA: 'Activate 2FA for my account',
     deactivate2FA: 'Deactivate 2FA',
-
-    // Publishing
-    createArticle: 'Create New Article',
-    searchByTitle: 'Search by Title',
-    searchByAuthor: 'Author',
-    searchByStatus: 'Status'
 }
 
 const extendedDictionary = { 

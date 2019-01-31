@@ -38,7 +38,7 @@ class PostListItem extends Component {
                 <div class="flex-col article-list-status">
                     <span class={"article-list-status-" + this.props.item.status} style={{ backgroundColor : POST_STATUS[this.props.item.status].color }}>
                         { POST_STATUS[this.props.item.status].w }
-                    </span>              
+                    </span>
                 </div>              
                 <div class="flex-col article-list-author">
                     <img src={this.author.avatarURL} />

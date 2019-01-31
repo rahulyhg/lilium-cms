@@ -5,6 +5,14 @@ const dictionary = {
     // General
     emailAddress: "Address email",
     password: 'Mot de passe',
+    update: 'Mettre à jour',
+
+    // Publishing
+    createArticle: 'Créer un article',
+    searchByTitle: 'Recherche par titre',
+    searchByAuthor: 'Auteur',
+    searchByStatus: 'Statut',
+
     article: {
         statusses: {
             allStatusses: 'Tous les statuts',
@@ -12,9 +20,57 @@ const dictionary = {
             published: 'Publié',
             reviewing: 'En revue',
             backToDraft: 'Retourné au brouillon'
+        },
+        fields: {
+            title: 'Titre',
+            subtitle: 'Sous-titre',
+            content: 'Contenu',
+            author: 'Auteur',
+            status: 'Statut',
+            hidden: 'Caché',
+            updated: 'Mis à jour',
+            aliases: 'Alias',
+            media: 'Médie',
+            nsfw: 'NSFW',
+            date: 'Date',
+            isSponsored: 'Est sponsorisé',
+            sponsoredCampaignID: 'Id campaigne sponsorisée',
+            useSponsoredBox: 'Utiliser la mention sponsorisé',
+            sponsoredBoxContent: 'Contenu mention sponsorisée',
+            sponsoredBoxLogo: 'Logo mention sponsorisée',
+            sponsoredBoxTitle: 'Titre mention sponsorisée',
+            sponsoredBoxURL: 'URL mention sponsorisée',
+            lang: 'Langue',
+            name: 'Slug',
+            language: 'Langue',
+            url: 'URL',
+            wordcount: 'Nombre de mots',
+            editions: 'Éditions'
+        },
+        historyEntries: {
+            updated: 'a modifié',
+            published: 'a publié cet article',
+            unpublished: 'a dépublié cet article',
+            submitted: 'a soumis cet article pour révision',
+            refused: 'a refusé cet article',
+            destroyed: 'a détruit cet article',
+            created: 'a créé cet article',
+            updatedArticle: 'a modifié cet article'
         }
     },
     anyone: 'Tout le monde',
+    aboutArticle: 'À propos de cet article',
+    pubTitle: 'Titre de publication',
+    subtitle: 'Sous-titre',
+    featuredImage: 'Image',
+    language: 'Langue',
+    edition: 'Édition',
+    seoTitle: 'Titre SEO',
+    seoSubtitle: 'Sous-titre SEO',
+    makeSticky: 'Épingler à la page d\'accueil',
+    urlOnly: 'Accessible par URL seulement',
+    updateSlug: 'Changer Slug',
+    updateAuthor: 'Changer l\'auteur',
 
     // BigList
     filters: 'Filtres',
@@ -92,12 +148,6 @@ const dictionary = {
     enter6digits: 'Entrerz le nombre à 6 chiffres',
     activate2FA: 'Activer 2FA pour mon compte',
     deactivate2FA: 'Désactiver 2FA',
-
-    // Publishing
-    createArticle: 'Créer un article',
-    searchByTitle: 'Recherche par titre',
-    searchByAuthor: 'Autheur',
-    searchByStatus: 'Statut'
 }
 
 const extendedDictionary = { 
