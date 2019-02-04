@@ -56,7 +56,7 @@ class Router {
         }
 
         hooks.fire('clientobject_parsed', cli);
-        hooks.fire(cli._c, 'clientobject_parsed', cli);
+        hooks.fireSite(cli._c, 'clientobject_parsed', cli);
         if (!cli.routeinfo.isStatic && !cli.routeinfo.front && !cli.routeinfo.api) {
             session.injectSessionInCli(cli, cb);
         } else if (cli.routeinfo.api) {
