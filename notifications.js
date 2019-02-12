@@ -50,26 +50,16 @@ class LiliumSocket {
         var path = param.path;
 
         sharedcache.get("hit_" + sid, data => {
-            if (data) {
-                db.update(ls.config, 'hits', {
-                    userid : db.mongoID(uid),
-                    path : data.path
-                }, {
-                    $set : {
-                        userid : db.mongoID(uid),
-                        path : data.path
-                    },
-                    $inc : {
-                        timespent : Date.now() - data.at
-                    }
-                }, () => {
-
-                }, true, true, true);
-            }
+            data && db.insert(ls.config, 'hits', {
+                userid : db.mongoID(uid),
+                path : data.path,
+                timespent : Date.now() - data.since,
+                since : data.since
+            }, () => { });
 
             sharedcache.set({
                 ["hit_" + sid] : {
-                    path, at : Date.now()
+                    path, since : Date.now()
                 }
             }, () => {
                 
@@ -88,22 +78,14 @@ class LiliumSocket {
         var memObj = {};
         sharedcache.socket(uid, 'remove', sid, function(remainingSessions) {
             sharedcache.get("hit_" + sid, data => {
-                if (data) {
-                    db.update(ls.config, 'hits', {
-                        userid : db.mongoID(uid),
-                        path : data.path
-                    }, {
-                        $set : {
-                            userid : db.mongoID(uid),
-                            path : data.path
-                        },
-                        $inc : {
-                            timespent : Date.now() - data.at
-                        }
-                    }, () => {
-        
-                    }, true, true, true);
-                }
+                data && db.insert(ls.config, 'hits', {
+                    userid : db.mongoID(uid),
+                    path : data.path,
+                    timespent : Date.now() - data.since,
+                    since : data.since
+                }, () => { });
+
+                sharedcache.unset('hit_' + sid);
             });
             /*
             var sessionCount = remainingSessions.length;

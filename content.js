@@ -353,8 +353,8 @@ class ContentLib {
 
                                 db.join(_c, 'hits', [
                                     { $match : { path : "/lilium/publishing/write/" + _id.toString() }},
-                                    { $sort : { timespent : -1 } },
-                                    { $project : {timespent : 1, userid : 1, _id : 0} }
+                                    { $group : { _id : "$userid", timespent : { $sum : "$timespent" } } },
+                                    { $project : { timespent : 1, userid : "$_id" } }
                                 ], hits => {
                                     sendback({
                                         authortotal, authortotaltoday, decorations, websitetotal, lastpublished, 
