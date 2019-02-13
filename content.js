@@ -648,7 +648,7 @@ class ContentLib {
                         if (entry) {
                             this.fetchDeepFieldsFromDiff(_c, newpost, entry, () => {
                                 newpost.updated = new Date();
-                                col.replaceOne({_id : postid}, newpost, {}, (err, r) => {
+                                col.updateOne({_id : postid}, { $set : newpost }, {}, (err, r) => {
                                     log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
 
                                     hooks.fireSite(_c, 'article_updated', { article : newpost, _c, full : false });
@@ -751,6 +751,7 @@ class ContentLib {
                 publishedOn : new Date(),
                 publishedAt : Date.now(),
                 date : new Date(),
+                name : post.name,
                 url : "/" + post.alleditions.map(x => x.lang[post.language].slug).join('/') + "/" + post.name
             };
 
@@ -791,6 +792,7 @@ class ContentLib {
     refreshURL(_c, fullpost, caller, done) {
         const url = "/" + fullpost.alleditions.map(x => x.lang[fullpost.language || "en"].slug).join('/') + "/" + fullpost.name;
         if (fullpost.url != url) {
+            log('Content', 'Updating URL from ' + fullpost.url + ' to ' + url, 'info');
             fullpost.aliases = [...(fullpost.aliases || []), fullpost.url];
             fullpost.url = url;
 
