@@ -8,11 +8,12 @@ import { getSession } from '../../data/cache';
 import { navigateTo } from '../../routing/link';
 import { castNotification } from '../../layout/notifications';
 import { Spinner } from '../../layout/loading';
+import { Picker } from '../../layout/picker';
 import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
 import Modal from '../../widgets/modal';
 import dateFormat from 'dateformat';
-import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink } from '../../lib/publishing';
+import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink, addPostToSeries } from '../../lib/publishing';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
@@ -903,9 +904,36 @@ export default class EditView extends Component {
         });
     }
 
+    // TODO : TOFINISH
     triggerAddToSeries(done) {
-        // TODO
-        done && done();
+        Picker.cast({
+            accept : ["chain"],
+            options : {
+                chain : {
+                    selected : undefined
+                }
+            }
+        }, resp => {
+            if (resp && resp.chain) {
+                addPostToSeries(this.state.post._id, resp.chain._id, (err, resp) => {
+                    if (err) {
+                        castNotification({
+                            type : "warning",
+                            title : "Add to content chain",
+                            message : "This article could not be added to the content chain."
+                        });
+                    } else {
+                        castNotification({
+                            type : "success",
+                            title : "Add to content chain",
+                            message : "This article was successfully added to the content chain."
+                        });
+                    }
+                });
+            } else {
+                done && done();
+            }
+        });
     }
 
     updateAuthor() {
