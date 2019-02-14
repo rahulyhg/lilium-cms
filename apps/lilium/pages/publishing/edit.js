@@ -178,6 +178,7 @@ class PublishingActions extends Component {
                 dropacts.push(
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Add to series", work : this.props.actions.triggerAddToSeries.bind(this) },
                     { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Unpublish", work : this.props.actions.unpublish.bind(this) }
                 );
@@ -476,6 +477,7 @@ export default class EditView extends Component {
             triggerAuthorChange : this.triggerAuthorChange.bind(this),
             triggerSlugChange : this.triggerSlugChange.bind(this),
             triggerPreviewLinkChange : this.triggerPreviewLinkChange.bind(this),
+            triggerAddToSeries : this.triggerAddToSeries.bind(this),
             commitchanges : this.commitchanges.bind(this),
             unpublish : this.unpublish.bind(this),
             refuse : this.refuse.bind(this)
@@ -899,6 +901,11 @@ export default class EditView extends Component {
 
             done && done(); 
         });
+    }
+
+    triggerAddToSeries(done) {
+        // TODO
+        done && done();
     }
 
     updateAuthor() {

@@ -711,30 +711,36 @@ class ContentLib {
             }
 
             db.findUnique(config.default(), 'entities', { _id : caller }, (err, fullrequester) => {
-                if (fullrequester.roles.includes('editor') || !post.author || caller.toString() == post.author.toString()) {
-                    if (!post.date) {
-                        post.date = new Date();
-                        post.date = post.date;
+                try {
+                    if (fullrequester.roles.includes('editor') || !post.author || caller.toString() == post.author.toString()) {
+                        if (!post.date) {
+                            post.date = new Date();
+                            post.date = post.date;
+                        }
+
+                        post.seotitle = post.seotitle || post.title[0]
+                        post.seosubtitle = post.seosubtitle || post.subtitle[0]
+
+                        if (!post.name) {
+                            post.name = require('slug')(post.seotitle).toLowerCase();
+                            post.name = post.name;
+                        }
+
+                        if (
+                            !post.editions || post.editions.length == 0 || !post.author || !post.media || 
+                            !post.title[0] || !post.subtitle[0] || !post.content[0]
+                        ) {
+                            return sendback({ error : "Missing fields", code : 401 });
+                        }
+
+                        sendback(undefined, post);
+                    } else {
+                        return sendback({ error : "Missing rights", code : 403 });
                     }
-
-                    post.seotitle = post.seotitle || post.title[0]
-                    post.seosubtitle = post.seosubtitle || post.subtitle[0]
-
-                    if (!post.name) {
-                        post.name = require('slug')(post.seotitle).toLowerCase();
-                        post.name = post.name;
-                    }
-
-                    if (
-                        !post.editions || post.editions.length == 0 || !post.author || !post.media || 
-                        !post.title[0] || !post.subtitle[0] || !post.content[0]
-                    ) {
-                        return sendback({ error : "Missing fields", code : 401 });
-                    }
-
-                    sendback(undefined, post);
-                } else {
-                    return sendback({ error : "Missing rights", code : 403 });
+                } catch (err) {
+                    log('Publishing', 'Error validating post', 'err');
+                    console.log(err);
+                    sendback({ error : err.toString(), code : 500, stack : err });
                 }
             });
         });
@@ -746,46 +752,52 @@ class ContentLib {
                 return sendback(err);
             } 
 
-            const updated = {
-                status : "published",
-                publishedOn : new Date(),
-                publishedAt : Date.now(),
-                date : new Date(),
-                name : post.name,
-                url : "/" + post.alleditions.map(x => x.lang[post.language].slug).join('/') + "/" + post.name
-            };
+            try {
+                const updated = {
+                    status : "published",
+                    publishedOn : new Date(),
+                    publishedAt : Date.now(),
+                    date : new Date(),
+                    name : post.name,
+                    url : "/" + post.alleditions.map(x => x.lang[post.language || "en"].slug).join('/') + "/" + post.name
+                };
 
-            db.update(_c, 'content', { _id : post._id }, updated, () => {
-                db.remove(_c, 'autosave', { contentid : post._id }, () => {
-                    this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
-                        this.updateActionStats(_c, post, score => {
-                            hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
-                            hooks.fireSite(_c, 'article_updated', { article : post, _c });
-                            hooks.fire('article_published', {
-                                article: post, _c
+                db.update(_c, 'content', { _id : post._id }, updated, () => {
+                    db.remove(_c, 'autosave', { contentid : post._id }, () => {
+                        this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
+                            this.updateActionStats(_c, post, score => {
+                                hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
+                                hooks.fireSite(_c, 'article_updated', { article : post, _c });
+                                hooks.fire('article_published', {
+                                    article: post, _c
+                                });
+
+                                this.generate(_c, post, () => {
+                                    sendback({ historyentry, newstate : post });
+
+                                    notifications.emitToWebsite(_c.id, {
+                                        articleid : post._id,
+                                        at : Date.now(),
+                                        by : caller
+                                    }, "articlePublished");
+
+                                    if (caller.toString() != (post.author && post.author.toString())) {
+                                        notifications.notifyUser(post.author, _c.id, {
+                                            title: "Article published",
+                                            msg: post.title + ' was published on the website.',
+                                            type: 'success'
+                                        });
+                                    }
+                                }, 'all');
                             });
-
-                            this.generate(_c, post, () => {
-                                sendback({ historyentry, newstate : post });
-
-                                notifications.emitToWebsite(_c.id, {
-                                    articleid : post._id,
-                                    at : Date.now(),
-                                    by : caller
-                                }, "articlePublished");
-
-                                if (caller.toString() != (post.author && post.author.toString())) {
-                                    notifications.notifyUser(post.author, _c.id, {
-                                        title: "Article published",
-                                        msg: post.title + ' was published on the website.',
-                                        type: 'success'
-                                    });
-                                }
-                            }, 'all');
                         });
                     });
                 });
-            });
+            } catch (err) {
+                log('Publishing', 'Error validating post', 'err');
+                console.log(err);
+                sendback({ error : err.toString(), code : 500, stack : err });
+            }
         });
     }
 
