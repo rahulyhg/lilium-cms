@@ -658,7 +658,7 @@ export default class EditView extends Component {
 
     preview(done) {
         this.save(() => {
-            const loc = liliumcms.url + "/publishing/preview/" + this.props.postid + "/" + (this.state.post.previewkey || "");
+            const loc = liliumcms.url + "/preview/" + this.props.postid + "/" + (this.state.post.previewkey || "");
             try {
                 if (this.previewWindow && !this.previewWindow.closed) {
                     this.previewWindow.document.location = loc;
