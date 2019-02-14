@@ -81,3 +81,9 @@ export function getNewPreviewLink(postid, done) {
         done(r.status != 200, json || {}, r);
     });
 };
+
+export function addPostToSeries(postid, serieid, done) {
+    API.post("/chains/addpost/" + serieid + "/" + postid, {}, (err, json, r) => {
+        done(r.status != 200, json || {});
+    });
+}

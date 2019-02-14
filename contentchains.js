@@ -321,6 +321,25 @@ class ContentChains {
                     });
                 });
             });
+        } else if (path == "addpost") {
+            let chainid = cli.routeinfo.path[3];
+            let postid = cli.routeinfo.path[4];
+
+            db.findUnique(cli._c, 'contentchains', { _id : db.mongoID(chainid) }, (err, chain) => {
+                if (chain && postid) {
+                    if (chain.articles && chain.articles.map(x => x.toString()).includes(postid)) {
+                        cli.throwHTTP(409, undefined, true);
+                    } else {
+                        db.update(cli._c, 'contentchains', { _id : db.mongoID(chainid) }, {
+                            $addToSet : { articles : db.mongoID(postid) }
+                        }, () => {
+                            cli.sendJSON({ added : postid, to : chainid });
+                        }, false, true, true)
+                    }
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            });
         } else if (path == "unpublish") {
             let updatedData = cli.postdata.data;
             updatedData.status = "draft";
