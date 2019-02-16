@@ -14,6 +14,7 @@ let sharedMemoryProcess;
 let dataServerProcess;
 let redisserver;
 let bootCount = 0;
+let shuttingdown;
 
 class ProcessManager {
     start() { 
@@ -32,33 +33,56 @@ class ProcessManager {
     }
 
     onExit(code = 0) {
+        shuttingdown = true;
         log();
         log("Network", "----------------------------------------------", "lilium");
         log('Network', 'Killing CAIJ process', 'lilium');
         if (this.caijProc) {
-            process.kill(this.caijProc.process.pid, "SIGKILL");
-            log('Network', 'Killed CAIJ process', 'lilium');
+            try {
+                process.kill(this.caijProc.process.pid, "SIGKILL");
+                log('Network', 'Killed CAIJ process', 'lilium');
+            } catch (err) {
+                log('Network', 'Did not kill CAIJ process', 'info');
+            }
         }
 
         const pids = Object.keys(garden);
         log('Network', 'Killing Lilium processes with PIDs : ' + pids.join(', '), 'lilium');
-        pids.forEach(pid => process.kill(pid, "SIGKILL"));
+        pids.forEach(pid => {
+            try {
+                log('Network', 'Terminating process ' + pid, 'lilium');
+                process.kill(pid, "SIGKILL")
+            } catch (err) {
+                log('Network', 'Did not terminate process ' + pid, 'info');
+            }
+        });
 
         log('Network', 'Killing data server process', 'lilium');
         if (dataServerProcess) {
-            process.kill(dataServerProcess.process.pid, "SIGKILL"); 
-            log('Network', 'Killed data server', 'lilium');
+            try {
+                process.kill(dataServerProcess.process.pid, "SIGKILL"); 
+                log('Network', 'Killed data server', 'lilium');
+            } catch (err) {
+                log('Network', 'Did not kill data server process : ' + err, 'info');
+            }
         }
 
         log('Network', 'Killing shared memory process', 'lilium');
         if (sharedMemoryProcess) { 
-            process.kill(sharedMemoryProcess.process.pid, "SIGKILL"); 
-            log('Network', 'Killed shared memory server', 'lilium');
+            try {
+                process.kill(sharedMemoryProcess.process.pid, "SIGKILL"); 
+                log('Network', 'Killed shared memory server', 'lilium');
+            } catch (err) {
+                log('Network', 'Did not kill shared memory process : ' + err, 'info');
+            }
         }
 
         log('Network', 'Gracefully terminated Lilium process', 'success');
 
-        console.log("Sending exit code " + code);
+        log('Network', "Sending exit code " + code, 'lilium');
+        log("Network", "----------------------------------------------", "lilium");
+        log();
+
         process.exitCode = code;
         process.exit(code);
     }
@@ -113,24 +137,33 @@ class GardenerCluster extends ProcessManager {
                 });
 
                 !global.__TEST && cluster.on('exit', (worker, code, signal) => {
-                    if (worker == this.caijProc) {
-                        this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash", logname : "JNTOR"})
-                        return this.caijProc.on('message', this.broadcast.bind(this));
+                    if (!shuttingdown) {
+                        if (worker == this.caijProc) {
+                            this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash", logname : "JNTOR"})
+                            return this.caijProc.on('message', this.broadcast.bind(this));
+                        }
+
+                        log('Network', 'Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal, 'err');
+                        log('Network', 'Starting a new worker', 'info');
+
+                        const pid = worker.process.pid;
+                        const dyingChld = garden[pid];
+
+                        if (dyingChld) {
+                            const chld = cluster.fork({instancenum : dyingChld.instancenum, parent : "gardener", logname : "CHLD" + dyingChld.instancenum});
+                            chld.instancenum = dyingChld.instancenum;
+                            chld.on('message', this.broadcast.bind(this));
+
+                            delete garden[pid];
+                            garden[chld.process.pid] = chld;
+                            bootCount++;
+                            log('Network', 'Started a new worked with process ' + worker.process.pid, 'success');
+                        } else {
+                            log('Network', 'A worker died before instance it could be added to garden.', 'error');
+                            log('Network', 'This is a fatal error', 'error');
+                            this.onExit(1);
+                        }
                     }
-
-                    log('Network', 'Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal, 'err');
-                    log('Network', 'Starting a new worker', 'info');
-
-                    const pid = worker.process.pid;
-                    const dyingChld = garden[pid];
-                    const chld = cluster.fork({instancenum : dyingChld.instancenum, parent : "gardener", logname : "CHLD" + dyingChld.instancenum});
-                    chld.instancenum = dyingChld.instancenum;
-                    chld.on('message', this.broadcast.bind(this));
-
-                    delete garden[pid];
-                    garden[chld.process.pid] = chld;
-                    bootCount++;
-                    log('Network', 'Started a new worked with process ' + worker.process.pid, 'success');
                 }); 
             });
         } else {
