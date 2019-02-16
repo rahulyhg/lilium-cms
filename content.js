@@ -158,7 +158,7 @@ class ContentLib {
             if (!post) {
                 sendback(false);
             } else {
-                if (slug == name) {
+                if (slug == post.name) {
                     this.getFull(_c, post._id, deepArticle => {
                         this.generate(_c, deepArticle, () => {
                             sendback(true);
@@ -175,11 +175,11 @@ class ContentLib {
         let extra = {};
         extra.ctx = "article";
         extra.article = deepArticle;
-        extra.topic = deepArticle.topic;
+        extra.editions = deepArticle.editions;
 
-        if (!extra.topic) {
-            log('Content', 'Cannot generate article without a topic, ID : ' + (deepArticle && deepArticle._id), 'warn');
-            return cb && cb(new Error("Cannot generate article without a topic"));
+        if (!extra.editions || extra.editions.length == 0) {
+            log('Content', 'Cannot generate article without an edition, ID : ' + (deepArticle && deepArticle._id), 'warn');
+            return cb && cb(new Error("Cannot generate article without an edition"));
         }
 
         if (deepArticle.deepmedia) {
@@ -198,7 +198,7 @@ class ContentLib {
             article: deepArticle
         });
 
-        let ctx = deepArticle.templatename || (deepArticle.topic && deepArticle.topic.articletemplate) || "article";
+        let ctx = deepArticle.templatename || "article";
         let filename = deepArticle.name;
 
         deepArticle.headline = deepArticle.title[0];
@@ -215,10 +215,6 @@ class ContentLib {
 
                 const nextPage = (resp)  => {
                     if (cIndex == 0) {
-                        require('./fileserver.js').deleteFile(_c.server.html + "/" + deepArticle.topic.completeSlug + "/" + deepArticle.name + ".html", ()  => {
-                            log('Article', "Cleared non-paginated version of article from file system");
-                        });
-
                         cb && cb({
                             success : true, 
                             deepArticle : deepArticle,
@@ -292,7 +288,7 @@ class ContentLib {
                 }, 'article_async_render')
             } else {
                 // Generate LML page
-                filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
+                filelogic.renderThemeLML3(_c, ctx, deepArticle.alleditions.map(x => x.lang[deepArticle.language||"en"].slug).join('/') + "/" + filename + '.html', extra , (name)  => {
                     cb && cb({
                         success: true,
                         deepArticle : deepArticle
@@ -364,7 +360,6 @@ class ContentLib {
                                         subline : article.subtitle[0],
                                         fullauthor : article.fullauthor,
                                         timespent : article.date - article.createdOn,
-                                        fulltopic : article.fulltopic,
                                         media : article.deepmedia.sizes.facebook.url,
                                         nsfw : article.nsfw,
                                         isSponsored : article.isSponsored,

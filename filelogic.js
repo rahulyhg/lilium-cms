@@ -1,4 +1,5 @@
 const FileServer = fileserver = require('./fileserver.js');
+const fs = require('fs');
 const _c = require('./config.js');
 const LML = require('./lml.js');
 const LML2 = require('./lml/compiler.js');
@@ -246,13 +247,21 @@ class FileLogic {
         const _c = cli._c || cli;
         const ctxName = contextname || "home";
 
-        themeLib.fetchCurrentTheme(_c, cTheme => {
-            extra.language = extra.language || _c.website.language;
-            cTheme.settings = cTheme.settings || {};
+        if (!cli.crash) {
+            cli.crash = err => { throw err; };
+        }   
 
-            extra.theme = cTheme;
-            extra.minify = true;
-            extra.url = _c.server.url;
+        themeLib.fetchCurrentTheme(_c, cTheme => {
+            try {
+                extra.language = extra.language || _c.website.language;
+                cTheme.settings = cTheme.settings || {};
+
+                extra.theme = cTheme;
+                extra.minify = true;
+                extra.url = _c.server.url;
+            } catch (err) {
+                return cli.crash(err);
+            }
 
             try {
                 extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
@@ -262,17 +271,21 @@ class FileLogic {
             let layoutPath;
             let savePath;
 
-            if (cTheme.contexts[ctxName]) {
-                readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
-                layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || "layout.lml3");
-            } else {
-                readPath = _c.server.base + "flowers/" + cTheme.uName + "/lml/" + _c.env + ".lml3";
-            }
+            try {
+                if (cTheme.contexts[ctxName]) {
+                    readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
+                    layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || "layout.lml3");
+                } else {
+                    readPath = _c.server.base + "flowers/" + cTheme.uName + "/lml/" + _c.env + ".lml3";
+                }
 
-            savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
+                savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
 
-            if (extra.topic && extra.topic.override) {
-                extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
+                if (extra.topic && extra.topic.override) {
+                    extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
+                }
+            } catch (err) {
+                return cli.crash(err);
             }
 
             log('FileLogic', 'Compiling theme LML3 with context ' + contextname, 'info')
@@ -286,17 +299,22 @@ class FileLogic {
 
                 const next = cdned => {
                     fileserver.createDirIfNotExists(savePath, () => {
-                        const handle = FileServer.getOutputFileHandle(savePath, 'w+');
-                        FileServer.writeToFile(handle, cdned, () => {
-                            handle.close();
-                            handle.destroy();
-
-                            done(cdned);
-                        });
+                        try {
+                            log('FileLogic', 'Writing LML3 compiled file to disk => ' + savePath, 'info');
+                            fs.writeFile(savePath, cdned, { encoding : "utf8" }, err => {
+                                if (err) {
+                                    return cli.crash(err);
+                                }
+                                log('FileLogic', 'LML3 compiled file was written to disk', 'success');
+                                done(cdned);
+                            });
+                        } catch (err) {
+                            return cli.crash(err);
+                        }
                     }, false);
                 }
 
-                if (layoutPath) {
+                if (layoutPath && !cTheme.nolayout) {
                     LML3.compile(_c, layoutPath, extra, (fHtml) => {
                         require('./cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minimize(fHtml), _c, cdned => {
                             next(cdned);
