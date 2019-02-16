@@ -330,14 +330,18 @@ class FileServer {
             });
         }
 
-        const stream = fs.createReadStream(filename)
-        stream.pipe(cli.response);
+        try {
+            const stream = fs.createReadStream(filename)
+            stream.pipe(cli.response);
 
-        stream.on('close',  ()  => {
-            cli.response.end();
-            stream.destroy();
-            callback && callback();
-        });
+            stream.on('close',  ()  => {
+                cli.response.end();
+                stream.destroy();
+                callback && callback();
+            });
+        } catch (err) {
+            cli.crash(err);
+        }
     };
 
     pipeContentToClient  (cli, content) {

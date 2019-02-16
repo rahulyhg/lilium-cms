@@ -98,7 +98,7 @@ class Amp {
                 filelogic.renderThemeLML3(cli, 'amp', 'amp/' + article.name + '.html', {
                     config : cli._c,
                     article, language 
-                }, (filecontent) => {
+                }, filecontent => {
                     log("AMP", "Generated AMP page for article : " + article.title);
                     cli.response.writeHead(200);
                     cli.response.end(filecontent);

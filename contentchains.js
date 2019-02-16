@@ -12,6 +12,7 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     createdBy : 1,
     createdOn : 1,
     lastModified : 1,
+    language : 1,
     edition : 1,
     media: { $arrayElemAt: ['$media', 0] },
     
@@ -26,9 +27,12 @@ const CHAIN_DEEP_PROJECTION = {
     slug : 1,
     presentation : 1,
     status : 1,
+    language : 1,
     lastModified : 1,
 
     'featuredimage' : '$media.sizes.facebook.url',
+    'thumbnail' : '$media.sizes.thumbnaillarge.url',
+    'square' : '$media.sizes.thumbnail.url',
 
     'articles._id': 1,
     'articles.title': 1,
@@ -52,6 +56,7 @@ class ContentChains {
             subtitle : "",
             slug : "",
             presentation : "",
+            language : 'en',
             status : "draft",
             createdBy : undefined,
             createdOn : new Date(),
@@ -120,7 +125,7 @@ class ContentChains {
                     from : "content",
                     as : "articles",
                     foreignField : "_id",
-                    localField : "serie"
+                    localField : "articles"
                 }
             }, 
             { $unwind : "$media" }, 
@@ -315,6 +320,25 @@ class ContentChains {
 
                     });
                 });
+            });
+        } else if (path == "addpost") {
+            let chainid = cli.routeinfo.path[3];
+            let postid = cli.routeinfo.path[4];
+
+            db.findUnique(cli._c, 'contentchains', { _id : db.mongoID(chainid) }, (err, chain) => {
+                if (chain && postid) {
+                    if (chain.articles && chain.articles.map(x => x.toString()).includes(postid)) {
+                        cli.throwHTTP(409, undefined, true);
+                    } else {
+                        db.update(cli._c, 'contentchains', { _id : db.mongoID(chainid) }, {
+                            $addToSet : { articles : db.mongoID(postid) }
+                        }, () => {
+                            cli.sendJSON({ added : postid, to : chainid });
+                        }, false, true, true)
+                    }
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
             });
         } else if (path == "unpublish") {
             let updatedData = cli.postdata.data;

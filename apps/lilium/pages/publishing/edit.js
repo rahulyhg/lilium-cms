@@ -8,11 +8,12 @@ import { getSession } from '../../data/cache';
 import { navigateTo } from '../../routing/link';
 import { castNotification } from '../../layout/notifications';
 import { Spinner } from '../../layout/loading';
+import { Picker } from '../../layout/picker';
 import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
 import Modal from '../../widgets/modal';
 import dateFormat from 'dateformat';
-import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink } from '../../lib/publishing';
+import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink, addPostToSeries } from '../../lib/publishing';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
@@ -178,6 +179,7 @@ class PublishingActions extends Component {
                 dropacts.push(
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Add to series", work : this.props.actions.triggerAddToSeries.bind(this) },
                     { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "red", text : "Unpublish", work : this.props.actions.unpublish.bind(this) }
                 );
@@ -476,6 +478,7 @@ export default class EditView extends Component {
             triggerAuthorChange : this.triggerAuthorChange.bind(this),
             triggerSlugChange : this.triggerSlugChange.bind(this),
             triggerPreviewLinkChange : this.triggerPreviewLinkChange.bind(this),
+            triggerAddToSeries : this.triggerAddToSeries.bind(this),
             commitchanges : this.commitchanges.bind(this),
             unpublish : this.unpublish.bind(this),
             refuse : this.refuse.bind(this)
@@ -655,7 +658,7 @@ export default class EditView extends Component {
 
     preview(done) {
         this.save(() => {
-            const loc = liliumcms.url + "/publishing/preview/" + this.props.postid + "/" + (this.state.post.previewkey || "");
+            const loc = liliumcms.url + "/preview/" + this.props.postid + "/" + (this.state.post.previewkey || "");
             try {
                 if (this.previewWindow && !this.previewWindow.closed) {
                     this.previewWindow.document.location = loc;
@@ -898,6 +901,38 @@ export default class EditView extends Component {
             }
 
             done && done(); 
+        });
+    }
+
+    // TODO : TOFINISH
+    triggerAddToSeries(done) {
+        Picker.cast({
+            accept : ["chain"],
+            options : {
+                chain : {
+                    selected : undefined
+                }
+            }
+        }, resp => {
+            if (resp && resp.chain) {
+                addPostToSeries(this.state.post._id, resp.chain._id, (err, resp) => {
+                    if (err) {
+                        castNotification({
+                            type : "warning",
+                            title : "Add to content chain",
+                            message : "This article could not be added to the content chain."
+                        });
+                    } else {
+                        castNotification({
+                            type : "success",
+                            title : "Add to content chain",
+                            message : "This article was successfully added to the content chain."
+                        });
+                    }
+                });
+            } else {
+                done && done();
+            }
         });
     }
 

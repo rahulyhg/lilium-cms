@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
-import { TextField, SelectField, StackBox, CheckboxField } from '../../widgets/form';
+import { TextField, SelectField, StackBox, CheckboxField, MediaPickerField } from '../../widgets/form';
 
 export class ThemeSettingsForm extends Component {
     constructor(props) {
@@ -23,6 +23,10 @@ export class ThemeSettingsForm extends Component {
         }, () => {
             log('Themes', 'Updated theme field : ' + field, 'success');
         });
+    }
+
+    imageChanged(field, value) {
+        value && value._id && this.valueChanged(field, value._id);
     }
 
     componentDidMount() {
@@ -59,7 +63,15 @@ export class ThemeSettingsForm extends Component {
                 placeholder={entry.attr.displayname} 
                 onChange={this.valueChanged.bind(this)}
                 initialValue={this.coldState[name]} 
-            />)
+            />);
+
+            case "image": return (<MediaPickerField
+                name={name}
+                size={entry.attr.size}
+                placeholder={entry.attr.displayname}
+                onChange={this.imageChanged.bind(this)}
+                initialValue={this.coldState[name]}
+            />);
 
             case "title": return (<h2>{entry.attr.displayname}</h2>);
 

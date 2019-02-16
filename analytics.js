@@ -579,7 +579,7 @@ class GoogleAnalytics {
     }
 
     storeRealtime(_c, done) {
-        GoogleAnalyticsRequest.realtime(_c, this, (err, data) => {
+        !_c.optoutGA && GoogleAnalyticsRequest.realtime(_c, this, (err, data) => {
             if (data) {
                 const beautifulData = StatsBeautifier.realtime(_c, data.data || data);
                 beautifulData ? sharedcache.set({

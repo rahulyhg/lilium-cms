@@ -134,3 +134,44 @@
         }
     }
 }
+
+#picker-chain {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .text-field-header {
+        padding: 20px;
+        background-color: @whiteish;
+        border-bottom: 1px solid @lesswhiteish;
+        flex : 0 0 100px;
+        height: 100px;
+    }
+
+    .chain-list {
+        flex-grow : 1;
+        padding: 10px;
+
+        .chain-list-item {
+            background: @whitebg;
+            box-shadow: @softshadow;
+            cursor: pointer;
+            margin: 10px;
+            padding: 20px;
+
+            h3, h4 {
+                padding: 0;
+                margin: 0;
+            }
+
+            h4 {
+                font-weight: normal;
+            }   
+
+            h5 {
+                margin: 10px 0px 0px;
+                font-weight: normal;
+            }
+        }
+    }
+}

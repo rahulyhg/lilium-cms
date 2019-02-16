@@ -3,12 +3,14 @@ import { getLocal } from '../data/cache';
 import { TabView, Tab } from '../widgets/tabview';
 import { ImagePicker } from './imagepicker';
 import { PlacePicker } from './placepicker';
+import { ChainPicker } from './chainpicker';
 import { EmbedPicker, embedToComponentCarousel } from './embedpicker';
 
 const PickerMap = {
     [ImagePicker.slug]: ImagePicker,
     [PlacePicker.slug]: PlacePicker,
-    [EmbedPicker.slug]: EmbedPicker
+    [EmbedPicker.slug]: EmbedPicker,
+    [ChainPicker.slug]: ChainPicker
 };
 
 const LAST_OPENED_LOCAL_KEY = 'picker.lastopened';
@@ -232,6 +234,8 @@ class CarouselPreview extends Component {
                 return MapCarouselPreview;
             case EmbedPicker.slug:
                 return EmbedCarouselPreview;
+            case ChainPicker.slug:
+                return ChainPickerPreview
             default:
                 return DefaultCarouselPreview;
         }
@@ -280,6 +284,12 @@ const MapCarouselPreview = props => (
     <div className="map-carousel-preview">
         <i className="map-marker-icon fa-4x fas fa-map-marker-check"></i>
         <p className="place-name">{props.el.displayname}</p>
+    </div>
+);
+
+const ChainPickerPreview = props => (
+    <div>
+
     </div>
 );
 

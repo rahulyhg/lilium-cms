@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import API from "../../data/api";
 import { castNotification } from '../../layout/notifications';
-import { TextField, ButtonWorker } from "../../widgets/form";
+import { TextField, ButtonWorker, SelectField } from "../../widgets/form";
 import { EditionPicker } from '../../widgets/editionpicker';
 import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
@@ -148,12 +148,19 @@ export class EditContentChain extends Component {
                         }
                     </div>
 
+                    <div class="card publishing-card">
+                        <SelectField name="language" placeholder="Language" initialValue={this.state.chain.language || "en"} value={this.state.chain.language || "en"} onChange={this.updateValues.bind(this)} options={[
+                            { text : "English", value : "en" },
+                            { text : "Français", value : "fr" }
+                        ]} />
+                    </div>
+
                     <h4>Select articles for the content chain</h4>
                     <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
 
                     <h4>Select an edition for this series</h4>
                     <div class="card publishing-card nopad">
-                        <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.edition || []} value={this.state.chain.edition} name="edition" />
+                        <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.edition || []} value={this.state.chain.edition} language={this.state.chain.language || "en"} name="edition" />
                     </div>
 
                     <hr />

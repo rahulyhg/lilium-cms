@@ -192,13 +192,8 @@ var Themes = function () {
                     try {
                         ThemeInstance.enable(config, info, function() {
                             if (!doc.value) {
-                                db.update(config, 'themes', {
-                                    uName: uName
-                                }, { settings : settings}, function() {
-                                    ActiveTheme[config.id].settings = curSettings || settings;
-                                    callback();
-                                });
-
+                                ActiveTheme[config.id].settings = curSettings || settings;
+                                callback();
                             } else {
                                 ActiveTheme[config.id].settings = curSettings || doc.value.settings || ActiveTheme[config.id].settings;
     

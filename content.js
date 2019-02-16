@@ -158,7 +158,7 @@ class ContentLib {
             if (!post) {
                 sendback(false);
             } else {
-                if (slug == name) {
+                if (slug == post.name) {
                     this.getFull(_c, post._id, deepArticle => {
                         this.generate(_c, deepArticle, () => {
                             sendback(true);
@@ -175,11 +175,11 @@ class ContentLib {
         let extra = {};
         extra.ctx = "article";
         extra.article = deepArticle;
-        extra.topic = deepArticle.topic;
+        extra.editions = deepArticle.editions;
 
-        if (!extra.topic) {
-            log('Content', 'Cannot generate article without a topic, ID : ' + (deepArticle && deepArticle._id), 'warn');
-            return cb && cb(new Error("Cannot generate article without a topic"));
+        if (!extra.editions || extra.editions.length == 0) {
+            log('Content', 'Cannot generate article without an edition, ID : ' + (deepArticle && deepArticle._id), 'warn');
+            return cb && cb(new Error("Cannot generate article without an edition"));
         }
 
         if (deepArticle.deepmedia) {
@@ -198,7 +198,7 @@ class ContentLib {
             article: deepArticle
         });
 
-        let ctx = deepArticle.templatename || (deepArticle.topic && deepArticle.topic.articletemplate) || "article";
+        let ctx = deepArticle.templatename || "article";
         let filename = deepArticle.name;
 
         deepArticle.headline = deepArticle.title[0];
@@ -215,10 +215,6 @@ class ContentLib {
 
                 const nextPage = (resp)  => {
                     if (cIndex == 0) {
-                        require('./fileserver.js').deleteFile(_c.server.html + "/" + deepArticle.topic.completeSlug + "/" + deepArticle.name + ".html", ()  => {
-                            log('Article', "Cleared non-paginated version of article from file system");
-                        });
-
                         cb && cb({
                             success : true, 
                             deepArticle : deepArticle,
@@ -292,7 +288,7 @@ class ContentLib {
                 }, 'article_async_render')
             } else {
                 // Generate LML page
-                filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
+                filelogic.renderThemeLML3(_c, ctx, deepArticle.alleditions.map(x => x.lang[deepArticle.language||"en"].slug).join('/') + "/" + filename + '.html', extra , (name)  => {
                     cb && cb({
                         success: true,
                         deepArticle : deepArticle
@@ -353,8 +349,8 @@ class ContentLib {
 
                                 db.join(_c, 'hits', [
                                     { $match : { path : "/lilium/publishing/write/" + _id.toString() }},
-                                    { $sort : { timespent : -1 } },
-                                    { $project : {timespent : 1, userid : 1, _id : 0} }
+                                    { $group : { _id : "$userid", timespent : { $sum : "$timespent" } } },
+                                    { $project : { timespent : 1, userid : "$_id" } }
                                 ], hits => {
                                     sendback({
                                         authortotal, authortotaltoday, decorations, websitetotal, lastpublished, 
@@ -364,7 +360,6 @@ class ContentLib {
                                         subline : article.subtitle[0],
                                         fullauthor : article.fullauthor,
                                         timespent : article.date - article.createdOn,
-                                        fulltopic : article.fulltopic,
                                         media : article.deepmedia.sizes.facebook.url,
                                         nsfw : article.nsfw,
                                         isSponsored : article.isSponsored,
@@ -648,7 +643,7 @@ class ContentLib {
                         if (entry) {
                             this.fetchDeepFieldsFromDiff(_c, newpost, entry, () => {
                                 newpost.updated = new Date();
-                                col.replaceOne({_id : postid}, newpost, {}, (err, r) => {
+                                col.updateOne({_id : postid}, { $set : newpost }, {}, (err, r) => {
                                     log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
 
                                     hooks.fireSite(_c, 'article_updated', { article : newpost, _c, full : false });
@@ -711,30 +706,36 @@ class ContentLib {
             }
 
             db.findUnique(config.default(), 'entities', { _id : caller }, (err, fullrequester) => {
-                if (fullrequester.roles.includes('editor') || !post.author || caller.toString() == post.author.toString()) {
-                    if (!post.date) {
-                        post.date = new Date();
-                        post.date = post.date;
+                try {
+                    if (fullrequester.roles.includes('editor') || !post.author || caller.toString() == post.author.toString()) {
+                        if (!post.date) {
+                            post.date = new Date();
+                            post.date = post.date;
+                        }
+
+                        post.seotitle = post.seotitle || post.title[0]
+                        post.seosubtitle = post.seosubtitle || post.subtitle[0]
+
+                        if (!post.name) {
+                            post.name = require('slug')(post.seotitle).toLowerCase();
+                            post.name = post.name;
+                        }
+
+                        if (
+                            !post.editions || post.editions.length == 0 || !post.author || !post.media || 
+                            !post.title[0] || !post.subtitle[0] || !post.content[0]
+                        ) {
+                            return sendback({ error : "Missing fields", code : 401 });
+                        }
+
+                        sendback(undefined, post);
+                    } else {
+                        return sendback({ error : "Missing rights", code : 403 });
                     }
-
-                    post.seotitle = post.seotitle || post.title[0]
-                    post.seosubtitle = post.seosubtitle || post.subtitle[0]
-
-                    if (!post.name) {
-                        post.name = require('slug')(post.seotitle).toLowerCase();
-                        post.name = post.name;
-                    }
-
-                    if (
-                        !post.editions || post.editions.length == 0 || !post.author || !post.media || 
-                        !post.title[0] || !post.subtitle[0] || !post.content[0]
-                    ) {
-                        return sendback({ error : "Missing fields", code : 401 });
-                    }
-
-                    sendback(undefined, post);
-                } else {
-                    return sendback({ error : "Missing rights", code : 403 });
+                } catch (err) {
+                    log('Publishing', 'Error validating post', 'err');
+                    console.log(err);
+                    sendback({ error : err.toString(), code : 500, stack : err });
                 }
             });
         });
@@ -746,51 +747,59 @@ class ContentLib {
                 return sendback(err);
             } 
 
-            const updated = {
-                status : "published",
-                publishedOn : new Date(),
-                publishedAt : Date.now(),
-                date : new Date(),
-                url : "/" + post.alleditions.map(x => x.lang[post.language].slug).join('/') + "/" + post.name
-            };
+            try {
+                const updated = {
+                    status : "published",
+                    publishedOn : new Date(),
+                    publishedAt : Date.now(),
+                    date : new Date(),
+                    name : post.name,
+                    url : "/" + post.alleditions.map(x => x.lang[post.language || "en"].slug).join('/') + "/" + post.name
+                };
 
-            db.update(_c, 'content', { _id : post._id }, updated, () => {
-                db.remove(_c, 'autosave', { contentid : post._id }, () => {
-                    this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
-                        this.updateActionStats(_c, post, score => {
-                            hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
-                            hooks.fireSite(_c, 'article_updated', { article : post, _c });
-                            hooks.fire('article_published', {
-                                article: post, _c
+                db.update(_c, 'content', { _id : post._id }, updated, () => {
+                    db.remove(_c, 'autosave', { contentid : post._id }, () => {
+                        this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
+                            this.updateActionStats(_c, post, score => {
+                                hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
+                                hooks.fireSite(_c, 'article_updated', { article : post, _c });
+                                hooks.fire('article_published', {
+                                    article: post, _c
+                                });
+
+                                this.generate(_c, post, () => {
+                                    sendback({ historyentry, newstate : post });
+
+                                    notifications.emitToWebsite(_c.id, {
+                                        articleid : post._id,
+                                        at : Date.now(),
+                                        by : caller
+                                    }, "articlePublished");
+
+                                    if (caller.toString() != (post.author && post.author.toString())) {
+                                        notifications.notifyUser(post.author, _c.id, {
+                                            title: "Article published",
+                                            msg: post.title + ' was published on the website.',
+                                            type: 'success'
+                                        });
+                                    }
+                                }, 'all');
                             });
-
-                            this.generate(_c, post, () => {
-                                sendback({ historyentry, newstate : post });
-
-                                notifications.emitToWebsite(_c.id, {
-                                    articleid : post._id,
-                                    at : Date.now(),
-                                    by : caller
-                                }, "articlePublished");
-
-                                if (caller.toString() != (post.author && post.author.toString())) {
-                                    notifications.notifyUser(post.author, _c.id, {
-                                        title: "Article published",
-                                        msg: post.title + ' was published on the website.',
-                                        type: 'success'
-                                    });
-                                }
-                            }, 'all');
                         });
                     });
                 });
-            });
+            } catch (err) {
+                log('Publishing', 'Error validating post', 'err');
+                console.log(err);
+                sendback({ error : err.toString(), code : 500, stack : err });
+            }
         });
     }
 
     refreshURL(_c, fullpost, caller, done) {
         const url = "/" + fullpost.alleditions.map(x => x.lang[fullpost.language || "en"].slug).join('/') + "/" + fullpost.name;
         if (fullpost.url != url) {
+            log('Content', 'Updating URL from ' + fullpost.url + ' to ' + url, 'info');
             fullpost.aliases = [...(fullpost.aliases || []), fullpost.url];
             fullpost.url = url;
 
