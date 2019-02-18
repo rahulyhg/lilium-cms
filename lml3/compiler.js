@@ -117,7 +117,7 @@ class LMLContext {
         this.libs = {
             encodec : require('entities'),
             app : require('../build').getAppScript,
-            cdn : require('../cdn'),
+            cdn : require('../lib/cdn'),
             slugify : require('slugify'),
             fileio : require('../fileserver.js'),
             encode : x => (x && x.replace ? x.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") : x),

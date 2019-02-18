@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const AESEncryptor = require('./aesencryptor');
+const AESEncryptor = require('./lib/aesencryptor');
 const _c = require('./config.js');
 const db = require('./includes/db');
 const binList = require('./backend/static/creditBIN.json');
