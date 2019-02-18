@@ -1,4 +1,3 @@
-
 const hooks = require('./hooks.js');
 const db = require('./includes/db.js');
 const isElder = require('./network/info.js').isElderChild();
@@ -37,8 +36,7 @@ class Core {
             log('Core', 'Creating global library access', 'lilium');
 
             global.core = {
-                fileserver : require('./fileserver'),
-                filelogic : require('./filelogic'),
+                filelogic : require('./pipeline/filelogic'),
                 hooks : require('./hooks'),
                 entities : require('./entities'),
                 livevars : require('./livevars'),
@@ -116,7 +114,7 @@ const loadEndpoints = () => {
 
     log('Endpoints', 'Loading endpoints', 'info');
     const endpoints = require('./pipeline/endpoints.js');
-    const filelogic = require('./filelogic.js');
+    const filelogic = require('./pipeline/filelogic');
     const admin = require('./backend/admin.js');
     const entities = require('./entities.js');
     const LoginLib = require('./backend/login.js');
@@ -201,7 +199,7 @@ const loadImageSizes = () => {
 };
 
 const loadCurrencies = () => {
-    require('./money').preloadCurrencies();
+    require('./lib/money').preloadCurrencies();
 };
 
 const loadPlugins = (cb) => {
@@ -387,7 +385,7 @@ const loadWebsites = (loadEverything) => {
     sites = require('./sites.js');
 
     const currentRoot = __dirname;
-    const fss = require('./fileserver.js');
+    const fss = require('./pipeline/filelogic');
 
     log('Core', 'Reading sites directory', 'info');
     fss.dirExists(currentRoot + "/sites", (exists) => {

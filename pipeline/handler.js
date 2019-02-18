@@ -4,7 +4,7 @@ var inspect = require('util').inspect;
 var Busboy = require('busboy');
 var config = require('../config.js');
 var fs = require('fs');
-var fileserver = require('../fileserver.js');
+const filelogic = require('./filelogic');
 var htmlserver = require('./htmlserver.js');
 var db = require('../includes/db.js');
 var imageSize = require('image-size');
@@ -93,7 +93,7 @@ var Handler = function () {
                                    require('../media').getDirectoryForNew(cli._c, updir => {
                                        var mime = getMimeByMimeType(mimetype, cli);
                                        //Gen random name
-                                       filename = fileserver.genRandomNameFile(filename);
+                                       filename = filelogic.genRandomNameFile(filename);
                                        var saveTo = updir + filename + mime;
                                        var name = filename + mime;
 

@@ -3,7 +3,7 @@ var _c = require('./config.js');
 var LML = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
 var db = require('./includes/db.js');
-var fileserver = require('./fileserver.js');
+const filelogic = require('./pipeline/filelogic');
 var checksum = require('checksum');
 var compressor = require('node-minify');
 
@@ -80,13 +80,13 @@ var Precomp = function () {
                     }
                 });
             } else {
-                fileserver.moveFile(inFile, outFile, function() {
+                filelogic.moveFile(inFile, outFile, function() {
                     callback(true);
                 });
             }
         } else {
             log('Precompiler', "Moving " + inFile + " => " + outFile, 'info');
-            fileserver.moveFile(inFile, outFile, function() {
+            filelogic.moveFile(inFile, outFile, function() {
                 callback(true);
             });
         }
@@ -177,7 +177,7 @@ var Precomp = function () {
                             absWritePath + curFile.slice(curFile.lastIndexOf('/') + 1, curFile.length).slice(0, -4) : 
                             absWritePath + curFile.slice(0, -4);
 
-                        fileserver.fileExists(wPath, function (exists) {
+                        filelogic.fileExists(wPath, function (exists) {
                             if (!force && exists && histoObj[curFile] == sum) {
                                 db.insert(conf, 'compiledfiles', {
                                     filename: curFile,
@@ -232,17 +232,17 @@ var Precomp = function () {
     var mergeJS = function (conf, readycb, theme) {
         var files = that.getJSQueue(theme ? 'theme' : 'admin', conf.id);
         var compiledPath = conf.server.html + "/compiled/" + (theme ? 'scripts' : 'admin') +".js";
-        var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
+        var fHandle = filelogic.getOutputFileHandle(compiledPath, 'w+');
         var fileIndex = 0;
         var fileTotal = files.length;
 
         log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of '+ (theme? 'theme' : 'admin') +' context', 'info');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
-                fileserver.fileExists(files[fileIndex], function(exists) {
+                filelogic.fileExists(files[fileIndex], function(exists) {
                     if (exists) {
-                        fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
-                            fileserver.writeToFile(fHandle, '\n', function() {
+                        filelogic.pipeFileToHandle(fHandle, files[fileIndex], function () {
+                            filelogic.writeToFile(fHandle, '\n', function() {
                                 log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
                                 fileIndex++;
                                 nextFile();
@@ -255,7 +255,7 @@ var Precomp = function () {
                     }
                 });
             } else {
-                fileserver.closeFileHandle(fHandle);
+                filelogic.closeFileHandle(fHandle);
                 log('Precompiled', 'Merged ' + fileIndex + ' JS files', 'success');
                 readycb();
             }
@@ -266,16 +266,16 @@ var Precomp = function () {
     var mergeCSS = function (conf, readycb, theme) {
         var files = that.getCSSQueue((theme ? 'theme' :'admin'), conf.id);
         var compiledPath = conf.server.html + "/compiled/"+ (theme? 'style' : 'admin') +".css";
-        var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
+        var fHandle = filelogic.getOutputFileHandle(compiledPath, 'w+');
         var fileIndex = 0;
         var fileTotal = files.length;
 
         log('Precompiler', 'Merging ' + fileTotal + ' CSS files of '+ (theme? 'Theme' : 'Admin') +' context', 'info');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
-                fileserver.fileExists(files[fileIndex], function(exists) {
+                filelogic.fileExists(files[fileIndex], function(exists) {
                     if (exists) {
-                        fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
+                        filelogic.pipeFileToHandle(fHandle, files[fileIndex], function () {
                             log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
                             fileIndex++;
                             nextFile();
@@ -287,7 +287,7 @@ var Precomp = function () {
                     }
                 });
             } else {
-                fileserver.closeFileHandle(fHandle);
+                filelogic.closeFileHandle(fHandle);
                 log('Precompiled', 'Merged ' + fileIndex + ' CSS files', 'success');
                 readycb();
             }
@@ -386,7 +386,7 @@ var Precomp = function () {
 
 
     this.precompile = function (conf, readycb, themesFiles, force, extra = {}) {
-        fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function () {
+        filelogic.createDirIfNotExists(conf.server.html + "/compiled/", function () {
             runLoop(conf, function () {
                 compileQueue(conf, function() {
                     mergeJS(conf, function () {

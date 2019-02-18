@@ -1,7 +1,6 @@
 const fs = require('fs');
 const _c = require('./config.js');
-const fileserver = require('./fileserver.js');
-const filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 
 const Admin = require('./backend/admin.js');
 const db = require('./includes/db.js');
@@ -79,9 +78,9 @@ class Plugins {
                     callback(allPlugins);
                 } else {
                     var infoPath = plugindir + dirs[i] + "/" + _c.default().paths.pluginsInfo;
-                    fileserver.fileExists(infoPath, (exists) => {
+                    filelogic.fileExists(infoPath, (exists) => {
                         if (exists) {
-                            fileserver.readJSON(infoPath, (json) => {
+                            filelogic.readJSON(infoPath, (json) => {
                                 json.dirName = dirs[i];
                                 allPlugins.push(json);
                                 nextDir();

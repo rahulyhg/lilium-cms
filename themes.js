@@ -1,7 +1,6 @@
 var fs = require('fs');
 var _c = require('./config.js');
-var fileserver = require('./fileserver.js');
-var filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
@@ -127,9 +126,9 @@ var Themes = function () {
                     callback(allThemes)
                 } else {
                     var infoPath = themedir + dirs[i] + "/" + conf.paths.themesInfo;
-                    fileserver.fileExists(infoPath, function (exists) {
+                    filelogic.fileExists(infoPath, function (exists) {
                         if (exists) {
-                            fileserver.readJSON(infoPath, function (json) {
+                            filelogic.readJSON(infoPath, function (json) {
                                 json.dirName = dirs[i];
                                 allThemes.push(json);
                                 nextDir();

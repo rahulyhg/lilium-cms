@@ -1,5 +1,5 @@
 const config = require('./config.js');
-const fileserver = require('./fileserver.js');
+const filelogic = require('./pipeline/filelogic');
 const cluster = require('cluster');
 const RedisServer = require('redis-server');
 const log = require('./log');

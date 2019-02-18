@@ -1,6 +1,6 @@
 
 const db = require('./includes/db.js');
-const filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 const config = require('./config.js');
 const hooks = require('./hooks.js');
 

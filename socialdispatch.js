@@ -1,7 +1,7 @@
 const db = require('./includes/db.js');
 
 const config = require('./config.js');
-const filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 const request = require('request');
 const articleLib = require('./content.js');
 const searchLib = require('./search.js');

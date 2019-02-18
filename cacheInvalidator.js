@@ -1,5 +1,5 @@
 var fs = require('fs');
-var fileserver = require("./fileserver.js");
+const filelogic = require('./pipeline/filelogic');
 var conf = require('./config.js');
 var util = require('util');
 var db = require('./includes/db.js');
@@ -15,10 +15,10 @@ var CacheInvalidator = function () {
             const oldpath = pkg._c.server.html + pkg.oldurl;
             if (pkg.paginated) {
                 log('Cache', 'Clearing directory ' + oldpath, 'info');
-                fileserver.emptyDirectory(oldpath, { fileFilter : "*.html" }, () => {});
+                filelogic.emptyDirectory(oldpath, { fileFilter : "*.html" }, () => {});
             } else {
                 log('Cache', 'Clearing cached file ' + oldpath + ".html", 'info');
-                fileserver.deleteFile(oldpath + ".html", () => {});
+                filelogic.deleteFile(oldpath + ".html", () => {});
             }
         });
 
@@ -36,7 +36,7 @@ var CacheInvalidator = function () {
                     db.findUnique(conf.default(), 'entities', {_id : db.mongoID(data.article.author)}, function(err, entity) {
                         var path = html + "/author/" + entity.slug;
                         log('Cache', 'Emptying author cache : ' + entity.displayname);
-                        fileserver.emptyDirectory(path, deleteOpt, function() {});
+                        filelogic.emptyDirectory(path, deleteOpt, function() {});
                     });
                 }
             }

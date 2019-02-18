@@ -1,5 +1,5 @@
 
-const filelogic = require('./filelogic')
+const filelogic = require('./pipeline/filelogic');
 const db = require('./includes/db')
 const config = require('./config')
 

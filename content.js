@@ -1,6 +1,6 @@
 const db = require('./includes/db');
 const config = require('./config');
-const filelogic = require('./filelogic');
+const filelogic = require('./pipeline/filelogic');
 
 const CDN = require('./lib/cdn');
 const hooks = require('./hooks');
@@ -892,13 +892,13 @@ class ContentLib {
     
                     if (fullpost.fulltopic && fullpost.title && fullpost.title.length > 1) {
                         fullpost.title.forEach((x, i) => {
-                            fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + "/" + (i+1) + ".html", () => {});
+                            filelogic.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + "/" + (i+1) + ".html", () => {});
                         })
                     } else if (fullpost.fulltopic) {
-                        fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
+                        filelogic.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
                     }
 
-                    fileserver.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html", () => {});
+                    filelogic.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html", () => {});
                 }, true);
             });
         });
@@ -940,10 +940,10 @@ class ContentLib {
 
                 if (fullpost.fulltopic && fullpost.title && fullpost.title.length > 1) {
                     fullpost.title.forEach((x, i) => {
-                        fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + "/" + (i+1) + ".html", () => {});
+                        filelogic.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + "/" + (i+1) + ".html", () => {});
                     })
                 } else if (fullpost.fulltopic) {
-                    fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
+                    filelogic.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
                 }
             });
         });

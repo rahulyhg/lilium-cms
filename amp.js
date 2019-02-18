@@ -1,7 +1,6 @@
 const db = require('./includes/db.js');
 const articleLib = require('./content.js');
-const filelogic = require('./filelogic.js');
-const fileserver = require('./fileserver.js');
+const filelogic = require('./pipeline/filelogic');
 const hooks = require('./hooks.js');
 const cdn = require('./lib/cdn.js');
 const themes = require('./themes.js');
@@ -102,7 +101,7 @@ class Amp {
                     cli.response.end(filecontent);
 
                     const filepath = cli._c.server.html + "/amp/" + article.name + ".html";
-                    fileserver.dumpToFile(filepath, filecontent, () => {
+                    filelogic.dumpToFile(filepath, filecontent, () => {
                         hooks.fireSite(cli._c, "ampGenerated", { article, filepath });
                         log("AMP", "Cached file written");
                     }, 'utf8');

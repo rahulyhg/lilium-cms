@@ -7,7 +7,7 @@ const AdminEndpoints = {
 
 const AdminMenus = [];
 
-const filelogic = require('../filelogic.js');
+const filelogic = require('../pipeline/filelogic');
 const LML2 = require('../lml/compiler.js');
 const LML3 = require('../lml3/compiler');
 const hooks = require('../hooks.js');
@@ -47,7 +47,7 @@ class Admin {
             LML2.compileToFile(cli._c.server.base + "/backend/dynamic/admin/welcome.lml",
                 cli._c.server.html + "/static/tmp/welcome.html",
                 () => {
-                    require('../fileserver.js').pipeFileToClient(
+                    require('../filelogic.js').pipeFileToClient(
                         cli, 
                         cli._c.server.html + "/static/tmp/welcome.html", 
                         function() {}, 

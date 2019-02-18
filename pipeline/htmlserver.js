@@ -1,5 +1,4 @@
-var fileserver = require('../fileserver.js');
-var filelogic = require('../filelogic.js');
+const filelogic = require('./filelogic');
 var sharedcache = require("../sharedcache.js");
 var styledpages = require('../styledpages.js');
 var editions = require('../editions');
@@ -74,9 +73,9 @@ class HTMLServer {
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
         var filepath = cli._c.server.html + cli.routeinfo.relsitepath;
-        fileserver.fileExists(filepath, function(exists) {
+        filelogic.fileExists(filepath, function(exists) {
             if (exists) {
-                fileserver.pipeFileToClient(cli, filepath, noop);
+                filelogic.pipeFileToClient(cli, filepath, noop);
             } else {
                 cli.throwHTTP(404, 'Not found', true);
             }
@@ -91,20 +90,20 @@ class HTMLServer {
 		var filename = cli._c.server.html + cli.routeinfo.relsitepath;
 		var htmlFile = filename + ".html";
 
-		fileserver.fileExists(htmlFile, function (fileExists){
+		filelogic.fileExists(htmlFile, function (fileExists){
 			if (fileExists) {
 				cli.routeinfo.isStatic = true;
-				fileserver.pipeFileToClient(cli, htmlFile, function() {
+				filelogic.pipeFileToClient(cli, htmlFile, function() {
 					cli.touch('htmlserver.serveClient.callback');
 				});
 			} else {
-				fileserver.fileExists(filename, function (fileExists){
+				filelogic.fileExists(filename, function (fileExists){
 					if (fileExists) {
 						// If html page requested from root
 						if (cli.routeinfo.path.length == 1 && cli.routeinfo.relsitepath.indexOf('.html') !== -1) {
 							cli.redirect(cli._c.server.url + cli.routeinfo.fullpath.slice(-5), true);
 						} else {
-							fileserver.pipeFileToClient(cli, filename, function (){
+							filelogic.pipeFileToClient(cli, filename, function (){
 								cli.touch('htmlserver.serveClient.callback');
 							});
 						}
@@ -130,7 +129,7 @@ class HTMLServer {
                                         } else {
                                             log('HTMLServer', 'Article generated from cli', 'details');
                                             cli.routeinfo.isStatic = true;
-                                            fileserver.pipeFileToClient(cli, filename + '.html', function () {
+                                            filelogic.pipeFileToClient(cli, filename + '.html', function () {
                                                 cli.touch('htmlserver.serveClient.callback');
                                             });
                                         }

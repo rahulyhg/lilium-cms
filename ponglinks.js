@@ -2,7 +2,7 @@ const db = require('./includes/db');
 const sharedcache = require('./sharedcache');
 const isElder = require('./network/info').isElderChild();
 const SHA1 = (str) => require('crypto-js').SHA1(str).toString();
-const filelogic = require('./filelogic');
+const filelogic = require('./pipeline/filelogic');
 
 const ALLOWED_EDIT_FIELDS = [
     "destination", "identifier", "status"

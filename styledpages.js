@@ -1,9 +1,7 @@
 const db = require('./includes/db.js');
-const fileserver = require('./fileserver.js');
-const filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 const networkinfo = require('./network/info.js');
 const hooks = require('./hooks');
-
 
 class StyledPages {
     constructor() {
@@ -23,7 +21,7 @@ class StyledPages {
         };
 
         if (page.skiplayout) {
-            fileserver.dumpToFile(landingPath, page.content, done, 'utf8');
+            filelogic.dumpToFile(landingPath, page.content, done, 'utf8');
         } else {
             filelogic.renderThemeLML(conf, 'styledpage', landingPath, extra, done);
         }
@@ -32,10 +30,10 @@ class StyledPages {
     sendPage(cli, page) {
         let landingPath = that.generateFileName(cli._c, page);
         let go = () => {
-            fileserver.pipeFileToClient(cli, landingPath, () => {}, true);
+            filelogic.pipeFileToClient(cli, landingPath, () => {}, true);
         };
 
-        fileserver.fileExists(landingPath, function(exists) {
+        filelogic.fileExists(landingPath, function(exists) {
             if (!exists) {
                 that.generatePage(cli._c, page, () => {
                     go();
@@ -84,7 +82,7 @@ class StyledPages {
             if (err || !page) { return done(err); }
 
             var cachedFile = that.generateFileName(conf, page);
-            fileserver.deleteFile(cachedFile, () => {
+            filelogic.deleteFile(cachedFile, () => {
                 db.update(conf, 'styledpages', {_id : db.mongoID(pageID)}, newData, () => {
                     db.findUnique(conf, 'styledpages', {_id : db.mongoID(pageID)}, (err, newpage) => {
                         hooks.fireSite(conf, 'styledpageSaved', {page : newpage});

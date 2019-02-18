@@ -105,7 +105,7 @@ class Config  {
     }
 
     saveConfigs(config, callback) {
-        require('./fileserver.js').saveJSON(config.server.base + "/sites/" + config.jsonfile, config, callback);
+        require('./filelogic.js').saveJSON(config.server.base + "/sites/" + config.jsonfile, config, callback);
     }
 
     registerConfigs(key, object) {

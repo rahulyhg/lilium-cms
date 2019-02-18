@@ -1,8 +1,8 @@
-var filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 var conf = require('./config.js');
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
-var fs = require('./fileserver.js');
+const fs = require('./pipeline/filelogic');
 
 var livevars = require('./livevars.js');
 var imageResizer = require('./imageResizer.js');

@@ -1,5 +1,4 @@
-const fileserver = require('./fileserver.js');
-const filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 const nodemailer = require('nodemailer');
 const db = require('./includes/db.js');
 const LML2 = require('./lml/compiler.js');

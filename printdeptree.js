@@ -43,8 +43,6 @@ if (singledep) {
         singledep = './' + singledep;
     }
 
-    console.log("DEPENDENTS OF : " + singledep);
-    console.log();
     Object.keys(deps).filter(x => deps[x].includes(singledep)).forEach(x => console.log(x));
 } else {
     console.log(deps);

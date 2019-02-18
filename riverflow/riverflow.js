@@ -1,5 +1,3 @@
-
-const fileserver = require('../fileserver.js');
 const config = require('../config.js');
 const Admin = require('../backend/admin.js');
 const Livevar = require('../livevars.js');

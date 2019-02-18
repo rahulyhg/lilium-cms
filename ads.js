@@ -1,6 +1,6 @@
 const db = require('./includes/db');
 const config = require('./config');
-const filelogic = require('./filelogic');
+const filelogic = require('./pipeline/filelogic');
 const hooks = require('./hooks');
 const _patterns = {};
 

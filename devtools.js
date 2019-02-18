@@ -1,6 +1,6 @@
 
 var Admin = require('./backend/admin.js');
-var filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 var lml = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
 var notif = require('./notifications.js');
@@ -142,7 +142,7 @@ class DevTools {
 
             cb(arr); 
         } else if (levels[0] == "scripts") {
-            require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
+            require('./filelogic.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
                 cb(list);
             });
         } else if (levels[0] == "htmlfiles") {
@@ -672,12 +672,12 @@ var maybeExecuteScript = function(cli) {
 
 var listAllCachedFiles = function(cli, levels, params, cb) {
     var dirPath = cli._c.server.html;
-    require('./fileserver.js').listDirContent(dirPath, function(rootarr) {
-        require('./fileserver.js').listDirContent(dirPath + "/next", function(nextarr) {
-            require('./fileserver.js').listDirContent(dirPath + "/tags", function(tagsarr) {
-                require('./fileserver.js').listDirContent(dirPath + "/category", function(catarr) {
-                    require('./fileserver.js').listDirContent(dirPath + "/author", function(autharr) {
-                        require('./fileserver.js').listDirContent(dirPath + "/search", function(serarr) {
+    require('./filelogic.js').listDirContent(dirPath, function(rootarr) {
+        require('./filelogic.js').listDirContent(dirPath + "/next", function(nextarr) {
+            require('./filelogic.js').listDirContent(dirPath + "/tags", function(tagsarr) {
+                require('./filelogic.js').listDirContent(dirPath + "/category", function(catarr) {
+                    require('./filelogic.js').listDirContent(dirPath + "/author", function(autharr) {
+                        require('./filelogic.js').listDirContent(dirPath + "/search", function(serarr) {
                             rootarr = rootarr.filter(function(obj) { return obj.indexOf(".html") !== -1 });
                             cb({
                                 html : rootarr,

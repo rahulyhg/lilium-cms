@@ -119,7 +119,7 @@ class LMLContext {
             app : require('../build').getAppScript,
             cdn : require('../lib/cdn'),
             slugify : require('slugify'),
-            fileio : require('../fileserver.js'),
+            fileio : require('../pipeline/filelogic.js'),
             encode : x => (x && x.replace ? x.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") : x),
             snip : (snipid, ...args) => require('../themes').renderSnip(this._c, snipid, args)
         };

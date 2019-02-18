@@ -58,7 +58,7 @@ class ClientObject {
             this.response.writeHead(code, headers);
             this.response.end(message || undefined);
         } else if (code >= 400 && code < 500) {
-            require('../filelogic.js').serveErrorPage(this, code);
+            require('./filelogic.js').serveErrorPage(this, code);
         } else {
             this.debug();
         }

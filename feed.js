@@ -3,7 +3,7 @@ const db = require('./includes/db.js');
 const config = require('./config.js');
 const admin = require('./backend/admin.js');
 const livevars = require('./livevars.js');
-const filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 const noop = require('./noop.js');
 
 class LMLFeed {

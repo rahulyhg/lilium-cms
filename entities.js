@@ -1,7 +1,7 @@
 var _c = configs = require('./config.js');
 
 var db = require('./includes/db.js');
-var filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var imageResizer = require('./imageResizer.js');

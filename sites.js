@@ -1,8 +1,7 @@
 var config = require('./config.js');
 
 var livevars = require('./livevars.js');
-var fileserver = require('./fileserver.js');
-var filelogic = require('./filelogic.js');
+const filelogic = require('./pipeline/filelogic');
 var analytics = require('./analytics.js');
 var db = require('./includes/db.js');
 var fs = require('fs');
@@ -35,18 +34,18 @@ var SiteInitializer = function (conf, siteobj) {
     var loadHTMLStructure = function (done) {
         if (!isElder) { return done(); }
 
-        fileserver.createDirIfNotExists(conf.server.html, function (valid) {
-            fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
-                fileserver.createDirIfNotExists(conf.server.html + "/amp", function(nextvalid) {
-                    fileserver.createDirIfNotExists(conf.server.html + "/api", function(nextvalid) {
+        filelogic.createDirIfNotExists(conf.server.html, function (valid) {
+            filelogic.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
+                filelogic.createDirIfNotExists(conf.server.html + "/amp", function(nextvalid) {
+                    filelogic.createDirIfNotExists(conf.server.html + "/api", function(nextvalid) {
                         if (valid && nextvalid) {
-                            log('FileServer',
+                            log('filelogic',
                                 'HTML Directory was validated at : ' +
                                 conf.server.html,
                                 'success'
                             );
                         } else {
-                            log('FileServer', 'Error validated html directories', 'err');
+                            log('filelogic', 'Error validated html directories', 'err');
                         }
                 
                         done();
@@ -62,34 +61,34 @@ var SiteInitializer = function (conf, siteobj) {
         log('Sites', 'Initializing symlinks', 'info');
         var to = conf.server.html + '/static';
         var rootDir = conf.server.base + 'backend/static/';
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/uploads';
         rootDir = conf.server.base + 'backend/static/uploads/';
         mkdirp.sync(rootDir);
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/u';
         rootDir = conf.server.base + 'backend/static/u/';
         mkdirp.sync(rootDir);
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/webfonts';
         rootDir = conf.server.base + 'backend/static/webfonts/';
         mkdirp.sync(rootDir);
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/tinymce';
         rootDir = conf.server.base + "node_modules/tinymce/";
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/flatpickr';
         rootDir = conf.server.base + "node_modules/flatpickr/dist";
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/chartjs';
         rootDir = conf.server.base + "node_modules/chart.js/dist";
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         done();
     };
@@ -244,7 +243,7 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadRobots = function(cb) {
         if (!isElder) { return cb(); }
-        fileserver.createSymlink(conf.server.base + "backend/static/robots.txt", conf.server.html + "/robots.txt", cb);
+        filelogic.createSymlink(conf.server.base + "backend/static/robots.txt", conf.server.html + "/robots.txt", cb);
     };
 
     this.initialize = function (done) {
@@ -614,7 +613,7 @@ var Sites = function () {
     this.loadSites = function (cb) {
         var that = this;
         log('Sites', 'Reading sites directory for websites configurations', 'info');
-        fileserver.listDirContent(__dirname + "/sites/", function (files) {
+        filelogic.listDirContent(__dirname + "/sites/", function (files) {
             files = files.filter(x => x.endsWith('.json'));
             files.unshift(files.splice(files.indexOf('default.json'), 1)[0]);
             log('Sites', 'Found ' + files.length + ' sites', 'info');
@@ -627,7 +626,7 @@ var Sites = function () {
                     var sitename = files[fileIndex].replace('.json', '');
                     log('Sites', 'Loading config for website ' + sitename, 'lilium');
 
-                    fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
+                    filelogic.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
                         var keyname = sitename.replace('//', '').replace(/\s/g, '/');
                         siteInfo.jsonfile = files[fileIndex];
 
