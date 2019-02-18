@@ -432,11 +432,11 @@
                 {"name" : "settings_saved", "priority" : 1000, "callback" : "settingsSaved"}
             ]
         }, {
-            "module" : "build.js",
+            "module" : "controllers/build.js",
             "endpoint" : "build",
             "support" : ["admin_post"]
         }, {
-            "module" : "cssbuilder.js",
+            "module" : "controllers/cssbuilder.js",
             "endpoint" : "buildcss",
             "support" : ["admin_post"]
         }, {

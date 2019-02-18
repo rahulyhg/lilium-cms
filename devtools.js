@@ -151,7 +151,7 @@ class DevTools {
     
     setup() {
         require('./config').eachSync(_c => {
-            require('./build').pushToBuildTree(_c, 'devtools', 'devtools', {
+            require('./make/build').pushToBuildTree(_c, 'devtools', 'devtools', {
                 babel : {
                     "plugins": [
                         ["transform-react-jsx", { "pragma":"h" }]
@@ -231,7 +231,7 @@ var restartPM2 = function(cli) {
 
 var maybeInitBuild = function(cli) {
     if (cli.hasRightOrRefuse('admin')) {
-        require('./build').initialBuild(() => { cli.sendJSON({ done : 1 }); });
+        require('./make/build').initialBuild(() => { cli.sendJSON({ done : 1 }); });
     }
 }
 

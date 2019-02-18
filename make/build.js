@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Babel = require("babel-core");
 const webpack = require('webpack');
-const hooks = require('./hooks');
+const hooks = require('../hooks');
 
 const init_build_tree = [];
 const WEBPACK_CACHE = {};
@@ -36,21 +36,6 @@ class Builder {
         };
 
         next();
-    }
-
-    adminPOST(cli) {
-        if (cli.hasRightOrRefuse('lilium')) {
-            if (cli.routeinfo.path[2] == "lilium") {
-                const b = init_build_tree.find(x => x.input == "lilium" && x._c.id == cli._c.id);
-                if (b) {
-                    this.build(b._c, b.input, b.outputkey, Object.assign({}, b.options, {dontOverwite : false}), () => {
-                        cli.sendJSON({done : 1})
-                    })
-                } else {
-                    cli.sendJSON({ error : "nobuildinfo" });
-                }
-            }
-        }
     }
 
     build(_c, input, outputkey, options, done) {
@@ -153,7 +138,7 @@ class Builder {
     }
 
     getBundle(siteid, outputkey, sendback) {
-        require('./lib/sharedcache').get('_babel_' + siteid + "_" + outputkey, markup => {
+        require('../lib/sharedcache').get('_babel_' + siteid + "_" + outputkey, markup => {
             sendback(markup);
         });
     }

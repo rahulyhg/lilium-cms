@@ -9,7 +9,7 @@ var hooks = require('./hooks.js');
 var themes = require('./themes.js');
 var endpoints = require('./pipeline/endpoints.js');
 var sessions = require('./lib/session.js');
-var buildLib = require('./build');
+var buildLib = require('./make/build');
 var mail = require('./mail.js');
 var sharedcache = require('./lib/sharedcache.js');
 var sitemap = require('./lib/sitemap.js');
@@ -17,7 +17,7 @@ var analytics = require('./analytics.js');
 var adslib = require('./lib/ads');
 var roles = require('./role');
 const metrics = require('./lib/metrics');
-var V4DevServer = require('./v4devserver');
+var V4DevServer = require('./make/v4devserver');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -131,10 +131,6 @@ var SiteInitializer = function (conf, siteobj) {
             hooks.fire('dbtest', err);
             dbinit();
         });
-    };
-
-    this.precompile = function (done) {
-        done && done();
     };
 
     var update = function(conf, done) {
@@ -255,6 +251,30 @@ var SiteInitializer = function (conf, siteobj) {
                         v4.dumpV3UrlInFront(conf, () => {
                             log('Sites', 'Old URLs will now redirect to new version', 'success');
                         });
+
+                        const buildLib = require('./make/build');   
+                        const cssBuildLib = require('./make/cssbuilder'); 
+                        const pathLib = require('path');
+
+                        buildLib.pushToBuildTree(conf, 'lilium', 'lilium', {
+                            outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
+                            babel : {
+                                "plugins": [
+                                    ["transform-react-jsx", { "pragma":"h" }],
+                                    ["transform-class-properties"],
+                                    ["@babel/plugin-proposal-object-rest-spread", {
+                                        useBuildIns : true
+                                    }],
+                                ],
+                                "presets" : [
+                                    [ "@babel/preset-env" ]
+                                ]
+                            },
+                            dontOverwite : true
+                        });
+
+                        this.v4devserver = new V4DevServer(conf);
+                        this.v4devserver.start();
                     }
 
                     loadTheme(function() {

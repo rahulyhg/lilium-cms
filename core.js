@@ -214,8 +214,8 @@ const loadPlugins = (cb) => {
 const makeBuild = (cb) => {
     if (!isElder) { return cb(); }
 
-    const buildLib = require('./build');   
-    const cssBuildLib = require('./cssbuilder'); 
+    const buildLib = require('./make/build');
+    const cssBuildLib = require('./make/cssbuilder');
     const pathLib = require('path');
 
     buildLib.initialBuild(() => {

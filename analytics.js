@@ -3,7 +3,7 @@ const db = require('./lib/db.js');
 const sharedcache = require('./lib/sharedcache.js');
 const hooks = require('./hooks.js');
 const notifications = require('./notifications.js');
-const builder = require('./build');
+const builder = require('./make/build');
 
 // Google API
 const {google} = require('googleapis');
