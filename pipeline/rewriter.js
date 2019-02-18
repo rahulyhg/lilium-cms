@@ -1,5 +1,3 @@
-
-
 class Rewriter {
     rewrite(cli) {
         if (cli.routeinfo.path.length > 1 && cli.routeinfo.path[cli.routeinfo.path.length - 1] == "feed" && !cli.routeinfo.admin) {
