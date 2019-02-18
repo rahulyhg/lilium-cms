@@ -101,7 +101,7 @@ class ProcessManager {
 class GardenerCluster extends ProcessManager {
     start() {
         if (cluster.isMaster) {
-            require('./masthead.js');
+            require('./includes/masthead.js');
             log.setName("GRDNR");
             log('Network', 'Loading network config', 'lilium');
 

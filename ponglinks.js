@@ -44,8 +44,6 @@ class PongLinks {
     }   
 
     createLink(_c, creatorid, link, done) {
-        console.log('link: ', link);
-        
         const hash = this.hashDestination(JSON.stringify(link));
         const versions = link.versions.map((v, i) => {
             v.identifier = v.identifier.trim().replace(/[\s\&]/g, '_');
