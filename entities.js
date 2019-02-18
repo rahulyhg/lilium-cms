@@ -5,7 +5,6 @@ var filelogic = require('./filelogic.js');
 var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var imageResizer = require('./imageResizer.js');
-var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
 var preferences = require('./preferences.js');
 var feed = require('./feed.js');
