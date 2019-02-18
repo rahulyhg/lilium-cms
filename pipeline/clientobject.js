@@ -1,6 +1,5 @@
 const entities = require('../entities.js');
 const db = require('../includes/db.js');
-const events = require('../events.js');
 
 class ClientObject {
     constructor(req, resp) {
@@ -38,7 +37,6 @@ class ClientObject {
     }
 
     did (cat, type, extra, cb) {
-        // events.register(this._c, cat, type, this.userinfo.user, extra, cb);
         cb && cb();
     };
 

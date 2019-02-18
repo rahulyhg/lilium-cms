@@ -13,7 +13,6 @@ var themes = require('./themes.js');
 var endpoints = require('./pipeline/endpoints.js');
 var sessions = require('./session.js');
 var buildLib = require('./build');
-var events = require('./events.js');
 var mail = require('./mail.js');
 var sharedcache = require('./sharedcache.js');
 var sitemap = require('./lib/sitemap.js');
@@ -244,12 +243,6 @@ var SiteInitializer = function (conf, siteobj) {
         }
     };
 
-    var initEvents = function(cb) {
-        log('Sites', "Initializing events", 'info');
-        if (!isElder) { return cb(); }
-        events.init(conf, cb);
-    };
-
     var loadRobots = function(cb) {
         if (!isElder) { return cb(); }
         fileserver.createSymlink(conf.server.base + "backend/static/robots.txt", conf.server.html + "/robots.txt", cb);
@@ -279,52 +272,50 @@ var SiteInitializer = function (conf, siteobj) {
         loadHTMLStructure(function () {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
-                    initEvents(function() {
-                        log('Sites', 'Initializing email senders', 'info');
-                        if (/*isElder &&*/ conf.emails) {
-                            mail.setSender(conf.id, {
-                                user : conf.emails.senderemail,
-                                pass : conf.emails.senderpass,
-                                from : conf.emails.senderfrom
-                            });
-                        }
-
-                        if (isElder && (global.liliumenv.mode != "script" || global.liliumenv.caij)) {
-                            sitemap.scheduleCreation(conf, true);
-                        }
-
-                        if (isElder) {
-                            log('Sites', "Loading polling for elder child", 'info');
-                            analytics.pollRealtime(conf);
-                        }
-
-                        if (isElder) {
-                            log('Sites', 'V4 will load all older URL in cache front', 'info');
-                            const V4 = require('./v4');
-                            const v4 = new V4();
-                            v4.dumpV3UrlInFront(conf, () => {
-                                log('Sites', 'Old URLs will now redirect to new version', 'success');
-                            });
-                        }
-
-                        loadTheme(function() {
-                            if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-                                return done();
-                            }
-
-                            loadSessions(function() {
-                                loadRobots(function() {
-                                    update(conf, function() {
-                                        sharedcache.hi();
-
-                                        checkForWP(conf);
-                                        hooks.fire('site_initialized', conf);
-                                        log('Sites', 'Initialized site with id ' + conf.id, 'success');
-                                        done();
-                                    });
-                                });
-                            });  
+                    log('Sites', 'Initializing email senders', 'info');
+                    if (/*isElder &&*/ conf.emails) {
+                        mail.setSender(conf.id, {
+                            user : conf.emails.senderemail,
+                            pass : conf.emails.senderpass,
+                            from : conf.emails.senderfrom
                         });
+                    }
+
+                    if (isElder && (global.liliumenv.mode != "script" || global.liliumenv.caij)) {
+                        sitemap.scheduleCreation(conf, true);
+                    }
+
+                    if (isElder) {
+                        log('Sites', "Loading polling for elder child", 'info');
+                        analytics.pollRealtime(conf);
+                    }
+
+                    if (isElder) {
+                        log('Sites', 'V4 will load all older URL in cache front', 'info');
+                        const V4 = require('./v4');
+                        const v4 = new V4();
+                        v4.dumpV3UrlInFront(conf, () => {
+                            log('Sites', 'Old URLs will now redirect to new version', 'success');
+                        });
+                    }
+
+                    loadTheme(function() {
+                        if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
+                            return done();
+                        }
+
+                        loadSessions(function() {
+                            loadRobots(function() {
+                                update(conf, function() {
+                                    sharedcache.hi();
+
+                                    checkForWP(conf);
+                                    hooks.fire('site_initialized', conf);
+                                    log('Sites', 'Initialized site with id ' + conf.id, 'success');
+                                    done();
+                                });
+                            });
+                        });  
                     });
                 });
             });
