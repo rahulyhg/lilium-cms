@@ -5,7 +5,7 @@ const request = require('request');
 const db = require('./includes/db');
 const LML3 = require('./lml3/compiler');
 const sharedcache = require('./sharedcache');
-const SMS = require('./sms');
+const SMS = require('./lib/sms');
 
 class PasswordRecovery {
     generateCode() {
