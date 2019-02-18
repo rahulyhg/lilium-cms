@@ -23,8 +23,6 @@ var LMLContext = require('./lmlcontext.js');
 var fileserver = require('./fileserver.js');
 var _c = require('./config.js');
 
-var Petals = require('./petal.js');
-
 var LML = function () {
     // Reference to self
     var that = lml = thislml = this;
@@ -137,9 +135,7 @@ var LML = function () {
                     split[currentIndex] = LMLSlang.pulloutVar(context, split[currentIndex].substring(1));
                 }
 
-                if (Petals.isRegistered(split[currentIndex])) {
-                    fullpath = Petals.get(split[currentIndex]).filepath;
-                } else if (split[currentIndex][0] == '%') {
+                if (split[currentIndex][0] == '%') {
                     fullpath = split[currentIndex];
                     executeLML = false;
                 } else {

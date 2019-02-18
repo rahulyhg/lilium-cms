@@ -1,13 +1,10 @@
 
 const config = require('./config.js');
-const Petal = require('./petal.js');
 const filelogic = require('./filelogic.js');
 const lmllib = require('./lmllib.js');
 const sharedcache = require('./sharedcache');
 
 const request = require('request');
-
-const _dashpetals = [];
 
 class Dashboard {
     getPetals()         {};

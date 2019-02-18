@@ -212,12 +212,6 @@ class ContentSearch {
     }
 
     setup() {
-        require('./petal.js').register(
-            'dashboardSearch', 
-            require('./config.js').default().server.base + "backend/dynamic/dashsearch.petal"
-        );
-
-        // require('./dashboard.js').registerDashPetal("dashboardSearch", 300);
     }
 }
 

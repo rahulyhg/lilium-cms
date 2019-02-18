@@ -48,7 +48,6 @@ class Core {
                 LML3 : require('./lml3/compiler'),
                 LML2 : require('./lml'),
                 notifications : require('./notifications'),
-                petal : require('./petal'),
                 precomp : require('./precomp'),
                 preferences : require('./preferences'),
                 scheduler : require('./lib/scheduler'),
@@ -67,7 +66,6 @@ class Core {
             loadStandardInput();
             loadImageSizes();
             loadLiveVars();
-            loadGlobalPetals();
             loadLMLLibs();
             loadAudiences();
             loadBackendSearch();
@@ -182,15 +180,6 @@ const loadEndpoints = () => {
 
     hooks.fire('endpoints');
     log('Endpoints', 'Loaded endpoints', 'success');
-};
-
-const loadGlobalPetals = () => {
-    const Petals = require('./petal.js');
-    const _c = require('./config.js');
-    Petals.register('adminbar',         _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
-    Petals.register('adminhead',        _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
-    Petals.register('adminsidebar',     _c.default().server.base + 'backend/dynamic/admin/adminsidebar.petal');
-    Petals.register('backendsearch',    _c.default().server.base + 'backend/dynamic/admin/backendsearch.petal');
 };
 
 const initShell = () => {

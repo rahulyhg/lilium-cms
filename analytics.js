@@ -827,18 +827,8 @@ class GoogleAnalytics {
         that.addSite(cli._c);
     }
 
-    prepareDashboard() {
-        require('./petal.js').register(
-            'dashboardAnalytics', 
-            require('./config.js').default().server.base + "backend/dynamic/dashanalytics.petal"
-        );
-
-        require('./dashboard.js').registerDashPetal("dashboardAnalytics", 200);
-    }
-
     setup() {
         log('Analytics', "Analytics controller setup");
-        that.prepareDashboard();
 
         require('./config').eachSync(_c => {
             builder.pushToBuildTree(_c, "networkboard", 'networkboard', {

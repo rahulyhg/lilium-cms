@@ -2,7 +2,6 @@ const Stream = require("stream");
 
 const configs = require('../config.js');
 const lmllib = require('../lmllib.js');
-const Petals = require('../petal.js');
 const fileserver = require('../fileserver.js');
 const CDN = require('../cdn.js');
 const opChar = '{';
@@ -529,11 +528,7 @@ class LMLTagParser {
                     toCompile = false;
                 } 
 
-                if (Petals.isRegistered(petalname)) {
-                    fullpath = Petals.get(petalname).filepath;
-                } else {
-                    fullpath = ctx.extra.rootDir + "/" + petalname + ".petal";
-                }
+                fullpath = ctx.extra.rootDir + "/" + petalname + ".petal";
 
                 if (toCompile) {
                     fileserver.readFile(fullpath, (ctn) => {
