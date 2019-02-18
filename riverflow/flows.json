@@ -479,7 +479,7 @@
             "endpoint" : "styledpages",
             "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
         }, {
-            "module" : "cdn.js",
+            "module" : "lib/cdn.js",
             "endpoint" : "cdn",
             "support" : [],
             "hooks" : [

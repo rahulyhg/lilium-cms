@@ -220,7 +220,7 @@ class FileLogic {
                             require('./fileserver.js').readFile(tmpPath, ctn => {
                                 log('FileLogic', 'Passing content through CDN', 'detail');
 
-                                require('./cdn.js').parse(ctn, cli, cdned => {
+                                require('./lib/cdn.js').parse(ctn, cli, cdned => {
                                     log('FileLogic', 'Parsed content', 'success');
                                     var handle = FileServer.getOutputFileHandle(savePath, 'w+');
                                     FileServer.writeToFile(handle, cdned, () => {
@@ -316,7 +316,7 @@ class FileLogic {
 
                 if (layoutPath && !cTheme.nolayout) {
                     LML3.compile(_c, layoutPath, extra, (fHtml) => {
-                        require('./cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minimize(fHtml), _c, cdned => {
+                        require('./lib/cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minimize(fHtml), _c, cdned => {
                             next(cdned);
                         });
                     });
@@ -373,7 +373,7 @@ class FileLogic {
                         extra.contentHTML = ctn;
 
                         if (skipLayout) {
-                            return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, cdned => {
+                            return require('./lib/cdn.js').parse(fileserver.minifyString(ctn), _c, cdned => {
                                 fileserver.createDirIfNotExists(savePath, () => {
                                     var handle = FileServer.getOutputFileHandle(savePath, 'w+');
                                     FileServer.writeToFile(handle, cdned, () => {
@@ -394,7 +394,7 @@ class FileLogic {
                                 extra,
                                 fHtml => {
                                     log('FileLogic', 'Completed Theme page compilation', 'success');
-                                    require('./cdn.js').parse(fileserver.minifyString(fHtml), _c, cdned => {
+                                    require('./lib/cdn.js').parse(fileserver.minifyString(fHtml), _c, cdned => {
                                         log("FileLogic", "Minifier and CDN called back to Filelogic", 'detail');
 
                                         fileserver.createDirIfNotExists(savePath, () => {

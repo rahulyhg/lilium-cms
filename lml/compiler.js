@@ -3,7 +3,7 @@ const Stream = require("stream");
 const configs = require('../config.js');
 const lmllib = require('../lmllib.js');
 const fileserver = require('../fileserver.js');
-const CDN = require('../cdn.js');
+const CDN = require('../lib/cdn.js');
 const opChar = '{';
 const clChar = '}';
 

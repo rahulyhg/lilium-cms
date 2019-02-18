@@ -2,7 +2,7 @@ const db = require('./includes/db');
 const config = require('./config');
 const filelogic = require('./filelogic');
 
-const CDN = require('./cdn');
+const CDN = require('./lib/cdn');
 const hooks = require('./hooks');
 const notifications = require('./notifications');
 const DeepDiff = require('deep-diff');

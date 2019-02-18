@@ -11,7 +11,7 @@ const sitemapLib = require('../lib/sitemap.js');
 const articleLib = require('../content.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
-const CDN = require('../cdn');
+const CDN = require('../lib/cdn');
 
 const janitorJobs = [
     "cacheTopic", "batchCacheArticle", "cacheEntity"

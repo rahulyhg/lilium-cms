@@ -4,7 +4,7 @@ const articleLib = require('./content.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
 const hooks = require('./hooks.js');
-const cdn = require('./cdn.js');
+const cdn = require('./lib/cdn.js');
 const themes = require('./themes.js');
 
 const JSDOM = require('jsdom'); 
