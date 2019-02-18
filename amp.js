@@ -1,5 +1,4 @@
 const db = require('./includes/db.js');
-const endpoints = require('./endpoints.js');
 const articleLib = require('./content.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');

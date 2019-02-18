@@ -1,7 +1,7 @@
-const hooks = require('./hooks.js');
-const config = require('./config.js'); 
+const hooks = require('../hooks.js');
+const config = require('../config.js'); 
 
-const metrics = require('./lib/metrics');
+const metrics = require('../lib/metrics');
 
 // Schema : { SITE_ID : { METHOD : { ENDPOINT : Object } } }
 const registeredEndpoints = {};

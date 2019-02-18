@@ -41,7 +41,6 @@ class Core {
                 filelogic : require('./filelogic'),
                 hooks : require('./hooks'),
                 entities : require('./entities'),
-                endpoints : require('./endpoints'),
                 livevars : require('./livevars'),
                 API : require('./api'),
                 imageResizer : require('./imageResizer'),
@@ -117,7 +116,7 @@ const loadEndpoints = () => {
     if (global.liliumenv.mode == "script" || global.liliumenv.caij) { return; }
 
     log('Endpoints', 'Loading endpoints', 'info');
-    const endpoints = require('./endpoints.js');
+    const endpoints = require('./pipeline/endpoints.js');
     const filelogic = require('./filelogic.js');
     const admin = require('./backend/admin.js');
     const entities = require('./entities.js');

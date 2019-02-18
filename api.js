@@ -12,7 +12,6 @@ class EndpointMethods {
 }
 
 const db = require('./includes/db.js');
-const endpoints = require('./endpoints.js');
 const sharedcache = require('./sharedcache.js');
 const entities = require('./entities.js');
 
