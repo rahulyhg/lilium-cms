@@ -24,7 +24,7 @@ class Core {
         initMetrics();
         initShell();
 
-        const inbound = require('./inbound.js')
+        const inbound = require('./pipeline/inbound.js')
         inbound.createServer(true);
 
         require('./includes/caller.js')

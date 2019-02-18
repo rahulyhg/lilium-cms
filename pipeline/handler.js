@@ -2,16 +2,15 @@ var Router = require('./router.js');
 var Dispatcher = require('./dispatcher.js');
 var inspect = require('util').inspect;
 var Busboy = require('busboy');
-var config = require('./config.js');
+var config = require('../config.js');
 var fs = require('fs');
-var fileserver = require('./fileserver.js');
-var htmlserver = require('./frontend/htmlserver.js');
-var db = require('./includes/db.js');
+var fileserver = require('../fileserver.js');
+var htmlserver = require('../frontend/htmlserver.js');
+var db = require('../includes/db.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
-var log = require('./log.js');
-const hooks = require('./hooks');
-const mediaUpload = require('./mediaUpload');
+const hooks = require('../hooks');
+const mediaUpload = require('../mediaUpload');
 
 var Handler = function () {
     var GET = function (cli) {
@@ -91,7 +90,7 @@ var Handler = function () {
                                if (mimeTypeIsSupported(mimetype, cli)) {
                                    hasFile = true;
            
-                                   require('./media').getDirectoryForNew(cli._c, updir => {
+                                   require('../media').getDirectoryForNew(cli._c, updir => {
                                        var mime = getMimeByMimeType(mimetype, cli);
                                        //Gen random name
                                        filename = fileserver.genRandomNameFile(filename);
@@ -202,7 +201,7 @@ var Handler = function () {
 
     var OPTIONS = function(cli) {
         if (!cli._c) {
-            require('./config').fetchConfigFromCli(cli);
+            require('../config').fetchConfigFromCli(cli);
         }
 
         const origin = cli.request.headers.corsorigin || cli.request.headers.origin || (cli._c && cli._c.server.url);
@@ -240,7 +239,7 @@ var Handler = function () {
 
     var handleAPI = function(cli) {
         Router.parseClientObject(cli, (loggedin) => {
-            require('./api.js').serveApi(cli);
+            require('../api.js').serveApi(cli);
         });
     };
 

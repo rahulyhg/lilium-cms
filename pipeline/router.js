@@ -1,9 +1,9 @@
 const url = require('url');
 const pathlib = require('path');
-const session = require('./session');
-const hooks = require('./hooks');
-const _c = require('./config');
-const clerk = require('./clerk');
+const session = require('../session');
+const hooks = require('../hooks');
+const _c = require('../config');
+const clerk = require('../clerk');
 
 class Router {
     parseClientObject(cli, cb) {
@@ -63,7 +63,7 @@ class Router {
             cli.apitoken = cli.request.headers.ltk;
             cli.apisession = false;
             if (cli.apitoken) {
-                require('./api.js').getSession(cli.apitoken, (session) => {
+                require('../api.js').getSession(cli.apitoken, (session) => {
                     cli.apisession = session;
                     cb(!!session);
                 });

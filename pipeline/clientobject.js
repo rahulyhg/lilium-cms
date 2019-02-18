@@ -1,7 +1,6 @@
-const entities = require('./entities.js');
-const log = require('./log.js');
-const db = require('./includes/db.js');
-const events = require('./events.js');
+const entities = require('../entities.js');
+const db = require('../includes/db.js');
+const events = require('../events.js');
 
 class ClientObject {
     constructor(req, resp) {
@@ -48,7 +47,7 @@ class ClientObject {
     };
 
     reloadSession (cb) {
-        require('./session.js').reloadSession(this, cb);
+        require('../session.js').reloadSession(this, cb);
     };
 
     throwHTTP  (code, message, hard, headers) {
@@ -61,7 +60,7 @@ class ClientObject {
             this.response.writeHead(code, headers);
             this.response.end(message || undefined);
         } else if (code >= 400 && code < 500) {
-            require('./filelogic.js').serveErrorPage(this, code);
+            require('../filelogic.js').serveErrorPage(this, code);
         } else {
             this.debug();
         }
@@ -223,7 +222,7 @@ class ClientObject {
             this.throwHTTP(500, 'Lilium Internal Server Error', true);
         } else {
             log('ClientObject', 'Compiling LML3 crash page', 'info');
-            require('./lml3/compiler').compile(
+            require('../lml3/compiler').compile(
                 this._c, 
                 require('path').join(liliumroot, 'backend', 'dynamic', 'crash.lml3'),
                 { error : ex },

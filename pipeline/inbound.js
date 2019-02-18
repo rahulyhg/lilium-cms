@@ -1,7 +1,7 @@
-const hooks = require('./hooks.js')
-const log = require('./log.js')
+const hooks = require('../hooks.js')
+const log = require('../log.js')
 const fs = require('fs')
-const metrics = require('./metrics');
+const metrics = require('../metrics');
 
 class Inbound {
     constructor() {
@@ -32,7 +32,7 @@ class Inbound {
     handleReq(req, resp) {
         metrics.plus('requests');
         metrics.plus('requestspers');
-        require('./cachefront.js').getURL(req.url, (dat) => {
+        require('../cachefront.js').getURL(req.url, (dat) => {
             if (dat && (!dat.expiry || dat.expiry > Date.now())) {
                 resp.writeHead(dat.status || 200, dat.headers || { "Content-Type" : dat.ctype });
                 dat.data ? resp.end(dat.data) : resp.end();
@@ -61,7 +61,7 @@ class Inbound {
     }
 
     start() {
-        const _c = require('./config.js').tryDefault();
+        const _c = require('../config.js').tryDefault();
         log('Inbound', 'Ready to receive requests', 'success');
 
         hooks.fire("server_will_start", {server : this.server});
@@ -85,7 +85,7 @@ class Inbound {
 
             this.socketio = require('socket.io')(this.server);
 
-            if (require('./localcast').clustered) {
+            if (require('../localcast').clustered) {
                 const redis = require('socket.io-redis');
                 this.socketio.adapter(redis());
             }

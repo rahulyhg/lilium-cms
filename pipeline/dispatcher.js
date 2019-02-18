@@ -1,13 +1,12 @@
-var Admin = require('./backend/admin.js');
-var HTMLServer = require('./frontend/htmlserver.js');
-var Endpoints = require('./endpoints.js');
-var LiveVars = require('./livevars.js');
-var log = require('./log.js');
-var entities = require('./entities.js');
-var api = require('./api.js');
-var rewriter = require('./rewriter.js');
-var hooks = require('./hooks');
-var clerk = require('./clerk.js');
+var Admin = require('../backend/admin.js');
+var HTMLServer = require('../frontend/htmlserver.js');
+var Endpoints = require('../endpoints.js');
+var LiveVars = require('../livevars.js');
+var entities = require('../entities.js');
+var api = require('../api.js');
+var rewriter = require('../rewriter.js');
+var hooks = require('../hooks');
+var clerk = require('../clerk.js');
 
 var Dispatcher = function () {
     this.dispatch = function (cli) {
