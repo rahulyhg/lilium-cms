@@ -5,7 +5,6 @@ var lml = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
 var notif = require('./notifications.js');
 var configs = require('./config');
-var precomp = require('./precomp.js');
 var fs = require('fs');
 var db = require('./lib/db.js');
 
@@ -633,9 +632,6 @@ var refreshCache = function(cli, ctx) {
         case 'insertads':
             parseContentAds(cli);
             break;
-        case 'precompile':
-            recompileQueue(cli);
-            break;
         case 'unwrapimgs':
             unwrapImages(cli);
             break;
@@ -726,21 +722,6 @@ var parseContentAds = function(cli) {
             type : "warning"
         });
     }
-};
-
-var recompileQueue = function(cli) {
-    require('./config.js').each(function(_c, next) {
-        precomp.precompile(_c, function() {
-            require('./templateBuilder.js').precompThemeFiles(_c, function() {
-                notif.notifyUser(cli.userinfo.userid, cli._c.id, {
-                    title: "Precompiler",
-                    msg : "Precompiled files for website " + _c.website.sitetitle,
-                    type: "success"
-                });
-                next();
-            }, true);
-        });
-    }, function() {}, undefined, true);
 };
 
 module.exports = new DevTools();

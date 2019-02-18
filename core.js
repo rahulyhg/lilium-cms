@@ -45,7 +45,6 @@ class Core {
                 LML3 : require('./lml3/compiler'),
                 LML2 : require('./lml'),
                 notifications : require('./notifications'),
-                precomp : require('./precomp'),
                 preferences : require('./preferences'),
                 scheduler : require('./lib/scheduler'),
                 search : require('./search'),
@@ -70,26 +69,24 @@ class Core {
             loadVocab(() => {
                 loadPlugins(() => {
                     loadRoles(() => {
-                        precompile(() => {
-                            redirectIfInit(resp, () => {
-                                makeBuild(() => {
-                                    loadGitHub();
-                                    require('./riverflow/riverflow.js').loadFlows();
+                        redirectIfInit(resp, () => {
+                            makeBuild(() => {
+                                loadGitHub();
+                                require('./riverflow/riverflow.js').loadFlows();
 
-                                    inbound.handleQueue();
-                
-                                    loadCacheInvalidator();
-                
-                                    log('Lilium', 'Starting inbound server', 'info');
-                                    loadNotifications();
-                                    notifyAdminsViaEmail();
-                                    executeRunScript();
-                                    initSchedulingTasks();
-                                    initLocalcast();
-                
-                                    log('Core', 'Firing initialized signal', 'info');
-                                    hooks.fire('init');
-                                });
+                                inbound.handleQueue();
+            
+                                loadCacheInvalidator();
+            
+                                log('Lilium', 'Starting inbound server', 'info');
+                                loadNotifications();
+                                notifyAdminsViaEmail();
+                                executeRunScript();
+                                initSchedulingTasks();
+                                initLocalcast();
+            
+                                log('Core', 'Firing initialized signal', 'info');
+                                hooks.fire('init');
                             });
                         });
                     });
@@ -408,23 +405,6 @@ const loadLMLLibs = () => {
     const dashboard = require('./dashboard.js');
     dashboard.registerLMLLib();
     hooks.trigger('loaded_core_lml_libs');
-};
-
-const precompile = (done) => {
-    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-        return done();
-    }
-
-    if (!isElder) {
-        return done();
-    }
-
-    log('Core', 'Staring precompilation', 'info');
-    hooks.fire("will_precompile");
-    sites.loopPrecomp(() => {
-        hooks.fire("did_precompile");
-        done();
-    });
 };
 
 const redirectIfInit = (resp, cb) => {

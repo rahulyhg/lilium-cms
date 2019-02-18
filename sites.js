@@ -5,7 +5,6 @@ const filelogic = require('./pipeline/filelogic');
 var analytics = require('./analytics.js');
 var db = require('./lib/db.js');
 var fs = require('fs');
-var Precompiler = require('./precomp.js');
 var hooks = require('./hooks.js');
 var themes = require('./themes.js');
 var endpoints = require('./pipeline/endpoints.js');
@@ -135,46 +134,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     this.precompile = function (done) {
-        if (!isElder) { return done(); }
-
-        var base = conf.server.base;
-        var htmlbase = conf.server.html;
-
-        log('SiteInitializer', "Registering admin default frontend JS and CSS", 'info');
-        Precompiler.registerJSFile(htmlbase + "/compiled/admin/js/const.js", 100, "admin", conf.id);
-
-        const pathLib = require('path');
-        buildLib.pushToBuildTree(conf, 'lilium', 'lilium', {
-            outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
-            babel : {
-                "plugins": [
-                    ["transform-react-jsx", { "pragma":"h" }],
-                    ["transform-class-properties"],
-                    ["@babel/plugin-proposal-object-rest-spread", {
-                        useBuildIns : true
-                    }],
-                ],
-                "presets" : [
-                    [ "@babel/preset-env" ]
-                ]
-            },
-            dontOverwite : true
-        });
-
-        this.v4devserver = new V4DevServer(conf);
-        this.v4devserver.start();
-
-        hooks.fireSite(conf, 'frontend_will_precompile', {
-            config: conf,
-            Frontend: Precompiler 
-        });
-        Precompiler.precompile(conf, function () {
-            hooks.fireSite(conf, 'frontend_precompiled', {
-                config: conf,
-                Frontend : Precompiler
-            });
-            done();
-        });
+        done && done();
     };
 
     var update = function(conf, done) {
