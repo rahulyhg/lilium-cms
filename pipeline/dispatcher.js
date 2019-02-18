@@ -1,5 +1,5 @@
 var Admin = require('../backend/admin.js');
-var HTMLServer = require('../frontend/htmlserver.js');
+var HTMLServer = require('./htmlserver.js');
 var Endpoints = require('./endpoints.js');
 var LiveVars = require('../livevars.js');
 var entities = require('../entities.js');

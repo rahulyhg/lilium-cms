@@ -23,9 +23,6 @@ const registeredLibraries = {
             decodeHTML : function(str = "") { return require('entities').decodeHTML(str.toString()); } 
         };
     },
-    frontend: function (context) {
-        return require('./frontend.js');
-    },
     json: function(context) {
         return JSON;
     },

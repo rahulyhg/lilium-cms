@@ -6,13 +6,18 @@ var db = require('./includes/db.js');
 var fileserver = require('./fileserver.js');
 var checksum = require('checksum');
 var compressor = require('node-minify');
-var frontend = require('./frontend.js');
 
 var _c = require('./config.js');
 var hooks = require('./hooks.js');
 
 var precompQueue = new Array();
 var siteQueue = new Object();
+
+var JavaScriptFiles = new Object();
+var CSSFiles = new Object();
+
+var bodyPrefix = "liliumbody-";
+var defaultBodySuffix = "generic";
 
 var Precomp = function () {
     var that = this;
@@ -225,7 +230,7 @@ var Precomp = function () {
     }
 
     var mergeJS = function (conf, readycb, theme) {
-        var files = frontend.getJSQueue(theme ? 'theme' : 'admin', conf.id);
+        var files = that.getJSQueue(theme ? 'theme' : 'admin', conf.id);
         var compiledPath = conf.server.html + "/compiled/" + (theme ? 'scripts' : 'admin') +".js";
         var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
         var fileIndex = 0;
@@ -259,7 +264,7 @@ var Precomp = function () {
     };
 
     var mergeCSS = function (conf, readycb, theme) {
-        var files = frontend.getCSSQueue((theme ? 'theme' :'admin'), conf.id);
+        var files = that.getCSSQueue((theme ? 'theme' :'admin'), conf.id);
         var compiledPath = conf.server.html + "/compiled/"+ (theme? 'style' : 'admin') +".css";
         var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
         var fileIndex = 0;
@@ -290,6 +295,96 @@ var Precomp = function () {
         nextFile();
     };
 
+    this.registerJSFile = function (absPath, priority, context, siteid) {
+        context = context || "all";
+
+        // TODO Handle Site ID
+        var site = JavaScriptFiles[siteid];
+
+        if (!site) {
+            site = new Object();
+            JavaScriptFiles[siteid] = site;
+        }
+
+        var arr = site[context];
+
+        if (!arr) {
+            arr = new Array();
+            site[context] = arr;
+        }
+
+        if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
+            while (typeof arr[priority] !== 'undefined') {
+                priority++;
+            }
+
+            arr[priority] = absPath;
+        };
+
+        log('Frontend', 'Registered JS file ' + absPath + '@' + priority + " with context " + context + ' on site ' + siteid, 'detail');
+    };
+
+    this.getJSQueue = function (contextName, siteid) {
+        if (JavaScriptFiles[siteid]) {
+            var arr = JavaScriptFiles[siteid][contextName || "all"];
+            var returnedArr = new Array();
+
+            if (arr)
+                for (var index in arr) {
+                    returnedArr.push(arr[index]);
+                }
+
+            return returnedArr;
+        } else {
+            return [];
+        }
+    };
+
+    this.registerCSSFile = function (absPath, priority, context, siteid) {
+        context = context || "all";
+
+        var site = CSSFiles[siteid];
+
+        if (!site) {
+            site = new Object();
+            CSSFiles[siteid] = site;
+        }
+
+        var arr = site[context];
+
+        if (!arr) {
+            arr = new Array();
+            site[context] = arr;
+        }
+
+        if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
+            while (typeof arr[priority] !== 'undefined') {
+                priority++;
+            }
+
+            arr[priority] = absPath;
+        };
+
+        log('Frontend', 'Registered CSS file ' + absPath + '@' + priority + " with context " + context + ' on site ' + siteid, 'detail');
+    };
+
+    this.getCSSQueue = function (contextName, siteid) {
+        if (CSSFiles[siteid]) {
+            var arr = CSSFiles[siteid][contextName || "all"];
+            var returnedArr = new Array();
+
+            if (arr)
+                for (var index in arr) {
+                    returnedArr.push(arr[index]);
+                }
+    
+            return returnedArr;
+        } else {
+            return [];
+        }
+    };
+
+
     this.precompile = function (conf, readycb, themesFiles, force, extra = {}) {
         fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function () {
             runLoop(conf, function () {
@@ -303,4 +398,5 @@ var Precomp = function () {
     };
 };
 
-module.exports = new Precomp();
+const that = new Precomp();
+module.exports = that;

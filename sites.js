@@ -7,7 +7,6 @@ var analytics = require('./analytics.js');
 var db = require('./includes/db.js');
 var fs = require('fs');
 var Precompiler = require('./precomp.js');
-var Frontend = require('./frontend.js');
 var hooks = require('./hooks.js');
 var themes = require('./themes.js');
 var endpoints = require('./pipeline/endpoints.js');
@@ -143,7 +142,7 @@ var SiteInitializer = function (conf, siteobj) {
         var htmlbase = conf.server.html;
 
         log('SiteInitializer', "Registering admin default frontend JS and CSS", 'info');
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/const.js", 100, "admin", conf.id);
+        Precompiler.registerJSFile(htmlbase + "/compiled/admin/js/const.js", 100, "admin", conf.id);
 
         const pathLib = require('path');
         buildLib.pushToBuildTree(conf, 'lilium', 'lilium', {
@@ -168,12 +167,12 @@ var SiteInitializer = function (conf, siteobj) {
 
         hooks.fireSite(conf, 'frontend_will_precompile', {
             config: conf,
-            Frontend: Frontend
+            Frontend: Precompiler 
         });
         Precompiler.precompile(conf, function () {
             hooks.fireSite(conf, 'frontend_precompiled', {
                 config: conf,
-                Frontend
+                Frontend : Precompiler
             });
             done();
         });

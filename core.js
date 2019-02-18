@@ -76,7 +76,6 @@ class Core {
                             redirectIfInit(resp, () => {
                                 makeBuild(() => {
                                     loadGitHub();
-                                    loadFrontend();
                                     require('./riverflow/riverflow.js').loadFlows();
 
                                     inbound.handleQueue();
@@ -366,13 +365,6 @@ const notifyAdminsViaEmail = () => {
             }
         });
     });
-};
-
-const loadFrontend = () => {
-    log('Frontend', 'Registering default values from core', 'info');
-    const Frontend = require('./frontend.js');
-    Frontend.registerFromCore();
-    hooks.fire('frontend_registered');
 };
 
 const prepareDefaultSiteCreation = (cb) => {
