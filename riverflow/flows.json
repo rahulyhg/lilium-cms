@@ -506,7 +506,7 @@
             "endpoint" : "entities",
             "support" : ["admin_post", "livevar", "setup", "api_get", "api_post"]
         }, {
-            "module" : "staffing.js",
+            "module" : "controllers/staffing.js",
             "endpoint" : "staffing",
             "support" : ["admin_post", "livevar", "admin_delete", "admin_put"]
         }, {

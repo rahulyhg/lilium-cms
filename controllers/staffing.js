@@ -1,16 +1,7 @@
-const configLib = require('./config');
-const db = require('./includes/db');
+const configLib = require('../config');
+const db = require('../includes/db');
 
-const BUNCH_PROJECTION = {
-    legalname : 1, ssn : 1, startdate : 1,
-    enddate : 1, status : 1, position : 1,
-    schedule : 1, rate : 1, currency : 1,
-    address : 1, phone : 1,
-
-    "entity._id" : 1, "entity.displayname" : 1, "entity.avatarURL" : 1,
-    "entity.phone" : 1, "entity.username" : 1, "entity.email" : 1, "entity.revoked" : 1,
-    "entity.stripeuserid" : 1
-};
+const { terminate, restore, update, getSimple, getFull } = require('../lib/staffing');
 
 class Staffing {
     adminDELETE(cli) {
@@ -19,10 +10,8 @@ class Staffing {
         }
 
         if (cli.routeinfo.path[2] == "terminate") {
-            db.update(configLib.default(), 'staffing', { _id : db.mongoID(cli.routeinfo.path[3]) }, { status : "terminated" }, () => {
-                db.update(configLib.default(), 'entities', { _id : db.mongoID(cli.routeinfo.path[4]) }, { revoked : true }, () => {
-                    cli.sendJSON({ revoked : true, terminated : true });
-                });
+            terminate(db.mongoID(cli.routeinfo.path[3]), db.mongoID(cli.routeinfo.path[4]), () => {
+                cli.sendJSON({ revoked : true, terminated : true });
             });
         } else {
             cli.throwHTTP(404, undefined, true);
@@ -39,12 +28,12 @@ class Staffing {
         }
 
         if (cli.routeinfo.path[2] == "restore") {
-            db.update(configLib.default(), 'staffing', { _id : db.mongoID(cli.routeinfo.path[3]) }, { status : "active" }, () => {
+            restore(db.mongoID(cli.routeinfo.path[3]), () => {
                 cli.sendJSON({ terminated : false });
             });
         } else if (cli.routeinfo.path[2] == "edit") {
             cli.readPostData(dat => {
-                db.update(configLib.default(), 'staffing', { _id : db.mongoID(cli.routeinfo.path[3]) }, { [dat.field] : dat.value }, () => {
+                update(db.mongoID(cli.routeinfo.path[3]), dat.field, dat.value, () => {
                     cli.sendJSON(dat);
                 });
             });
@@ -55,16 +44,11 @@ class Staffing {
 
     livevar(cli, levels, params, sendback) {
         if (levels[0] == "me") {
-            db.findUnique(configLib.default(), 'staffing', { _id: db.mongoID(cli.session.data._id) }, (err, staffinfo = {}) => {
+            getSimple(db.mongoID(cli.session.data._id), (err, staffinfo) => {
                 sendback({err, staffinfo});
             });
         } else if (levels[0] == "single" && cli.hasRight('manage-staff')) {
-            db.join(configLib.default(), 'staffing', [
-                { $match : { _id : db.mongoID(levels[1]) } },
-                { $lookup : { from : 'entities', as : 'entity', localField : 'entityid', foreignField : '_id' } },
-                { $project : BUNCH_PROJECTION },
-                { $unwind : "$entity" }
-            ], arr => {
+            getFull({ _id : db.mongoID(levels[1]) }, arr => {
                 sendback({ staff : arr[0] });
             });
         } else if (levels[0] == "bunch" && cli.hasRight('manage-staff')) {
@@ -85,12 +69,7 @@ class Staffing {
                 $match.legalname = new RegExp(params.filters.search, 'i');
             }
 
-            db.join(configLib.default(), 'staffing', [
-                { $match },
-                { $lookup : { from : 'entities', as : 'entity', localField : 'entityid', foreignField : '_id' } },
-                { $project : BUNCH_PROJECTION },
-                { $unwind : "$entity" }
-            ], arr => {
+            getFull($match, arr => {
                 sendback({ items : arr });
             });
         } else {
