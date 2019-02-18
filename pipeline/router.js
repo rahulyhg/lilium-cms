@@ -3,7 +3,6 @@ const pathlib = require('path');
 const session = require('../session');
 const hooks = require('../hooks');
 const _c = require('../config');
-const clerk = require('../clerk');
 
 class Router {
     parseClientObject(cli, cb) {
@@ -70,8 +69,6 @@ class Router {
             } else {
                 cb(false);
             }
-        } else if (cli.routeinfo.front) {
-            clerk.greet(cli, cb);
         } else {
             cb(false);
         };

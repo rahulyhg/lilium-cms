@@ -6,7 +6,6 @@ var entities = require('../entities.js');
 var api = require('../api.js');
 var rewriter = require('./rewriter.js');
 var hooks = require('../hooks');
-var clerk = require('../clerk.js');
 
 var Dispatcher = function () {
     this.dispatch = function (cli) {
@@ -14,9 +13,7 @@ var Dispatcher = function () {
         hooks.fire('request_dispatched', cli);
 
         try {
-            if (cli.routeinfo.front) {
-                clerk.serve(cli);
-            } else if (cli.routeinfo.admin) {
+            if (cli.routeinfo.admin) {
                 if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
                     Admin.serveDashboard(cli);
                 } else {
