@@ -94,7 +94,7 @@ class FileLogic {
         const adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml");
 
         // Locate entity
-        require('./iplocator').findClient(cli);
+        require('./lib/iplocator').findClient(cli);
         sharedcache.get('admin_template_' + cli._c.uid, function(hContent) {
             if (hContent) {
                 cli.response.writeHead(200, {"content-type" : "text/html"});

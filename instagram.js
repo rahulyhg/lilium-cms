@@ -1,7 +1,7 @@
 const config = require('./config.js');
 const networkinfo = require('./network/info.js');
 const db = require('./includes/db.js');
-const scheduler = require('./scheduler.js');
+const scheduler = require('./lib/scheduler.js');
 const request = require('request');
 const sharedcache = require('./sharedcache.js');
 

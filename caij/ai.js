@@ -155,12 +155,6 @@ class AI {
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
         ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
         
-        /*
-        ai.statsemailInterval = require('../scheduler.js').schedule("CAIJ_StatEmail_Networkwide", {
-            runat : Knowledge.sendEmailAt
-        }, createStatsEmailTask).start();
-        */
-
         createHomepageTask();
         createFacebookTask();
         createSocialDispatchTask();
@@ -168,7 +162,7 @@ class AI {
         createFiller3daysTask();
         createHotTask();
 
-        ai.thedailyliliumInterval = require('../scheduler.js').schedule("CAIJ_The_Daily_Lilium", {
+        ai.thedailyliliumInterval = require('../lib/scheduler.js').schedule("CAIJ_The_Daily_Lilium", {
             runat : Knowledge.theDailyLiliumAt
         }, generateTheDailyLilium).start();
     }

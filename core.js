@@ -51,7 +51,7 @@ class Core {
                 petal : require('./petal'),
                 precomp : require('./precomp'),
                 preferences : require('./preferences'),
-                scheduler : require('./scheduler'),
+                scheduler : require('./lib/scheduler'),
                 search : require('./search'),
                 sharedcache : require('./sharedcache'),
                 socialdispatch : require('./socialdispatch'),

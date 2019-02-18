@@ -329,7 +329,7 @@
             "endpoint" : "login",
             "support" : ["api_get", "api_post"]
         }, {
-            "module": "twoFactor.js",
+            "module": "controllers/twoFactor.js",
             "endpoint": "2fa",
             "support": ["livevar", "admin_post"]
         }, {

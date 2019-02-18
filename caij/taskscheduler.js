@@ -1,5 +1,3 @@
-
-
 const tasks = [];
 
 class TaskScheduler {

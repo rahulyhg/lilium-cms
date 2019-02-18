@@ -5,7 +5,7 @@ const dateFormat = require('dateformat');
 const Money = require("./money");
 const request = require('request');
 const CryptoJS = require('crypto-js');
-const twoFactor = require('./twoFactor');
+const twoFactor = require('./lib/twoFactor');
 
 const money = new Money();
 
