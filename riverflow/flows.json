@@ -401,7 +401,7 @@
             "endpoint" : "fix",
             "support" : ["livevar","admin_post"]
         }, {
-            "module" : "plugins.js",
+            "module" : "controllers/plugins.js",
             "endpoint" : "plugins",
             "support" : ["admin_post", "livevar"]
         }, {
@@ -546,7 +546,7 @@
             "endpoint" : "amp",
             "support" : ["get"]
         }, {
-            "module" : "cakepop.js",
+            "module" : "controllers/cakepop.js",
             "endpoint" : "cakepop",
             "support" : ["admin_post", "livevar"]
         }, {

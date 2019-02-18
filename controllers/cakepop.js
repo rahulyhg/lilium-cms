@@ -27,10 +27,10 @@
  *
  *************************************************************************************************************************/
 
-const db = require('./lib/db.js');
-const filelogic = require('./pipeline/filelogic');
-const config = require('./config.js');
-const hooks = require('./hooks');
+const db = require('../lib/db.js');
+const filelogic = require('../pipeline/filelogic');
+const config = require('../config.js');
+const hooks = require('../hooks');
 
 const CAKEPOP_COLLECTION = "cakepops";
 

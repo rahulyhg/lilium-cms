@@ -200,7 +200,7 @@ const loadCurrencies = () => {
 };
 
 const loadPlugins = (cb) => {
-    const plugins = require('./plugins.js');
+    const plugins = require('./lib/plugins');
 
     log('Plugins', 'Loading plugins');
     plugins.init(() => {
