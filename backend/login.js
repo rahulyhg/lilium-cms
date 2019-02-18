@@ -6,7 +6,7 @@ const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 
 const api = require('../api.js');
-const metrics = require('../metrics');
+const metrics = require('../lib/metrics');
 const twoFactor = require('../twoFactor');
 const padlock = require('../lib/padlock');
 const dateformat = require('dateformat');

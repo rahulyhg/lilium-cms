@@ -1,6 +1,6 @@
 var _c = require('../config.js');
 
-var metrics = require('../metrics');
+const metrics = require('../lib/metrics');
 var MongoClient = require('mongodb').MongoClient
 var mongoObjectID = require('mongodb').ObjectID;
 var noop = () => {};

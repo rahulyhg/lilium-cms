@@ -1,7 +1,7 @@
 const hooks = require('../hooks.js')
 
 const fs = require('fs')
-const metrics = require('../metrics');
+const metrics = require('../lib/metrics');
 
 class Inbound {
     constructor() {

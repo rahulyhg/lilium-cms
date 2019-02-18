@@ -22,7 +22,7 @@
 var db = require('./includes/db.js');
 
 var hooks = require('./hooks.js');
-var metrics = require('./metrics');
+const metrics = require('./lib/metrics');
 
 var RegisteredLiveVariables = new Object();
 

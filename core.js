@@ -5,7 +5,7 @@ const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./v4');
 const OS = require('os');
 const ShellServer = require('./cli/server');
-const metrics = require('./metrics');
+const metrics = require('./lib/metrics');
 
 global.require_template = require('./templaterequire');
 

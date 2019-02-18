@@ -455,10 +455,6 @@
             "endpoint" : "snips",
             "support" : []
         }, {
-            "module" : "secrets.js",
-            "endpoint" : "secrets",
-            "support" : ["admin_post", "livevar"]
-        }, {
             "module" : "devtools.js",
             "endpoint" : "devtools",
             "support" : ["admin_post", "livevar", "setup"]
@@ -510,7 +506,7 @@
             "endpoint" : "staffing",
             "support" : ["admin_post", "livevar", "admin_delete", "admin_put"]
         }, {
-            "module" : "metrics.js",
+            "module" : "controllers/metrics.js",
             "endpoint" : "metrics",
             "support" : ["livevar"]
         }, {

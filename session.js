@@ -3,7 +3,7 @@ var entities = require('./entities.js');
 var db = require('./includes/db.js');
 
 var sharedcache = require('./sharedcache.js');
-var metrics = require('./metrics');
+const metrics = require('./lib/metrics');
 
 var UserSesh = function (token) {
     this.data = new Object();

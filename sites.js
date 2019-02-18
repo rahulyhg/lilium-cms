@@ -17,11 +17,11 @@ var events = require('./events.js');
 var various = require('./various.js');
 var mail = require('./mail.js');
 var sharedcache = require('./sharedcache.js');
-var sitemap = require('./sitemap.js');
+var sitemap = require('./lib/sitemap.js');
 var analytics = require('./analytics.js');
 var adslib = require('./ads');
 var roles = require('./role');
-var metrics = require('./metrics');
+const metrics = require('./lib/metrics');
 var V4DevServer = require('./v4devserver');
 
 var networkInfo = require('./network/info.js');
