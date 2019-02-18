@@ -1,5 +1,5 @@
 
-const db = require('../includes/db.js');
+const db = require('../lib/db.js');
 const config = require('../config.js');
 const badges = require('../badges.js');
 const articleLib = require('../content.js');

@@ -19,7 +19,7 @@
  *                                                                                                       *
  *********************************************************************************************************/
 
-var db = require('./includes/db.js');
+var db = require('./lib/db.js');
 
 var hooks = require('./hooks.js');
 const metrics = require('./lib/metrics');

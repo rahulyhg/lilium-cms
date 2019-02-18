@@ -1,5 +1,5 @@
 var livevars = require('../livevars.js');
-var db = require('../includes/db.js');
+var db = require('../lib/db.js');
 
 // Search schemas
 var queriedCollections = new Array();

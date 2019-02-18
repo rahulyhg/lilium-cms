@@ -463,7 +463,7 @@
             "endpoint" : "embed",
             "support" : ["livevar", "admin_post"]
         }, {
-            "module" : "sharedcache.js",
+            "module" : "lib/sharedcache.js",
             "endpoint" : "sharedcache",
             "support" : ["livevar"]
         }, {

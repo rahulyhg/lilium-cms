@@ -1,5 +1,5 @@
 
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const CryptoJS = require('crypto-js');
 
 const POKE_TIMEOUT = 4 * 1000;    // 4 seconds

@@ -1,4 +1,4 @@
-const db = require('../includes/db.js');
+const db = require('../lib/db.js');
 const CryptoJS = require('crypto-js');
 const _c = require('../config.js');
 const entities = require('../entities.js');

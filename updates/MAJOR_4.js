@@ -1,6 +1,6 @@
 // Feronia 
 // Libraries
-const db = require('../includes/db');
+const db = require('../lib/db');
 
 const createStaffing = (_c, done) => {
     db.findToArray(_c, "entities", {}, (err, arr) => {

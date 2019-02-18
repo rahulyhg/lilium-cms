@@ -1,5 +1,5 @@
 const CryptoJS = require('crypto-js');
-const db = require(liliumroot + '/includes/db');
+const db = require(liliumroot + '/lib/db');
 const configLib = require(liliumroot + '/config');
 
 const cleanCollections = (collections, then) => {

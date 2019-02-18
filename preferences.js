@@ -1,5 +1,5 @@
 
-var db = require('./includes/db.js');
+var db = require('./lib/db.js');
 const _c = require('./config');
 
 class Preferences {

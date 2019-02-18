@@ -6,7 +6,7 @@
 
 const crypto = require('crypto');
 const _c =require('./config');
-const db = require('./includes/db');
+const db = require('./lib/db');
 
 class PwManager {
 

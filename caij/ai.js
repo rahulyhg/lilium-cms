@@ -1,8 +1,6 @@
 const taskscheduler = require('./taskscheduler.js');
 const executor = require('./executor.js');
 
-
-
 const oneSecond = 1000;
 const oneMinute = oneSecond * 60;
 const halfHour = oneMinute * 30;

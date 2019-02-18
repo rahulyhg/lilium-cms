@@ -1,6 +1,6 @@
 const path = require('path');
 const makeIndex = require(path.join(global.liliumroot || __dirname, "apps", "lilium", "index.html"));
-const db = require('./includes/db');
+const db = require('./lib/db');
 const cachefront = require('./cachefront');
 
 class V4 {

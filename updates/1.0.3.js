@@ -1,4 +1,4 @@
-const db = require('../includes/db.js');
+const db = require('../lib/db.js');
 
 module.exports = (conf, done) => {
     db.createCollections(conf, ["reports", "userclients", "usersessions", "pageviews", "userevents"], () => {

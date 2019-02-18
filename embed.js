@@ -5,7 +5,7 @@ const pathlib = require('path');
 const Admin = require('./backend/admin.js');
 const mkdirp = require('mkdirp');
 const dateformat = require('dateformat');
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 
 class EmbedController {
     livevar(cli, levels, params, sendback) {

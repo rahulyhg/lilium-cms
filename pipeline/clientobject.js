@@ -1,5 +1,5 @@
 const entities = require('../entities.js');
-const db = require('../includes/db.js');
+const db = require('../lib/db.js');
 
 class ClientObject {
     constructor(req, resp) {

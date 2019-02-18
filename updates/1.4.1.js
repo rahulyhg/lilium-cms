@@ -2,7 +2,7 @@
 // Go through all articles with a "media" property defined
 // Set all media credits in the "uploads" collection using article featuredcredit properties
 
-const db = require('../includes/db');
+const db = require('../lib/db');
 const CONTENT_COLLECTION = "content";
 const MEDIA_COLLECTION = "media";
 

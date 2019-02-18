@@ -1,4 +1,4 @@
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const articleLib = require('./content.js');
 const filelogic = require('./pipeline/filelogic');
 const hooks = require('./hooks.js');

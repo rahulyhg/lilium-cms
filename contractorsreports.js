@@ -1,4 +1,4 @@
-const db = require('./includes/db');
+const db = require('./lib/db');
 const fs = require('fs');
 const dateformat = require('dateformat');
 const configlib = require('./config');

@@ -153,7 +153,7 @@ class Builder {
     }
 
     getBundle(siteid, outputkey, sendback) {
-        require('./sharedcache').get('_babel_' + siteid + "_" + outputkey, markup => {
+        require('./lib/sharedcache').get('_babel_' + siteid + "_" + outputkey, markup => {
             sendback(markup);
         });
     }

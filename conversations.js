@@ -1,5 +1,5 @@
 
-var db = require('./includes/db.js');
+var db = require('./lib/db.js');
 var _c = require('./config.js');
 var livevars = require('./livevars.js');
 var notifications = require('./notifications.js');

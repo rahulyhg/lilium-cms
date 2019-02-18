@@ -3,7 +3,7 @@ var _c = require('./config.js');
 const filelogic = require('./pipeline/filelogic');
 
 var Admin = require('./backend/admin.js');
-var db = require('./includes/db.js');
+var db = require('./lib/db.js');
 var livevars = require('./livevars.js');
 var pathLib = require('path');
 

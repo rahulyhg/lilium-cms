@@ -1,6 +1,6 @@
 // Libraries inclusion
-const db = require('./includes/db.js');
-const sharedcache = require('./sharedcache.js');
+const db = require('./lib/db.js');
+const sharedcache = require('./lib/sharedcache.js');
 const hooks = require('./hooks.js');
 const notifications = require('./notifications.js');
 const builder = require('./build');

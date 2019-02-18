@@ -3,7 +3,7 @@ module.exports = function (_ready_) {
     var fs = require('fs');
     var port = 8080;
     var qs = require('querystring');
-    var db = require('./includes/db.js');
+    var db = require('./lib/db.js');
 
     log('Init', "Creating initialization temporary server");
     var parsePost = function (pd) {

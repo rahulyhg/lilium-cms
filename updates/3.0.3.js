@@ -1,4 +1,4 @@
-const db = require('../includes/db');
+const db = require('../lib/db');
 
 module.exports = (_c, done) => {
     db.find(_c, 'ads', {}, [], (err, cur) => {

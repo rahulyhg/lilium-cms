@@ -23,7 +23,7 @@
 */
 
 const Analytics = require('./analytics');
-const db = require('./includes/db');
+const db = require('./lib/db');
 const dashboard = require('./dashboard');
 const dateformat = require('dateformat');
 const hooks = require('./hooks')

@@ -1,4 +1,4 @@
-const db = require(liliumroot + '/includes/db');
+const db = require(liliumroot + '/lib/db');
 const MESSAGES = require('../messages');
 const { listOfPosts, fullPost } = require('../formatters.js');
 

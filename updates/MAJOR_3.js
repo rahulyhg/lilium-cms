@@ -1,5 +1,5 @@
 // Libraries
-const db = require('../includes/db');
+const db = require('../lib/db');
 
 // Call stack
 const remodalPonglinks = (_c, done) => {

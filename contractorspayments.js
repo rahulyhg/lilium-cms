@@ -1,5 +1,5 @@
 const filelogic = require('./pipeline/filelogic');
-const db = require('./includes/db');
+const db = require('./lib/db');
 const _c = require('./config');
 const dateFormat = require('dateformat');
 const Money = require("./lib/money");

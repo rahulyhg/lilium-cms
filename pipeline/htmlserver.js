@@ -1,11 +1,11 @@
 const filelogic = require('./filelogic');
-var sharedcache = require("../sharedcache.js");
+var sharedcache = require("../lib/sharedcache.js");
 var styledpages = require('../styledpages.js');
 var editions = require('../editions');
 var _conf = require('../config.js');
 var articleLib = require('../content.js');
 var ipevents = require('../ipevents.js');
-var db = require('../includes/db');
+var db = require('../lib/db');
 var noop = function() {};
 
 

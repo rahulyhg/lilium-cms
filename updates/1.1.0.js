@@ -1,5 +1,5 @@
 
-const db = require('../includes/db.js');
+const db = require('../lib/db.js');
 
 module.exports = (_c, done) => {
     db.createCollection(_c, 'contentchains', () => {

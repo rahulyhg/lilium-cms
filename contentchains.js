@@ -1,5 +1,5 @@
 
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const filelogic = require('./pipeline/filelogic');
 const articleLib = require('./content.js');
 

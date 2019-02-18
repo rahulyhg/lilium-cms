@@ -1,5 +1,5 @@
 const hooks = require('./hooks.js');
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./v4');
 const OS = require('os');
@@ -49,7 +49,7 @@ class Core {
                 preferences : require('./preferences'),
                 scheduler : require('./lib/scheduler'),
                 search : require('./search'),
-                sharedcache : require('./sharedcache'),
+                sharedcache : require('./lib/sharedcache'),
                 socialdispatch : require('./socialdispatch'),
                 themes : require('./themes'),
             };

@@ -11,8 +11,8 @@ class EndpointMethods {
     }
 }
 
-const db = require('./includes/db.js');
-const sharedcache = require('./sharedcache.js');
+const db = require('./lib/db.js');
+const sharedcache = require('./lib/sharedcache.js');
 const entities = require('./entities.js');
 
 const ApiEndpoints = new EndpointMethods();

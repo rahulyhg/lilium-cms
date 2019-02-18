@@ -1,6 +1,6 @@
-const db = require('./includes/db');
+const db = require('./lib/db');
 const request = require('request');
-const sharedcache = require('./sharedcache');
+const sharedcache = require('./lib/sharedcache');
 let _key;
 
 const BASE_URL = "https://api.darksky.net/forecast/";

@@ -1,5 +1,5 @@
 
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 
 class Duplicate {
     available(_c, collection, selector, send) {

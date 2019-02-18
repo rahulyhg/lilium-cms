@@ -2,9 +2,9 @@
 const path = require('path');
 const request = require('request');
 
-const db = require('./includes/db');
+const db = require('./lib/db');
 const LML3 = require('./lml3/compiler');
-const sharedcache = require('./sharedcache');
+const sharedcache = require('./lib/sharedcache');
 const SMS = require('./lib/sms');
 
 class PasswordRecovery {

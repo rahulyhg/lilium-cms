@@ -7,7 +7,7 @@ var notif = require('./notifications.js');
 var configs = require('./config');
 var precomp = require('./precomp.js');
 var fs = require('fs');
-var db = require('./includes/db.js');
+var db = require('./lib/db.js');
 
 class DevTools {
     adminGET (cli) {
@@ -541,14 +541,14 @@ var maybeInsertFeed = function(cli) {
         extra[dat.extra[i].key] = dat.extra[i].value;
     }
 
-    require('./feed.js').push(dat.extid, require('./includes/db.js').mongoID(dat.actor), dat.type, dat.site, extra, function() {
+    require('./feed.js').push(dat.extid, require('./lib/db.js').mongoID(dat.actor), dat.type, dat.site, extra, function() {
         cli.sendJSON(dat);
     });
 };
 
 var unwrapImages = function(cli) {
     log('Devtools', 'Unwrapping all images from <p> tags');
-    var db = require('./includes/db.js');
+    var db = require('./lib/db.js');
     db.find(cli._c, 'content', {}, [], function(err, cur) {
         var done = function() {
             log('Devtools', 'Done unwrapping articles');
@@ -697,7 +697,7 @@ var listAllCachedFiles = function(cli, levels, params, cb) {
 
 var parseContentAds = function(cli) {
     var pcount = cli._c.content.adsperp;
-    var db = require('./includes/db.js');
+    var db = require('./lib/db.js');
     var jsdom = require("jsdom");
     log('Devtools', 'Parsing ads for all articles', 'info');
     if (pcount) {

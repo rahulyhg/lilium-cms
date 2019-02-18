@@ -1,5 +1,5 @@
 
-const sharedcache = require('./sharedcache');
+const sharedcache = require('./lib/sharedcache');
 
 const CACHE_KEY = "cf_";
 

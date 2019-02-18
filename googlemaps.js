@@ -1,8 +1,8 @@
 const googleMapsClient = require('@google/maps');
 const xxh = require('xxhashjs')
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const _c = require('./config');
-const cacheServer = require('./sharedcache');
+const cacheServer = require('./lib/sharedcache');
 
 const GM_CACHE_COLLECTION = 'googleplacescache';
 const GM_CACHE_PREFIX = 'gm_query_autocomplete';

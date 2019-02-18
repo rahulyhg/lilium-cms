@@ -1,7 +1,7 @@
 const configlib = require('./config');
-const db = require('./includes/db');
+const db = require('./lib/db');
 const xxh = require('xxhashjs')
-const sharedcache = require('./sharedcache');
+const sharedcache = require('./lib/sharedcache');
 const localcast = require('./localcast');
 
 const AUDIENCES_COLLECTION = 'audiences';

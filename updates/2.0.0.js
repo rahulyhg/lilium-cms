@@ -1,4 +1,4 @@
-const db = require('../includes/db');
+const db = require('../lib/db');
 
 const mkdirp = require('mkdirp');
 const configlib = require('../config');

@@ -3,7 +3,7 @@ const _c = require('./config.js');
 const filelogic = require('./pipeline/filelogic');
 
 const Admin = require('./backend/admin.js');
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const livevars = require('./livevars.js');
 const hooks = require('./hooks.js');
 const RegisteredPlugins = new Object();

@@ -1,6 +1,6 @@
 const filelogic = require('./pipeline/filelogic');
 var conf = require('./config.js');
-var db = require('./includes/db.js');
+var db = require('./lib/db.js');
 var mongo = require('mongodb');
 const fs = require('./pipeline/filelogic');
 

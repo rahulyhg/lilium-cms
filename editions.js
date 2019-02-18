@@ -1,4 +1,4 @@
-const db = require('./includes/db');
+const db = require('./lib/db');
 
 const EDITION_COLLECTION = "editions";
 const SECTION_COLLECTION = "sections";

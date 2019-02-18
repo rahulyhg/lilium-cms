@@ -1,11 +1,11 @@
 const _c = require('./config.js');
 const sessionManager = require('./session.js');
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const metrics = require('./lib/metrics');
 const hooks = require('./hooks.js');
 const sites = require('./sites.js');
 const livevars = require('./livevars.js');
-const sharedcache = require('./sharedcache.js');
+const sharedcache = require('./lib/sharedcache.js');
 
 let io;
 let sockets = {};

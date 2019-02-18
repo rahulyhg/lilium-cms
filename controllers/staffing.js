@@ -1,5 +1,5 @@
 const configLib = require('../config');
-const db = require('../includes/db');
+const db = require('../lib/db');
 
 const { terminate, restore, update, getSimple, getFull } = require('../lib/staffing');
 

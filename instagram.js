@@ -1,9 +1,9 @@
 const config = require('./config.js');
 const networkinfo = require('./network/info.js');
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const scheduler = require('./lib/scheduler.js');
 const request = require('request');
-const sharedcache = require('./sharedcache.js');
+const sharedcache = require('./lib/sharedcache.js');
 
 const igDomain = "https://www.instagram.com/";
 const statsParam = "?__a=1";

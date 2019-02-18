@@ -1,6 +1,6 @@
 
 const filelogic = require('./pipeline/filelogic');
-const db = require('./includes/db')
+const db = require('./lib/db')
 const config = require('./config')
 
 const DR_COLLECTION = "datareaderreports";

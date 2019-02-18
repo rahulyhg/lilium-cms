@@ -1,4 +1,4 @@
-const db = require('./includes/db.js');
+const db = require('./lib/db.js');
 const fs = require('fs');
 const xxhash = require('xxhashjs');
 const mkdirp = require('mkdirp');

@@ -1,5 +1,5 @@
-const db = require('./includes/db');
-const sharedcache = require('./sharedcache');
+const db = require('./lib/db');
+const sharedcache = require('./lib/sharedcache');
 const isElder = require('./network/info').isElderChild();
 const SHA1 = (str) => require('crypto-js').SHA1(str).toString();
 const filelogic = require('./pipeline/filelogic');
