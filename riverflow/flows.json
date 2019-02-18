@@ -538,7 +538,7 @@
             "endpoint" : "socialdispatch",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "pwmanager.js",
+            "module" : "controllers/pwmanager.js",
             "endpoint" : "pwmanager",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
@@ -562,7 +562,7 @@
             "endpoint" : "editions",
             "support" : ["livevar", "admin_delete", "admin_put", "admin_post"]
         }, {
-            "module" : "session.js",
+            "module" : "controllers/session.js",
             "endpoint" : "session",
             "support" : ["livevar"]
         }, {

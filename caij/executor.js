@@ -1,5 +1,4 @@
-
-const localcast = require('../localcast.js');
+const localcast = require('../network/localcast.js');
 const request = require('request');
 const fs = require('fs');
 

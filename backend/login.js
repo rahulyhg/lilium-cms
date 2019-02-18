@@ -3,7 +3,7 @@ const CryptoJS = require('crypto-js');
 const _c = require('../config.js');
 const entities = require('../entities.js');
 const hooks = require('../hooks.js');
-const sessions = require('../session.js');
+const sessions = require('../lib/session.js');
 
 const api = require('../pipeline/api.js');
 const metrics = require('../lib/metrics');

@@ -143,7 +143,7 @@ const loadEndpoints = () => {
 
     endpoints.register('*', 'logout', 'GET', (cli) => {
         cli.touch("endpoints.POST.logout");
-        const sessions = require('./session.js');
+        const sessions = require('./lib/session.js');
         sessions.logout(cli);
     });
 
@@ -285,7 +285,7 @@ const gracefullyCrash = (err) => {
 
     if (global.__TEST) {
         log('Core', 'Test mode will force Lilium to exit', 'warn');
-        require('./localcast').fatal(err);
+        require('./network/localcast').fatal(err);
     }
 };
 
@@ -296,7 +296,7 @@ const bindCrash = () => {
 };
 
 const initLocalcast = () => { 
-    require('./localcast').init();
+    require('./network/localcast').init();
 }
 
 const loadStandardInput = () => {

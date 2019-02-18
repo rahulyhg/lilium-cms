@@ -374,7 +374,7 @@ class Entities {
             cli.did("entity", "update");
             if (!err){
                 log('Entities', 'Updated entity with id ' + cli.userinfo.userid);
-                require('./session.js').reloadSession(cli, function() {
+                require('./lib/session.js').reloadSession(cli, function() {
                     cli.sendJSON({
                         success : true
                     });
@@ -396,7 +396,7 @@ class Entities {
 
         if (imgid && imgurl) {
             db.update(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, {avatarURL : imgurl, avatarMini : miniurl || imgurl, avatarID : db.mongoID(imgid)}, function(err, res) {
-                require('./session.js').reloadSession(cli, function() {
+                require('./lib/session.js').reloadSession(cli, function() {
                     cli.sendJSON({
                         imgid : db.mongoID(imgid),
                         imgurl : imgurl,
@@ -417,7 +417,7 @@ class Entities {
     };
 
     commitProfilePic (cli, filename, cb) {
-        var sessionManager = require('./session.js');
+        var sessionManager = require('./lib/session.js');
         var ext = filename.substring(filename.lastIndexOf('.') + 1);
 
         require('./media').getDirectoryForNew(cli._c, updir => {

@@ -1,5 +1,5 @@
 const _c = require('./config.js');
-const sessionManager = require('./session.js');
+const sessionManager = require('./lib/session.js');
 const db = require('./lib/db.js');
 const metrics = require('./lib/metrics');
 const hooks = require('./hooks.js');

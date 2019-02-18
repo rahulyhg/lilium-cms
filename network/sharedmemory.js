@@ -2,7 +2,7 @@ const log = require('../log');
 const fs = require('fs');
 const net = require('net');
 const pathlib = require('path');
-const localcast = require('../localcast');
+const localcast = require('./localcast');
 
 const mem = {
     roles: {},

@@ -1,4 +1,4 @@
-const db = require('./lib/db.js');
+const db = require('../lib/db.js');
 const hooks = {};
 
 class LocalCast {

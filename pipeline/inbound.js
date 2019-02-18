@@ -85,7 +85,7 @@ class Inbound {
 
             this.socketio = require('socket.io')(this.server);
 
-            if (require('../localcast').clustered) {
+            if (require('../network/localcast').clustered) {
                 const redis = require('socket.io-redis');
                 this.socketio.adapter(redis());
             }

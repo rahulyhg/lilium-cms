@@ -292,14 +292,14 @@ var Themes = function () {
                         that.enableTheme(conf, info.uName, err => {
                             if (err) {
                                 log('Theme', '[FATAL] Error registering default theme', 'err');
-                                require('./localcast').fatal(err);
+                                require('./network/localcast').fatal(err);
                             } else {
                                 cb()
                             }
                         }, {});
                     } else {
                         log('Theme', '[FATAL] No theme found in /flowers directory', 'err');
-                        require('./localcast').fatal(new Error("Lilium requires at least one theme located under /flowers"));
+                        require('./network/localcast').fatal(new Error("Lilium requires at least one theme located under /flowers"));
                     }
                 } else {
                     that.enableTheme(conf, theme.uName, err => {
