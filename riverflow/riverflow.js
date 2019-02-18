@@ -4,7 +4,7 @@ const Livevar = require('../livevars.js');
 const Endpoints = require('../pipeline/endpoints.js');
 const Hooks = require('../hooks.js');
 const CAIJ = require('../caij/caij.js');
-const API = require('../api.js');
+const API = require('../pipeline/api.js');
 
 const isElder = require('../network/info.js').isElderChild();
 

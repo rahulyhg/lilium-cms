@@ -40,7 +40,7 @@ class Core {
                 hooks : require('./hooks'),
                 entities : require('./entities'),
                 livevars : require('./livevars'),
-                API : require('./api'),
+                API : require('./pipeline/api'),
                 imageResizer : require('./imageResizer'),
                 LML3 : require('./lml3/compiler'),
                 LML2 : require('./lml'),

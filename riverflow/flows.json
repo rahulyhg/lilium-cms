@@ -361,9 +361,9 @@
             "endpoint" : "search",
             "support" : ["livevar", "setup"]
         }, {
-            "module" : "ads.js",
+            "module" : "controllers/ads.js",
             "endpoint" : "ads",
-            "support" : ["admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "datareader.js",
             "endpoint" : "datareader",
@@ -542,7 +542,7 @@
             "endpoint" : "pwmanager",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
-            "module" : "amp.js",
+            "module" : "controllers/amp.js",
             "endpoint" : "amp",
             "support" : ["get"]
         }, {

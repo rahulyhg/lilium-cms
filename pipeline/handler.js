@@ -239,7 +239,7 @@ var Handler = function () {
 
     var handleAPI = function(cli) {
         Router.parseClientObject(cli, (loggedin) => {
-            require('../api.js').serveApi(cli);
+            require('./api.js').serveApi(cli);
         });
     };
 

@@ -3,7 +3,7 @@ var HTMLServer = require('./htmlserver.js');
 var Endpoints = require('./endpoints.js');
 var LiveVars = require('../livevars.js');
 var entities = require('../entities.js');
-var api = require('../api.js');
+var api = require('./api.js');
 var rewriter = require('./rewriter.js');
 var hooks = require('../hooks');
 

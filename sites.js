@@ -15,7 +15,7 @@ var mail = require('./mail.js');
 var sharedcache = require('./lib/sharedcache.js');
 var sitemap = require('./lib/sitemap.js');
 var analytics = require('./analytics.js');
-var adslib = require('./ads');
+var adslib = require('./lib/ads');
 var roles = require('./role');
 const metrics = require('./lib/metrics');
 var V4DevServer = require('./v4devserver');
@@ -229,7 +229,7 @@ var SiteInitializer = function (conf, siteobj) {
         if (!isElder) { return cb(); }
         roles.loadRolesInCache(() => {
             sessions.initSessionsFromDatabase(conf, () => {
-                require('./api.js').loadSessionsInCache(cb);
+                require('./pipeline/api.js').loadSessionsInCache(cb);
             });
         });
     };

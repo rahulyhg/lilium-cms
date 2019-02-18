@@ -5,7 +5,7 @@ const entities = require('../entities.js');
 const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 
-const api = require('../api.js');
+const api = require('../pipeline/api.js');
 const metrics = require('../lib/metrics');
 const twoFactor = require('../lib/twoFactor');
 const padlock = require('../lib/padlock');

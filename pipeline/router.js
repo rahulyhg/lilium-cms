@@ -62,7 +62,7 @@ class Router {
             cli.apitoken = cli.request.headers.ltk;
             cli.apisession = false;
             if (cli.apitoken) {
-                require('../api.js').getSession(cli.apitoken, (session) => {
+                require('./api.js').getSession(cli.apitoken, (session) => {
                     cli.apisession = session;
                     cb(!!session);
                 });
