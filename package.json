@@ -85,7 +85,6 @@
     "crypto-js": "latest",
     "dateformat": "latest",
     "deep-diff": "latest",
-    "dependency-tree": "^6.3.0",
     "diff": "^3.5.0",
     "diff-match-patch": "^1.0.4",
     "emitter": "0.0.5",
