@@ -266,7 +266,7 @@ const loadRoles = (cb) => {
 const loadGitHub = () => {
     if (!isElder) return;
 
-    require('./github').initialize();
+    require('./lib/github').initialize();
 }
 
 const gracefullyCrash = (err) => {
