@@ -1,33 +1,55 @@
 // Libraries
 const sharedcache = require('./sharedcache');
 const db = require('./includes/db');
+const configLib = require('./config');
 
 // Constants
 const CACHE_PREFIX = "padlock_";
-const BLOCK_THRESHOLD = 5;
 
 class Padlock {
-    loginFailed(userid, sendback) {
-        sharedcache.get(CACHE_PREFIX + "failed_" + userid, num => {
-            const newnum = num ? ++num : 1;
-            sharedcache.set({ [CACHE_PREFIX + "failed_" + userid] : newnum }, () => {
-                if (BLOCK_THRESHOLD - newnum <= 0) {
-                    // React accordingly
-                }
+    get blockThreshold() {
+        return configLib.default().allowedLoginAttempts || 5;
+    }
 
-                sendback && sendback(BLOCK_THRESHOLD - newnum);
-            });
+    loginFailed(username, sendback) {
+        sharedcache.get(CACHE_PREFIX + "failed_" + username, num => {
+            const newnum = num ? ++num : 1;
+            if (this.blockThreshold - newnum <= 0) {
+                this.blockUser(username, () => {
+                    this.refreshFailedLoginCount(username, () => {
+                        sendback && sendback(true);
+                    });
+                });
+            } else {
+                sharedcache.set({ [CACHE_PREFIX + "failed_" + username] : newnum }, () => {
+                    sendback && sendback(false);
+                });
+            }
         });
     }
 
-    userCanLogin(userid, sendback) {
-        sharedcache.get(CACHE_PREFIX + "failed_" + userid, num => {
-            sendback(!num || num < BLOCK_THRESHOLD);
-        })
+    isUserLocked(username, done) {
+        sharedcache.get(CACHE_PREFIX + "locked_" + username, lock => {
+            if (lock && lock.until > Date.now()) {
+                done(lock.until);
+            } else {
+                done(false);
+            }
+        });
+    }   
+
+    blockUser(username, done) {
+        sharedcache.set({
+            [ CACHE_PREFIX + "locked_" + username ] : {
+                until : Date.now() + (1000 * 60 * 5)
+            }
+        }, () => {
+            done();
+        });
     }
 
-    refreshFailedLoginCount(userid, done) {
-        sharedcache.get(CACHE_PREFIX + "failed_" + userid, 0);
+    refreshFailedLoginCount(username, done) {
+        sharedcache.set({[CACHE_PREFIX + "failed_" + username] : 0}, () => done());
     }
 }
 

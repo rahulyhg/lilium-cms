@@ -8,6 +8,8 @@ const log = require('../log.js');
 const api = require('../api.js');
 const metrics = require('../metrics');
 const twoFactor = require('../twoFactor');
+const padlock = require('../padlock');
+const dateformat = require('dateformat');
 
 const loginSuccess = (cli, userObj, cb) => {
 	cli.touch('login.loginsuccess');
@@ -98,32 +100,41 @@ class Login {
             ];
 
             cli.touch("login.authUser@networkcheck");
-            db.findUnique(_c.default(), 'entities', conds, (err, user) => {
-                if (!err && user) {
-                    if (user.enforce2fa && user.confirmed2fa) {
-                        
-                        if (token2fa && twoFactor.validate2fa(user._id.toString(), token2fa)) {
-                            entities.fetchFromDB(cli._c, user.username, userObj => {
-                                log("Auth", "Login with credentials and 2FA success with user " + user.username, "lilium");
-                                loginSuccess(cli, userObj);
-                            });
-                        } else {
-                            metrics.plus('failedauth');
-                            hooks.fire('user_login_failed', cli);
-                            log("Auth", "Login attempt failed with user " + usr + " due to invalid 2FA token", "warn");
-                            cli.sendJSON({ error: 'credentials', message: (_c.default().env == 'prod') ? 'Login failed' : 'Invalid 2FA Token', success : false })
-                        }
-                    } else {
-                        entities.fetchFromDB(cli._c, user.username, userObj => {
-                            log("Auth", "Login with credentials success with user " + user.username, "lilium");
-                            loginSuccess(cli, userObj);
-                        });
-                    }
-                } else {
+            padlock.isUserLocked(usr, locked => {
+                if (locked) {
                     metrics.plus('failedauth');
-                    hooks.fire('user_login_failed', cli);
-                    log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
-                    cli.sendJSON({ error : "credentials", message: 'Login Failed', success : false })
+                    cli.sendJSON({ error : 'blocked', until : locked, message : 'Blocked until ' + dateformat(new Date(locked), 'HH:MM'), success : false });
+                } else {
+                    db.findUnique(_c.default(), 'entities', conds, (err, user) => {
+                        if (!err && user) {
+                            if (user.blockedUntil && user.blockedUntil > Date.now()) {
+                            } else if (user.enforce2fa && user.confirmed2fa) {
+                                if (token2fa && twoFactor.validate2fa(user._id.toString(), token2fa)) {
+                                    entities.fetchFromDB(cli._c, user.username, userObj => {
+                                        log("Auth", "Login with credentials and 2FA success with user " + user.username, "lilium");
+                                        loginSuccess(cli, userObj);
+                                    });
+                                } else {
+                                    metrics.plus('failedauth');
+                                    hooks.fire('user_login_failed', cli);
+                                    log("Auth", "Login attempt failed with user " + usr + " due to invalid 2FA token", "warn");
+                                    cli.sendJSON({ error: 'credentials', message: (_c.default().env == 'prod') ? 'Login failed' : 'Invalid 2FA Token', success : false })
+                                }
+                            } else {
+                                entities.fetchFromDB(cli._c, user.username, userObj => {
+                                    log("Auth", "Login with credentials success with user " + user.username, "lilium");
+                                    loginSuccess(cli, userObj);
+                                });
+                            }
+                        } else {
+                            padlock.loginFailed(usr, blocked => {
+                                metrics.plus('failedauth');
+                                hooks.fire('user_login_failed', cli);
+                                log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
+                                cli.sendJSON({ error : "credentials", blocked, message: 'Login Failed', success : false })
+                            });
+                        }
+                    });
                 }
             });
 		} else {
