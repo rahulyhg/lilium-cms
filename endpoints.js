@@ -1,6 +1,6 @@
 const hooks = require('./hooks.js');
 const config = require('./config.js'); 
-const log = require('./log.js');
+
 const metrics = require('./metrics');
 
 // Schema : { SITE_ID : { METHOD : { ENDPOINT : Object } } }

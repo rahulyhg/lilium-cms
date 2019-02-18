@@ -3,7 +3,7 @@ var conf = require('./config.js');
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
 var fs = require('./fileserver.js');
-var log = require('./log.js');
+
 var livevars = require('./livevars.js');
 var imageResizer = require('./imageResizer.js');
 var imageSize = require('image-size');

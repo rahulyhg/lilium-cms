@@ -4,7 +4,7 @@ const _c = require('../config.js');
 const entities = require('../entities.js');
 const hooks = require('../hooks.js');
 const sessions = require('../session.js');
-const log = require('../log.js');
+
 const api = require('../api.js');
 const metrics = require('../metrics');
 const twoFactor = require('../twoFactor');

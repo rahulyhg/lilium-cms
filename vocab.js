@@ -1,5 +1,5 @@
 const path = require('path');
-const log = require('./log.js');
+
 const { readdir, readdirSync, writeFileSync } = require('fs');
 const _c = require('./config');
 const webpack = require('webpack');

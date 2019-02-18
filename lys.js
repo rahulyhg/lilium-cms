@@ -1,4 +1,3 @@
-var log = require('./log.js');
 var cachedLys = new Object();
 
 var Lys = function() {

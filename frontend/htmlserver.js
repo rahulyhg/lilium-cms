@@ -8,7 +8,7 @@ var articleLib = require('../content.js');
 var ipevents = require('../ipevents.js');
 var db = require('../includes/db');
 var noop = function() {};
-var log = require('../log.js');
+
 
 const MIMES = {
     "":"text/html",

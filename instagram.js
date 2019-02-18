@@ -1,4 +1,3 @@
-const log = require('./log.js');
 const config = require('./config.js');
 const networkinfo = require('./network/info.js');
 const db = require('./includes/db.js');

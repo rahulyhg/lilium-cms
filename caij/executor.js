@@ -1,4 +1,4 @@
-const log = require('../log.js');
+
 const localcast = require('../localcast.js');
 const request = require('request');
 const fs = require('fs');

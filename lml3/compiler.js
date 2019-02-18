@@ -1,4 +1,4 @@
-const log = require('../log.js');
+
 const metrics = require('../metrics');
 
 // Documentation : https://docs.google.com/document/d/1CNue3XC7tBQbr1BnBQaQUxkKCPF6qidOW7lgvZe3ets/edit?usp=sharing

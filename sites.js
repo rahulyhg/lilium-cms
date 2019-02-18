@@ -1,5 +1,5 @@
 var config = require('./config.js');
-var log = require('./log.js');
+
 var livevars = require('./livevars.js');
 var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');

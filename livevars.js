@@ -20,7 +20,7 @@
  *********************************************************************************************************/
 
 var db = require('./includes/db.js');
-var log = require('./log.js');
+
 var hooks = require('./hooks.js');
 var metrics = require('./metrics');
 

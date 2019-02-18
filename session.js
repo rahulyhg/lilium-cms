@@ -1,7 +1,7 @@
 var _c = require('./config.js');
 var entities = require('./entities.js');
 var db = require('./includes/db.js');
-var log = require('./log.js');
+
 var sharedcache = require('./sharedcache.js');
 var metrics = require('./metrics');
 

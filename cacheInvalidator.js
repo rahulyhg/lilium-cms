@@ -4,7 +4,7 @@ var conf = require('./config.js');
 var util = require('util');
 var db = require('./includes/db.js');
 var hooks = require('./hooks.js');
-var log = require('./log.js');
+
 var readdirp = require('readdirp');
 
 var CacheInvalidator = function () {

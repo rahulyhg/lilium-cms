@@ -1,4 +1,4 @@
-const log = require('./log.js');
+
 const net = require('net');
 const gdinfo = require('./network/info.js');
 const gdconf = require('./sites/default').network;

@@ -1,4 +1,3 @@
-const log = require('./log.js');
 const db = require('./includes/db.js');
 
 const noop = () => {};

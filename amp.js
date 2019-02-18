@@ -3,7 +3,6 @@ const endpoints = require('./endpoints.js');
 const articleLib = require('./content.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
-const log = require('./log.js');
 const hooks = require('./hooks.js');
 const cdn = require('./cdn.js');
 const themes = require('./themes.js');

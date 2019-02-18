@@ -1,4 +1,4 @@
-const log = require('./log.js');
+
 const config = require('./config.js');
 const Petal = require('./petal.js');
 const filelogic = require('./filelogic.js');

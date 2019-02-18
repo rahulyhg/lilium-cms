@@ -1,4 +1,4 @@
-var log = require('./log.js');
+
 var db = require('./includes/db.js');
 var _c = require('./config.js');
 var livevars = require('./livevars.js');

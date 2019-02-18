@@ -22,7 +22,7 @@
 var LMLContext = require('./lmlcontext.js');
 var fileserver = require('./fileserver.js');
 var _c = require('./config.js');
-var log = require('./log.js');
+
 var Petals = require('./petal.js');
 
 var LML = function () {

@@ -1,5 +1,5 @@
 const db = require('./includes/db.js');
-const log = require('./log.js');
+
 const config = require('./config.js');
 const filelogic = require('./filelogic.js');
 const request = require('request');

@@ -2,7 +2,7 @@ var fs = require('fs');
 var _c = require('./config.js');
 var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');
-var log = require('./log.js');
+
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');

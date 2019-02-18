@@ -1,4 +1,4 @@
-const log = require('./log.js');
+
 const hooks = require('./hooks.js');
 const db = require('./includes/db.js');
 const isElder = require('./network/info.js').isElderChild();

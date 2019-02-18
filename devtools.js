@@ -1,4 +1,4 @@
-var log = require('./log.js');
+
 var Admin = require('./backend/admin.js');
 var filelogic = require('./filelogic.js');
 var lml = require('./lml.js');

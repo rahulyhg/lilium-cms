@@ -1,4 +1,4 @@
-var log = require('./log.js');
+
 var db = require('./includes/db.js');
 
 var VariousWrap = function(col, type) {

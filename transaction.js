@@ -1,5 +1,5 @@
 var conf = require('./config.js');
-var log = require('./log.js');
+
 var stripe;
 var transaction = function () {
 

@@ -1,4 +1,4 @@
-const log = require('./log.js');
+
 const _configs = {};
 
 class Config  {

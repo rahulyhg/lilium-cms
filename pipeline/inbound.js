@@ -1,5 +1,5 @@
 const hooks = require('../hooks.js')
-const log = require('../log.js')
+
 const fs = require('fs')
 const metrics = require('../metrics');
 

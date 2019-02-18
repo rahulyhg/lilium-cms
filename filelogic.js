@@ -4,7 +4,7 @@ const _c = require('./config.js');
 const LML = require('./lml.js');
 const LML2 = require('./lml/compiler.js');
 const LML3 = require('./lml3/compiler.js');
-const log = require('./log.js');
+
 const db = require('./includes/db.js');
 const sharedcache = require('./sharedcache.js');
 

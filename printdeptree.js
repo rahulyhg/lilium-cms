@@ -38,7 +38,7 @@ rootFiles.forEach(x => {
 
 let singledep = process.argv[2];
 
-if (singledep && deps[singledep]) {
+if (singledep) {
     console.log("DEPENDENTS OF : " + singledep);
     console.log();
     Object.keys(deps).filter(x => deps[x].includes(singledep)).forEach(x => console.log(x));

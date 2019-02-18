@@ -1,4 +1,3 @@
-const log = require('./log');
 const db = require('./includes/db');
 const request = require('request');
 const config = require('./config');

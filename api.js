@@ -11,7 +11,6 @@ class EndpointMethods {
     }
 }
 
-const log = require('./log.js');
 const db = require('./includes/db.js');
 const endpoints = require('./endpoints.js');
 const sharedcache = require('./sharedcache.js');

@@ -2,7 +2,7 @@ const fs = require('fs');
 const _c = require('./config.js');
 const fileserver = require('./fileserver.js');
 const filelogic = require('./filelogic.js');
-const log = require('./log.js');
+
 const Admin = require('./backend/admin.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');

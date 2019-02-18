@@ -1,5 +1,5 @@
 var _c = require('../config.js');
-var log = require('../log.js');
+
 var metrics = require('../metrics');
 var MongoClient = require('mongodb').MongoClient
 var mongoObjectID = require('mongodb').ObjectID;

@@ -1,7 +1,7 @@
 const db = require('./includes/db');
 const config = require('./config');
 const filelogic = require('./filelogic');
-const log = require('./log');
+
 const CDN = require('./cdn');
 const hooks = require('./hooks');
 const notifications = require('./notifications');

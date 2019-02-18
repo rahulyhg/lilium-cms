@@ -1,4 +1,3 @@
-const log = require('./log.js');
 const Admin = require('./backend/admin.js');
 const LML2 = require('./lml/compiler.js');
 const fileserver = require('./fileserver.js');

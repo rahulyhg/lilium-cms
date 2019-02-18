@@ -1,4 +1,4 @@
-const log = require('./log.js');
+
 const _c = require('./config.js');
 const isElder = require('./network/info.js').isElderChild();
 

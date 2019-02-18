@@ -1,4 +1,4 @@
-var log = require('./log.js');
+
 var _c = require('./config.js');
 
 var BodyClasses = new Object();

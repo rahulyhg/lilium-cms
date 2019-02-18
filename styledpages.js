@@ -3,7 +3,7 @@ const fileserver = require('./fileserver.js');
 const filelogic = require('./filelogic.js');
 const networkinfo = require('./network/info.js');
 const hooks = require('./hooks');
-const log = require('./log.js');
+
 
 class StyledPages {
     constructor() {

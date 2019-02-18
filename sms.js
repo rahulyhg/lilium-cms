@@ -1,5 +1,4 @@
 const request = require('request');
-const log = require('./log');
 const hooks = require('./hooks')
 
 class SMS {

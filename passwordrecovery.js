@@ -1,7 +1,7 @@
 // ⚠️ Sensitive endpoints /accesscheckpoint ⚠️
 const path = require('path');
 const request = require('request');
-const log = require('./log');
+
 const db = require('./includes/db');
 const LML3 = require('./lml3/compiler');
 const sharedcache = require('./sharedcache');

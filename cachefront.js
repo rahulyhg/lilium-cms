@@ -1,4 +1,4 @@
-const log = require('./log');
+
 const sharedcache = require('./sharedcache');
 
 const CACHE_KEY = "cf_";

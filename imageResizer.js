@@ -1,5 +1,5 @@
 var fs = require('fs');
-var log = require('./log.js');
+
 var sizes = require('./imageSize.js');
 var fs = require('fs')
   , gm = require('gm').subClass({imageMagick: true});

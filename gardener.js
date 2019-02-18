@@ -2,8 +2,9 @@ const config = require('./config.js');
 const fileserver = require('./fileserver.js');
 const cluster = require('cluster');
 const RedisServer = require('redis-server');
+const log = require('./log');
 const fs = require('fs');
-const log = require('./log.js');
+
 const { spawn, execSync } = require('child_process');
 
 const garden = {};

@@ -1,4 +1,3 @@
-const log = require('./log.js');
 const fileserver = require('./fileserver.js');
 const filelogic = require('./filelogic.js');
 const nodemailer = require('nodemailer');

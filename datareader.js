@@ -1,4 +1,4 @@
-const log = require('./log')
+
 const filelogic = require('./filelogic')
 const db = require('./includes/db')
 const config = require('./config')

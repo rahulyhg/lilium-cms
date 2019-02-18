@@ -1,4 +1,4 @@
-const log = require('../log');
+
 const db = require('../includes/db');
 const { JSDOM } = require('jsdom');
 

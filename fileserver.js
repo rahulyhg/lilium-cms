@@ -2,7 +2,7 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const _c = require('./config.js');
-const log = require('./log.js');
+
 const minify = require('html-minifier').minify;
 const uglifycss = require('uglifycss');
 const UglifyJS = require("uglify-js");

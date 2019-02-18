@@ -1,5 +1,5 @@
 const Stream = require("stream");
-const log = require('../log.js');
+
 const configs = require('../config.js');
 const lmllib = require('../lmllib.js');
 const Petals = require('../petal.js');

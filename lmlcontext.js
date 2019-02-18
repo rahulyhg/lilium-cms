@@ -1,4 +1,4 @@
-var log = require('./log.js');
+
 var lmllib = require('./lmllib.js');
 var fileserver = require('./fileserver.js');
 

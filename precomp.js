@@ -1,5 +1,5 @@
 var _c = require('./config.js');
-var log = require('./log.js');
+
 var LML = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
 var db = require('./includes/db.js');
@@ -7,7 +7,7 @@ var fileserver = require('./fileserver.js');
 var checksum = require('checksum');
 var compressor = require('node-minify');
 var frontend = require('./frontend.js');
-var log = require('./log.js');
+
 var _c = require('./config.js');
 var hooks = require('./hooks.js');
 

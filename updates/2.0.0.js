@@ -1,5 +1,5 @@
 const db = require('../includes/db');
-const log = require('../log');
+
 const mkdirp = require('mkdirp');
 const configlib = require('../config');
 

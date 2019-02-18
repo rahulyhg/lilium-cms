@@ -1,4 +1,4 @@
-const log = require('../log.js');
+const log = require('../log');
 const fs = require('fs');
 const net = require('net');
 const pathlib = require('path');

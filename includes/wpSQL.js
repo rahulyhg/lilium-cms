@@ -23,7 +23,7 @@ var fetchQuizAnswer = "SELECT * FROM wp_qquiz_quest_answer";
 
 var db = require('./db.js');
 var mysql = require('mysql');
-var log = require('../log.js');
+
 var request = require('request');
 var fs = require('fs');
 var imageSize = require('image-size');

@@ -1,4 +1,3 @@
-var log = require('./log.js');
 var request = require('request');
 var tz = require('moment-timezone');
 

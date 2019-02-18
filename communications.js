@@ -1,4 +1,4 @@
-const log = require('./log.js');
+
 const db = require('./includes/db.js');
 const mail = require('./mail.js');
 const Admin = require('./backend/admin.js');

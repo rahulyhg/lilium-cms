@@ -1,5 +1,4 @@
 // Libraries inclusion
-const log = require('./log.js');
 const db = require('./includes/db.js');
 const sharedcache = require('./sharedcache.js');
 const hooks = require('./hooks.js');

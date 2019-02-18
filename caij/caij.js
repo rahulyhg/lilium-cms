@@ -1,6 +1,6 @@
 const net = require('net');
 
-const log = require('../log.js');
+
 const fileserver = require('../fileserver.js');
 
 const taskscheduler = require('./taskscheduler.js');

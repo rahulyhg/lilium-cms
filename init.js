@@ -1,6 +1,5 @@
 module.exports = function (_ready_) {
     var http = require('http');
-    var log = require('./log');
     var fs = require('fs');
     var port = 8080;
     var qs = require('querystring');

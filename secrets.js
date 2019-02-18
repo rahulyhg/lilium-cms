@@ -1,5 +1,5 @@
 var config = require('./config.js');
-var log = require('./log.js');
+
 var db = require('./includes/db.js');
 var admin = require('./backend/admin.js');
 var filelogic = require('./filelogic.js');

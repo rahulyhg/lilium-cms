@@ -1,5 +1,5 @@
 var _c = configs = require('./config.js');
-var log = require('./log.js');
+
 var db = require('./includes/db.js');
 var filelogic = require('./filelogic.js');
 var CryptoJS = require('crypto-js');
