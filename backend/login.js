@@ -100,7 +100,8 @@ class Login {
             ];
 
             cli.touch("login.authUser@networkcheck");
-            padlock.isUserLocked(usr, locked => {
+            const lockkey = usr + cli.request.headers["user-agent"];
+            padlock.isUserLocked(lockkey, locked => {
                 if (locked) {
                     metrics.plus('failedauth');
                     cli.sendJSON({ error : 'blocked', until : locked, message : 'Blocked until ' + dateformat(new Date(locked), 'HH:MM'), success : false });
@@ -127,7 +128,7 @@ class Login {
                                 });
                             }
                         } else {
-                            padlock.loginFailed(usr, blocked => {
+                            padlock.loginFailed(lockkey, blocked => {
                                 metrics.plus('failedauth');
                                 hooks.fire('user_login_failed', cli);
                                 log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
