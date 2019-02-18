@@ -8,7 +8,7 @@ const log = require('../log.js');
 const api = require('../api.js');
 const metrics = require('../metrics');
 const twoFactor = require('../twoFactor');
-const padlock = require('../padlock');
+const padlock = require('../lib/padlock');
 const dateformat = require('dateformat');
 
 const loginSuccess = (cli, userObj, cb) => {
