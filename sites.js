@@ -14,7 +14,6 @@ var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
 var buildLib = require('./build');
 var events = require('./events.js');
-var various = require('./various.js');
 var mail = require('./mail.js');
 var sharedcache = require('./sharedcache.js');
 var sitemap = require('./lib/sitemap.js');
@@ -245,11 +244,6 @@ var SiteInitializer = function (conf, siteobj) {
         }
     };
 
-    var loadVarious = function(done) {
-        if (!isElder) { return done(); }
-        various.init(conf, done);
-    };
-
     var initEvents = function(cb) {
         log('Sites', "Initializing events", 'info');
         if (!isElder) { return cb(); }
@@ -313,25 +307,23 @@ var SiteInitializer = function (conf, siteobj) {
                             });
                         }
 
-                        loadVarious(function() {
-                            loadTheme(function() {
-                                if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-                                    return done();
-                                }
+                        loadTheme(function() {
+                            if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
+                                return done();
+                            }
 
-                                loadSessions(function() {
-                                    loadRobots(function() {
-                                        update(conf, function() {
-                                            sharedcache.hi();
+                            loadSessions(function() {
+                                loadRobots(function() {
+                                    update(conf, function() {
+                                        sharedcache.hi();
 
-                                            checkForWP(conf);
-                                            hooks.fire('site_initialized', conf);
-                                            log('Sites', 'Initialized site with id ' + conf.id, 'success');
-                                            done();
-                                        });
+                                        checkForWP(conf);
+                                        hooks.fire('site_initialized', conf);
+                                        log('Sites', 'Initialized site with id ' + conf.id, 'success');
+                                        done();
                                     });
-                                });  
-                            });
+                                });
+                            });  
                         });
                     });
                 });

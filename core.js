@@ -56,7 +56,6 @@ class Core {
                 sharedcache : require('./sharedcache'),
                 socialdispatch : require('./socialdispatch'),
                 themes : require('./themes'),
-                various : require('./various')
             };
 
             log('Core', 'Created global library', 'success');
