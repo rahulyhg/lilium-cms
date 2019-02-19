@@ -270,10 +270,10 @@ class PasswordResetForm extends Component {
         if (this.inputValues.oldpassword && this.inputValues.newpassword
             && this.inputValues.newpassword == this.inputValues.confirmnewpassword) {
                 API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
-                    if (!err && data.updated) {
+                    if (!err && (!data.err && data.updated)) {
                         castNotification({ title: 'Password updated', message: 'Successfully updated your password!', type: 'success' });
-                    } else if (!err && !data.updated) {
-                        castNotification({ title: 'Error updating password', message: 'The provided old password is not the good one.', type: 'warning' }); 
+                    } else {
+                        castNotification({ title: 'Error updating password', message: data.err || 'Error updating password', type: 'warning' }); 
                     }
 
                     done && done();
