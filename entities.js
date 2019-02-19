@@ -229,16 +229,30 @@ class Entities {
                     cli.refuse();
                 }
             } else if (cli.routeinfo.path[2] == 'updatePassword') {
-                const old = CryptoJS.SHA256(cli.postdata.data.old).toString(CryptoJS.enc.Hex);
-                const shhh = CryptoJS.SHA256(cli.postdata.data.new).toString(CryptoJS.enc.Hex);
-                const _id = db.mongoID(cli.userinfo.userid);
-
-                db.update(require('./lib/config').default(), 'entities', { _id, shhh : {$ne : shhh}, $or : [{shhh : old}, {mustupdatepassword : true}] }, { shhh, mustupdatepassword : false }, (err, r) => {
-                    log('Entities', 'Updated entity ' + _id + ' : ' + !!r.matchedCount, 'info');
-                    cli.sendJSON({
-                        updated : !!r.matchedCount
+                if (cli.postdata.data.new != cli.postdata.data.old) {
+                    const old = CryptoJS.SHA256(cli.postdata.data.old).toString(CryptoJS.enc.Hex);
+                    const newPWD = CryptoJS.SHA256(cli.postdata.data.new).toString(CryptoJS.enc.Hex);
+                    const _id = db.mongoID(cli.userinfo.userid);
+    
+                    db.findUnique(require('./config').default(), 'entities', { _id: _id }, (err, user) => {
+                        if (!err && user) {
+                            if (old == user.shhh || user.mustupdatepassword) {
+                                db.update(require('./config').default(), 'entities', { _id, shhh : {$ne : newPWD}, $or : [{shhh : old}, {mustupdatepassword : true}] }, { shhh: newPWD, mustupdatepassword : false }, (err, r) => {
+                                    log('Entities', 'Updated entity ' + _id + ' : ' + !!r.matchedCount, 'info');
+                                    cli.sendJSON({
+                                        updated : !!r.matchedCount
+                                    });
+                                });
+                            } else {
+                                cli.sendJSON({ err: "The provided 'old' password was wrong", updated: false });
+                            }
+                        } else {
+                            cli.sendJSON({ err: 'Error fetching user from database for password reset', updated: false });
+                        }
                     });
-                });
+                } else {
+                    cli.sendJSON({ err: "The new password password must be different from the old one", updated: false })
+                }
             } else {
                 switch (cli.postdata.data.form_name) {
                 case "update_profile":
