@@ -6,7 +6,6 @@ var CryptoJS = require('crypto-js');
 var livevars = require('./pipeline/livevars');
 var imageResizer = require('./lib/imageResizer.js');
 var hooks = require('./lib/hooks');
-var preferences = require('./preferences.js');
 
 const PERSONALITIES_ASSOC = {
     none : {displayname : "Unknown"     ,description : "Did not take the personality test" },

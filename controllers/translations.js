@@ -1,7 +1,6 @@
-const vocab = require('./vocab');
+const vocab = require('../lib/vocab');
 
 class Translations {
-
     livevar(cli, levels, params, sendback) {
         if (levels[0] == 'getSupportedLanguages') {
             sendback(vocab.getSupportedLanguages());

@@ -245,7 +245,7 @@ var SiteInitializer = function (conf, siteobj) {
 
                     if (isElder) {
                         log('Sites', 'V4 will load all older URL in cache front', 'info');
-                        const V4 = require('./v4');
+                        const V4 = require('./lib/v4');
                         const v4 = new V4();
                         v4.dumpV3UrlInFront(conf, () => {
                             log('Sites', 'Old URLs will now redirect to new version', 'success');

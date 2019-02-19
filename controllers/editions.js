@@ -1,29 +1,8 @@
-const db = require('./lib/db');
+const db = require('../lib/db');
+const { updatePostsAfterMerge, fieldToRef, getFull } = require('../lib/editions');
 
 const EDITION_COLLECTION = "editions";
 const SECTION_COLLECTION = "sections";
-
-function updatePostsAfterMerge(_c, then, now, done) {
-    let ctn = 0;
-    const processOnePost = cur => {
-        cur.next((err, post) => {
-            if (!post) {
-                log("Editions", "Updated " + ctn + " posts after merging", "success");
-                return done({ postupdated : ctn });
-            }
-
-            ctn++;
-            post.editions[then.level] = now._id;
-            db.update(_c, 'content', { _id : post._id }, { editions : post.editions }, () => setImmediate(() => processOnePost(cur)));
-        });
-    }
-
-    db.find(_c, 'content', { editions : then._id }, [], (err, cur) => processOnePost(cur));
-}
-
-function fieldToRef(field, value) {
-    return field == "icon" || field == "featuredimage" ? db.mongoID(value) : value;
-}
 
 class EditionController {
     adminPOST(cli) {
@@ -308,12 +287,6 @@ class EditionController {
         sendback();
     }
 
-    getFull(_id, sendback) {
-        db.findUnique(cli._c, 'editions', { _id }, (err, ed) => {
-            sendback(ed);
-        });
-    }
-
     livevar(cli, levels, params, done) {
         const act = levels[0];
 
@@ -322,7 +295,7 @@ class EditionController {
                 done(eds);
             });
         } else if (act == "full") {
-            this.getFull(db.mongoID(levels[1]), ed => done(ed));
+            getFull(db.mongoID(levels[1]), ed => done(ed));
         } else if (act == "all") {
             db.findToArray(cli._c, 'sections', {}, (err, sections) => {
                 db.join(cli._c, 'editions', [

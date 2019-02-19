@@ -451,7 +451,7 @@
             "endpoint" : "sharedcache",
             "support" : ["livevar"]
         }, {
-            "module" : "styledpages.js",
+            "module" : "controllers/styledpages.js",
             "endpoint" : "styledpages",
             "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
         }, {
@@ -466,7 +466,7 @@
             "endpoint" : "publishing",
             "support" : ["admin_post", "admin_put", "admin_delete", "get", "livevar"]
         }, {
-            "module" : "contentchains.js",
+            "module" : "controllers/contentchains.js",
             "endpoint" : "chains",
             "support" : ["livevar", "admin_post"]
         }, {
@@ -494,7 +494,7 @@
             "endpoint" : "role",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "preferences.js",
+            "module" : "controllers/preferences.js",
             "endpoint" : "preferences",
             "support" : ["admin_post", "livevar"]
         }, {
@@ -502,7 +502,7 @@
             "endpoint" : "media",
             "support" : ["admin_post", "setup"]
         }, {
-            "module" : "translations.js",
+            "module" : "controllers/translations.js",
             "endpoint" : "translations",
             "support" : ["admin_post", "livevar"]
         }, {
@@ -534,7 +534,7 @@
             "endpoint" : "sites",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "editions.js",
+            "module" : "controllers/editions.js",
             "endpoint" : "editions",
             "support" : ["livevar", "admin_delete", "admin_put", "admin_post"]
         }, {
@@ -558,7 +558,7 @@
             "endpoint" : "creditcards",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
-            "module" : "vocab.js",
+            "module" : "controllers/vocab.js",
             "endpoint" : "vocab",
             "support" : ["admin_post"]
         }, {

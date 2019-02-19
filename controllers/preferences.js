@@ -1,9 +1,7 @@
-
-var db = require('./lib/db.js');
-const _c = require('./lib/config');
+var db = require('../lib/db.js');
+const _c = require('../lib/config');
 
 class Preferences {
-
     adminPOST(cli) {
         cli.touch('Preferences.adminPOST');
         if (cli.routeinfo.path[2] == 'updatePreference') {

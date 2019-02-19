@@ -1,7 +1,7 @@
 const hooks = require('./lib/hooks');
 const db = require('./lib/db.js');
 const isElder = require('./network/info.js').isElderChild();
-const V4 = require('./v4');
+const V4 = require('./lib/v4');
 const OS = require('os');
 const ShellServer = require('./cli/server');
 const metrics = require('./lib/metrics');
@@ -45,7 +45,6 @@ class Core {
                 LML3 : require('./lml3/compiler'),
                 LML2 : require('./lml/lml'),
                 notifications : require('./notifications'),
-                preferences : require('./preferences'),
                 scheduler : require('./lib/scheduler'),
                 search : require('./search'),
                 sharedcache : require('./lib/sharedcache'),
@@ -419,7 +418,7 @@ const redirectIfInit = (resp, cb) => {
 };
 
 const loadVocab = (done) => {
-    const vocab = require('./vocab.js');
+    const vocab = require('./lib/vocab.js');
     vocab.preloadDicos(done);
 };
 
