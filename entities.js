@@ -5,9 +5,8 @@ const filelogic = require('./pipeline/filelogic');
 var CryptoJS = require('crypto-js');
 var livevars = require('./pipeline/livevars');
 var imageResizer = require('./lib/imageResizer.js');
-var hooks = require('./hooks.js');
+var hooks = require('./lib/hooks');
 var preferences = require('./preferences.js');
-var feed = require('./feed.js');
 
 const PERSONALITIES_ASSOC = {
     none : {displayname : "Unknown"     ,description : "Did not take the personality test" },
@@ -180,14 +179,6 @@ class Entities {
         db.update(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, dat, function() {
             cli.postdata.data.usr = cli.userinfo.user;
             cli.postdata.data.psw = cli.postdata.data.password;
-
-            db.findToArray(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
-                feed.push(cli.userinfo.userid, cli.userinfo.userid, 'welcomed', cli._c.id, {
-                    displayname : dat.displayname,
-                    avatarURL : arr[0].avatarURL,
-                    job : dat.jobtitle
-                });
-            }, {avatarURL : 1});
 
             cli.did("auth", "welcome");
             require('./backend/login.js').authUser(cli);

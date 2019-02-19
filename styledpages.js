@@ -1,7 +1,7 @@
 const db = require('./lib/db.js');
 const filelogic = require('./pipeline/filelogic');
 const networkinfo = require('./network/info.js');
-const hooks = require('./hooks');
+const hooks = require('./lib/hooks');
 
 class StyledPages {
     constructor() {

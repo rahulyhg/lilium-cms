@@ -10,7 +10,7 @@ const AdminMenus = [];
 const filelogic = require('../pipeline/filelogic');
 const LML2 = require('../lml/compiler.js');
 const LML3 = require('../lml3/compiler');
-const hooks = require('../hooks.js');
+const hooks = require('../lib/hooks');
 
 class AdminMenu {
     constructor() {

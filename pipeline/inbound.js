@@ -1,4 +1,4 @@
-const hooks = require('../hooks.js')
+const hooks = require('../lib/hooks')
 
 const fs = require('fs')
 const metrics = require('../lib/metrics');

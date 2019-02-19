@@ -22,11 +22,11 @@
 - Include custom articles published from a different page
 */
 
-const Analytics = require('./analytics');
+const Analytics = require('./lib/analytics');
 const db = require('./lib/db');
-const dashboard = require('./dashboard');
+const dashboard = require('./lib/dashboard');
 const dateformat = require('dateformat');
-const hooks = require('./hooks')
+const hooks = require('./lib/hooks')
 
 const SERVER_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
 
@@ -77,7 +77,7 @@ class TheDailyLilium {
                             } }
                         ], decorations => {
                             log('DailyLilium', "Fetched all new decorations with full author", 'detail');
-                            const { DEFAULT_BADGES_ASSOC, BADGE_LEVEL_TEXT } = require('./badges').getDecorationSettings();
+                            const { DEFAULT_BADGES_ASSOC, BADGE_LEVEL_TEXT } = require('./lib/badges').getDecorationSettings();
                             report.decorations = decorations;
                             decorations.forEach(x => {
                                 x.reason = DEFAULT_BADGES_ASSOC[x.slug].reason.replace('<n>', DEFAULT_BADGES_ASSOC[x.slug].levels[x.level]);

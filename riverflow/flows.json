@@ -353,7 +353,7 @@
             "endpoint" : "notifications",
             "support" : ["admin_post"]
         }, {
-            "module" : "googlemaps.js",
+            "module" : "controllers/googlemaps.js",
             "endpoint" : "googlemaps",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
@@ -381,14 +381,6 @@
             "endpoint" : "darksky",
             "support" : ["livevar", "setup"]
         }, {
-            "module" : "reporting.js",
-            "endpoint" : "r",
-            "support" : ["livevar", "get", "setup"]
-        }, {
-            "module" : "instagram.js",
-            "endpoint" : "instagram",
-            "support" : ["livevar", "get"]
-        }, {
             "module" : "fix.js",
             "endpoint" : "fix",
             "support" : ["livevar","admin_post"]
@@ -397,7 +389,7 @@
             "endpoint" : "plugins",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "flagging.js",
+            "module" : "controllers/flagging.js",
             "endpoint" : "flagging",
             "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"]
         }, {
@@ -413,11 +405,11 @@
             "endpoint" : "themes",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "dashboard.js",
+            "module" : "controllers/dashboard.js",
             "endpoint" : "dashboard",
             "support" : ["livevar"]
         }, {
-            "module" : "analytics.js",
+            "module" : "controllers/analytics.js",
             "endpoint" : "googleanalytics",
             "support" : ["livevar", "setup", "get"],
             "hooks" : [
@@ -432,7 +424,7 @@
             "endpoint" : "buildcss",
             "support" : ["admin_post"]
         }, {
-            "module" : "communications.js",
+            "module" : "controllers/communications.js",
             "endpoint" : "communications",
             "support" : ["admin_post", "livevar"]
         }, {
@@ -447,7 +439,7 @@
             "endpoint" : "snips",
             "support" : []
         }, {
-            "module" : "devtools.js",
+            "module" : "controllers/devtools.js",
             "endpoint" : "devtools",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
@@ -458,10 +450,6 @@
             "module" : "lib/sharedcache.js",
             "endpoint" : "sharedcache",
             "support" : ["livevar"]
-        }, {
-            "module" : "feed.js",
-            "endpoint" : "feed",
-            "support" : ["setup","livevar"]
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
@@ -498,7 +486,7 @@
             "endpoint" : "metrics",
             "support" : ["livevar"]
         }, {
-            "module" : "entityrelationship.js",
+            "module" : "controllers/entityrelationship.js",
             "endpoint" : "entityrelationship",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
@@ -518,7 +506,7 @@
             "endpoint" : "translations",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "badges.js",
+            "module" : "controllers/badges.js",
             "endpoint" : "decorations",
             "support" : ["setup", "livevar", "admin_post"]
         }, {
@@ -558,11 +546,11 @@
             "endpoint" : "settings",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "contractorspayments.js",
+            "module" : "controllers/contractorspayments.js",
             "endpoint" : "contractorspayments",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "contractorspayments.js",
+            "module" : "controllers/contractorspayments.js",
             "endpoint" : "contractorinvoice",
             "support" : ["get"]
         }, {
@@ -574,7 +562,7 @@
             "endpoint" : "vocab",
             "support" : ["admin_post"]
         }, {
-            "module" : "contractorsreports.js",
+            "module" : "controllers/contractorsreports.js",
             "endpoint" : "contractorsreports",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }

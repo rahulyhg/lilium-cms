@@ -1,4 +1,4 @@
-const db = require('./lib/db');
+const db = require('../lib/db');
 
 const LIVEVAR_POSTER_LOOKUP = {
     from : "fbusers",

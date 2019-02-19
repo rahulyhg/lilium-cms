@@ -1,11 +1,9 @@
-const filelogic = require('./pipeline/filelogic');
-const db = require('./lib/db');
-const _c = require('./lib/config');
+const filelogic = require('../pipeline/filelogic');
+const db = require('../lib/db');
+const _c = require('../lib/config');
 const dateFormat = require('dateformat');
-const Money = require("./lib/money");
-const request = require('request');
-const CryptoJS = require('crypto-js');
-const twoFactor = require('./lib/twoFactor');
+const Money = require("../lib/money");
+const twoFactor = require('../lib/twoFactor');
 
 const money = new Money();
 
@@ -23,50 +21,6 @@ const STATUSES = {
 };
 
 class ContractorHandler {
-    stripeCallback(cli) {
-        if (cli.userinfo && cli.userinfo.loggedin && cli.routeinfo.params.code) {
-            const userid = db.mongoID(cli.userinfo.userid);
-            const code = cli.routeinfo.params.code;
-
-            log('Stripe', 'Received OAuth code ' + code, 'success');
-
-            request({
-                method : "POST",
-                form : {
-                    code,
-                    client_secret : money.getConfig().sk,
-                    grant_type : "authorization_code"
-                },
-                uri : "https://connect.stripe.com/oauth/token"
-            }, (err, resp, text) => {
-                const stripejson = JSON.parse(text);
-
-                if (stripejson.error) {
-                    log('Stripe', stripejson.error_description, 'err');
-                    return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/admin/stripeerror");
-                }
-
-                db.update(require(liliumroot + "/config").default(), 'entities', {
-                    _id : userid 
-                }, { 
-                    stripecode : code,
-                    stripetoken : stripejson.access_token,
-                    striperefresh : stripejson.refresh_token,
-                    stripeuserid : stripejson.stripe_user_id,
-                    stripepk : stripejson.stripe_publishable_key,
-
-                    stripeoauth : true,
-                    stripeauthfrom : cli._c.server.protocol + cli._c.server.url,
-                    stripecodeat : new Date()
-                }, (err, r) => {
-                    cli.redirect(cli._c.server.protocol + cli._c.server.url + "/admin/contractordash");
-                });
-            });
-        } else {
-            cli.throwHTTP(404);
-        }
-    }
-
     GET(cli) {
         if (!cli.isLoggedIn || !cli.routeinfo.path[1] || isNaN(cli.routeinfo.path[1])) {
             return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
@@ -77,13 +31,13 @@ class ContractorHandler {
             $match.to = db.mongoID(cli.userinfo.userid);
         }
 
-        db.findUnique(require(liliumroot + "/config").default(), 'contractorinvoices', $match, (err, invoice) => {
+        db.findUnique(require("../lib/config").default(), 'contractorinvoices', $match, (err, invoice) => {
             if (!invoice) {
                 return cli.throwHTTP(404, undefined, true);
             }
             
             db.findUnique(
-                require(liliumroot + "/config").default(), 
+                require("../lib/config").default(), 
                 'entities', 
                 { _id : invoice.to },
             (err, contractor) => {
@@ -96,18 +50,6 @@ class ContractorHandler {
                     }
                 );
             });
-        });
-    }
-
-    adminEditArticlePost(cli) {
-        if (!cli.hasRight("manage-contractors")) {
-            return cli.refuse();
-        }
-        
-        require(liliumroot + "/config").each((_c, next) => {
-            db.update(_c, 'content', { _id : db.mongoID(cli.routeinfo.path[2]) }, { worth : parseInt(cli.postdata.data.worth) }, () => next());
-        }, () => {
-            cli.sendJSON({ok : 1});
         });
     }
 
@@ -132,7 +74,7 @@ class ContractorHandler {
                 money.dispatchPending(dat.ids, db.mongoID(cli.userinfo.userid), () => {
                     require(liliumroot + "/notifications").notifyUser(
                         cli.userinfo.userid, 
-                        require(liliumroot + "/config").default(),
+                        require("../lib/config").default(),
                         {done : true},
                         "managecontractors"
                     );
@@ -152,38 +94,6 @@ class ContractorHandler {
         } else {
             cli.refuse();
         }
-    }
-
-    generateInvoicePage(cli) {
-        if (!cli.isLoggedIn || !cli.routeinfo.path[1] || isNaN(cli.routeinfo.path[1])) {
-            return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
-        }
-
-        const $match = { number : parseInt(cli.routeinfo.path[1]) };
-        if (!cli.hasRight('manage-contractors')) {
-            $match.to = db.mongoID(cli.userinfo.userid);
-        }
-
-        db.findUnique(require(liliumroot + "/config").default(), 'contractorinvoices', $match, (err, invoice) => {
-            if (!invoice) {
-                return cli.throwHTTP(404, undefined, true);
-            }
-            
-            db.findUnique(
-                require(liliumroot + "/config").default(), 
-                'entities', 
-                { _id : invoice.to },
-            (err, contractor) => {
-                require(liliumroot + "/lml3/compiler").compile(
-                    cli._c, 
-                    liliumroot + "/backend/dynamic/invoice.lml3",
-                    { invoice, contractor },
-                    markup => {
-                        cli.sendHTML(markup, 200);
-                    }
-                );
-            });
-        });
     }
 
     livevarManage(cli, levels, params, sendback) {
@@ -315,7 +225,7 @@ class ContractorHandler {
                 return sendback([]);
             }
 
-            db.join(require(liliumroot + "/config").default(), 'contractorinvoices', [
+            db.join(require("../lib/config").default(), 'contractorinvoices', [
                 { $sort : { _id : -1 } },
                 { $lookup : {
                     from : "entities", 
@@ -343,7 +253,7 @@ class ContractorHandler {
                 }
             ], items => sendback(items));
         } else if (levelone == "code") {
-            db.findUnique(require(liliumroot + "/config").default(), 'entities', { 
+            db.findUnique(require("../lib/config").default(), 'entities', { 
                 _id : db.mongoID(cli.userinfo.userid) 
             }, (err, entity) => {
                 sendback(entity);

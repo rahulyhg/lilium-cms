@@ -30,7 +30,7 @@
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const config = require('../lib/config');
-const hooks = require('../hooks');
+const hooks = require('../lib/hooks');
 
 const CAKEPOP_COLLECTION = "cakepops";
 

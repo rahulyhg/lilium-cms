@@ -2,7 +2,7 @@
 const db = require('./lib/db.js');
 const filelogic = require('./pipeline/filelogic');
 const config = require('./lib/config');
-const hooks = require('./hooks.js');
+const hooks = require('./lib/hooks');
 
 const PRIORITIES = {
     "0" : "Level 0 : Whenever",

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Babel = require("babel-core");
 const webpack = require('webpack');
-const hooks = require('../hooks');
+const hooks = require('../lib/hooks');
 
 const init_build_tree = [];
 const WEBPACK_CACHE = {};

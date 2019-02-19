@@ -1,4 +1,4 @@
-const hooks = require('../hooks.js');
+const hooks = require('../lib/hooks');
 const config = require('../lib/config'); 
 
 const metrics = require('../lib/metrics');

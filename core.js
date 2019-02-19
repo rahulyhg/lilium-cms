@@ -1,4 +1,4 @@
-const hooks = require('./hooks.js');
+const hooks = require('./lib/hooks');
 const db = require('./lib/db.js');
 const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./v4');
@@ -37,7 +37,7 @@ class Core {
 
             global.core = {
                 filelogic : require('./pipeline/filelogic'),
-                hooks : require('./hooks'),
+                hooks : require('./lib/hooks'),
                 entities : require('./entities'),
                 livevars : require('./pipeline/livevars'),
                 API : require('./pipeline/api'),
@@ -62,7 +62,6 @@ class Core {
             loadStandardInput();
             loadImageSizes();
             loadLiveVars();
-            loadLMLLibs();
             loadAudiences();
             loadBackendSearch();
             
@@ -325,7 +324,7 @@ const loadStandardInput = () => {
 
 const loadCacheInvalidator = () => {
     log("CacheInvalidator", 'Initializing cacheInvalidator', 'info');
-    const cacheInvalidator = require('./cacheInvalidator.js');
+    const cacheInvalidator = require('./lib/cacheInvalidator.js');
     cacheInvalidator.init(() => {
         log("CacheInvalidator", 'Ready to invalidate cached files', 'success');
     });
@@ -398,13 +397,6 @@ const loadWebsites = (loadEverything) => {
             prepareDefaultSiteCreation(loadEverything);
         }
     });
-};
-
-const loadLMLLibs = () => {
-    hooks.trigger('will_load_core_lml_libs');
-    const dashboard = require('./dashboard.js');
-    dashboard.registerLMLLib();
-    hooks.trigger('loaded_core_lml_libs');
 };
 
 const redirectIfInit = (resp, cb) => {

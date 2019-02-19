@@ -9,7 +9,7 @@ var htmlserver = require('./htmlserver.js');
 var db = require('../lib/db.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
-const hooks = require('../hooks');
+const hooks = require('../lib/hooks');
 const mediaUpload = require('./mediaupload');
 
 var Handler = function () {

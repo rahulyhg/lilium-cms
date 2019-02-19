@@ -2,7 +2,7 @@ const config = require('../lib/config');
 const Admin = require('../backend/admin.js');
 const Livevar = require('../pipeline/livevars.js');
 const Endpoints = require('../pipeline/endpoints.js');
-const Hooks = require('../hooks.js');
+const Hooks = require('../lib/hooks');
 const CAIJ = require('../caij/caij.js');
 const API = require('../pipeline/api.js');
 

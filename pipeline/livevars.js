@@ -21,7 +21,7 @@
 
 var db = require('../lib/db.js');
 
-var hooks = require('../hooks.js');
+var hooks = require('../lib/hooks');
 const metrics = require('../lib/metrics');
 
 var RegisteredLiveVariables = {}; 

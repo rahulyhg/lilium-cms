@@ -1,8 +1,8 @@
 const googleMapsClient = require('@google/maps');
 const xxh = require('xxhashjs')
-const db = require('./lib/db.js');
-const _c = require('./lib/config');
-const cacheServer = require('./lib/sharedcache');
+const db = require('../lib/db.js');
+const _c = require('../lib/config');
+const cacheServer = require('../lib/sharedcache');
 
 const GM_CACHE_COLLECTION = 'googleplacescache';
 const GM_CACHE_PREFIX = 'gm_query_autocomplete';
@@ -79,7 +79,7 @@ class GoogleMapsController {
     }
 
     initClient() {
-        const apiKey = require('../keys/placesapi.json').key;
+        const apiKey = require('../../keys/placesapi.json').key;
         if (!apiKey) throw new Error('Google Maps API key was null');
         this.googleClient = googleMapsClient.createClient({
             key: apiKey

@@ -1,7 +1,7 @@
 
 const db = require('./lib/db.js');
 const config = require('./lib/config');
-const hooks = require('./hooks');
+const hooks = require('./lib/hooks');
 
 const PROJECTION = {
     title : 1, subtitle : 1, media : 1, editions : 1, status : 1, date : 1, author : 1, _id : 1 
