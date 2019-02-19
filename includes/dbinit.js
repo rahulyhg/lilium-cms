@@ -4,7 +4,7 @@
     
     Creates all required collections in MongoDB for Lilium to run.
 */
-var log = require('../log.js');
+
 
 var mongoDocuments = {
 	names : [

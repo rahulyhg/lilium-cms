@@ -1,12 +1,10 @@
-const log = require('../log.js');
-const fileserver = require('../fileserver.js');
-const config = require('../config.js');
+const config = require('../lib/config');
 const Admin = require('../backend/admin.js');
-const Livevar = require('../livevars.js');
-const Endpoints = require('../endpoints.js');
-const Hooks = require('../hooks.js');
+const Livevar = require('../pipeline/livevars.js');
+const Endpoints = require('../pipeline/endpoints.js');
+const Hooks = require('../lib/hooks');
 const CAIJ = require('../caij/caij.js');
-const API = require('../api.js');
+const API = require('../pipeline/api.js');
 
 const isElder = require('../network/info.js').isElderChild();
 

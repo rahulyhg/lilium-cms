@@ -1,5 +1,5 @@
-const db = require('../includes/db.js');
-const config = require('../config.js');
+const db = require('../lib/db.js');
+const config = require('../lib/config');
 
 module.exports = (_c, done) => {
     db.createCollection(_c, 'socialaccounts', () => {

@@ -9,7 +9,7 @@ const configs = {};
 class DataServer {
     start() {
         const dirpath = path.join(liliumroot, 'sites')
-        const files = fs.readdirSync(dirpath);
+        const files = fs.readdirSync(dirpath).filter(x => x.endsWith('.json'));
         
         files.forEach(f => {
             const _c = require(path.join(dirpath, f));

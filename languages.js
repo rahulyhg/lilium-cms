@@ -1,4 +1,4 @@
-const db = require('./includes/db');
+const db = require('./lib/db');
 
 const SL_COLLECTION = 'supportedlanguages';
 const ALL_LANGUAGES = require('./lists/languages');

@@ -1,5 +1,4 @@
-const log = require('../log.js');
-const metrics = require('../metrics');
+const metrics = require('../lib/metrics');
 
 // Documentation : https://docs.google.com/document/d/1CNue3XC7tBQbr1BnBQaQUxkKCPF6qidOW7lgvZe3ets/edit?usp=sharing
 const LMLConst = {
@@ -117,10 +116,10 @@ class LMLContext {
     loadLibraries() {
         this.libs = {
             encodec : require('entities'),
-            app : require('../build').getAppScript,
-            cdn : require('../cdn'),
+            app : require('../make/build').getAppScript,
+            cdn : require('../lib/cdn'),
             slugify : require('slugify'),
-            fileio : require('../fileserver.js'),
+            fileio : require('../pipeline/filelogic.js'),
             encode : x => (x && x.replace ? x.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") : x),
             snip : (snipid, ...args) => require('../themes').renderSnip(this._c, snipid, args)
         };

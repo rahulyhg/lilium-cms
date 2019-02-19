@@ -1,6 +1,6 @@
 const CryptoJS = require('crypto-js');
-const db = require(liliumroot + '/includes/db');
-const configLib = require(liliumroot + '/config');
+const db = require(liliumroot + '/lib/db');
+const configLib = require(liliumroot + '/lib/config');
 
 const cleanCollections = (collections, then) => {
     let index = -1;

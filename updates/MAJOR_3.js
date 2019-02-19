@@ -1,5 +1,5 @@
 // Libraries
-const db = require('../includes/db');
+const db = require('../lib/db');
 
 // Call stack
 const remodalPonglinks = (_c, done) => {
@@ -53,7 +53,7 @@ const remodalEntities = done => {
         cur.hasNext((err, hasnext) => {
             hasnext ? cur.next((err, entity) => {
                 if (Array.isArray(entity.reportsto)) {
-                    db.update(require('../config').default(), 'entities', { _id : entity._id }, { reportsto : db.mongoID(entity.reportsto[0]) }, () => {
+                    db.update(require('../lib/config').default(), 'entities', { _id : entity._id }, { reportsto : db.mongoID(entity.reportsto[0]) }, () => {
                         setTimeout(() => doOne(cur), 0);
                     });
                 } else {
@@ -63,7 +63,7 @@ const remodalEntities = done => {
         });
     };
 
-    db.find(require('../config').default(), 'entities', { reportsto : { $exists : 1 } }, [], (err, cur) => {
+    db.find(require('../lib/config').default(), 'entities', { reportsto : { $exists : 1 } }, [], (err, cur) => {
         doOne(cur);
     });
 };

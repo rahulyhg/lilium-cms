@@ -6,7 +6,7 @@ class ShellSession {
         this.at = new Date();
         this.id = Math.random().toString(16).substring(2);
 
-        this._c = require('../config').default();
+        this._c = require('../lib/config').default();
     }
 
     setConfig(_c) {

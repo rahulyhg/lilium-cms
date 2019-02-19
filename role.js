@@ -1,13 +1,12 @@
-var config = require('./config.js');
-var filelogic = require('./filelogic.js');
-var conf = require('./config.js');
-var db = require('./includes/db.js');
+var config = require('./lib/config');
+const filelogic = fs = require('./pipeline/filelogic');
+var conf = require('./lib/config');
+var db = require('./lib/db.js');
 var mongo = require('mongodb');
-var livevars = require('./livevars.js');
-var fs = require('./fileserver.js');
+var livevars = require('./pipeline/livevars');
 var notification = require('./notifications.js');
 var sites = require('./sites.js');
-var sharedcache = require('./sharedcache.js');
+var sharedcache = require('./lib/sharedcache.js');
 
 var Role = function () {
     this.adminPOST = function (cli) {

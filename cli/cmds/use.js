@@ -1,4 +1,4 @@
-const configlib = require(liliumroot + '/config');
+const configlib = require(liliumroot + '/lib/config');
 const MESSAGES = require('../messages');
 
 module.exports = function(session, sitename) {

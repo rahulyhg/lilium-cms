@@ -1,5 +1,5 @@
-const log = require('../log');
-const db = require('../includes/db');
+
+const db = require('../lib/db');
 const { JSDOM } = require('jsdom');
 
 module.exports = (_c, done) => {

@@ -23,12 +23,12 @@ var fetchQuizAnswer = "SELECT * FROM wp_qquiz_quest_answer";
 
 var db = require('./db.js');
 var mysql = require('mysql');
-var log = require('../log.js');
+
 var request = require('request');
 var fs = require('fs');
 var imageSize = require('image-size');
 var imageResizer = require('../imageResizer.js');
-var conf = require('../config.js');
+var conf = require('../lib/config');
 
 // Wordpress ID => Lilium Mongo ID
 var cachedUsers = new Object();
@@ -412,8 +412,8 @@ var ftPosts = function(siteid, mysqldb, done) {
 
 var ftUploads = function(siteid, mysqldb, done) {
     var Media = require('../media.js');
-    var cconf = require('../config.js').fetchConfig(siteid);
-    var fu = require('../fileserver.js');
+    var cconf = require('../lib/config').fetchConfig(siteid);
+    const fu = require('./pipeline/filelogic');
 
     var oUrl = cconf.wordpress.originalurl;
     if (oUrl.charAt(oUrl.length-1) == "/") {
@@ -619,7 +619,7 @@ var WordpressSQLToLiliumMongo = function() {
             log('WP', 'Background work starting now');
             setTimeout(function() {
                 runTasks(siteid, mdb, function() {
-                    var Configs = require('../config.js');
+                    var Configs = require('../lib/config');
                     var siteConf = Configs.fetchConfig(siteid);
                     siteConf.wptransferring = false;
                     siteConf.wptransfer = true;

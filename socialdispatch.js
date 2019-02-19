@@ -1,11 +1,11 @@
-const db = require('./includes/db.js');
-const log = require('./log.js');
-const config = require('./config.js');
-const filelogic = require('./filelogic.js');
+const db = require('./lib/db.js');
+
+const config = require('./lib/config');
+const filelogic = require('./pipeline/filelogic');
 const request = require('request');
-const articleLib = require('./content.js');
+const articleLib = require('./lib/content.js');
 const searchLib = require('./search.js');
-const sharedcache = require('./sharedcache.js');
+const sharedcache = require('./lib/sharedcache.js');
 
 const CAIJ = require('./caij/caij.js');
 

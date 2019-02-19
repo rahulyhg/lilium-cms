@@ -1,4 +1,4 @@
-const config = require('../config.js');
+const config = require('../lib/config');
 
 module.exports = (conf, done) => {
     conf.MIMES[".xml"] = "text/xml; charset=utf-8";

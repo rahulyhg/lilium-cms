@@ -1,8 +1,8 @@
 const Request = require('../request');
 const Test = require('../test');
 const CryptoJS = require('crypto-js');
-const db = require(liliumroot + '/includes/db');
-const configLib = require(liliumroot + '/config');
+const db = require(liliumroot + '/lib/db');
+const configLib = require(liliumroot + '/lib/config');
 const base32Encode = require('base32-encode');
 const otplib = require('otplib');
 

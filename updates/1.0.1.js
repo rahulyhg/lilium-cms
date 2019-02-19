@@ -1,5 +1,5 @@
-const db = require("../includes/db.js");
-const log = require("../log.js");
+const db = require("../lib/db.js");
+
 
 module.exports = (conf, done) => {
     log("Update", "Creating Styled Pages collection");

@@ -1,5 +1,3 @@
-const log = require('../log.js');
-
 const tasks = [];
 
 class TaskScheduler {

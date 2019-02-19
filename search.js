@@ -1,7 +1,7 @@
-const log = require('./log.js');
-const db = require('./includes/db.js');
-const config = require('./config.js');
-const hooks = require('./hooks');
+
+const db = require('./lib/db.js');
+const config = require('./lib/config');
+const hooks = require('./lib/hooks');
 
 const PROJECTION = {
     title : 1, subtitle : 1, media : 1, editions : 1, status : 1, date : 1, author : 1, _id : 1 
@@ -212,12 +212,6 @@ class ContentSearch {
     }
 
     setup() {
-        require('./petal.js').register(
-            'dashboardSearch', 
-            require('./config.js').default().server.base + "backend/dynamic/dashsearch.petal"
-        );
-
-        // require('./dashboard.js').registerDashPetal("dashboardSearch", 300);
     }
 }
 

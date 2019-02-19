@@ -1,8 +1,6 @@
 const taskscheduler = require('./taskscheduler.js');
 const executor = require('./executor.js');
 
-const log = require('../log.js');
-
 const oneSecond = 1000;
 const oneMinute = oneSecond * 60;
 const halfHour = oneMinute * 30;
@@ -116,7 +114,7 @@ class AI {
                 extra : {
                     origin : "AI",
                     action : "init",
-                    _c : require("../config.js").default()
+                    _c : require('../lib/config').default()
                 }
             });
         };
@@ -155,12 +153,6 @@ class AI {
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
         ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
         
-        /*
-        ai.statsemailInterval = require('../scheduler.js').schedule("CAIJ_StatEmail_Networkwide", {
-            runat : Knowledge.sendEmailAt
-        }, createStatsEmailTask).start();
-        */
-
         createHomepageTask();
         createFacebookTask();
         createSocialDispatchTask();
@@ -168,7 +160,7 @@ class AI {
         createFiller3daysTask();
         createHotTask();
 
-        ai.thedailyliliumInterval = require('../scheduler.js').schedule("CAIJ_The_Daily_Lilium", {
+        ai.thedailyliliumInterval = require('../lib/scheduler.js').schedule("CAIJ_The_Daily_Lilium", {
             runat : Knowledge.theDailyLiliumAt
         }, generateTheDailyLilium).start();
     }

@@ -1,28 +1,22 @@
-var config = require('./config.js');
-var log = require('./log.js');
-var livevars = require('./livevars.js');
-var fileserver = require('./fileserver.js');
-var filelogic = require('./filelogic.js');
-var analytics = require('./analytics.js');
-var db = require('./includes/db.js');
+var config = require('./lib/config');
+
+var livevars = require('./pipeline/livevars');
+const filelogic = require('./pipeline/filelogic');
+var analytics = require('./lib/analytics.js');
+var db = require('./lib/db.js');
 var fs = require('fs');
-var Precompiler = require('./precomp.js');
-var Frontend = require('./frontend.js');
-var hooks = require('./hooks.js');
-var themes = require('./themes.js');
-var endpoints = require('./endpoints.js');
-var sessions = require('./session.js');
-var buildLib = require('./build');
-var events = require('./events.js');
-var various = require('./various.js');
+var hooks = require('./lib/hooks');
+var themes = require('./lib/themes.js');
+var endpoints = require('./pipeline/endpoints.js');
+var sessions = require('./lib/session.js');
+var buildLib = require('./make/build');
 var mail = require('./mail.js');
-var sharedcache = require('./sharedcache.js');
-var sitemap = require('./sitemap.js');
-var analytics = require('./analytics.js');
-var adslib = require('./ads');
+var sharedcache = require('./lib/sharedcache.js');
+var sitemap = require('./lib/sitemap.js');
+var adslib = require('./lib/ads');
 var roles = require('./role');
-var metrics = require('./metrics');
-var V4DevServer = require('./v4devserver');
+const metrics = require('./lib/metrics');
+var V4DevServer = require('./make/v4devserver');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -38,18 +32,18 @@ var SiteInitializer = function (conf, siteobj) {
     var loadHTMLStructure = function (done) {
         if (!isElder) { return done(); }
 
-        fileserver.createDirIfNotExists(conf.server.html, function (valid) {
-            fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
-                fileserver.createDirIfNotExists(conf.server.html + "/amp", function(nextvalid) {
-                    fileserver.createDirIfNotExists(conf.server.html + "/api", function(nextvalid) {
+        filelogic.createDirIfNotExists(conf.server.html, function (valid) {
+            filelogic.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
+                filelogic.createDirIfNotExists(conf.server.html + "/amp", function(nextvalid) {
+                    filelogic.createDirIfNotExists(conf.server.html + "/api", function(nextvalid) {
                         if (valid && nextvalid) {
-                            log('FileServer',
+                            log('filelogic',
                                 'HTML Directory was validated at : ' +
                                 conf.server.html,
                                 'success'
                             );
                         } else {
-                            log('FileServer', 'Error validated html directories', 'err');
+                            log('filelogic', 'Error validated html directories', 'err');
                         }
                 
                         done();
@@ -65,34 +59,34 @@ var SiteInitializer = function (conf, siteobj) {
         log('Sites', 'Initializing symlinks', 'info');
         var to = conf.server.html + '/static';
         var rootDir = conf.server.base + 'backend/static/';
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/uploads';
         rootDir = conf.server.base + 'backend/static/uploads/';
         mkdirp.sync(rootDir);
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/u';
         rootDir = conf.server.base + 'backend/static/u/';
         mkdirp.sync(rootDir);
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/webfonts';
         rootDir = conf.server.base + 'backend/static/webfonts/';
         mkdirp.sync(rootDir);
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/tinymce';
         rootDir = conf.server.base + "node_modules/tinymce/";
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/flatpickr';
         rootDir = conf.server.base + "node_modules/flatpickr/dist";
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/chartjs';
         rootDir = conf.server.base + "node_modules/chart.js/dist";
-        fileserver.createSymlinkSync(rootDir, to);
+        filelogic.createSymlinkSync(rootDir, to);
 
         done();
     };
@@ -135,49 +129,6 @@ var SiteInitializer = function (conf, siteobj) {
         db.testConnection(conf, function (err) {
             hooks.fire('dbtest', err);
             dbinit();
-        });
-    };
-
-    this.precompile = function (done) {
-        if (!isElder) { return done(); }
-
-        var base = conf.server.base;
-        var htmlbase = conf.server.html;
-
-        log('SiteInitializer', "Registering admin default frontend JS and CSS", 'info');
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/const.js", 100, "admin", conf.id);
-
-        const pathLib = require('path');
-        buildLib.pushToBuildTree(conf, 'lilium', 'lilium', {
-            outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
-            babel : {
-                "plugins": [
-                    ["transform-react-jsx", { "pragma":"h" }],
-                    ["transform-class-properties"],
-                    ["@babel/plugin-proposal-object-rest-spread", {
-                        useBuildIns : true
-                    }],
-                ],
-                "presets" : [
-                    [ "@babel/preset-env" ]
-                ]
-            },
-            dontOverwite : true
-        });
-
-        this.v4devserver = new V4DevServer(conf);
-        this.v4devserver.start();
-
-        hooks.fireSite(conf, 'frontend_will_precompile', {
-            config: conf,
-            Frontend: Frontend
-        });
-        Precompiler.precompile(conf, function () {
-            hooks.fireSite(conf, 'frontend_precompiled', {
-                config: conf,
-                Frontend
-            });
-            done();
         });
     };
 
@@ -233,7 +184,7 @@ var SiteInitializer = function (conf, siteobj) {
         if (!isElder) { return cb(); }
         roles.loadRolesInCache(() => {
             sessions.initSessionsFromDatabase(conf, () => {
-                require('./api.js').loadSessionsInCache(cb);
+                require('./pipeline/api.js').loadSessionsInCache(cb);
             });
         });
     };
@@ -245,20 +196,9 @@ var SiteInitializer = function (conf, siteobj) {
         }
     };
 
-    var loadVarious = function(done) {
-        if (!isElder) { return done(); }
-        various.init(conf, done);
-    };
-
-    var initEvents = function(cb) {
-        log('Sites', "Initializing events", 'info');
-        if (!isElder) { return cb(); }
-        events.init(conf, cb);
-    };
-
     var loadRobots = function(cb) {
         if (!isElder) { return cb(); }
-        fileserver.createSymlink(conf.server.base + "backend/static/robots.txt", conf.server.html + "/robots.txt", cb);
+        filelogic.createSymlink(conf.server.base + "backend/static/robots.txt", conf.server.html + "/robots.txt", cb);
     };
 
     this.initialize = function (done) {
@@ -285,54 +225,74 @@ var SiteInitializer = function (conf, siteobj) {
         loadHTMLStructure(function () {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
-                    initEvents(function() {
-                        log('Sites', 'Initializing email senders', 'info');
-                        if (/*isElder &&*/ conf.emails) {
-                            mail.setSender(conf.id, {
-                                user : conf.emails.senderemail,
-                                pass : conf.emails.senderpass,
-                                from : conf.emails.senderfrom
-                            });
-                        }
-
-                        if (isElder && (global.liliumenv.mode != "script" || global.liliumenv.caij)) {
-                            sitemap.scheduleCreation(conf, true);
-                        }
-
-                        if (isElder) {
-                            log('Sites', "Loading polling for elder child", 'info');
-                            analytics.pollRealtime(conf);
-                        }
-
-                        if (isElder) {
-                            log('Sites', 'V4 will load all older URL in cache front', 'info');
-                            const V4 = require('./v4');
-                            const v4 = new V4();
-                            v4.dumpV3UrlInFront(conf, () => {
-                                log('Sites', 'Old URLs will now redirect to new version', 'success');
-                            });
-                        }
-
-                        loadVarious(function() {
-                            loadTheme(function() {
-                                if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-                                    return done();
-                                }
-
-                                loadSessions(function() {
-                                    loadRobots(function() {
-                                        update(conf, function() {
-                                            sharedcache.hi();
-
-                                            checkForWP(conf);
-                                            hooks.fire('site_initialized', conf);
-                                            log('Sites', 'Initialized site with id ' + conf.id, 'success');
-                                            done();
-                                        });
-                                    });
-                                });  
-                            });
+                    log('Sites', 'Initializing email senders', 'info');
+                    if (/*isElder &&*/ conf.emails) {
+                        mail.setSender(conf.id, {
+                            user : conf.emails.senderemail,
+                            pass : conf.emails.senderpass,
+                            from : conf.emails.senderfrom
                         });
+                    }
+
+                    if (isElder && (global.liliumenv.mode != "script" || global.liliumenv.caij)) {
+                        sitemap.scheduleCreation(conf, true);
+                    }
+
+                    if (isElder) {
+                        log('Sites', "Loading polling for elder child", 'info');
+                        analytics.pollRealtime(conf);
+                    }
+
+                    if (isElder) {
+                        log('Sites', 'V4 will load all older URL in cache front', 'info');
+                        const V4 = require('./lib/v4');
+                        const v4 = new V4();
+                        v4.dumpV3UrlInFront(conf, () => {
+                            log('Sites', 'Old URLs will now redirect to new version', 'success');
+                        });
+
+                        const buildLib = require('./make/build');   
+                        const cssBuildLib = require('./make/cssbuilder'); 
+                        const pathLib = require('path');
+
+                        buildLib.pushToBuildTree(conf, 'lilium', 'lilium', {
+                            outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
+                            babel : {
+                                "plugins": [
+                                    ["transform-react-jsx", { "pragma":"h" }],
+                                    ["transform-class-properties"],
+                                    ["@babel/plugin-proposal-object-rest-spread", {
+                                        useBuildIns : true
+                                    }],
+                                ],
+                                "presets" : [
+                                    [ "@babel/preset-env" ]
+                                ]
+                            },
+                            dontOverwite : true
+                        });
+
+                        this.v4devserver = new V4DevServer(conf);
+                        this.v4devserver.start();
+                    }
+
+                    loadTheme(function() {
+                        if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
+                            return done();
+                        }
+
+                        loadSessions(function() {
+                            loadRobots(function() {
+                                update(conf, function() {
+                                    sharedcache.hi();
+
+                                    checkForWP(conf);
+                                    hooks.fire('site_initialized', conf);
+                                    log('Sites', 'Initialized site with id ' + conf.id, 'success');
+                                    done();
+                                });
+                            });
+                        });  
                     });
                 });
             });
@@ -466,7 +426,7 @@ var Sites = function () {
         log('Sites', 'Initiating Wordpress website transfer');
         if (existingSite && existingSite != "") {
             log('Sites', 'Transferring Wordpress data to site with uid ' + existingSite);
-            var Configs = require('./config.js');
+            var Configs = require('./lib/config');
             var siteConf = Configs.fetchConfig(existingSite);
             siteConf.wptransferring = true;
             siteConf.wpdb = dat;
@@ -525,7 +485,7 @@ var Sites = function () {
                                     if (err) {
                                         cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
                                     } else {
-                                        var siteConf = require('./config.js').fetchConfig(existingSite);
+                                        var siteConf = require('./lib/config').fetchConfig(existingSite);
                                         siteConf.wptransferring = true;
                                         siteConf.wpdb = dat;
     
@@ -631,9 +591,11 @@ var Sites = function () {
 
     this.loadSites = function (cb) {
         var that = this;
-        fileserver.listDirContent(__dirname + "/sites/", function (files) {
+        log('Sites', 'Reading sites directory for websites configurations', 'info');
+        filelogic.listDirContent(__dirname + "/sites/", function (files) {
             files = files.filter(x => x.endsWith('.json'));
             files.unshift(files.splice(files.indexOf('default.json'), 1)[0]);
+            log('Sites', 'Found ' + files.length + ' sites', 'info');
 
             var fileIndex = 0;
             var nextFile = function () {
@@ -643,7 +605,7 @@ var Sites = function () {
                     var sitename = files[fileIndex].replace('.json', '');
                     log('Sites', 'Loading config for website ' + sitename, 'lilium');
 
-                    fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
+                    filelogic.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
                         var keyname = sitename.replace('//', '').replace(/\s/g, '/');
                         siteInfo.jsonfile = files[fileIndex];
 

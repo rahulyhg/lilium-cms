@@ -1,5 +1,5 @@
 var mysql = require('mysql');
-var log = require('../log.js');
+
 var db = require('./db.js');
 
 var tables = ["wp_users", "wp_usermeta", "wp_postmeta", "wp_posts", "wp_options"];

@@ -219,7 +219,7 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
                 document.getElementById('loginform').style.top = (window.innerHeight / 2 - 145) + "px";
             }
 
-            var failed = function() {
+            var failed = function(msg) {
                 var pwd = document.getElementById('txtpassword');
                 pwd.value = "";
                 pwd.focus();
@@ -229,7 +229,7 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
 
                 document.getElementById('loginbutton').style.display = "";
                 document.getElementById('loginmsg').style.display = "block";
-                document.getElementById('loginmsg').textContent = "Login failed."
+                document.getElementById('loginmsg').textContent = msg || "Login failed."
             }
 
             var gotLoginResp = function() {
@@ -239,10 +239,10 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
                     if (resp.success) {
                         document.location = resp.to;
                     } else {
-                        failed();
+                        failed(resp.message);
                     }
                 } else {
-                    failed();
+                    failed(resp.message);
                 }   
             }
 

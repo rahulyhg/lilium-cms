@@ -1,6 +1,6 @@
-const log = require('../log.js');
-const db = require('../includes/db.js');
-const config = require('../config.js');
+
+const db = require('../lib/db.js');
+const config = require('../lib/config');
 const badges = require('../badges.js');
 const articleLib = require('../content.js');
 

@@ -1,12 +1,11 @@
-const _c = require('./config.js');
-const cli = require('./clientobject.js');
-const sessionManager = require('./session.js');
-const db = require('./includes/db.js');
-const metrics = require('./metrics');
-const hooks = require('./hooks.js');
+const _c = require('./lib/config');
+const sessionManager = require('./lib/session.js');
+const db = require('./lib/db.js');
+const metrics = require('./lib/metrics');
+const hooks = require('./lib/hooks');
 const sites = require('./sites.js');
-const livevars = require('./livevars.js');
-const sharedcache = require('./sharedcache.js');
+const livevars = require('./pipeline/livevars');
+const sharedcache = require('./lib/sharedcache.js');
 
 let io;
 let sockets = {};
@@ -193,7 +192,7 @@ var Notification = function () {
                         metrics.plus('loggedinusers');
                         metrics.plus('socketevents');
                         for (var i = 0; i < namespaces.length; i++) {
-                            require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
+                            require('./pipeline/inbound.js').io().of(namespaces[i]).emit('userstatus', {
                                 id: session.data._id,
                                 displayname: session.data.displayname,
                                 status : 'online',
@@ -208,7 +207,7 @@ var Notification = function () {
 
     this.init = function () {
         if (global.liliumenv.mode != "script" && !global.liliumenv.caij && !process.env.job) {
-            let io = require('./inbound.js').io();
+            let io = require('./pipeline/inbound.js').io();
 
             log('Notifications', 'Creating site groups', 'live');
             _c.eachSync(function (conf) {
@@ -246,7 +245,7 @@ var Notification = function () {
                 var split = sockets[i].split('#');
                 
                 log('Notifications', 'Emit "'+(difftype||"notification")+'" to socket id ' + split[1] + " of " + split[0], 'live')
-                require('./inbound.js').io().of(split[0]).to(sockets[i]).emit(difftype || 'notification', notification);
+                require('./pipeline/inbound.js').io().of(split[0]).to(sockets[i]).emit(difftype || 'notification', notification);
                 metrics.plus('socketevents');
             }
         });
@@ -318,7 +317,7 @@ var Notification = function () {
 
     this.emitToWebsite = function (siteid, data, type) {
         metrics.plus('socketevents');
-        require('./inbound.js').io().of(idToNamespace[siteid]).emit(type || 'notification', data);
+        require('./pipeline/inbound.js').io().of(idToNamespace[siteid]).emit(type || 'notification', data);
     };
 
     this.messageNotif = function(user, msg, type) {
@@ -328,7 +327,7 @@ var Notification = function () {
                 var split = sockets[i].split('#');
                 
                 log('Notifications', 'Emit to socket id ' + split[1] + " of " + split[0], 'live')
-                require('./inbound.js').io().of(split[0]).to(sockets[i]).emit(type || 'message', msg);
+                require('./pipeline/inbound.js').io().of(split[0]).to(sockets[i]).emit(type || 'message', msg);
             }
         });
     };
@@ -417,13 +416,13 @@ var Notification = function () {
             broadcast(sites[i].id);
         }
 
-        require('./inbound.js').io().sockets.emit('notification', notification);
+        require('./pipeline/inbound.js').io().sockets.emit('notification', notification);
     };
 
     this.broadcast = function (data, msgType) {
         metrics.plus('socketevents');
         for (var i = 0; i < namespaces.length; i++) {
-            require('./inbound.js').io().of(namespaces[i]).emit(msgType || 'message', data);
+            require('./pipeline/inbound.js').io().of(namespaces[i]).emit(msgType || 'message', data);
         }
     };
 

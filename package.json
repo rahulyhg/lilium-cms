@@ -5,7 +5,7 @@
   "main": "index.prod.js",
   "scripts": {
     "test": "cd ./tests && ./runNpm.sh && exit 0",
-    "shell": "node shell.js",
+    "shell": "node ./cli/shell.js",
     "setupdev": "chmod +x ./setup.sh && ./setup.sh",
     "ci": "cd ./tests && ./runCI.sh && exit 0",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.prod.js",
@@ -85,7 +85,6 @@
     "crypto-js": "latest",
     "dateformat": "latest",
     "deep-diff": "latest",
-    "dependency-tree": "^6.3.0",
     "diff": "^3.5.0",
     "diff-match-patch": "^1.0.4",
     "emitter": "0.0.5",

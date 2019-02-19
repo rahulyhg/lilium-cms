@@ -1,5 +1,5 @@
-const db = require('../includes/db');
-const log = require('../log');
+const db = require('../lib/db');
+
 
 module.exports = (conf, done) => {
     let next = (cur) => {

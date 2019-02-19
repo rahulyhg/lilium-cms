@@ -1,7 +1,6 @@
-const log = require('./log.js');
 const Admin = require('./backend/admin.js');
 const LML2 = require('./lml/compiler.js');
-const fileserver = require('./fileserver.js');
+const filelogic = require('./pipeline/filelogic');
 
 const pathPrefix = "/backend/dynamic/snip/";
 const extPrefix = ".snip.lml";
@@ -14,7 +13,7 @@ class LMLSnip {
         extra.config = _c;
         extra.name = extra.name || snip;
 
-        fileserver.readFile(fullpath, (compilee) => {
+        filelogic.readFile(fullpath, (compilee) => {
             LML2.compileToString(_c.id, compilee, extra, (markup) => {
                 cb(undefined, markup);
             });
@@ -25,7 +24,7 @@ class LMLSnip {
         let snipname = cli.routeinfo.path[2];
         let extra = cli.routeinfo.params;
 
-        fileserver.fileExists(cli._c.server.base + pathPrefix + snipname + extPrefix, function(exists) {
+        filelogic.fileExists(cli._c.server.base + pathPrefix + snipname + extPrefix, function(exists) {
             if (exists) {
                 LMLSnip.renderSnip(cli._c, snipname, (err, html) => {
                     cli.response.writeHead(200, {"Content-Type" : "text/html"});

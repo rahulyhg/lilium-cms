@@ -1,4 +1,4 @@
-var log = require('../log.js');
+
 var rsync = require('rsync');
 var db = require('./db.js');
 

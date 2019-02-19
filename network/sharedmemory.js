@@ -1,15 +1,14 @@
-const log = require('../log.js');
+const log = require('../log');
 const fs = require('fs');
 const net = require('net');
 const pathlib = require('path');
-const localcast = require('../localcast');
+const localcast = require('./localcast');
 
 const mem = {
     roles: {},
     cache : {},
     sockets : {},
     sessions : {},
-    clerk : {},
     hits : {}
 }
 
@@ -105,19 +104,7 @@ class SharedMemory {
                     let object = JSON.parse(json.substring(0, json.length -1));
                     let resp = "";
 
-                    if (object.clerk) {
-                        let key = object.clerk.key;
-
-                        if (object.clerk.action == "get") {
-                            resp = JSON.stringify({session : mem.clerk[key]});
-                        } else if (object.clerk.action == "set") {
-                            mem.clerk[key] = object.clerk.payload;
-                            resp = '{"set" : true}';
-                        } else if (object.clerk.action == "unset") {
-                            resp = JSON.stringify({session : mem.clerk[key]});
-                            delete mem.clerk[key];
-                        }
-                    } else if (object.roles) {
+                    if (object.roles) {
                         let key = object.roles.role.name;
                         if (object.roles.action == "set") {
                             mem.roles[key] = object.roles.role;

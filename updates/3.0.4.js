@@ -1,6 +1,6 @@
-const db = require('../includes/db');
+const db = require('../lib/db');
 const contentlib = require('../content');
-const log = require('../log');
+
 
 module.exports = (_c, done) => {
     const next = cur => {

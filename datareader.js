@@ -1,7 +1,7 @@
-const log = require('./log')
-const filelogic = require('./filelogic')
-const db = require('./includes/db')
-const config = require('./config')
+
+const filelogic = require('./pipeline/filelogic');
+const db = require('./lib/db')
+const config = require('./lib/config')
 
 const DR_COLLECTION = "datareaderreports";
 const NETWORK_TABLE = ["entities", "cakepops", "fix", "decorations", "feed", "roles"];

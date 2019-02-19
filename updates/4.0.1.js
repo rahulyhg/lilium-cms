@@ -1,4 +1,4 @@
-const db = require('../includes/db');
+const db = require('../lib/db');
 
 const topicDeepFetch = (conf, _id, send) => {
     let parents = [];
