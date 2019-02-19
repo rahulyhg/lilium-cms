@@ -1,4 +1,4 @@
-const entities = require('../entities.js');
+const entities = require('../lib/entities.js');
 const db = require('../lib/db.js');
 
 class ClientObject {

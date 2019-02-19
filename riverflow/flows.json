@@ -474,7 +474,7 @@
             "endpoint" : "crew",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "entities.js",
+            "module" : "controllers/entities.js",
             "endpoint" : "entities",
             "support" : ["admin_post", "livevar", "setup", "api_get", "api_post"]
         }, {

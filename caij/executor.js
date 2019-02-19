@@ -8,7 +8,7 @@ const hooks = require('../lib/hooks');
 const db = require('../lib/db.js');
 const sitemapLib = require('../lib/sitemap.js');
 const articleLib = require('../lib/content.js');
-const entitieLib = require('../entities.js');
+const entitieLib = require('../lib/entities.js');
 const analyticsLib = require('../lib/analytics.js');
 const CDN = require('../lib/cdn');
 

@@ -13,7 +13,7 @@ class EndpointMethods {
 
 const db = require('../lib/db.js');
 const sharedcache = require('../lib/sharedcache.js');
-const entities = require('../entities.js');
+const entities = require('../lib/entities.js');
 
 const ApiEndpoints = new EndpointMethods();
 const SESSION_COLLECTION = "apisessions";

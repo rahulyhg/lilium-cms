@@ -73,7 +73,7 @@ var LiveVariables = function() {
 
         secondLevelVars(cli, params, function(params) {
             if (typeof RegisteredLiveVariables[topLevel] !== 'undefined') {
-                var entityLib = require('./entities.js');
+                var entityLib = require('../lib/entities.js');
                 var entity = cli.userinfo;
 
                 if (entityLib.isAllowed(entity, RegisteredLiveVariables[topLevel].rights)) {

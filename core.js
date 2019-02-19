@@ -38,7 +38,7 @@ class Core {
             global.core = {
                 filelogic : require('./pipeline/filelogic'),
                 hooks : require('./lib/hooks'),
-                entities : require('./entities'),
+                entities : require('./lib/entities'),
                 livevars : require('./pipeline/livevars'),
                 API : require('./pipeline/api'),
                 imageResizer : require('./lib/imageResizer'),
@@ -111,7 +111,7 @@ const loadEndpoints = () => {
     const endpoints = require('./pipeline/endpoints.js');
     const filelogic = require('./pipeline/filelogic');
     const admin = require('./backend/admin.js');
-    const entities = require('./entities.js');
+    const entities = require('./lib/entities.js');
     const LoginLib = require('./backend/login.js');
 
     endpoints.init();
@@ -237,7 +237,7 @@ const loadAudiences = () => {
 };
 
 const loadRoles = (cb) => {
-    const entities = require('./entities.js');
+    const entities = require('./lib/entities.js');
     entities.registerRole({
         name: 'admin',
         displayname: 'admin',

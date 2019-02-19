@@ -1,7 +1,7 @@
 const db = require('../lib/db.js');
 const CryptoJS = require('crypto-js');
 const _c = require('../lib/config');
-const entities = require('../entities.js');
+const entities = require('../lib/entities.js');
 const hooks = require('../lib/hooks');
 const sessions = require('../lib/session.js');
 
