@@ -381,7 +381,7 @@
             "endpoint" : "darksky",
             "support" : ["livevar", "setup"]
         }, {
-            "module" : "fix.js",
+            "module" : "controllers/fix.js",
             "endpoint" : "fix",
             "support" : ["livevar","admin_post"]
         }, {
@@ -542,7 +542,7 @@
             "endpoint" : "session",
             "support" : ["livevar"]
         }, {
-            "module" : "settings.js",
+            "module" : "controllers/settings.js",
             "endpoint" : "settings",
             "support" : ["admin_post", "livevar"]
         }, {
