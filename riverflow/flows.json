@@ -377,7 +377,7 @@
             "endpoint" : "accesscheckpoint",
             "support" : ["get", "post"]
         }, {
-            "module" : "darksky.js",
+            "module" : "controllers/darksky.js",
             "endpoint" : "darksky",
             "support" : ["livevar", "setup"]
         }, {
