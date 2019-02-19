@@ -116,7 +116,7 @@ class LMLContext {
     loadLibraries() {
         this.libs = {
             encodec : require('entities'),
-            app : require('../build').getAppScript,
+            app : require('../make/build').getAppScript,
             cdn : require('../lib/cdn'),
             slugify : require('slugify'),
             fileio : require('../pipeline/filelogic.js'),

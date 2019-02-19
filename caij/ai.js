@@ -114,7 +114,7 @@ class AI {
                 extra : {
                     origin : "AI",
                     action : "init",
-                    _c : require("../config.js").default()
+                    _c : require('../lib/config').default()
                 }
             });
         };

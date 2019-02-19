@@ -10,7 +10,7 @@ const AdminMenus = [];
 const filelogic = require('../pipeline/filelogic');
 const LML2 = require('../lml/compiler.js');
 const LML3 = require('../lml3/compiler');
-const hooks = require('../hooks.js');
+const hooks = require('../lib/hooks');
 
 class AdminMenu {
     constructor() {
@@ -133,7 +133,7 @@ class Admin {
 	registerLiveVar () {
 		let that = this;
 
-		require('../livevars.js').registerLiveVariable('adminmenus', (cli, levels, params, callback) => {
+		require('../pipeline/livevars.js').registerLiveVariable('adminmenus', (cli, levels, params, callback) => {
             if (!levels[0]) {
                 const sortedMenus = [];
                 const menus = that.getAdminMenus();

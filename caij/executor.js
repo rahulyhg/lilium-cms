@@ -2,14 +2,14 @@ const localcast = require('../network/localcast.js');
 const request = require('request');
 const fs = require('fs');
 
-const sites = require('../sites.js');
-const config = require('../config.js');
-const hooks = require('../hooks.js');
+const sites = require('../lib/sites.js');
+const config = require('../lib/config');
+const hooks = require('../lib/hooks');
 const db = require('../lib/db.js');
 const sitemapLib = require('../lib/sitemap.js');
-const articleLib = require('../content.js');
-const entitieLib = require('../entities.js');
-const analyticsLib = require('../analytics.js');
+const articleLib = require('../lib/content.js');
+const entitieLib = require('../lib/entities.js');
+const analyticsLib = require('../lib/analytics.js');
 const CDN = require('../lib/cdn');
 
 const janitorJobs = [
@@ -28,6 +28,9 @@ class RunningTask {
     }
 
     socialDispatch(sendback) {
+        return sendback();
+        ///////////////////////////////////////////
+
         let action = this.extra.action;
 
         log("RunningTask", "Executing socialDispatch task with action : " + action);

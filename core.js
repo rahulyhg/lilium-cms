@@ -1,12 +1,12 @@
-const hooks = require('./hooks.js');
+const hooks = require('./lib/hooks');
 const db = require('./lib/db.js');
 const isElder = require('./network/info.js').isElderChild();
-const V4 = require('./v4');
+const V4 = require('./lib/v4');
 const OS = require('os');
 const ShellServer = require('./cli/server');
 const metrics = require('./lib/metrics');
 
-global.require_template = require('./templaterequire');
+global.require_template = require('./lib/templaterequire');
 
 const v4 = new V4();
 
@@ -37,21 +37,18 @@ class Core {
 
             global.core = {
                 filelogic : require('./pipeline/filelogic'),
-                hooks : require('./hooks'),
-                entities : require('./entities'),
-                livevars : require('./livevars'),
+                hooks : require('./lib/hooks'),
+                entities : require('./lib/entities'),
+                livevars : require('./pipeline/livevars'),
                 API : require('./pipeline/api'),
-                imageResizer : require('./imageResizer'),
+                imageResizer : require('./lib/imageResizer'),
                 LML3 : require('./lml3/compiler'),
-                LML2 : require('./lml'),
-                notifications : require('./notifications'),
-                precomp : require('./precomp'),
-                preferences : require('./preferences'),
+                LML2 : require('./lml/lml'),
+                notifications : require('./lib/notifications'),
                 scheduler : require('./lib/scheduler'),
-                search : require('./search'),
+                search : require('./lib/search'),
                 sharedcache : require('./lib/sharedcache'),
-                socialdispatch : require('./socialdispatch'),
-                themes : require('./themes'),
+                themes : require('./lib/themes'),
             };
 
             log('Core', 'Created global library', 'success');
@@ -63,33 +60,30 @@ class Core {
             loadStandardInput();
             loadImageSizes();
             loadLiveVars();
-            loadLMLLibs();
             loadAudiences();
             loadBackendSearch();
             
             loadVocab(() => {
                 loadPlugins(() => {
                     loadRoles(() => {
-                        precompile(() => {
-                            redirectIfInit(resp, () => {
-                                makeBuild(() => {
-                                    loadGitHub();
-                                    require('./riverflow/riverflow.js').loadFlows();
+                        redirectIfInit(resp, () => {
+                            makeBuild(() => {
+                                loadGitHub();
+                                require('./riverflow/riverflow.js').loadFlows();
 
-                                    inbound.handleQueue();
-                
-                                    loadCacheInvalidator();
-                
-                                    log('Lilium', 'Starting inbound server', 'info');
-                                    loadNotifications();
-                                    notifyAdminsViaEmail();
-                                    executeRunScript();
-                                    initSchedulingTasks();
-                                    initLocalcast();
-                
-                                    log('Core', 'Firing initialized signal', 'info');
-                                    hooks.fire('init');
-                                });
+                                inbound.handleQueue();
+            
+                                loadCacheInvalidator();
+            
+                                log('Lilium', 'Starting inbound server', 'info');
+                                loadNotifications();
+                                notifyAdminsViaEmail();
+                                executeRunScript();
+                                initSchedulingTasks();
+                                initLocalcast();
+            
+                                log('Core', 'Firing initialized signal', 'info');
+                                hooks.fire('init');
                             });
                         });
                     });
@@ -116,7 +110,7 @@ const loadEndpoints = () => {
     const endpoints = require('./pipeline/endpoints.js');
     const filelogic = require('./pipeline/filelogic');
     const admin = require('./backend/admin.js');
-    const entities = require('./entities.js');
+    const entities = require('./lib/entities.js');
     const LoginLib = require('./backend/login.js');
 
     endpoints.init();
@@ -186,7 +180,7 @@ const initShell = () => {
 };
 
 const loadImageSizes = () => {
-    const imageSize = require('./imageSize.js');
+    const imageSize = require('./lib/imageSize.js');
 
     imageSize.add("mini", 48, 48);
     imageSize.add("thumbnail", 150, 150);
@@ -203,7 +197,7 @@ const loadCurrencies = () => {
 };
 
 const loadPlugins = (cb) => {
-    const plugins = require('./plugins.js');
+    const plugins = require('./lib/plugins');
 
     log('Plugins', 'Loading plugins');
     plugins.init(() => {
@@ -217,8 +211,8 @@ const loadPlugins = (cb) => {
 const makeBuild = (cb) => {
     if (!isElder) { return cb(); }
 
-    const buildLib = require('./build');   
-    const cssBuildLib = require('./cssbuilder'); 
+    const buildLib = require('./make/build');
+    const cssBuildLib = require('./make/cssbuilder');
     const pathLib = require('path');
 
     buildLib.initialBuild(() => {
@@ -226,7 +220,7 @@ const makeBuild = (cb) => {
             pathLib.join(liliumroot, 'apps', 'lilium', 'less'), 
             pathLib.join(liliumroot, 'backend', 'static', 'compiled', 'v4.css'), 
             { 
-                compress : require('./config').default().env == "prod" 
+                compress : require('./lib/config').default().env == "prod" 
             }, 
         err => {
             err && log('Core', 'Error compiling V4 less files to CSS : ' + err, 'err');
@@ -238,11 +232,11 @@ const makeBuild = (cb) => {
 const loadAudiences = () => {
     if (!isElder) { return; }
 
-    require('./audiences').preload();
+    require('./lib/audiences').preload();
 };
 
 const loadRoles = (cb) => {
-    const entities = require('./entities.js');
+    const entities = require('./lib/entities.js');
     entities.registerRole({
         name: 'admin',
         displayname: 'admin',
@@ -328,7 +322,7 @@ const loadStandardInput = () => {
 
 const loadCacheInvalidator = () => {
     log("CacheInvalidator", 'Initializing cacheInvalidator', 'info');
-    const cacheInvalidator = require('./cacheInvalidator.js');
+    const cacheInvalidator = require('./lib/cacheInvalidator.js');
     cacheInvalidator.init(() => {
         log("CacheInvalidator", 'Ready to invalidate cached files', 'success');
     });
@@ -336,26 +330,26 @@ const loadCacheInvalidator = () => {
 
 const loadLiveVars = () => {
     require('./backend/admin.js').registerLiveVar();
-    require('./notifications.js').registerLiveVar();
+    require('./lib/notifications.js').registerLiveVar();
     require('./backend/search.js').registerLiveVar();
 
-    const Livevars = require('./livevars.js').init();
+    const Livevars = require('./pipeline/livevars').init();
     Livevars.registerDebugEndpoint();
     log('Core', 'Loaded live variables', 'success');
 };
 
 const loadNotifications = () => {
-    require('./notifications.js').init();
+    require('./lib/notifications.js').init();
 }
 
 const notifyAdminsViaEmail = () => {
     if (!isElder) { return; }
 
-    const _c = require('./config');
+    const _c = require('./lib/config');
     db.findToArray(_c.default(), "entities", {roles : "lilium"}, (err, users) => {
         users.forEach((user) => {
             if (user.email) {
-                require('./mail.js').triggerHook(_c.default(), 'lilium_restarted', user.email, {
+                require('./lib/mail.js').triggerHook(_c.default(), 'lilium_restarted', user.email, {
                     sigsha : require("crypto-js").SHA256(new Date()).toString(require("crypto-js").enc.Hex),
                     user : user,
                     lmllibs : ["config", "extra", "date"]
@@ -366,7 +360,7 @@ const notifyAdminsViaEmail = () => {
 };
 
 const prepareDefaultSiteCreation = (cb) => {
-    require('./init.js')(cb);
+    require('./includes/init.js')(cb);
 };
 
 const validateNetworkSite = () => {
@@ -382,7 +376,7 @@ const validateNetworkSite = () => {
 }
 
 const loadWebsites = (loadEverything) => {
-    sites = require('./sites.js');
+    sites = require('./lib/sites.js');
 
     const currentRoot = __dirname;
     const fss = require('./pipeline/filelogic');
@@ -400,30 +394,6 @@ const loadWebsites = (loadEverything) => {
         } else {
             prepareDefaultSiteCreation(loadEverything);
         }
-    });
-};
-
-const loadLMLLibs = () => {
-    hooks.trigger('will_load_core_lml_libs');
-    const dashboard = require('./dashboard.js');
-    dashboard.registerLMLLib();
-    hooks.trigger('loaded_core_lml_libs');
-};
-
-const precompile = (done) => {
-    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-        return done();
-    }
-
-    if (!isElder) {
-        return done();
-    }
-
-    log('Core', 'Staring precompilation', 'info');
-    hooks.fire("will_precompile");
-    sites.loopPrecomp(() => {
-        hooks.fire("did_precompile");
-        done();
     });
 };
 
@@ -447,7 +417,7 @@ const redirectIfInit = (resp, cb) => {
 };
 
 const loadVocab = (done) => {
-    const vocab = require('./vocab.js');
+    const vocab = require('./lib/vocab.js');
     vocab.preloadDicos(done);
 };
 
@@ -527,7 +497,7 @@ const loadEnv = () => {
 
 const executeRunScript = () => {
     if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-        global.liliumenv.run && global.liliumenv.run.apply(require('./config.js'), [__dirname]);
+        global.liliumenv.run && global.liliumenv.run.apply(require('./lib/config'), [__dirname]);
     }
 }
 
@@ -559,7 +529,7 @@ const loadBackendSearch = () => {
 
 const initSchedulingTasks = () => {
     if (isElder) {
-        require('./config.js').eachSync((_c) => {
+        require('./lib/config').eachSync((_c) => {
             require('./caij/caij.js').scheduleTask("refreshTopicLatests", {
                 siteid : _c.id,
                 origin : "Elder"

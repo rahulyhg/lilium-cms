@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const _c =require('../config');
+const _c =require('../lib/config');
 const db = require('../lib/db');
 const PwManager = require('../lib/pwmanager');
 /**

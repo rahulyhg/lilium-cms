@@ -333,15 +333,15 @@
             "endpoint": "2fa",
             "support": ["livevar", "admin_post"]
         }, {
-            "module" : "ponglinks.js",
+            "module" : "controllers/ponglinks.js",
             "endpoint" : "ponglinks",
             "support" : ["livevar", "admin_post", "admin_put", "setup"]
         }, {
-            "module" : "ponglinks.js",
+            "module" : "controllers/ponglinks.js",
             "endpoint" : "pong",
             "support" : ["get"]
         }, {
-            "module" : "comments.js",
+            "module" : "controllers/comments.js",
             "endpoint" : "comments",
             "support" : ["admin_post", "admin_delete", "livevar", "get"]
         }, {
@@ -349,133 +349,102 @@
             "endpoint" : "money",
             "support" : ["livevar"]
         }, {
-            "module" : "notifications.js",
+            "module" : "controllers/notifications.js",
             "endpoint" : "notifications",
             "support" : ["admin_post"]
         }, {
-            "module" : "googlemaps.js",
+            "module" : "controllers/googlemaps.js",
             "endpoint" : "googlemaps",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "search.js",
+            "module" : "controllers/search.js",
             "endpoint" : "search",
-            "support" : ["livevar", "setup"]
+            "support" : ["livevar"]
         }, {
             "module" : "controllers/ads.js",
             "endpoint" : "ads",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "datareader.js",
+            "module" : "controllers/datareader.js",
             "endpoint" : "datareader",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "livevars.js",
-            "endpoint" : "livevars",
-            "support" : ["api_get"]
-        }, {
-            "module" : "thedailylilium.js",
+            "module" : "controllers/thedailylilium.js",
             "endpoint" : "thedailylilium",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "passwordrecovery.js",
+            "module" : "controllers/passwordrecovery.js",
             "endpoint" : "accesscheckpoint",
             "support" : ["get", "post"]
         }, {
-            "module" : "lys.js",
-            "endpoint" : "lys",
-            "support" : ["livevar"]
-        }, {
-            "module" : "darksky.js",
+            "module" : "controllers/darksky.js",
             "endpoint" : "darksky",
             "support" : ["livevar", "setup"]
         }, {
-            "module" : "reporting.js",
-            "endpoint" : "r",
-            "support" : ["livevar", "get", "setup"]
-        }, {
-            "module" : "instagram.js",
-            "endpoint" : "instagram",
-            "support" : ["livevar", "get"]
-        }, {
-            "module" : "fix.js",
+            "module" : "controllers/fix.js",
             "endpoint" : "fix",
             "support" : ["livevar","admin_post"]
         }, {
-            "module" : "plugins.js",
+            "module" : "controllers/plugins.js",
             "endpoint" : "plugins",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "flagging.js",
+            "module" : "controllers/flagging.js",
             "endpoint" : "flagging",
             "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"]
         }, {
-            "module" : "audiences.js",
+            "module" : "controllers/audiences.js",
             "endpoint" : "audiences",
             "support" : ["get", "admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
-            "module" : "languages.js",
+            "module" : "controllers/languages.js",
             "endpoint" : "languages",
             "support" : ["admin_post", "admin_delete", "livevar"]
         }, {
-            "module" : "themes.js",
+            "module" : "controllers/themes.js",
             "endpoint" : "themes",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "dashboard.js",
+            "module" : "controllers/dashboard.js",
             "endpoint" : "dashboard",
             "support" : ["livevar"]
         }, {
-            "module" : "analytics.js",
+            "module" : "controllers/analytics.js",
             "endpoint" : "googleanalytics",
             "support" : ["livevar", "setup", "get"],
             "hooks" : [
                 {"name" : "settings_saved", "priority" : 1000, "callback" : "settingsSaved"}
             ]
         }, {
-            "module" : "build.js",
+            "module" : "controllers/build.js",
             "endpoint" : "build",
             "support" : ["admin_post"]
         }, {
-            "module" : "cssbuilder.js",
+            "module" : "controllers/cssbuilder.js",
             "endpoint" : "buildcss",
             "support" : ["admin_post"]
         }, {
-            "module" : "communications.js",
+            "module" : "controllers/communications.js",
             "endpoint" : "communications",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "mail.js",
+            "module" : "controllers/mail.js",
             "endpoint" : "mailtemplates",
-            "support" : ["setup", "admin_post", "livevar", "admin_delete"],
-            "hooks" : [
-                {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
-            ]
+            "support" : ["admin_post", "livevar", "admin_delete"]
         }, {
-            "module" : "snip.js",
-            "endpoint" : "snips",
-            "support" : []
-        }, {
-            "module" : "devtools.js",
+            "module" : "controllers/devtools.js",
             "endpoint" : "devtools",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "embed.js",
+            "module" : "controllers/embed.js",
             "endpoint" : "embed",
-            "support" : ["livevar", "admin_post"]
+            "support" : ["livevar"]
         }, {
             "module" : "lib/sharedcache.js",
             "endpoint" : "sharedcache",
             "support" : ["livevar"]
         }, {
-            "module" : "conversations.js",
-            "endpoint" : "conversations",
-            "support" : ["admin_post", "livevar"]
-        }, {
-            "module" : "feed.js",
-            "endpoint" : "feed",
-            "support" : ["setup","livevar"]
-        }, {
-            "module" : "styledpages.js",
+            "module" : "controllers/styledpages.js",
             "endpoint" : "styledpages",
             "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
         }, {
@@ -486,19 +455,19 @@
                 { "name" : "themeLML_compiled", "priority" : 100, "callback" : "themeLMLCompiled" }
             ]
         }, {
-            "module" : "contentcontroller.js",
+            "module" : "controllers/content.js",
             "endpoint" : "publishing",
             "support" : ["admin_post", "admin_put", "admin_delete", "get", "livevar"]
         }, {
-            "module" : "contentchains.js",
+            "module" : "controllers/contentchains.js",
             "endpoint" : "chains",
             "support" : ["livevar", "admin_post"]
         }, {
-            "module" : "crew.js",
+            "module" : "controllers/crew.js",
             "endpoint" : "crew",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "entities.js",
+            "module" : "controllers/entities.js",
             "endpoint" : "entities",
             "support" : ["admin_post", "livevar", "setup", "api_get", "api_post"]
         }, {
@@ -510,33 +479,29 @@
             "endpoint" : "metrics",
             "support" : ["livevar"]
         }, {
-            "module" : "entityrelationship.js",
+            "module" : "controllers/entityrelationship.js",
             "endpoint" : "entityrelationship",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "role.js",
+            "module" : "controllers/role.js",
             "endpoint" : "role",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "preferences.js",
+            "module" : "controllers/preferences.js",
             "endpoint" : "preferences",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "media.js",
+            "module" : "controllers/media.js",
             "endpoint" : "media",
             "support" : ["admin_post", "setup"]
         }, {
-            "module" : "translations.js",
+            "module" : "controllers/translations.js",
             "endpoint" : "translations",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "badges.js",
+            "module" : "controllers/badges.js",
             "endpoint" : "decorations",
             "support" : ["setup", "livevar", "admin_post"]
-        }, {
-            "module" : "socialdispatch.js",
-            "endpoint" : "socialdispatch",
-            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "controllers/pwmanager.js",
             "endpoint" : "pwmanager",
@@ -546,19 +511,19 @@
             "endpoint" : "amp",
             "support" : ["get"]
         }, {
-            "module" : "cakepop.js",
+            "module" : "controllers/cakepop.js",
             "endpoint" : "cakepop",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "ipevents.js",
+            "module" : "controllers/ipevents.js",
             "endpoint" : "ipevents",
             "support" : ["livevar"]
         }, {
-            "module" : "sites.js",
+            "module" : "controllers/sites.js",
             "endpoint" : "sites",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "editions.js",
+            "module" : "controllers/editions.js",
             "endpoint" : "editions",
             "support" : ["livevar", "admin_delete", "admin_put", "admin_post"]
         }, {
@@ -566,27 +531,27 @@
             "endpoint" : "session",
             "support" : ["livevar"]
         }, {
-            "module" : "settings.js",
+            "module" : "controllers/settings.js",
             "endpoint" : "settings",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "contractorspayments.js",
+            "module" : "controllers/contractorspayments.js",
             "endpoint" : "contractorspayments",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "contractorspayments.js",
+            "module" : "controllers/contractorspayments.js",
             "endpoint" : "contractorinvoice",
             "support" : ["get"]
         }, {
-            "module" : "creditcardscontroller.js",
+            "module" : "controllers/creditcards.js",
             "endpoint" : "creditcards",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
-            "module" : "vocab.js",
+            "module" : "controllers/vocab.js",
             "endpoint" : "vocab",
             "support" : ["admin_post"]
         }, {
-            "module" : "contractorsreports.js",
+            "module" : "controllers/contractorsreports.js",
             "endpoint" : "contractorsreports",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }

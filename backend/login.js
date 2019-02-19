@@ -1,8 +1,8 @@
 const db = require('../lib/db.js');
 const CryptoJS = require('crypto-js');
-const _c = require('../config.js');
-const entities = require('../entities.js');
-const hooks = require('../hooks.js');
+const _c = require('../lib/config');
+const entities = require('../lib/entities.js');
+const hooks = require('../lib/hooks');
 const sessions = require('../lib/session.js');
 
 const api = require('../pipeline/api.js');
@@ -45,7 +45,7 @@ const loginSuccess = (cli, userObj, cb) => {
 
 class Login {
     magiclink (cli) {
-        db.findUnique(require('../config.js').default(), 
+        db.findUnique(require('../lib/config').default(), 
             'entities', 
             {_id : db.mongoID(cli.routeinfo.path[1]), magiclink : cli.routeinfo.path[2], revoked : {$ne : true}}, 
         (err, user) => {
@@ -58,7 +58,7 @@ class Login {
                     });
                 });
 
-                db.update(require('../config.js').default(), 'entities', {_id : user._id}, { magiclink : CryptoJS.SHA256(Math.random()).toString() }, () => {});
+                db.update(require('../lib/config').default(), 'entities', {_id : user._id}, { magiclink : CryptoJS.SHA256(Math.random()).toString() }, () => {});
             }
         });
     };

@@ -13,7 +13,7 @@ class EndpointMethods {
 
 const db = require('../lib/db.js');
 const sharedcache = require('../lib/sharedcache.js');
-const entities = require('../entities.js');
+const entities = require('../lib/entities.js');
 
 const ApiEndpoints = new EndpointMethods();
 const SESSION_COLLECTION = "apisessions";
@@ -90,7 +90,7 @@ class LiliumAPI {
     }
 
     loadSessionsInCache(done) {
-        db.join(require('../config.js').default(), SESSION_COLLECTION, [
+        db.join(require('../lib/config').default(), SESSION_COLLECTION, [
             {
                 $lookup : {
                     from : "entities",
@@ -128,7 +128,7 @@ class LiliumAPI {
             session.rights = rights;
 
             this.pushInCache("session_" + token, session, () => { 
-                db.insert(require('../config.js').default(), SESSION_COLLECTION, { 
+                db.insert(require('../lib/config').default(), SESSION_COLLECTION, { 
                     token, userid : user._id, 
                     since : Date.now() 
                 }, () => {

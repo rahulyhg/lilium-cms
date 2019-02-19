@@ -1,7 +1,7 @@
 const db = require('../lib/db');
 
 const mkdirp = require('mkdirp');
-const configlib = require('../config');
+const configlib = require('../lib/config');
 
 module.exports = (conf, done) => {
     log('Update', 'Updating uploads to new format...');
