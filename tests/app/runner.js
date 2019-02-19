@@ -2,7 +2,7 @@ const fs = require('fs');
 const pathlib = require('path');
 const Logger = require('./log');
 const db = require(liliumroot + '/lib/db');
-const configlib = require(liliumroot + '/config');
+const configlib = require(liliumroot + '/lib/config');
 
 const tests = fs.readdirSync(pathlib.join(__dirname, 'tests')).filter(x => !x.startsWith('.')).map(file => require(pathlib.join(__dirname, 'tests', file)));
 
