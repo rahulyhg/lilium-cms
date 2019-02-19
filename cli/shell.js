@@ -1,14 +1,14 @@
 const readline = require('readline-sync');
 const net = require('net');
 
-const MESSAGES = require('./cli/messages');
+const MESSAGES = require('./messages');
 
 function connectToLilium() {
     let connection;
     console.log('Connecting...');
 
     try {
-        connection = net.connect('./cli/shell.sock');
+        connection = net.connect('./shell.sock');
         connection.on('error', err => {
             console.log('Connection lost');
             process.exit(1);

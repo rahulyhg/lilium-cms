@@ -1,9 +1,9 @@
 const db = require('./lib/db.js');
 
-const config = require('./config.js');
+const config = require('./lib/config');
 const filelogic = require('./pipeline/filelogic');
 const request = require('request');
-const articleLib = require('./content.js');
+const articleLib = require('./lib/content.js');
 const searchLib = require('./search.js');
 const sharedcache = require('./lib/sharedcache.js');
 

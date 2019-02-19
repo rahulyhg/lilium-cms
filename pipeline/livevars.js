@@ -19,12 +19,12 @@
  *                                                                                                       *
  *********************************************************************************************************/
 
-var db = require('./lib/db.js');
+var db = require('../lib/db.js');
 
-var hooks = require('./hooks.js');
-const metrics = require('./lib/metrics');
+var hooks = require('../hooks.js');
+const metrics = require('../lib/metrics');
 
-var RegisteredLiveVariables = new Object();
+var RegisteredLiveVariables = {}; 
 
 var LiveVariables = function() {
     var preparePackage = function(cli) {
@@ -36,7 +36,7 @@ var LiveVariables = function() {
     var createEndpoint = function(callback, rights) {
         return {
             callback: callback,
-            rights: rights || new Array()
+            rights: rights || [] 
         };
     };
 
@@ -198,56 +198,6 @@ var LiveVariables = function() {
     
         // Possibility to chain
         return this;
-    };
-
-    this.apiGET = function(cli) {
-        let variables = cli.routeinfo.params.v;
-        const now = Date.now();
-
-        const handleOne = (variable, send) => {
-            const name = variable.varname;
-            const levels = name.split('.');
-            const toplevel = levels.shift();
-            const params = variable.params || {};
-
-            if (RegisteredLiveVariables[toplevel]) {
-                RegisteredLiveVariables[toplevel].callback(cli, levels, params, val => {
-                    send(val);
-                });
-            } else {
-                send(404);
-            }
-        }
-
-        if (!Array.isArray(variables)) {
-            handleOne(variables, (val) => {
-                if (typeof val == "object") {
-                    cli.sendJSON(val);
-                } else {
-                    cli.sendText(val);
-                }
-            });
-        } else {
-            let index = -1;
-            let output = {};
-
-            const nextVar = () => {
-                if (++index == variables.length) {
-                    return finished();
-                }
-
-                handleOne(variables[index], (val) => {
-                    output[variables[index].varname] = val;
-                    nextVar();
-                });
-            };
-
-            const finished = () => {
-                cli.sendJSON(output);
-            };
-
-            nextVar();
-        }
     };
 
     this.getAll = function() {

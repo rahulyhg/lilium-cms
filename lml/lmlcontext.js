@@ -1,6 +1,5 @@
-
 var lmllib = require('./lmllib.js');
-const filelogic = require('./pipeline/filelogic');
+const filelogic = require('../pipeline/filelogic');
 
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot

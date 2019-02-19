@@ -1,7 +1,6 @@
-
 const db = require('./lib/db.js');
 const filelogic = require('./pipeline/filelogic');
-const articleLib = require('./content.js');
+const articleLib = require('./lib/content.js');
 
 const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     title : 1,

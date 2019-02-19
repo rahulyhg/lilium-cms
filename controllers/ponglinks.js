@@ -1,32 +1,15 @@
-const db = require('./lib/db');
-const sharedcache = require('./lib/sharedcache');
-const isElder = require('./network/info').isElderChild();
-const SHA1 = (str) => require('crypto-js').SHA1(str).toString();
-const filelogic = require('./pipeline/filelogic');
+const db = require('../lib/db');
+const sharedcache = require('../lib/sharedcache');
+const isElder = require('../network/info').isElderChild();
+const filelogic = require('../pipeline/filelogic');
 
 const ALLOWED_EDIT_FIELDS = [
     "destination", "identifier", "status"
 ];
 
+const plib = require('../lib/ponglinks');
+
 class PongLinks {
-    hashDestination(dest) {
-        return new Buffer(Date.now().toString()).toString('base64').slice(0, -2);
-
-        // Old logic
-        return new Buffer(SHA1(dest)).toString('base64').substring(10);
-    }
-
-    parseEditFields(keyval) {
-        const edit = {};
-        ALLOWED_EDIT_FIELDS.forEach(x => {
-            if (keyval[x]) {
-                edit[x] = keyval[x];
-            }
-        });
-
-        return edit;
-    }
-
     adminGET(cli) {
         if (!cli.hasRight('ponglinks')) {
             return cli.refuse();
@@ -39,79 +22,16 @@ class PongLinks {
         }
     }
 
-    editLink(_c, _id, keyval, done) {
-        db.update(_c, 'ponglinks', { _id }, this.parseEditFields(keyval), (err, r) => done(err, !!r.modifiedCount));
-    }   
-
-    createLink(_c, creatorid, link, done) {
-        const hash = this.hashDestination(JSON.stringify(link));
-        const versions = link.versions.map((v, i) => {
-            v.identifier = v.identifier.trim().replace(/[\s\&]/g, '_');
-            if (!v.destination.startsWith('http')) {
-                v.destination = "https://" + v.destination.trim();
-            }
-
-            return {
-                destination : v.destination.trim() + (v.destination.includes("?") ? "&" : "?") +
-                    "utm_campaign=" + link.defaults.campaign +
-                    "&utm_source=" + link.defaults.source +
-                    "&utm_medium=" + v.identifier,
-                hash : i + 1000,
-                medium : v.identifier
-            };
-        });
-
-        db.insert(_c, 'ponglinks', {
-            creatorid, hash, versions,
-
-            createdOn : new Date(),
-            createdAt : Date.now(),
-
-            status : "active", 
-            identifier : link.identifier,
-            defaults : link.defaults,
-            clicks : 0
-        }, (err, r) => {
-            done(err, r.insertedId);
-
-            const set = {};
-            versions.forEach(x => {
-                set["ponglinks_" + hash + x.hash] = x.destination;
-            });
-
-            sharedcache.set(set);
-            
-            done && done();
-        });
-    }
-
     adminPOST(cli) {
         if (cli.hasRightOrRefuse('ponglinks')) {            
             const action = cli.routeinfo.path[2];
             if (action == "create") {
-                this.createLink(cli._c, db.mongoID(cli.userinfo.userid), cli.postdata.data, (err, id)  => cli.sendJSON(err ? { error : err.toString() } : { id }) );
+                plib.createLink(cli._c, db.mongoID(cli.userinfo.userid), cli.postdata.data, (err, id)  => cli.sendJSON(err ? { error : err.toString() } : { id }) );
             } else if (action == "edit") {
-                this.editLink(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, (err, mod) => cli.sendJSON(err ? { error : err.toString() } : { mod }));
+                plib.editLink(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, (err, mod) => cli.sendJSON(err ? { error : err.toString() } : { mod }));
             } else {
                 cli.throwHTTP(404, undcefined, true);
             }
-        }
-    }
-
-    /**
-     * Checks that all version objects have a hash, if not, attribute a new hash (in place)
-     * @param {array} versions Array of version objects
-     */
-    maybeCreateHash(versions) {
-        const nestHash = () => {
-            const highest = versions.reduce((a, b) => (a.hash > (b.hash || 0)) ? a : b);
-            return (highest && highest.hash) ? highest.hash + 1 : 1000;
-        }
-
-        if (versions && versions.length) {
-            versions.forEach(version => {
-                if (!version.hash) version.hash = nestHash();
-            });
         }
     }
 
@@ -122,7 +42,7 @@ class PongLinks {
                     const newValues = {};
                     if (json.versions) {
                         newValues.versions = json.versions || [];
-                        this.maybeCreateHash(json.versions);
+                        plib.maybeCreateHash(json.versions);
                         
                     }
                     if (json.defaults) newValues.defaults = json.defaults;
@@ -234,7 +154,7 @@ class PongLinks {
     setup() {
         if (isElder) {
             log('Ponglinks', 'Elder process is storing links', 'info');
-            const sites = require('./config').getAllSites();
+            const sites = require('../lib/config').getAllSites();
             sites.forEach(site => {
                 db.findToArray(site, 'ponglinks', {}, (err, arr) => {
                     const set = {};

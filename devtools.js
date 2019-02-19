@@ -1,10 +1,10 @@
 
 var Admin = require('./backend/admin.js');
 const filelogic = require('./pipeline/filelogic');
-var lml = require('./lml.js');
+var lml = require('./lml/lml.js');
 var LML2 = require('./lml/compiler.js');
 var notif = require('./notifications.js');
-var configs = require('./config');
+var configs = require('./lib/config');
 var fs = require('fs');
 var db = require('./lib/db.js');
 
@@ -111,7 +111,7 @@ class DevTools {
                     break;
 
                 case "authors":
-                    db.findToArray(require('./config.js').default(), 'entities', {}, (err, arr) => {
+                    db.findToArray(require('./lib/config').default(), 'entities', {}, (err, arr) => {
                         cb(arr);
                     }, {displayname : 1, slug : 1, username : 1}, undefined, undefined, true);
                     break;
@@ -121,7 +121,7 @@ class DevTools {
             }
 
         } else if (levels[0] == "whereiseveryone") {
-            db.findToArray(require('./config').default(), 'entities', {
+            db.findToArray(require('./lib/config').default(), 'entities', {
                 geo : {$exists : 1}, 
                 "geo.timezone" : {$ne : false}
             }, (err, arr) => {
@@ -130,7 +130,7 @@ class DevTools {
         } else if (levels[0] == "me") {
             cb(cli.userinfo);
         } else if (levels[0] == "livevars") {
-            var allLV = require('./livevars.js').getAll();
+            var allLV = require('./pipeline/livevars').getAll();
             var arr = [];
 
             for (var ep in allLV) {
@@ -150,7 +150,7 @@ class DevTools {
     };
     
     setup() {
-        require('./config').eachSync(_c => {
+        require('./lib/config').eachSync(_c => {
             require('./make/build').pushToBuildTree(_c, 'devtools', 'devtools', {
                 babel : {
                     "plugins": [
@@ -288,7 +288,7 @@ var maybeRegenCache = function(cli) {
             { $limit : total }
         ], arr => {
             const ids = arr.map(x => x._id);
-            const contentlib = require('./content');
+            const contentlib = require('./lib/content');
             
             let i = -1;
             const doOne = () => {
@@ -440,7 +440,7 @@ var handleWordpressContent = function(_c, articles, done) {
                     }
 
                     article.author = undefined;
-                    db.findUnique(require('./config').default(), 'entities', {}, (err, author) => {
+                    db.findUnique(require('./lib/config').default(), 'entities', {}, (err, author) => {
                         if (author) {
                             article.author = author._id;
                             article.createdBy = author._id;

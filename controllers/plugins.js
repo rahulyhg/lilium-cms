@@ -1,5 +1,5 @@
 const pluginsLib = require('../lib/plugins');
-const _c = require('../config.js');
+const _c = require('../lib/config');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 

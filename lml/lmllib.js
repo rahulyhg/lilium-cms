@@ -1,8 +1,6 @@
-
-
 const registeredLibraries = {
     config: function (context) {
-        const conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
+        const conf = context.config || require('./lib/config').fetchConfig(context.extra.siteid);
         return {
             default: conf
         };
@@ -47,7 +45,7 @@ const registeredLibraries = {
         };
     },
     vocab: function (context) {
-        const conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
+        const conf = context.config || require('./lib/config').fetchConfig(context.extra.siteid);
         return require('./vocab.js').getDico(conf.website.language);
     },
     article: function (context) {
@@ -57,10 +55,10 @@ const registeredLibraries = {
         return require('./plugins.js');
     },
     themes: function (context) {
-        return require('./themes.js');
+        return require('./lib/themes.js');
     },
     theme : function (context) {
-        return require('./themes.js').getEnabledTheme(context.config);
+        return require('./lib/themes.js').getEnabledTheme(context.config);
     },
     slug : function(context) {
         return {

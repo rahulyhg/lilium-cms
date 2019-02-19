@@ -1,7 +1,7 @@
 const Stream = require("stream");
 
-const configs = require('../config.js');
-const lmllib = require('../lmllib.js');
+const configs = require('../lib/config');
+const lmllib = require('./lmllib.js');
 const filelogic = require('../pipeline/filelogic');
 const CDN = require('../lib/cdn.js');
 const opChar = '{';

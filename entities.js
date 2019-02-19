@@ -1,10 +1,10 @@
-var _c = configs = require('./config.js');
+var _c = configs = require('./lib/config');
 
 var db = require('./lib/db.js');
 const filelogic = require('./pipeline/filelogic');
 var CryptoJS = require('crypto-js');
-var livevars = require('./livevars.js');
-var imageResizer = require('./imageResizer.js');
+var livevars = require('./pipeline/livevars');
+var imageResizer = require('./lib/imageResizer.js');
 var hooks = require('./hooks.js');
 var preferences = require('./preferences.js');
 var feed = require('./feed.js');
@@ -226,7 +226,7 @@ class Entities {
         if (cli.routeinfo.path[1] == 'me') {
             if (cli.routeinfo.path[2] == "updateOneField") {
                 if (ALLOWED_ME_FIELDS.includes(cli.postdata.data.field)) {
-                    db.update(require('./config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, {
+                    db.update(require('./lib/config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, {
                         [cli.postdata.data.field] : cli.postdata.data.value
                     }, () => {
                         cli.sendJSON({
@@ -243,7 +243,7 @@ class Entities {
                 const shhh = CryptoJS.SHA256(cli.postdata.data.new).toString(CryptoJS.enc.Hex);
                 const _id = db.mongoID(cli.userinfo.userid);
 
-                db.update(require('./config').default(), 'entities', { _id, shhh : {$ne : shhh}, $or : [{shhh : old}, {mustupdatepassword : true}] }, { shhh, mustupdatepassword : false }, (err, r) => {
+                db.update(require('./lib/config').default(), 'entities', { _id, shhh : {$ne : shhh}, $or : [{shhh : old}, {mustupdatepassword : true}] }, { shhh, mustupdatepassword : false }, (err, r) => {
                     log('Entities', 'Updated entity ' + _id + ' : ' + !!r.matchedCount, 'info');
                     cli.sendJSON({
                         updated : !!r.matchedCount
@@ -420,7 +420,7 @@ class Entities {
         var sessionManager = require('./lib/session.js');
         var ext = filename.substring(filename.lastIndexOf('.') + 1);
 
-        require('./media').getDirectoryForNew(cli._c, updir => {
+        require('./lib/media').getDirectoryForNew(cli._c, updir => {
             imageResizer.resize(updir + filename, filename, ext, cli._c, function(images) {
                 var userid = cli.userinfo.userid;
                 var avatarURL = images.square.url;
@@ -545,7 +545,7 @@ class Entities {
             }
         }
 
-        newEnt.sites = entData.sites || [require('./config.js').default().id];
+        newEnt.sites = entData.sites || [require('./lib/config').default().id];
         newEnt.jobtitle = entData.jobtitle;
         newEnt.displayname = entData.displayname;
         newEnt.firstname = entData.firstname;
@@ -574,7 +574,7 @@ class Entities {
             return done(false, 'fields');
         }
 
-        db.findUnique(require('./config').default(), 'entities', { username : data.username }, (err, maybeExist) => {
+        db.findUnique(require('./lib/config').default(), 'entities', { username : data.username }, (err, maybeExist) => {
             if (maybeExist) {
                 return done(false, 'username');
             }
@@ -593,7 +593,7 @@ class Entities {
             entity.magiclink = magiclink;
             entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
 
-            db.insert(require('./config').default(), 'entities', entity, () => {
+            db.insert(require('./lib/config').default(), 'entities', entity, () => {
                 require('./mail.js').triggerHook(_c, 'to_new_user', entity.email, {
                     entity : entity
                 });
@@ -640,7 +640,7 @@ class Entities {
 
     apiGET(cli) {
         if (cli.routeinfo.path[2] == "list" && cli.hasAPIRight("list-entities")) {
-            db.find(require('./config.js').default(), 'entities', {}, [], (err, cursor) => {
+            db.find(require('./lib/config').default(), 'entities', {}, [], (err, cursor) => {
                 cursor.project({ displayname : 1, revoked : 1, email : 1, username : 1 })
                     .sort({revoked : 1, displayname : 1})
                     .toArray((err, arr) => {
@@ -805,7 +805,7 @@ class Entities {
                 ], arr => {
                     const rights = arr && arr[0] ? arr[0].rights : [];
 
-                    require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
+                    require('./lib/crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
                         badges : data.badges,
                         huespin : data.huespin, 
                         levels : data.levels, 
@@ -1049,7 +1049,7 @@ class Entities {
                     phone : cli.postdata.data.phone.replace(/([^0-9])/g, '')
                 }
 
-                db.update(require('./config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, payload, () => {
+                db.update(require('./lib/config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, payload, () => {
                     cli.sendJSON({avatarURL : images.square.url});
                 });
             });

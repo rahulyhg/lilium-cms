@@ -1,6 +1,6 @@
 const Session = require('../lib/session');
 const db = require('../lib/db');
-const _c = require('../config');
+const _c = require('../lib/config');
 
 class SessionController {
     livevar(cli, levels, params, callback) {

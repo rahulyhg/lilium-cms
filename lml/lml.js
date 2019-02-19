@@ -20,8 +20,8 @@
  *********************************************************************************************************/
 
 var LMLContext = require('./lmlcontext.js');
-const filelogic = require('./pipeline/filelogic');
-var _c = require('./config.js');
+const filelogic = require('../pipeline/filelogic');
+var _c = require('../lib/config');
 
 var LML = function () {
     // Reference to self

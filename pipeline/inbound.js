@@ -32,7 +32,7 @@ class Inbound {
     handleReq(req, resp) {
         metrics.plus('requests');
         metrics.plus('requestspers');
-        require('../cachefront.js').getURL(req.url, (dat) => {
+        require('../lib/cachefront.js').getURL(req.url, (dat) => {
             if (dat && (!dat.expiry || dat.expiry > Date.now())) {
                 resp.writeHead(dat.status || 200, dat.headers || { "Content-Type" : dat.ctype });
                 dat.data ? resp.end(dat.data) : resp.end();
@@ -61,7 +61,7 @@ class Inbound {
     }
 
     start() {
-        const _c = require('../config.js').tryDefault();
+        const _c = require('../lib/config').tryDefault();
         log('Inbound', 'Ready to receive requests', 'success');
 
         hooks.fire("server_will_start", {server : this.server});

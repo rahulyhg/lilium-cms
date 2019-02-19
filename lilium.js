@@ -6,7 +6,7 @@ class LiliumCMS {
 
         let startupTime = Date.now();
         require('./core.js').makeEverythingSuperAwesome(core => {
-            let _config = require('./config.js');
+            let _config = require('./lib/config');
             log('Lilium', 'Initialization signal received', 'lilium');
             log('Config', 'App is located at ' + _config.default().server.base, 'info');
             log('Config', 'Root PATH is at ' + _config.default().server.html, 'info');

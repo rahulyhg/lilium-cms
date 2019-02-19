@@ -1,5 +1,5 @@
 
-const _c = require('./config.js');
+const _c = require('./lib/config');
 const isElder = require('./network/info.js').isElderChild();
 
 const events = {};

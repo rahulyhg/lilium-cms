@@ -1,12 +1,11 @@
-
 const db = require('./lib/db.js');
 const mail = require('./mail.js');
 const Admin = require('./backend/admin.js');
-const livevars = require('./livevars.js');
+const livevars = require('./pipeline/livevars');
 
 class LMLCommunications {
     deepFetch(_c, comm, done) {
-        db.findUnique(require('./config.js').default(), 'entities', {_id : comm.poster}, (err, op) => {
+        db.findUnique(require('./lib/config').default(), 'entities', {_id : comm.poster}, (err, op) => {
             comm.posterobj = op;
             done();
         });
@@ -48,7 +47,7 @@ class LMLCommunications {
         let users = article.subscribers || [];
         log('Communications', 'Dispatching emails to ' + users.length + " users");
         for (let i = 0; i < users.length; i++) if (users[i].toString() != senderid.toString()) {
-            db.findUnique(require('./config.js').default(), 'entities', {_id : users[i]}, (err, to) => {
+            db.findUnique(require('./lib/config').default(), 'entities', {_id : users[i]}, (err, to) => {
                 require('./mail.js').triggerHook(_c, 'communication_on_article', to.email, {
                     to : to,
                     communication : comm,

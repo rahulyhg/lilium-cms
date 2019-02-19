@@ -1,6 +1,6 @@
 
 const db = require('./lib/db.js');
-const config = require('./config.js');
+const config = require('./lib/config');
 const filelogic = require('./pipeline/filelogic');
 
 const COLLECTION_NAME = "entityrelationship";

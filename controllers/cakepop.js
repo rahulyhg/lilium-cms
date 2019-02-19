@@ -29,7 +29,7 @@
 
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
-const config = require('../config.js');
+const config = require('../lib/config');
 const hooks = require('../hooks');
 
 const CAKEPOP_COLLECTION = "cakepops";
@@ -117,7 +117,7 @@ class Cakepop {
     }
 
     deepFetch(id, sendback) {
-        db.join(require('./config.js').default(), CAKEPOP_COLLECTION, [
+        db.join(require('./lib/config').default(), CAKEPOP_COLLECTION, [
             {
                 $match : {
                     _id : id

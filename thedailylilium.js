@@ -33,7 +33,7 @@ const SERVER_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
 class TheDailyLilium {
     storeYesterday(_c, datetime, _id, done) {
         log('DailyLilium', "Generating The Daily Lilium entry for date " + datetime, 'info');
-        const _d = require('./config').default();
+        const _d = require('./lib/config').default();
 
         const temp = new Date(datetime);
         const datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 0, 0, 0);
@@ -157,14 +157,14 @@ class TheDailyLilium {
                     status : "draft"
                 }
 
-                db.insert(require('./config').default(), 'tdlposts', article, (err, r) => {
+                db.insert(require('./lib/config').default(), 'tdlposts', article, (err, r) => {
                     cli.sendJSON({ articleid : article._id, error : err });
                 });
                 break;
 
             case "save":
                 const updated = cli.postdata.data;
-                db.update(require('./config').default(), 'tdlposts', {_id}, updated, (err) => cli.sendJSON({ok:!err}));
+                db.update(require('./lib/config').default(), 'tdlposts', {_id}, updated, (err) => cli.sendJSON({ok:!err}));
                 break;
 
             default:
@@ -184,7 +184,7 @@ class TheDailyLilium {
                 $match.headline = new RegExp(params.filters.search, 'i');
             }
 
-            db.join(require('./config').default(), 'tdlposts', [
+            db.join(require('./lib/config').default(), 'tdlposts', [
                 { $match },
                 { $sort : { _id : -1 } },
                 { $limit : 50 }
@@ -192,7 +192,7 @@ class TheDailyLilium {
                 sendback({ items, total : items.length });
             });
         } else if (action == "single") {
-            db.join(require('./config').default(), 'tdlposts', [
+            db.join(require('./lib/config').default(), 'tdlposts', [
                 { $match : { _id : db.mongoID(levels[1]) } }
             ], arr => {
                 sendback(arr[0]);
@@ -203,7 +203,7 @@ class TheDailyLilium {
             const _id = dateformat(datestart, "ddmmyyyy") + tzoffset + "-day";
 
             db.findUnique(cli._c, 'thedailylilium', { _id }, (err, report) => {
-                // db.findToArray(require('./config').default(), 'tdlposts', { editionOf : _id }, (err, customposts) => {
+                // db.findToArray(require('./lib/config').default(), 'tdlposts', { editionOf : _id }, (err, customposts) => {
                     if (!report) {
                         this.storeYesterday(cli._c, datestart, _id, report => {
                             // report.customposts = customposts;

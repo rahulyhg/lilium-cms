@@ -1,8 +1,8 @@
 
 const db = require('./lib/db.js');
-const config = require('./config.js');
+const config = require('./lib/config');
 const admin = require('./backend/admin.js');
-const livevars = require('./livevars.js');
+const livevars = require('./pipeline/livevars');
 const filelogic = require('./pipeline/filelogic');
 const noop = require('./noop.js');
 

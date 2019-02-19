@@ -1,4 +1,4 @@
-const config = require('./config.js');
+const config = require('./lib/config');
 const filelogic = require('./pipeline/filelogic');
 const cluster = require('cluster');
 const RedisServer = require('redis-server');

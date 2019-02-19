@@ -1,4 +1,4 @@
-const config = require('./config.js');
+const config = require('./lib/config');
 const networkinfo = require('./network/info.js');
 const db = require('./lib/db.js');
 const scheduler = require('./lib/scheduler.js');

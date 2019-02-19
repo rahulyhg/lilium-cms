@@ -1,6 +1,6 @@
 var fs = require('fs');
 const filelogic = require('./pipeline/filelogic');
-var conf = require('./config.js');
+var conf = require('./lib/config');
 var util = require('util');
 var db = require('./lib/db.js');
 var hooks = require('./hooks.js');

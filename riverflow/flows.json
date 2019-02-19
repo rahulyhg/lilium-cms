@@ -333,15 +333,15 @@
             "endpoint": "2fa",
             "support": ["livevar", "admin_post"]
         }, {
-            "module" : "ponglinks.js",
+            "module" : "controllers/ponglinks.js",
             "endpoint" : "ponglinks",
             "support" : ["livevar", "admin_post", "admin_put", "setup"]
         }, {
-            "module" : "ponglinks.js",
+            "module" : "controllers/ponglinks.js",
             "endpoint" : "pong",
             "support" : ["get"]
         }, {
-            "module" : "comments.js",
+            "module" : "controllers/comments.js",
             "endpoint" : "comments",
             "support" : ["admin_post", "admin_delete", "livevar", "get"]
         }, {
@@ -369,10 +369,6 @@
             "endpoint" : "datareader",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "livevars.js",
-            "endpoint" : "livevars",
-            "support" : ["api_get"]
-        }, {
             "module" : "thedailylilium.js",
             "endpoint" : "thedailylilium",
             "support" : ["admin_post", "livevar"]
@@ -380,10 +376,6 @@
             "module" : "passwordrecovery.js",
             "endpoint" : "accesscheckpoint",
             "support" : ["get", "post"]
-        }, {
-            "module" : "lys.js",
-            "endpoint" : "lys",
-            "support" : ["livevar"]
         }, {
             "module" : "darksky.js",
             "endpoint" : "darksky",
@@ -409,7 +401,7 @@
             "endpoint" : "flagging",
             "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"]
         }, {
-            "module" : "audiences.js",
+            "module" : "controllers/audiences.js",
             "endpoint" : "audiences",
             "support" : ["get", "admin_post", "admin_put", "admin_delete", "livevar"]
         }, {
@@ -417,7 +409,7 @@
             "endpoint" : "languages",
             "support" : ["admin_post", "admin_delete", "livevar"]
         }, {
-            "module" : "themes.js",
+            "module" : "controllers/themes.js",
             "endpoint" : "themes",
             "support" : ["admin_post", "livevar"]
         }, {
@@ -459,17 +451,13 @@
             "endpoint" : "devtools",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
-            "module" : "embed.js",
+            "module" : "controllers/embed.js",
             "endpoint" : "embed",
-            "support" : ["livevar", "admin_post"]
+            "support" : ["livevar"]
         }, {
             "module" : "lib/sharedcache.js",
             "endpoint" : "sharedcache",
             "support" : ["livevar"]
-        }, {
-            "module" : "conversations.js",
-            "endpoint" : "conversations",
-            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "feed.js",
             "endpoint" : "feed",
@@ -486,7 +474,7 @@
                 { "name" : "themeLML_compiled", "priority" : 100, "callback" : "themeLMLCompiled" }
             ]
         }, {
-            "module" : "contentcontroller.js",
+            "module" : "controllers/content.js",
             "endpoint" : "publishing",
             "support" : ["admin_post", "admin_put", "admin_delete", "get", "livevar"]
         }, {
@@ -494,7 +482,7 @@
             "endpoint" : "chains",
             "support" : ["livevar", "admin_post"]
         }, {
-            "module" : "crew.js",
+            "module" : "controllers/crew.js",
             "endpoint" : "crew",
             "support" : ["admin_post", "livevar", "setup"]
         }, {
@@ -522,7 +510,7 @@
             "endpoint" : "preferences",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "media.js",
+            "module" : "controllers/media.js",
             "endpoint" : "media",
             "support" : ["admin_post", "setup"]
         }, {
@@ -550,7 +538,7 @@
             "endpoint" : "cakepop",
             "support" : ["admin_post", "livevar"]
         }, {
-            "module" : "ipevents.js",
+            "module" : "controllers/ipevents.js",
             "endpoint" : "ipevents",
             "support" : ["livevar"]
         }, {
@@ -578,7 +566,7 @@
             "endpoint" : "contractorinvoice",
             "support" : ["get"]
         }, {
-            "module" : "creditcardscontroller.js",
+            "module" : "controllers/creditcards.js",
             "endpoint" : "creditcards",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]
         }, {

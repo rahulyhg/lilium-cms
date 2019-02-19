@@ -1,10 +1,10 @@
-const db = require('./lib/db.js');
+const db = require('../lib/db.js');
 const fs = require('fs');
 const xxhash = require('xxhashjs');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const dateFormat = require('dateformat');
-const imageResizer = require('./imageResizer.js');
+const imageResizer = require('../lib/imageResizer.js');
 
 // Used to make the hashed name of a file unique.
 let fileUniqueNumber = 0;

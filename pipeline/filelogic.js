@@ -1,6 +1,6 @@
 const fs = require('fs');
-const _c = require('../config.js');
-const LML = require('../lml.js');
+const _c = require('../lib/config');
+const LML = require('../lml/lml.js');
 const LML2 = require('../lml/compiler.js');
 const LML3 = require('../lml3/compiler.js');
 
@@ -215,7 +215,7 @@ class FileLogic {
             if (isPresent) {
                 that.pipeFileToClient(cli, savePath, () => {}, true, "text/html; charset=utf8");
             } else {
-                const theme = require('../themes.js');
+                const theme = require('../lib/themes.js');
                 extra.config = cli._c;
                 extra.contextname = "next";
                 extra.siteid = cli._c.id;
@@ -257,7 +257,7 @@ class FileLogic {
     };
 
     renderThemeLML3 (cli, contextname, outputfilename, extra = {}, done, nolayout) {
-        const themeLib = require('../themes.js');
+        const themeLib = require('../lib/themes.js');
         const _c = cli._c || cli;
         const ctxName = contextname || "home";
 
@@ -342,7 +342,7 @@ class FileLogic {
     };
 
     renderThemeLML (cli, ctxName, preferredFileName, extra = {}, callback, skipLayout) {
-        const theme = require('../themes.js');
+        const theme = require('../lib/themes.js');
         const _c = cli._c || cli;
 
         extra.config = _c;

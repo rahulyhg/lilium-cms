@@ -1,4 +1,4 @@
-const db = require('./lib/db');
+const db = require('../lib/db');
 
 const LIVEVAR_COMMENT_BATCHSIZE = 50;
 const COMMENT_TO_ARTICLE_LOOKUP = {

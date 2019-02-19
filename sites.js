@@ -1,12 +1,12 @@
-var config = require('./config.js');
+var config = require('./lib/config');
 
-var livevars = require('./livevars.js');
+var livevars = require('./pipeline/livevars');
 const filelogic = require('./pipeline/filelogic');
 var analytics = require('./analytics.js');
 var db = require('./lib/db.js');
 var fs = require('fs');
 var hooks = require('./hooks.js');
-var themes = require('./themes.js');
+var themes = require('./lib/themes.js');
 var endpoints = require('./pipeline/endpoints.js');
 var sessions = require('./lib/session.js');
 var buildLib = require('./make/build');
@@ -427,7 +427,7 @@ var Sites = function () {
         log('Sites', 'Initiating Wordpress website transfer');
         if (existingSite && existingSite != "") {
             log('Sites', 'Transferring Wordpress data to site with uid ' + existingSite);
-            var Configs = require('./config.js');
+            var Configs = require('./lib/config');
             var siteConf = Configs.fetchConfig(existingSite);
             siteConf.wptransferring = true;
             siteConf.wpdb = dat;
@@ -486,7 +486,7 @@ var Sites = function () {
                                     if (err) {
                                         cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
                                     } else {
-                                        var siteConf = require('./config.js').fetchConfig(existingSite);
+                                        var siteConf = require('./lib/config').fetchConfig(existingSite);
                                         siteConf.wptransferring = true;
                                         siteConf.wpdb = dat;
     

@@ -1,6 +1,6 @@
 
 var db = require('./lib/db.js');
-const _c = require('./config');
+const _c = require('./lib/config');
 
 class Preferences {
 

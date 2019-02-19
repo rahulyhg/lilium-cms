@@ -1,4 +1,4 @@
-var livevars = require('../livevars.js');
+var livevars = require('../pipeline/livevars.js');
 var db = require('../lib/db.js');
 
 // Search schemas

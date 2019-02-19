@@ -133,7 +133,7 @@ class Admin {
 	registerLiveVar () {
 		let that = this;
 
-		require('../livevars.js').registerLiveVariable('adminmenus', (cli, levels, params, callback) => {
+		require('../pipeline/livevars.js').registerLiveVariable('adminmenus', (cli, levels, params, callback) => {
             if (!levels[0]) {
                 const sortedMenus = [];
                 const menus = that.getAdminMenus();

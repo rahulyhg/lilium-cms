@@ -3,11 +3,11 @@ const request = require('request');
 const fs = require('fs');
 
 const sites = require('../sites.js');
-const config = require('../config.js');
+const config = require('../lib/config');
 const hooks = require('../hooks.js');
 const db = require('../lib/db.js');
 const sitemapLib = require('../lib/sitemap.js');
-const articleLib = require('../content.js');
+const articleLib = require('../lib/content.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
 const CDN = require('../lib/cdn');

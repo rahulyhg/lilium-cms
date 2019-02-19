@@ -1,7 +1,7 @@
 const path = require('path');
 
 const { readdir, readdirSync, writeFileSync } = require('fs');
-const _c = require('./config');
+const _c = require('./lib/config');
 const webpack = require('webpack');
 
 function compileVocabFile(lang, done) {

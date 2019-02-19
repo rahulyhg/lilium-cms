@@ -1,5 +1,5 @@
 const AMPlib = require('../lib/amp');
-const articleLib = require('../content.js');
+const articleLib = require('../lib/content.js');
 
 class AMPController {
     GET(cli) {

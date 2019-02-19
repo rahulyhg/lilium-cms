@@ -1,23 +1,6 @@
-const db = require('./lib/db.js');
-
-const noop = () => {};
+const db = require('../lib/db.js');
 
 class IPEvents {
-    push(_c, ip, ev, url, extra, cb) {
-        db.rawCollection(_c, 'ipevents', {}, (err, collection) => {
-            collection.updateOne({
-                ip : ip,
-                ev : ev
-            }, {
-                $inc : {count : 1},
-                $addToSet : {urls : url},
-                $set : {extra : extra}
-            }, {
-                upsert : true
-            }, cb || noop)
-        });
-    }
-
     livevar(cli, levels, params, send) {
         switch (levels[0]) {
             case "top":

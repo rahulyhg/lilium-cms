@@ -39,18 +39,18 @@ class Core {
                 filelogic : require('./pipeline/filelogic'),
                 hooks : require('./hooks'),
                 entities : require('./entities'),
-                livevars : require('./livevars'),
+                livevars : require('./pipeline/livevars'),
                 API : require('./pipeline/api'),
-                imageResizer : require('./imageResizer'),
+                imageResizer : require('./lib/imageResizer'),
                 LML3 : require('./lml3/compiler'),
-                LML2 : require('./lml'),
+                LML2 : require('./lml/lml'),
                 notifications : require('./notifications'),
                 preferences : require('./preferences'),
                 scheduler : require('./lib/scheduler'),
                 search : require('./search'),
                 sharedcache : require('./lib/sharedcache'),
                 socialdispatch : require('./socialdispatch'),
-                themes : require('./themes'),
+                themes : require('./lib/themes'),
             };
 
             log('Core', 'Created global library', 'success');
@@ -183,7 +183,7 @@ const initShell = () => {
 };
 
 const loadImageSizes = () => {
-    const imageSize = require('./imageSize.js');
+    const imageSize = require('./lib/imageSize.js');
 
     imageSize.add("mini", 48, 48);
     imageSize.add("thumbnail", 150, 150);
@@ -223,7 +223,7 @@ const makeBuild = (cb) => {
             pathLib.join(liliumroot, 'apps', 'lilium', 'less'), 
             pathLib.join(liliumroot, 'backend', 'static', 'compiled', 'v4.css'), 
             { 
-                compress : require('./config').default().env == "prod" 
+                compress : require('./lib/config').default().env == "prod" 
             }, 
         err => {
             err && log('Core', 'Error compiling V4 less files to CSS : ' + err, 'err');
@@ -235,7 +235,7 @@ const makeBuild = (cb) => {
 const loadAudiences = () => {
     if (!isElder) { return; }
 
-    require('./audiences').preload();
+    require('./lib/audiences').preload();
 };
 
 const loadRoles = (cb) => {
@@ -336,7 +336,7 @@ const loadLiveVars = () => {
     require('./notifications.js').registerLiveVar();
     require('./backend/search.js').registerLiveVar();
 
-    const Livevars = require('./livevars.js').init();
+    const Livevars = require('./pipeline/livevars').init();
     Livevars.registerDebugEndpoint();
     log('Core', 'Loaded live variables', 'success');
 };
@@ -348,7 +348,7 @@ const loadNotifications = () => {
 const notifyAdminsViaEmail = () => {
     if (!isElder) { return; }
 
-    const _c = require('./config');
+    const _c = require('./lib/config');
     db.findToArray(_c.default(), "entities", {roles : "lilium"}, (err, users) => {
         users.forEach((user) => {
             if (user.email) {
@@ -507,7 +507,7 @@ const loadEnv = () => {
 
 const executeRunScript = () => {
     if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-        global.liliumenv.run && global.liliumenv.run.apply(require('./config.js'), [__dirname]);
+        global.liliumenv.run && global.liliumenv.run.apply(require('./lib/config'), [__dirname]);
     }
 }
 
@@ -539,7 +539,7 @@ const loadBackendSearch = () => {
 
 const initSchedulingTasks = () => {
     if (isElder) {
-        require('./config.js').eachSync((_c) => {
+        require('./lib/config').eachSync((_c) => {
             require('./caij/caij.js').scheduleTask("refreshTopicLatests", {
                 siteid : _c.id,
                 origin : "Elder"

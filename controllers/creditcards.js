@@ -1,8 +1,8 @@
-const CC = require('./creditcards');
+const CC = require('../lib/creditcards');
 
 class CreditCardController {
     constructor() {
-        this.ccManager = require('./creditcards');
+        this.ccManager = require('../lib/creditcards');
     }
 
     adminDELETE(cli) {

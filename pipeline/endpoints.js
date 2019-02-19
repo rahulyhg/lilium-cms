@@ -1,5 +1,5 @@
 const hooks = require('../hooks.js');
-const config = require('../config.js'); 
+const config = require('../lib/config'); 
 
 const metrics = require('../lib/metrics');
 

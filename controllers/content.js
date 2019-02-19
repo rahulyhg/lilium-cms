@@ -1,7 +1,7 @@
-const filelogic = require('./pipeline/filelogic');
-const contentlib = require('./content');
-const hooks = require('./hooks');
-const db = require('./lib/db');
+const filelogic = require('../pipeline/filelogic');
+const contentlib = require('../lib/content');
+const hooks = require('../hooks');
+const db = require('../lib/db');
 
 class ContentController {
     GET(cli) {

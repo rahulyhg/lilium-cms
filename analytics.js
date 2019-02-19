@@ -96,7 +96,7 @@ class GoogleAnalyticsRequest {
     }
 
     static authorDashboard(_c, gAnalytics, userid, send) {
-        db.findUnique(require('./config').default(), 'entities', { _id : userid }, (err, user) => {
+        db.findUnique(require('./lib/config').default(), 'entities', { _id : userid }, (err, user) => {
             const req = {
                 "metrics" : defaultMetrics, 
                 "start-date" : "30daysAgo", 
@@ -265,7 +265,7 @@ class GoogleAnalyticsRequest {
             }
 
             db.findUnique(_c, 'content', { name : slug }, (err, article) => {
-                db.findUnique(require('./config').default(), 'entities', { _id : article ? article.author : undefined }, (err, author) => {
+                db.findUnique(require('./lib/config').default(), 'entities', { _id : article ? article.author : undefined }, (err, author) => {
                     total.toppage = {
                         article : article ? {
                             title : article.title[0],
@@ -475,7 +475,7 @@ class StatsBeautifier {
             }
         }
                 
-        const ArticleLib = require('./content');
+        const ArticleLib = require('./lib/content');
         const EntityLib = require('./entities');
 
         let arti = -1;
@@ -615,7 +615,7 @@ class GoogleAnalytics {
             sites : [],
             sitetotal : []
         };
-        require('./config').each((site, next) => {
+        require('./lib/config').each((site, next) => {
             sharedcache.get('analytics_realtime_' + site.id, data => {
                 if (!data || !data.pages || !data.pages.map) {
                     return next();
@@ -663,7 +663,7 @@ class GoogleAnalytics {
     }
 
     getAllSitesRealtime(send) {
-        const sites = require('./config').getAllSites();
+        const sites = require('./lib/config').getAllSites();
         const sitesdata = [];
         let index = -1;
         let nextsite = () => {
@@ -830,7 +830,7 @@ class GoogleAnalytics {
     setup() {
         log('Analytics', "Analytics controller setup");
 
-        require('./config').eachSync(_c => {
+        require('./lib/config').eachSync(_c => {
             builder.pushToBuildTree(_c, "networkboard", 'networkboard', {
                 babel : {
                     "plugins": [

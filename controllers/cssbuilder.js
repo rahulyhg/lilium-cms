@@ -9,7 +9,7 @@ class CSSBuilderController {
                     pathLib.join(liliumroot, 'apps', 'lilium', 'less'), 
                     pathLib.join(liliumroot, 'backend', 'static', 'compiled', 'v4.css'), 
                     { 
-                        compress : require('../config').default().env == "prod" 
+                        compress : require('../lib/config').default().env == "prod" 
                     }, 
                 err => {
                     err && log('Core', 'Error compiling V4 less files to CSS : ' + err, 'err');

@@ -1,4 +1,4 @@
-var conf = require('./config.js');
+var conf = require('./lib/config');
 
 var stripe;
 var transaction = function () {

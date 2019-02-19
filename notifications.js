@@ -1,10 +1,10 @@
-const _c = require('./config.js');
+const _c = require('./lib/config');
 const sessionManager = require('./lib/session.js');
 const db = require('./lib/db.js');
 const metrics = require('./lib/metrics');
 const hooks = require('./hooks.js');
 const sites = require('./sites.js');
-const livevars = require('./livevars.js');
+const livevars = require('./pipeline/livevars');
 const sharedcache = require('./lib/sharedcache.js');
 
 let io;

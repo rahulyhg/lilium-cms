@@ -39,7 +39,7 @@ class Darksky {
     }
 
     livevar(cli, levels, params, sendback) {
-        db.findUnique(require('./config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, (err, user) => {
+        db.findUnique(require('./lib/config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, (err, user) => {
             if (user && user.geo) {
                 this.getUserWeather(cli.userinfo.userid, user.geo.latitude, user.geo.longitude, forecast => {
                     sendback(forecast);

@@ -1,7 +1,5 @@
-
-const config = require('./config.js');
+const config = require('./lib/config');
 const filelogic = require('./pipeline/filelogic');
-const lmllib = require('./lmllib.js');
 const sharedcache = require('./lib/sharedcache');
 
 const request = require('request');

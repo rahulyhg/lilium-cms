@@ -213,7 +213,7 @@ class StyledPages {
 
     setup() {
         if (networkinfo.isElderChild()) {
-            require("./config.js").eachSync((site) => {
+            require('./lib/config').eachSync((site) => {
                 db.findToArray(site, 'styledpages', {staticfile : true}, (err, arr) => {
                     arr.forEach(p => this.generatePage(site, p, () => {}));
                 });

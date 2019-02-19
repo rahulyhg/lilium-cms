@@ -2,7 +2,7 @@ var Router = require('./router.js');
 var Dispatcher = require('./dispatcher.js');
 var inspect = require('util').inspect;
 var Busboy = require('busboy');
-var config = require('../config.js');
+var config = require('../lib/config');
 var fs = require('fs');
 const filelogic = require('./filelogic');
 var htmlserver = require('./htmlserver.js');
@@ -10,7 +10,7 @@ var db = require('../lib/db.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
 const hooks = require('../hooks');
-const mediaUpload = require('../mediaUpload');
+const mediaUpload = require('./mediaupload');
 
 var Handler = function () {
     var GET = function (cli) {
@@ -201,7 +201,7 @@ var Handler = function () {
 
     var OPTIONS = function(cli) {
         if (!cli._c) {
-            require('../config').fetchConfigFromCli(cli);
+            require('../lib/config').fetchConfigFromCli(cli);
         }
 
         const origin = cli.request.headers.corsorigin || cli.request.headers.origin || (cli._c && cli._c.server.url);

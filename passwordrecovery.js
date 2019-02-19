@@ -17,7 +17,7 @@ class PasswordRecovery {
     }
 
     sendSMS(username, code, callback) {
-        db.findUnique(require('./config').default(), 'entities', { username }, (err, entity) => {
+        db.findUnique(require('./lib/config').default(), 'entities', { username }, (err, entity) => {
             if (entity && entity.phone) {
                 SMS.sendTo(entity.phone, this.generateMessage(code), callback);
             } else {
@@ -32,7 +32,7 @@ class PasswordRecovery {
 
     commitPassword(username, password, sendback) {
         sharedcache.unset("recover_user_" + username, () => {
-            db.update(require('./config').default(), 'entities', { username }, { shhh : require('./entities').hashPassword(password) }, (err, r) => {
+            db.update(require('./lib/config').default(), 'entities', { username }, { shhh : require('./entities').hashPassword(password) }, (err, r) => {
                 sendback(r.modifiedCount);
             });
         });

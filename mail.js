@@ -73,7 +73,7 @@ class MailTemplate {
 
 class MailController {
     constructor() {
-        require('./config.js').eachSync((conf) => {
+        require('./lib/config').eachSync((conf) => {
         });
     }
 
@@ -245,7 +245,7 @@ class LMLMail {
                 callback && callback(new Error("Could not send email : missing fields"));
             } else {
                 log('Gmail', 'Sending email from ' + senderInfo[email.siteid].user + ' to ' + email.to);
-                let _c = require('./config.js').fetchConfig(email.siteid);
+                let _c = require('./lib/config').fetchConfig(email.siteid);
     
                 let emailobj = {
                     from : '"' + senderInfo[email.siteid].from + '" <' + senderInfo[email.siteid].user + ">",

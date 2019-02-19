@@ -108,7 +108,7 @@ class Reporting {
 
     setup() {
         let that = this;
-        require("./config.js").eachSync((site) => {
+        require('./lib/config').eachSync((site) => {
             that.sites[site.id] = new ReportedSite(site);
         });
     }

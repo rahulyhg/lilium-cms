@@ -2,7 +2,7 @@ const url = require('url');
 const pathlib = require('path');
 const session = require('../lib/session');
 const hooks = require('../hooks');
-const _c = require('../config');
+const _c = require('../lib/config');
 
 class Router {
     parseClientObject(cli, cb) {
