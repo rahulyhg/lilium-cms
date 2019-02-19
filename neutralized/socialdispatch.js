@@ -4,7 +4,7 @@ const config = require('./lib/config');
 const filelogic = require('./pipeline/filelogic');
 const request = require('request');
 const articleLib = require('./lib/content.js');
-const searchLib = require('./search.js');
+const searchLib = require('./lib/search.js');
 const sharedcache = require('./lib/sharedcache.js');
 
 const CAIJ = require('./caij/caij.js');

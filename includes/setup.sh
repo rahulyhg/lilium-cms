@@ -1,3 +1,6 @@
+echo "Moving to Lilium root directory"
+cd ..
+
 # Install native dependencies depending on OS
 echo "Detecting OS before installing native dependencies"
 OSuname="$(uname -s)"

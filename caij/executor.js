@@ -2,7 +2,7 @@ const localcast = require('../network/localcast.js');
 const request = require('request');
 const fs = require('fs');
 
-const sites = require('../sites.js');
+const sites = require('../lib/sites.js');
 const config = require('../lib/config');
 const hooks = require('../lib/hooks');
 const db = require('../lib/db.js');
@@ -28,6 +28,9 @@ class RunningTask {
     }
 
     socialDispatch(sendback) {
+        return sendback();
+        ///////////////////////////////////////////
+
         let action = this.extra.action;
 
         log("RunningTask", "Executing socialDispatch task with action : " + action);

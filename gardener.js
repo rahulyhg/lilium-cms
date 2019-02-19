@@ -2,7 +2,7 @@ const config = require('./lib/config');
 const filelogic = require('./pipeline/filelogic');
 const cluster = require('cluster');
 const RedisServer = require('redis-server');
-const log = require('./log');
+const log = require('./lib/log');
 const fs = require('fs');
 
 const { spawn, execSync } = require('child_process');

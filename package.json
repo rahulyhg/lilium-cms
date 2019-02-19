@@ -5,8 +5,9 @@
   "main": "index.prod.js",
   "scripts": {
     "test": "cd ./tests && ./runNpm.sh && exit 0",
+    "script": "node ./includes/runscript.js",
     "shell": "node ./cli/shell.js",
-    "setupdev": "chmod +x ./setup.sh && ./setup.sh",
+    "setup": "chmod +x ./includes/setup.sh && ./includes/setup.sh",
     "ci": "cd ./tests && ./runCI.sh && exit 0",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.prod.js",
     "dev": "node gardener.js dev",

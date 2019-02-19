@@ -1,5 +1,5 @@
 const db = require('../lib/db.js');
-const mail = require('../mail.js');
+const mail = require('../lib/mail.js');
 const Admin = require('../backend/admin.js');
 const livevars = require('../pipeline/livevars');
 const clib = require('../lib/communications');

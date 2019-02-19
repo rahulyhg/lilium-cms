@@ -1,6 +1,6 @@
 class LiliumCMS {
     init() {
-        global.log = require('./log');
+        global.log = require('./lib/log');
         global.liliumroot = __dirname;
         log('Lilium', 'Starting up...', 'lilium');
 

@@ -6,7 +6,7 @@ const OS = require('os');
 const ShellServer = require('./cli/server');
 const metrics = require('./lib/metrics');
 
-global.require_template = require('./templaterequire');
+global.require_template = require('./lib/templaterequire');
 
 const v4 = new V4();
 
@@ -44,11 +44,10 @@ class Core {
                 imageResizer : require('./lib/imageResizer'),
                 LML3 : require('./lml3/compiler'),
                 LML2 : require('./lml/lml'),
-                notifications : require('./notifications'),
+                notifications : require('./lib/notifications'),
                 scheduler : require('./lib/scheduler'),
-                search : require('./search'),
+                search : require('./lib/search'),
                 sharedcache : require('./lib/sharedcache'),
-                socialdispatch : require('./socialdispatch'),
                 themes : require('./lib/themes'),
             };
 
@@ -331,7 +330,7 @@ const loadCacheInvalidator = () => {
 
 const loadLiveVars = () => {
     require('./backend/admin.js').registerLiveVar();
-    require('./notifications.js').registerLiveVar();
+    require('./lib/notifications.js').registerLiveVar();
     require('./backend/search.js').registerLiveVar();
 
     const Livevars = require('./pipeline/livevars').init();
@@ -340,7 +339,7 @@ const loadLiveVars = () => {
 };
 
 const loadNotifications = () => {
-    require('./notifications.js').init();
+    require('./lib/notifications.js').init();
 }
 
 const notifyAdminsViaEmail = () => {
@@ -350,7 +349,7 @@ const notifyAdminsViaEmail = () => {
     db.findToArray(_c.default(), "entities", {roles : "lilium"}, (err, users) => {
         users.forEach((user) => {
             if (user.email) {
-                require('./mail.js').triggerHook(_c.default(), 'lilium_restarted', user.email, {
+                require('./lib/mail.js').triggerHook(_c.default(), 'lilium_restarted', user.email, {
                     sigsha : require("crypto-js").SHA256(new Date()).toString(require("crypto-js").enc.Hex),
                     user : user,
                     lmllibs : ["config", "extra", "date"]
@@ -361,7 +360,7 @@ const notifyAdminsViaEmail = () => {
 };
 
 const prepareDefaultSiteCreation = (cb) => {
-    require('./init.js')(cb);
+    require('./includes/init.js')(cb);
 };
 
 const validateNetworkSite = () => {
@@ -377,7 +376,7 @@ const validateNetworkSite = () => {
 }
 
 const loadWebsites = (loadEverything) => {
-    sites = require('./sites.js');
+    sites = require('./lib/sites.js');
 
     const currentRoot = __dirname;
     const fss = require('./pipeline/filelogic');

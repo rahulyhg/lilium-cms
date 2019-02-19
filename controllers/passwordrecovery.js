@@ -1,43 +1,9 @@
-// ⚠️ Sensitive endpoints /accesscheckpoint ⚠️
 const path = require('path');
-const request = require('request');
-
-const db = require('./lib/db');
-const LML3 = require('./lml3/compiler');
-const sharedcache = require('./lib/sharedcache');
-const SMS = require('./lib/sms');
+const LML3 = require('../lml3/compiler');
+const sharedcache = require('../lib/sharedcache');
+const plib = require('../lib/passwordrecovery');
 
 class PasswordRecovery {
-    generateCode() {
-        return (Math.random().toString().substring(3, 9) || this.generateCode()) + "C";
-    }
-
-    generateMessage(code) {
-        return `Hello 😎 \n\nAs requested, here is your Lilium code : ${code}. \n\nIf you did not request this code please disregard this message.\n\nCheers! 🌺`;
-    }
-
-    sendSMS(username, code, callback) {
-        db.findUnique(require('./lib/config').default(), 'entities', { username }, (err, entity) => {
-            if (entity && entity.phone) {
-                SMS.sendTo(entity.phone, this.generateMessage(code), callback);
-            } else {
-                callback(false);
-            }
-        }, {phone : 1});
-    }
-
-    adminGET(cli) {
-
-    }
-
-    commitPassword(username, password, sendback) {
-        sharedcache.unset("recover_user_" + username, () => {
-            db.update(require('./lib/config').default(), 'entities', { username }, { shhh : require('./entities').hashPassword(password) }, (err, r) => {
-                sendback(r.modifiedCount);
-            });
-        });
-    }
-
     GET(cli) {
         const maybeusername = cli.routeinfo.path[1];
         if (maybeusername) {
@@ -45,8 +11,8 @@ class PasswordRecovery {
                 const usercode = cli.request.headers["lml-code"];
                 const secret = cli.request.headers["lml-secret"];
                 if (!code) {
-                    const newcode = this.generateCode();
-                    this.sendSMS(maybeusername, newcode, (alright) => {
+                    const newcode = plib.generateCode();
+                    plib.sendSMS(maybeusername, newcode, (alright) => {
                         alright ? sharedcache.set({
                             ["recover_user_" + maybeusername] : newcode
                         }, () => {
@@ -55,7 +21,7 @@ class PasswordRecovery {
                         }) : cli.sendJSON({response : 1});
                     });
                 } else if (secret && usercode == code) {
-                    this.commitPassword(maybeusername, secret, (valid) => {
+                    plib.commitPassword(maybeusername, secret, (valid) => {
                         cli.sendJSON({response : valid ? 0 : 1})
                     });
                 } else if (usercode) {
