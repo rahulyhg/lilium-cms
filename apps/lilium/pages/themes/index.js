@@ -48,6 +48,7 @@ export class ThemeSettingsForm extends Component {
                 placeholder={entry.attr.displayname}
                 onChange={this.valueChanged.bind(this)}
                 initialValue={this.coldState[name] || []}
+                schema={entry.schema}
             />);
 
             case "checkbox": return (<CheckboxField 
