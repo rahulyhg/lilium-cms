@@ -22,12 +22,12 @@ const defaultCT = 'text/html; charset=utf-8';
 const glob = require('glob');
 const Minimize = new (require('minimize'))({ loose: true }); 
 
-const serveCachedFile = function (cli, fullpath) {
+const serveCachedFile = (cli, fullpath) => {
     cli.touch('that.serveCachedFile');
     that.serveAbsFile(cli, fullpath);
 };
 
-const serveSpecialPage = function (cli, fullpath) {
+const serveSpecialPage = (cli, fullpath) => {
     cli.touch('that.serveSpecialPage');
     var specialName =
         cli.routeinfo.login ? "login" :
@@ -40,28 +40,28 @@ const serveSpecialPage = function (cli, fullpath) {
     saveLmlPage(cli, readPath, savePath);
 };
 
-const serveStaticFile = function (cli, fullpath) {
+const serveStaticFile = (cli, fullpath) => {
     cli.touch('filelogix.serveStaticFile');
     cli.debug();
 };
 
-const redirectUserTo = function (cli) {
+const redirectUserTo = (cli) => {
     cli.touch('that.redirectUserTo');
     cli.debug();
 };
 
-const checkForSpecialPage = function (cli) {
+const checkForSpecialPage = (cli) => {
     cli.touch('that.checkForSpecialPage');
     return cli.routeinfo.admin || cli.routeinfo.login;
 };
 
-const checkForRedirection = function (cli) {
+const checkForRedirection = (cli) => {
     cli.touch('that.checkForRedirection');
     cli.redirectTo = undefined;
     return false;
 };
 
-const saveLmlPage = function (cli, readPath, savePath, extra) {
+const saveLmlPage = (cli, readPath, savePath, extra) => {
     extra = extra || new Object();
     extra.siteid = cli._c.id;
     extra.config = cli._c;
@@ -69,7 +69,7 @@ const saveLmlPage = function (cli, readPath, savePath, extra) {
     LML.executeToFile(
         readPath,
         savePath,
-        function () {
+        () => {
             cli.touch('that.serveSpecialPage.callback');
             cli.responseinfo.filecreated = true;
             serveCachedFile(cli, savePath);
@@ -94,7 +94,7 @@ class FileLogic {
 
     serveRelativeLML (cli, path, extra) {
         const savePath = cli._c.server.html + "/" + path + '/index.html';
-        that.fileExists(savePath, function (isPresent) {
+        that.fileExists(savePath, (isPresent) => {
             const readPath = cli._c.server.base + "backend/dynamic/" + path + ".lml";
             if (!isPresent) {
                 saveLmlPage(cli, readPath, savePath, extra);
@@ -109,7 +109,7 @@ class FileLogic {
 
         // Locate entity
         require('../lib/iplocator').findClient(cli);
-        sharedcache.get('admin_template_' + cli._c.uid, function(hContent) {
+        sharedcache.get('admin_template_' + cli._c.uid, (hContent) => {
             if (hContent) {
                 cli.response.writeHead(200, {"content-type" : "text/html"});
                 cli.response.end(hContent);
@@ -121,12 +121,12 @@ class FileLogic {
 
                 const now = new Date();
                 log('LML2', "Compiling file from " + adminPath, 'info');
-                that.readFile(adminPath, function(content) {
-                    LML2.compileToString(cli._c.id, content, extra, function(ctn) {
+                that.readFile(adminPath, (content) => {
+                    LML2.compileToString(cli._c.id, content, extra, (ctn) => {
                         ctn = that.minifyString(ctn);
                         sharedcache.set({
                             ["admin_template_" + cli._c.uid] : ctn
-                        }, function() {
+                        }, () => {
                             cli.response.writeHead(200, {"content-type" : "text/html"});
                             cli.response.end(ctn);
                             cb && cb();
