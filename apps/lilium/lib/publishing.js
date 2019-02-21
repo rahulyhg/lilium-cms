@@ -87,3 +87,9 @@ export function addPostToSeries(postid, serieid, done) {
         done(r.status != 200, json || {});
     });
 }
+
+export function sendPreviewEmail(postid, emails, done) {
+    API.post('/publishing/sendpreview/' + postid, { emails }, (err, json, r) => {
+        done(r.status != 200, json || {});
+    });
+}

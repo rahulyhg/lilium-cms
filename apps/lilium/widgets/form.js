@@ -98,6 +98,14 @@ export class ButtonWorker extends Component {
         }
     }
 
+    componentWillReceiveProps(newprops) {
+        if (newprops.working) {
+            this.setState({ working : true });
+        } else if (newprops.working === false) {
+            this.setState({ working : false });
+        }
+    }
+
     done() {
         this.setState({ working : false });
         this.props.done && this.props.done();

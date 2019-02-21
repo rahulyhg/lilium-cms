@@ -13,7 +13,7 @@ import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
 import Modal from '../../widgets/modal';
 import dateFormat from 'dateformat';
-import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink, addPostToSeries } from '../../lib/publishing';
+import { savePost, validatePost, getPostForEdit, refreshPost, destroyPost, refusePost, submitPostForApproval, publishPost, unpublishPost, getPublicationReport, updatePostSlug, getNewPreviewLink, addPostToSeries, sendPreviewEmail } from '../../lib/publishing';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
@@ -169,6 +169,7 @@ class PublishingActions extends Component {
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
                     { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
+                    { color : "black", text : "Email preview link", work : this.props.actions.triggerSendPreview.bind(this) },
                     { color : "red", text : "Destroy", work : this.props.actions.destroy.bind(this) }
                 );
             } else if (status == "published") {
@@ -181,6 +182,7 @@ class PublishingActions extends Component {
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
                     { color : "black", text : "Add to series", work : this.props.actions.triggerAddToSeries.bind(this) },
                     { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
+                    { color : "black", text : "Email preview link", work : this.props.actions.triggerSendPreview.bind(this) },
                     { color : "red", text : "Unpublish", work : this.props.actions.unpublish.bind(this) }
                 );
             } else if (status == "reviewing") {
@@ -193,6 +195,7 @@ class PublishingActions extends Component {
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
                     { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
+                    { color : "black", text : "Email preview link", work : this.props.actions.triggerSendPreview.bind(this) },
                     { color : "red", text : "Refuse submission", work : this.props.actions.refuse.bind(this) }
                 );
             }
@@ -479,6 +482,7 @@ export default class EditView extends Component {
             triggerSlugChange : this.triggerSlugChange.bind(this),
             triggerPreviewLinkChange : this.triggerPreviewLinkChange.bind(this),
             triggerAddToSeries : this.triggerAddToSeries.bind(this),
+            triggerSendPreview: this.triggerSendPreview.bind(this),
             commitchanges : this.commitchanges.bind(this),
             unpublish : this.unpublish.bind(this),
             refuse : this.refuse.bind(this)
@@ -880,6 +884,12 @@ export default class EditView extends Component {
         });        
     }
 
+    triggerSendPreview() {
+        this.setState({
+            showSendPreview : true
+        });
+    }
+
     triggerPreviewLinkChange(done) {
          getNewPreviewLink(this.state.post._id, (err, { previewkey }, r) => {
             if (!err) {
@@ -950,6 +960,36 @@ export default class EditView extends Component {
             updatingSlug : false,
             updatingAuthor : false
         });
+    }
+
+    sendPreviewEmail() {
+        const fieldvalue = this.stage.previewemail && this.stage.previewemail.trim();
+        if (!fieldvalue) {
+            castNotification({
+                type : "warning",
+                title : "Invalid list of emails",
+                message : err
+            })
+        } else {
+            const emails = fieldvalue.split(',').map(x => x.trim()).filter(x => x);
+            sendPreviewEmail(this.state.post._id, emails, (err, resp) => {
+                if (err) {
+                    castNotification({
+                        type : "warning",
+                        message : "Lilium refused to send a preview of this article to the provided email addresses",
+                        title : "Could not send preview"
+                    }) 
+                } else {
+                    castNotification({
+                        type : "success",
+                        title : "Emails sent",
+                        message : "Successfully sent preview via email"
+                    }) 
+
+                    this.setState({ showSendPreview : false });
+                }
+            })
+        }
     }
 
     handleDetailsAction(field, value) {
@@ -1077,6 +1117,13 @@ export default class EditView extends Component {
                     <ButtonWorker theme="blue"  type="outline" text="No, I want to keep it" sync={true} work={() => { this.setState({ destroyModalVisible: false }) }} />
                 </Modal>
 
+                <Modal title="Send preview via email" visible={this.state.showSendPreview} onClose={() => { this.setState({ showSendPreview : false }) }} >
+                    <p>The person you are sending the preview to will be able to follow any changes done to the article until it is published.</p>
+                    <p>It is however possible to invalidate the preview link. Doing so will render the link you are about to send unusable.</p>
+
+                    <TextField name="previewemail" placeholder='Email addresses, comma separated' onChange={(name, value) => { this.stage[name] = value; }} initialValue="" />
+                    <ButtonWorker text='Send email' work={this.sendPreviewEmail.bind(this)} />
+                </Modal>
             </div>
         )
     }
