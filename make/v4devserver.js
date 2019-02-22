@@ -1,3 +1,5 @@
+const pathlib = require('path');
+
 module.exports = class V4DevServer {
     constructor(_c) {
         this._c = _c;
@@ -45,6 +47,12 @@ module.exports = class V4DevServer {
                             }
                         }
                     },
+                ]
+            },
+            resolve : {
+                modules : [
+                    pathlib.resolve(pathlib.join(liliumroot, 'apps', 'lilium')),
+                    pathlib.resolve(pathlib.join(liliumroot, 'node_modules'))
                 ]
             },
             entry : require('path').join(liliumroot, 'tmp', 'app' + _c.uid + '.js'),

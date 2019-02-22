@@ -72,27 +72,28 @@
  *  ------------------------------------------------------------------------------------------------
  */
 import { Component, h, render } from 'preact';
-import { makeGlobalLogger } from './data/logger';
-import { Header } from './layout/header'
-import { LiliumMenu } from './layout/menu';
-import { URLRenderer } from './routing/urlrenderer';
-import { Picker } from './layout/picker';
-import { LoadingView } from './layout/loading';
-import { OverlayWrap } from './overlay/overlaywrap';
-import { PasswordReset } from './layout/passwordreset';
-import { Lys } from './layout/lys';
-import { LiliumSession } from './data/session';
-import { initiateConnection, bindRealtimeEvent } from './realtime/connection';
-import { initializeDevEnv, DevTools } from './dev/env';
-import { initLocal, setSession, mapUsers } from './data/cache';
-import { NotificationWrapper, castNotification } from './layout/notifications';
-import { setLanguage } from './data/vocab';
-import { CakepopWrapper } from './layout/cakepopsmanager';
+import { makeGlobalLogger } from 'data/logger';
+import { Header } from 'layout/header'
+import { LiliumMenu } from 'layout/menu';
+import { URLRenderer, EndpointStore } from 'routing/urlrenderer';
+import { Picker } from 'layout/picker';
+import { LoadingView } from 'layout/loading';
+import { OverlayWrap } from 'overlay/overlaywrap';
+import { PasswordReset } from 'layout/passwordreset';
+import { Lys } from 'layout/lys';
+import { LiliumSession } from 'data/session';
+import { initiateConnection, bindRealtimeEvent } from 'realtime/connection';
+import { initializeDevEnv, DevTools } from 'dev/env';
+import { initLocal, setSession, mapUsers } from 'data/cache';
+import { NotificationWrapper, castNotification } from 'layout/notifications';
+import { setLanguage } from 'data/vocab';
+import { CakepopWrapper } from 'layout/cakepopsmanager';
 
-import API from './data/api';
+import API from 'data/api';
 
 // Global access to session, connection state, URL
 window.liliumcms = window.liliumcms || {};
+liliumcms.session = new LiliumSession();
 liliumcms.connected = true;
 
 // Create `log` function
@@ -191,12 +192,12 @@ export class Lilium extends Component {
                     setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
 
                     // Create new session object with current user's information
-                    liliumcms.session = new LiliumSession(resp["/me"][0]);
+                    liliumcms.session.setUser(resp["/me"][0]);
 
                     // Set allowed endpoints according to admin menus, plus hardcoded ones
-                    liliumcms.session.setAllowedEndpoints([
+                    liliumcms.session.addAllowedEndpoints([
                         "me", "preferences", "logout", "notifications", "onboarding", 
-                        ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
+                        ...resp["/adminmenus"].map(x => x.absURL.split('/')[1]),
                     ]);
 
                     // Let the show begins
