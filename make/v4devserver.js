@@ -47,7 +47,7 @@ module.exports = class V4DevServer {
                     },
                 ]
             },
-            entry : require('path').join(_c.server.base, 'apps/lilium', 'main.js'),
+            entry : require('path').join(liliumroot, 'tmp', 'app' + _c.uid + '.js'),
             plugins: [ ],
             output : {
                 filename : "app.bundle.js"
