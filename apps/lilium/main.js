@@ -209,9 +209,13 @@ export class Lilium extends Component {
                         ...resp["/adminmenus"].map(x => x.absURL.split('/')[1]),
                     ]);
 
-                    fireEvent('appWillRender');
+                    const nextState = {
+                        session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage 
+                    }
+
+                    fireEvent('appWillRender', nextState);
                     // Let the show begins
-                    this.setState({ session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage }, () => {
+                    this.setState(nextState, () => {
                         fireEvent('appRendered');
                     }); 
                 });
