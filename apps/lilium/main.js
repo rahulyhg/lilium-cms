@@ -194,7 +194,11 @@ export class Lilium extends Component {
                 const currentLanguage = resp['/me'][0].preferences && resp['/me'][0].preferences.uiLanguage || 'english';
 
                 // Set user language before rendering the UI
-                setLanguage(currentLanguage, () => {
+                setLanguage(currentLanguage, languageInstance => {
+                    fireEvent('languageLoaded', {
+                        language : currentLanguage,
+                        instance : languageInstance
+                    });
                     
                     // Store all entities in session storage as well as mapped version of array
                     setSession("entities", resp["/entities/simple"]);

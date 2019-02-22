@@ -8,7 +8,6 @@ export const setLanguage = (lang, done) => {
     const languageFileName = lang + '.bundle.js';
     fetch('/static/compiled/' + languageFileName)
     .then(r => r.text()).then(js => {
-
         // EVAL DANGER ZONE //////
         /**/     eval(js)     /**/
         //////////////////////////
@@ -22,7 +21,7 @@ export const setLanguage = (lang, done) => {
         }
 
         // Create new execution context because Prmises are ridiculous
-        setTimeout(() => done && done(), 0);
+        setTimeout(() => done && done(langInstance), 0);
     })
     .catch(err => {
         log('Vocab', 'Failed to load vocab file : ' + lang, 'err');
