@@ -86,6 +86,7 @@ import { initiateConnection, bindRealtimeEvent } from 'realtime/connection';
 import { initializeDevEnv, DevTools } from 'dev/env';
 import { initLocal, setSession, mapUsers } from 'data/cache';
 import { NotificationWrapper, castNotification } from 'layout/notifications';
+import { fireEvent } from 'interactive/events';
 import { setLanguage } from 'data/vocab';
 import { CakepopWrapper } from 'layout/cakepopsmanager';
 
@@ -128,6 +129,7 @@ export class Lilium extends Component {
         // Fired when socket disconnects
         bindRealtimeEvent('disconnect', ev => {
             window.liliumcms.connected = false;
+            fireEvent('disconnect');
             log('Socket', "Lost internet connection, notifying user", 'socket');
 
             castNotification({
@@ -142,6 +144,7 @@ export class Lilium extends Component {
             log('Socket', "Internet connection restored, notifying user", 'socket');
 
             window.liliumcms.connected = true;
+            fireEvent('reconnect');
 
             // Process all pending requests from when socket was offline
             API.processPendingRequests();
@@ -172,13 +175,19 @@ export class Lilium extends Component {
         log('Lilium', 'Requesting current session information', 'lilium');
 
         // Fetch current user, admin menus, simple version of all entities
-        API.getMany([
+        const originalRequests = [
             { endpoint : '/me', params : {} },
             { endpoint : "/adminmenus", params : {} },
             { endpoint : "/entities/simple", params : {} }
-        ], (err, resp) => {
+        ];
+
+        fireEvent("sessionWillFetch", originalRequests);
+        API.getMany(originalRequests, (err, resp) => {
             // If no session found or at least one error detected, abort and output
+            fireEvent('sessionFetched', resp);
+
             if (!resp["/me"] || !resp["/me"][0] || Object.keys(err).filter(x => err[x]).length != 0) {
+                fireEvent('sessionFailed', err);
                 this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
@@ -200,8 +209,11 @@ export class Lilium extends Component {
                         ...resp["/adminmenus"].map(x => x.absURL.split('/')[1]),
                     ]);
 
+                    fireEvent('appWillRender');
                     // Let the show begins
-                    this.setState({ session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage });            
+                    this.setState({ session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage }, () => {
+                        fireEvent('appRendered');
+                    }); 
                 });
             }   
         });
@@ -243,4 +255,6 @@ export class Lilium extends Component {
 }
 
 log('Lilium', 'Lilium CMS V4, about to blow your mind in a million pieces.', 'lilium');
-render(<Lilium />, document.getElementById('app'));
+global.__start_lilium__ = () => {
+    render(<Lilium />, document.getElementById('app'));
+};
