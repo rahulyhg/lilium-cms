@@ -9,6 +9,7 @@ class ClientObject {
         this.ip = req.headers["x-real-ip"] || req.connection.remoteAddress;
         this.method = req.method;
         this.nodes = ['clientobject.new'];
+        this.userlanguage = req.headers["x-lml-language"] || "english";
         this.cookies = {};
         this.session = {};
         this.userinfo = {};
