@@ -78,6 +78,7 @@ class EditionEdit extends Component {
         return (<FieldClass 
             onChange={this.editionFieldChanged.bind(this)} 
             initialValue={initValue || ""} 
+            value={initValue || ""} 
             name={field.name} 
             placeholder={field.displayname} 
             {...field.props} />);
