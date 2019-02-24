@@ -345,8 +345,8 @@ if (process.env.spawn) {
     switch (global.psmanager) {
         case "pm2"     : global.__LILIUMNETWORK = new PM2Cluster(); break;
         case "cluster" : global.__LILIUMNETWORK = new GardenerCluster(); break;
-        default : log("Gardener", "No process manager defined.", "err"); process.exit(1);
+        default : log("Gardener", "No process manager defined.", "err"); 
     }
 
-    global.__LILIUMNETWORK.start();
+    global.__LILIUMNETWORK ? __LILIUMNETWORK.start() :process.exit(1);
 }
