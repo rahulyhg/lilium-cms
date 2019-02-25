@@ -270,6 +270,10 @@ class FileLogic {
                 extra.language = extra.language || _c.website.language;
                 cTheme.settings = cTheme.settings || {};
 
+                if (cTheme.settings) {
+                    cTheme.settings = cTheme.settings[extra.language] || cTheme.settings.en;
+                }
+
                 extra.theme = cTheme;
                 extra.minify = true;
                 extra.url = _c.server.url;
@@ -294,10 +298,6 @@ class FileLogic {
                 }
 
                 savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
-
-                if (extra.topic && extra.topic.override) {
-                    extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
-                }
             } catch (err) {
                 return cli.crash(err);
             }
