@@ -14,7 +14,7 @@ class ThemeControllers {
                     });
                 });
             } else if (cli.routeinfo.path[2] == "updateOneField") {
-                themelib.updateOneField(cli._c, cli.postdata.data.field, cli.postdata.data.value, () => {
+                themelib.updateOneField(cli._c, cli.postdata.data.lang, cli.postdata.data.field, cli.postdata.data.value, () => {
 
                 });
             } else {
