@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
 import { TextField, SelectField, StackBox, CheckboxField, MediaPickerField } from '../../widgets/form';
+import { TabView, Tab } from '../../widgets/tabview';
 
 export class ThemeSettingsForm extends Component {
     constructor(props) {
@@ -9,7 +10,9 @@ export class ThemeSettingsForm extends Component {
             theme : props.theme
         };
 
-        this.coldState = props.theme.settings || {};
+        const settings = props.theme.settings;
+
+        this.coldState = settings && settings[props.lang] ? settings[props.lang] : {};
     }
 
     componentWillReceiveProps(props) {
@@ -19,7 +22,7 @@ export class ThemeSettingsForm extends Component {
     valueChanged(field, value) {
         this.coldState[field] = value;
         API.post('/themes/updateOneField', {
-            field, value
+            field, value, lang : this.props.lang
         }, () => {
             log('Themes', 'Updated theme field : ' + field, 'success');
         });
@@ -156,7 +159,14 @@ export default class ThemeSettings extends Component {
                 <div style={{ maxWidth : 780, margin : "auto" }}>
                     <h1>Settings</h1>
                     <div class="theme-settings">
-                        <ThemeSettingsForm theme={this.state.current} />
+                        <TabView>
+                            <Tab title="English">
+                                <ThemeSettingsForm lang="en" theme={this.state.current} />
+                            </Tab>
+                            <Tab title="French">
+                                <ThemeSettingsForm lang="fr" theme={this.state.current} />
+                            </Tab>
+                        </TabView>
                     </div>
                 </div>
             </div>
