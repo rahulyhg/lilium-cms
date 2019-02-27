@@ -1,5 +1,5 @@
 const db = require('../lib/db');
-const contentlib = require('../content');
+const contentlib = require('../lib/content');
 
 
 module.exports = (_c, done) => {

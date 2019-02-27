@@ -159,7 +159,7 @@ const loadEndpoints = () => {
 
     admin.registerAdminEndpoint('me', 'POST', (cli) => {
         cli.touch('admin.POST.me');
-        entities.adminPOST(cli);
+        require('./controllers/entities').adminPOST(cli);
     });
 
     admin.registerAdminEndpoint('me', 'GET', (cli) => {

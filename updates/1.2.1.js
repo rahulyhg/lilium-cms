@@ -1,8 +1,8 @@
 
 const db = require('../lib/db.js');
 const config = require('../lib/config');
-const badges = require('../badges.js');
-const articleLib = require('../content.js');
+const badges = require('../lib/badges.js');
+const articleLib = require('../lib/content.js');
 
 const DECO_COLLECTION = "decorations";
 const ACTION_STATS_COLLECTION = "actionstats";
