@@ -2,5 +2,15 @@
     "active" : true,
     "displayname" : "Uncategorized",
     "slug" : "uncategorized",
-    "level" : 0
+    "level" : 0,
+    "lang" : {
+        "en" : {
+            "displayname" : "Uncategorized",
+            "slug" : "uncategorized"
+        }, 
+        "fr" : {
+            "displayname" : "Divers",
+            "slug" : "divers"
+        }
+    }
 }
