@@ -18,12 +18,12 @@ mkdir sites
 mkdir flowers
 mkdir plugins
 
-echo "Input / Paste theme github repo URL : "
-read themeurl
+#echo "Input / Paste theme github repo URL : "
+#read themeurl
 
-echo "Cloning ${themeurl} in theme directory"
+echo "Cloning default theme into theme directory"
 cd flowers 
-git clone ${themeurl} 
+git clone https://github.com/narcitymedia/lilium-violet-theme 
 cd */
 npm install 
 
