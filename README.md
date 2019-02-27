@@ -11,7 +11,7 @@ Lilium does not use Express, Mongoose, or other heavy libraries. Instead, it imp
 
 ## Installation guide
 
-All NodeJS packages are to be installed, and are documented in the package file. You can simply run *npm install && npm run setupdev* in the Lilium root folder.
+All NodeJS packages are to be installed, and are documented in the package file. You can simply run *npm run setupdev* in the Lilium root folder.
 
 ## Automated installation
 
