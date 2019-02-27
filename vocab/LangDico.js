@@ -6,13 +6,23 @@ class LangDico {
     }
 
     _v(str) {
-        return this.dictionary[str] || `Unknown key ${str}`;
+        const levels = str.split('.');
+        if (levels.length == 1) return this.dictionary[str] || log('Vocab', `Unknown key ${str}, 'warn)`);
+
+        // Allow dynamic access with dot notation
+        return levels.reduce((prev, curr) => {
+            return prev ? prev[curr] : null
+        }, this.dictionary) || 'Unknown dot notation key';
     }
 
     _ev(str, ...args) {
         return this.extendedDictionary[str] ? 
             this.extendedDictionary[str](...args) : 
             `Unknown key ${str}`;
+    }
+
+    extend(prefix, dict) {
+        this.dictionary["_" + prefix] = dict;
     }
 }
 

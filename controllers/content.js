@@ -50,7 +50,15 @@ class ContentController {
             case "preview" : 
                 contentlib.getPreview(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, markup => cli.sendHTML(markup));
                 break;
-
+            case 'sendpreview':
+                contentlib.sendPreviewViaEmail(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data.emails, db.mongoID(cli.userinfo.userid), (err, resp) => {
+                    if (err) {
+                        cli.throwHTTP(err);
+                    } else {
+                        cli.sendJSON(resp || {sent:true});
+                    }
+                });
+                break;
             default : cli.refuse();
         }
     }
@@ -179,6 +187,7 @@ class ContentController {
                     }
                 });
                 break;
+
             default:
                 cli.throwHTTP(404, undefined, true);
         }

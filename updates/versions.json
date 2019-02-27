@@ -141,5 +141,10 @@
         "codename" : "Feronia",
         "script" : "4.0.1.js",
         "features" : ["Editions"]
+    },
+    "4.0.2" : {
+        "codename" : "Feronia",
+        "script" : "4.0.2.js",
+        "features" : ["Multilang theme settings"]
     }
 }

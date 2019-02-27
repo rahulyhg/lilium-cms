@@ -98,6 +98,14 @@ export class ButtonWorker extends Component {
         }
     }
 
+    componentWillReceiveProps(newprops) {
+        if (newprops.working) {
+            this.setState({ working : true });
+        } else if (newprops.working === false) {
+            this.setState({ working : false });
+        }
+    }
+
     done() {
         this.setState({ working : false });
         this.props.done && this.props.done();
@@ -324,6 +332,16 @@ export class StackBox extends FormField {
                     name={field.name} 
                     onChange={onchange} 
                 />);
+
+            case "stack":
+                return (<StackBox 
+                    placeholder={field.displayname}
+                    name={field.name}
+                    onChange={onchange}
+                    initialValue={value}
+                    value={value} 
+                    schema={field.schema}
+                 />);
 
             case "select": 
                 return (<SelectField 

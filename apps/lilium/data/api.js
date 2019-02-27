@@ -51,6 +51,7 @@ class API {
         // Open HTTP socket, maybe set headers, and send
         xhr.open(method, `${endpoint}?p=${JSON.stringify(params)}`);
         data && xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('x-lml-language', (liliumcms.session.preferences && liliumcms.session.preferences.uiLanguage) || "english");
         xhr.send(data && JSON.stringify(data));
     }
 

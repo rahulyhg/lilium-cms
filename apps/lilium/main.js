@@ -72,27 +72,29 @@
  *  ------------------------------------------------------------------------------------------------
  */
 import { Component, h, render } from 'preact';
-import { makeGlobalLogger } from './data/logger';
-import { Header } from './layout/header'
-import { LiliumMenu } from './layout/menu';
-import { URLRenderer } from './routing/urlrenderer';
-import { Picker } from './layout/picker';
-import { LoadingView } from './layout/loading';
-import { OverlayWrap } from './overlay/overlaywrap';
-import { PasswordReset } from './layout/passwordreset';
-import { Lys } from './layout/lys';
-import { LiliumSession } from './data/session';
-import { initiateConnection, bindRealtimeEvent } from './realtime/connection';
-import { initializeDevEnv, DevTools } from './dev/env';
-import { initLocal, setSession, mapUsers } from './data/cache';
-import { NotificationWrapper, castNotification } from './layout/notifications';
-import { setLanguage } from './data/vocab';
-import { CakepopWrapper } from './layout/cakepopsmanager';
+import { makeGlobalLogger } from 'data/logger';
+import { Header } from 'layout/header'
+import { LiliumMenu } from 'layout/menu';
+import { URLRenderer, EndpointStore } from 'routing/urlrenderer';
+import { Picker } from 'layout/picker';
+import { LoadingView } from 'layout/loading';
+import { OverlayWrap } from 'overlay/overlaywrap';
+import { PasswordReset } from 'layout/passwordreset';
+import { Lys } from 'layout/lys';
+import { LiliumSession } from 'data/session';
+import { initiateConnection, bindRealtimeEvent } from 'realtime/connection';
+import { initializeDevEnv, DevTools } from 'dev/env';
+import { initLocal, setSession, mapUsers } from 'data/cache';
+import { NotificationWrapper, castNotification } from 'layout/notifications';
+import { fireEvent } from 'interactive/events';
+import { setLanguage } from 'data/vocab';
+import { CakepopWrapper } from 'layout/cakepopsmanager';
 
-import API from './data/api';
+import API from 'data/api';
 
 // Global access to session, connection state, URL
 window.liliumcms = window.liliumcms || {};
+liliumcms.session = new LiliumSession();
 liliumcms.connected = true;
 
 // Create `log` function
@@ -127,6 +129,7 @@ export class Lilium extends Component {
         // Fired when socket disconnects
         bindRealtimeEvent('disconnect', ev => {
             window.liliumcms.connected = false;
+            fireEvent('disconnect');
             log('Socket', "Lost internet connection, notifying user", 'socket');
 
             castNotification({
@@ -141,6 +144,7 @@ export class Lilium extends Component {
             log('Socket', "Internet connection restored, notifying user", 'socket');
 
             window.liliumcms.connected = true;
+            fireEvent('reconnect');
 
             // Process all pending requests from when socket was offline
             API.processPendingRequests();
@@ -171,38 +175,64 @@ export class Lilium extends Component {
         log('Lilium', 'Requesting current session information', 'lilium');
 
         // Fetch current user, admin menus, simple version of all entities
-        API.getMany([
-            { endpoint : '/me', params : {} },
+        const originalRequests = [
             { endpoint : "/adminmenus", params : {} },
             { endpoint : "/entities/simple", params : {} }
-        ], (err, resp) => {
-            // If no session found or at least one error detected, abort and output
-            if (!resp["/me"] || !resp["/me"][0] || Object.keys(err).filter(x => err[x]).length != 0) {
-                this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
-            } else {
-                log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
-                const currentLanguage = resp['/me'][0].preferences && resp['/me'][0].preferences.uiLanguage || 'english';
+        ];
 
-                // Set user language before rendering the UI
-                setLanguage(currentLanguage, () => {
-                    
-                    // Store all entities in session storage as well as mapped version of array
-                    setSession("entities", resp["/entities/simple"]);
-                    setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
+        fireEvent("sessionWillFetch", originalRequests);
+        API.get('/me', {}, (err, json, r) => {
+            if (!json || !json[0]) {
+                return this.setState({ error : err });
+            }
 
-                    // Create new session object with current user's information
-                    liliumcms.session = new LiliumSession(resp["/me"][0]);
+            // Create new session object with current user's information
+            liliumcms.session.setUser(json[0]);
+            const currentLanguage = liliumcms.session.preferences && liliumcms.session.preferences.uiLanguage || 'english';
 
-                    // Set allowed endpoints according to admin menus, plus hardcoded ones
-                    liliumcms.session.setAllowedEndpoints([
-                        "me", "preferences", "logout", "notifications", "onboarding", 
-                        ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
-                    ]);
+            fireEvent('sessionFetched', liliumcms.sesssion);
 
-                    // Let the show begins
-                    this.setState({ session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage });            
-                });
-            }   
+            fireEvent('liliumWillFetch', originalRequests);
+            API.getMany(originalRequests, (err, resp) => {
+                // If no session found or at least one error detected, abort and output
+                fireEvent('liliumFetched', resp);
+
+                if (Object.keys(err).filter(x => err[x]).length != 0) {
+                    fireEvent('sessionFailed', err);
+                    this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
+                } else {
+                    log('Lilium', 'Hello, ' + liliumcms.session.displayname + '!', 'success');
+
+                    // Set user language before rendering the UI
+                    setLanguage(currentLanguage, languageInstance => {
+                        fireEvent('languageLoaded', {
+                            language : currentLanguage,
+                            instance : languageInstance
+                        });
+                        
+                        // Store all entities in session storage as well as mapped version of array
+                        setSession("entities", resp["/entities/simple"]);
+                        setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
+
+
+                        // Set allowed endpoints according to admin menus, plus hardcoded ones
+                        liliumcms.session.addAllowedEndpoints([
+                            "me", "preferences", "logout", "notifications", "onboarding", 
+                            ...resp["/adminmenus"].map(x => x.absURL.split('/')[1]),
+                        ]);
+
+                        const nextState = {
+                            session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage 
+                        }
+
+                        fireEvent('appWillRender', nextState);
+                        // Let the show begins
+                        this.setState(nextState, () => {
+                            fireEvent('appRendered');
+                        }); 
+                    });
+                }   
+            });
         });
     }
 
@@ -242,4 +272,6 @@ export class Lilium extends Component {
 }
 
 log('Lilium', 'Lilium CMS V4, about to blow your mind in a million pieces.', 'lilium');
-render(<Lilium />, document.getElementById('app'));
+global.__start_lilium__ = () => {
+    render(<Lilium />, document.getElementById('app'));
+};

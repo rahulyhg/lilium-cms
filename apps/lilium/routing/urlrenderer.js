@@ -58,6 +58,10 @@ export class EndpointStore {
         EndpointStore.ENDPOINT_STORE[endpointname] = componentClass;
     }
 
+    static addAllowedEndpoint(endpoint) {
+        liliumcms.session.addAllowedEndpoint(endpoint);
+    }
+
     // Returns a component associated with an endpoint, or an error page
     static getComponentFromEndpoint(endpointname) {
         return liliumcms.session.allowedEndpoints.includes(endpointname) ? 
