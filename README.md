@@ -9,6 +9,9 @@ The platform has its own framework and unique API. Lilium makes it easy to creat
 
 Lilium does not use Express, Mongoose, or other heavy libraries. Instead, it implements its own web server using native NodeJS libraries.
 
+## Open source details
+Narcity Media is using Lilium CMS in production. However, it is currently using the V3. That means this version is not ready for production just yet. We still invite you to try the CMS and have fun with it, but we recommend to wait until the V4 is stable before deploying a website. 
+
 ## Installation guide
 
 All NodeJS packages are to be installed, and are documented in the package file. You can simply run *npm run setupdev* in the Lilium root folder.
