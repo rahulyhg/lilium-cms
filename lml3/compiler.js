@@ -176,11 +176,16 @@ class LML3 {
 
             log('LML3', 'Running in safe mode', 'info');
             try {
-              this.compile(_c, abspath, extra, done, true);
+                this.compile(_c, abspath, extra, done, true);
             } catch (ex) {
-              log('LML3', 'Error compiling file ' + abspath, 'err');
-              log('LML3', ex.stack, 'err');
-              done("<h2>Crashed.</h2>" + ex.stack.split('\n').join("<br />"));
+                log('LML3', 'Error compiling file ' + abspath, 'err');
+                log('LML3', ex.stack, 'err');
+
+                this.compile(_c, require('path').join(liliumroot, 'backend', 'dynamic', 'crash.lml3'), {  
+                    error : ex
+                }, markup => {
+                    done(markup);
+                });
             }
 
             return;
