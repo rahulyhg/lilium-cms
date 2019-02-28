@@ -196,7 +196,7 @@ server {
 ![bitmoji](https://render.bitstrips.com/v2/cpanel/9188364-18598575_8-s1-v1.png?transparent=1&palette=1&width=246)
 
 ## License ##
-This software does not come with a license, *YET*. It will likely come with a Mozilla Public License, or MIT in a few weeks / days. 
+Mozilla Public License Version 2.0
 
 ## Copyright ##
 © Narcity Media, 2019
