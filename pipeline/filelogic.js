@@ -41,7 +41,7 @@ const serveSpecialPage = (cli, fullpath) => {
 };
 
 const serveStaticFile = (cli, fullpath) => {
-    cli.touch('filelogix.serveStaticFile');
+    cli.touch('filelogic.serveStaticFile');
     cli.debug();
 };
 
@@ -287,6 +287,7 @@ class FileLogic {
 
             let readPath;
             let layoutPath;
+            let saveDir;
             let savePath;
 
             try {
@@ -297,7 +298,9 @@ class FileLogic {
                     readPath = _c.server.base + "flowers/" + cTheme.uName + "/lml/" + _c.env + ".lml3";
                 }
 
-                savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
+                 
+                saveDir = _c.server.html;
+                savePath = path.join(saveDir, outputfilename);
             } catch (err) {
                 return cli.crash(err);
             }
@@ -315,12 +318,14 @@ class FileLogic {
                     that.createDirIfNotExists(savePath, () => {
                         try {
                             log('FileLogic', 'Writing LML3 compiled file to disk => ' + savePath, 'info');
-                            fs.writeFile(savePath, cdned, { encoding : "utf8" }, err => {
-                                if (err) {
-                                    return cli.crash(err);
-                                }
-                                log('FileLogic', 'LML3 compiled file was written to disk', 'success');
-                                done(cdned);
+                            mkdirp(saveDir, () => {
+                                fs.writeFile(savePath, cdned, { encoding : "utf8" }, err => {
+                                    if (err) {
+                                        return cli.crash(err);
+                                    }
+                                    log('FileLogic', 'LML3 compiled file was written to disk', 'success');
+                                    done(cdned);
+                                });
                             });
                         } catch (err) {
                             return cli.crash(err);

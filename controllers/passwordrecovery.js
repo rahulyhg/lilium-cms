@@ -38,7 +38,7 @@ class PasswordRecovery {
         } else {
             LML3.compile(cli._c, 
                 path.join(
-                    cli._c.server.base, "backend/dynamic/liliumrecover.lml3"
+                    liliumroot, "backend", "dynamic", "liliumrecover.lml3"
                 ), {}, 
             (markup) => {
                 cli.sendHTML(markup);
