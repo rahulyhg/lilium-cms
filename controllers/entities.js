@@ -191,7 +191,7 @@ class Entities {
                 ], arr => {
                     const rights = arr && arr[0] ? arr[0].rights : [];
 
-                    require('./lib/crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
+                    require('../lib/crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
                         badges : data.badges,
                         huespin : data.huespin, 
                         levels : data.levels, 
