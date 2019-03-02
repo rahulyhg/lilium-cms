@@ -16,16 +16,19 @@ Simply navigate to the [issue section](https://github.com/narcitymedia/lilium-cm
 
 You will find three types of issue available : 
 
-** Feature request **
+**Feature request**
+
 Use this option if you think of something that would make this project better, but cannot / don't want to contribute code. 
 This is a great way to open up a conversation and get other people involved, too. 
 
-** Something is not working **
+**Something is not working**
+
 Oopsies. 💥 Well, that's ok. Nothing is flawless. The issue template will provide multiple "fields" which must be filled in order
 for the issue to be considered valid. Make sure to check the list of issues before opening one. Chances are someone else has
 already opened a similar one. 
 
-** I am working on something and need an issue open **
+**I am working on something and need an issue open**
+
 Really? You must be the coolest person to invite to a party. 
 Now, simply describe what problem you are fixing (reference to an other issue can help), or what feature you are implementing.
 The first contributors will get their name in the list of contributors in the README, because you rock. 🎸
@@ -50,7 +53,8 @@ Once everything is stable, we're merging v4 into dev for everyone to be able to 
 
 If the dev branch is stable enough, we're merging dev into master. We'll probably start using the tags soon.
 
-** Case scenario **
+**Case scenario**
+
 Maria finds an issue in the CMS she can fix. Maria opens an issue of type _I am working on something and need an issue open_.
 Maria forks the repo, and creates a branch called "fix-some-bug". Maria fixes the bug because she's an awesome rockstar. 
 Maria opens a pull request, and wants to merge her "fix-some-bug" branch with our "v4" branch. 
@@ -71,5 +75,3 @@ If your pull request adds a new dependency to the project, make sure to document
 library was used instead of your own code, and why this one amongst all the other libraries. 
 
 Node.JS libraries (backend) are usually fine and won't add that much stress on the CPU, and won't load the RAM with _stuff_. 
-
-## 
