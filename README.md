@@ -185,16 +185,15 @@ server {
 4.1.0
 
 ## Founder ##
-* Erik Desjardins
+* [Erik Desjardins](https://github.com/rykdesjardins)
 
 ## Contributors ##
 
-* Erik Desjardins
-* Samuel Rondeau-Millaire
-* Daniel McAuley
-* Era Sinbandith
-* Gabriel Cardinal
-* Narcity Media inc.
+* [Erik Desjardins](https://github.com/rykdesjardins)
+* [Samuel Rondeau-Millaire](https://github.com/samrm111)
+* [Daniel McAuley](https://github.com/DM87)
+* [Gabriel Cardinal](https://github.com/Gaboik)
+* [Narcity Media inc.](https://github.com/narcitymedia)
 
 ![bitmoji](https://render.bitstrips.com/v2/cpanel/9188364-18598575_8-s1-v1.png?transparent=1&palette=1&width=246)
 
