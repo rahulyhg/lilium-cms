@@ -156,7 +156,7 @@ export default class ThemeSettings extends Component {
                         <ThemeCard theme={x} active={x.uName == this.state.current.uName} />
                     ))}
                 </div>
-                <div style={{ maxWidth : 780, margin : "auto" }}>
+                <div style={{ maxWidth : 1024, margin : "auto" }}>
                     <h1>Settings</h1>
                     <div class="theme-settings">
                         <TabView>
