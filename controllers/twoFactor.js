@@ -1,4 +1,5 @@
 const twofalib = require('../lib/twoFactor');
+const configlib = require('../lib/config');
 const qrcode = require('qrcode');
 const base32Encode = require('base32-encode');
 const optlib = require('otplib');
@@ -28,8 +29,8 @@ class twoFactor {
     }
 
     livevar(cli, levels, params, sendback) {
-        const seed = base32Encode(Buffer.from(cli.userinfo.userid + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
-        const uri = optlib.authenticator.keyuri(cli.userinfo.user, 'Lilium CMS ' + _c.default().website.sitetitle, seed);
+        const seed = base32Encode(Buffer.from(cli.userinfo.userid + configlib.default().signature.privatehash), 'RFC4648').substring(0, 32);
+        const uri = optlib.authenticator.keyuri(cli.userinfo.user, 'Lilium CMS ' + configlib.default().website.sitetitle, seed);
 
         qrcode.toDataURL(uri, (err, data) => {
             if (!err && data) {
