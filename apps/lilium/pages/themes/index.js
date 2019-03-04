@@ -1,4 +1,6 @@
 import { h, Component } from 'preact';
+import dateformat from 'dateformat';
+import { castNotification } from '../../layout/notifications';
 import API from '../../data/api';
 import { TextField, SelectField, StackBox, CheckboxField, MediaPickerField, ButtonWorker } from '../../widgets/form';
 import { TabView, Tab } from '../../widgets/tabview';
@@ -11,8 +13,6 @@ export class ThemeSettingsForm extends Component {
         };
 
         const settings = props.theme.settings;
-
-        this.coldState = settings && settings[props.lang] ? settings[props.lang] : {};
     }
 
     componentWillReceiveProps(props) {
@@ -20,7 +20,6 @@ export class ThemeSettingsForm extends Component {
     }
 
     valueChanged(field, value) {
-        this.coldState[field] = value;
         API.post('/themes/updateOneField', {
             field, value, lang : this.props.lang
         }, () => {
@@ -41,7 +40,7 @@ export class ThemeSettingsForm extends Component {
             case "select": return (<SelectField 
                 name={name}
                 placeholder={entry.attr.displayname} 
-                initialValue={this.coldState[name]} 
+                initialValue={this.props.theme.settings[this.props.lang][name]} 
                 onChange={this.valueChanged.bind(this)}
                 options={entry.attr.datasource.map(s => { return { displayname : s.displayName, value : s.name } })}
             />);
@@ -50,7 +49,7 @@ export class ThemeSettingsForm extends Component {
                 name={name}
                 placeholder={entry.attr.displayname}
                 onChange={this.valueChanged.bind(this)}
-                initialValue={this.coldState[name] || []}
+                initialValue={this.props.theme.settings[this.props.lang][name] || []}
                 schema={entry.schema}
             />);
 
@@ -58,7 +57,7 @@ export class ThemeSettingsForm extends Component {
                 name={name}
                 placeholder={entry.attr.displayname}
                 onChange={this.valueChanged.bind(this)}
-                initialValue={this.coldState[name]}
+                initialValue={this.props.theme.settings[this.props.lang][name]}
             />);
 
             case "textarea": return (<TextField 
@@ -66,7 +65,7 @@ export class ThemeSettingsForm extends Component {
                 multiline={true}
                 placeholder={entry.attr.displayname} 
                 onChange={this.valueChanged.bind(this)}
-                initialValue={this.coldState[name]} 
+                initialValue={this.props.theme.settings[this.props.lang][name]} 
             />);
 
             case "image": return (<MediaPickerField
@@ -74,7 +73,7 @@ export class ThemeSettingsForm extends Component {
                 size={entry.attr.size}
                 placeholder={entry.attr.displayname}
                 onChange={this.imageChanged.bind(this)}
-                initialValue={this.coldState[name]}
+                initialValue={this.props.theme.settings[this.props.lang][name]}
             />);
 
             case "title": return (<h2>{entry.attr.displayname}</h2>);
@@ -83,7 +82,7 @@ export class ThemeSettingsForm extends Component {
                 name={name}
                 placeholder={entry.attr.displayname} 
                 onChange={this.valueChanged.bind(this)}
-                initialValue={this.coldState[name]} 
+                initialValue={this.props.theme.settings[this.props.lang][name]} 
             />);
         }
     }
@@ -146,7 +145,7 @@ export default class ThemeSettings extends Component {
     export(done) {
         const element = document.createElement('a');
         element.setAttribute('href', document.location.origin + "/themes/export");
-        element.setAttribute('download', "lilium-theme-export.json");
+        element.setAttribute('download', "lilium-theme-export-" + dateformat(new Date(), "yyyymmdd-HHMM") + ".json");
 
         element.style.display = 'none';
         document.body.appendChild(element);
@@ -155,6 +154,69 @@ export default class ThemeSettings extends Component {
 
         element.remove();
         done();
+    }
+
+    importJSON(done) {
+        const element = document.createElement('input');
+        element.setAttribute('type', "file");
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.addEventListener('change', ev => {
+            const file = element.files[0];
+            if (file && file.type.includes('json')) {
+                const reader = new FileReader();
+
+                reader.onload = readerEvent => {
+                    const text = reader.result;
+                    try {
+                        const json = JSON.parse(text);
+                        API.post('/themes/import', json, (err, resp, r) => {
+                            if (r.status == 200) {
+                                const th = this.state.current;
+                                th.settings = json.data;
+                                this.setState({ current : th });
+
+                                castNotification({
+                                    type : 'success',
+                                    message : 'Theme settings were successfully imported', 
+                                    title : 'Import settings'
+                                });
+                            } else {
+                                castNotification({
+                                    type : 'warning',
+                                    message : 'Something happened during theme settings restoration.', 
+                                    title : 'Import settings'
+                                });
+                            }
+
+                            done();
+                        });
+                    } catch (jsonEx) {
+                        castNotification({
+                            type : 'warning',
+                            message : 'Invalid settings file', 
+                            title : 'Import settings'
+                        });
+                        
+                        done();
+                    }
+                };
+
+                reader.readAsText(file);
+            } else {
+                castNotification({
+                    type : 'warning',
+                    message : 'Invalid settings file', 
+                    title : 'Import settings'
+                });
+
+                done();
+            }
+
+            element.remove();
+        });
+        element.click();
     }
 
     render() {
@@ -184,6 +246,7 @@ export default class ThemeSettings extends Component {
                         <div class="card" style={{ maxWidth : 1024, margin : "auto", padding: 14 }}>
                             <h2>Import / Export</h2>
                             <ButtonWorker text="Export" work={this.export.bind(this)} />
+                            <ButtonWorker text="Import" work={this.importJSON.bind(this)} />
                         </div>
                     </div>
                 </div>
