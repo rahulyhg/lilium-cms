@@ -144,7 +144,16 @@ export default class ThemeSettings extends Component {
     }
 
     export(done) {
-        window.open(document.location.origin + "/themes/export");
+        const element = document.createElement('a');
+        element.setAttribute('href', document.location.origin + "/themes/export");
+        element.setAttribute('download', "lilium-theme-export.json");
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        element.remove();
         done();
     }
 
