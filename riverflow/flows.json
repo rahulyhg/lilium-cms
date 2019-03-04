@@ -403,7 +403,7 @@
         }, {
             "module" : "controllers/themes.js",
             "endpoint" : "themes",
-            "support" : ["admin_post", "livevar"]
+            "support" : ["admin_post", "get", "livevar"]
         }, {
             "module" : "controllers/dashboard.js",
             "endpoint" : "dashboard",

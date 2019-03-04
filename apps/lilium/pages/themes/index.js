@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
-import { TextField, SelectField, StackBox, CheckboxField, MediaPickerField } from '../../widgets/form';
+import { TextField, SelectField, StackBox, CheckboxField, MediaPickerField, ButtonWorker } from '../../widgets/form';
 import { TabView, Tab } from '../../widgets/tabview';
 
 export class ThemeSettingsForm extends Component {
@@ -143,6 +143,11 @@ export default class ThemeSettings extends Component {
         })
     }
 
+    export(done) {
+        window.open(document.location.origin + "/themes/export");
+        done();
+    }
+
     render() {
         if (!this.state.ready) {
             return (<div>Loading</div>);
@@ -167,6 +172,10 @@ export default class ThemeSettings extends Component {
                                 <ThemeSettingsForm lang="fr" theme={this.state.current} />
                             </Tab>
                         </TabView>
+                        <div class="card" style={{ maxWidth : 1024, margin : "auto", padding: 14 }}>
+                            <h2>Import / Export</h2>
+                            <ButtonWorker text="Export" work={this.export.bind(this)} />
+                        </div>
                     </div>
                 </div>
             </div>
