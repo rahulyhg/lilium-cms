@@ -13,6 +13,10 @@ class ThemeControllers {
                         success: true
                     });
                 });
+            } else if (cli.routeinfo.path[2] == "import") {
+                themelib.overwriteSettings(cli._c, cli.postdata.data, err => { 
+                    err ? cli.throwHTTP(500, err, true) : cli.sendJSON({ newSettings : cli.postdata.data.data });
+                });
             } else if (cli.routeinfo.path[2] == "updateOneField") {
                 themelib.updateOneField(cli._c, cli.postdata.data.lang, cli.postdata.data.field, cli.postdata.data.value, () => {
                     cli.sendJSON({
