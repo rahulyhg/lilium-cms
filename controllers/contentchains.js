@@ -28,7 +28,7 @@ class ContentChains {
         }
 
         if (levels[0] == "bunch") {
-            cclib.bunchLivevar(...arguments);
+            cclib.getChains(cli, params, sendback);
         } else if (levels[0] == "deep") {
             cclib.deepFetch(cli._c, { _id : db.mongoID(levels[1]) }, (item) => {
                 sendback(item);
