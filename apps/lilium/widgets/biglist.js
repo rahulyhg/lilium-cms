@@ -45,7 +45,7 @@ export class BigList extends Component {
             component : props.listitem,
             addComponent : props.addComponent || BigListNullComponent,
             topElement : props.topElement,
-            emptyComponent : props.emptyComponent || BigListEmptyTemplate,
+            emptyComponent : props.emptyComponent || props.addComponent || BigListEmptyTemplate,
             index : 0,
             batchsize : props.batchsize || 30,
             livevarkey : typeof props.livevarkey == "undefined" ? "items" : props.livevarkey,
@@ -147,7 +147,11 @@ export class BigList extends Component {
 
                         {
                             this.state.items.length == 0 ? (
-                                <this.coldState.emptyComponent />
+                                this.coldState.emptyComponent ? (
+                                    <this.coldState.emptyComponent />
+                                ) : (
+                                    (<this.coldState.addComponent />)
+                                )
                             ) : [(<this.coldState.addComponent />), ...this.state.items.map(x => (
                                 <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
                             ))]
