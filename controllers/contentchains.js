@@ -115,7 +115,8 @@ class ContentChains {
         if (path == "new") {
             cclib.insertNewChain(cli._c, {
                 title : cli.postdata.data.title,
-                subtitle : cli.postdata.data.subtitle,                
+                subtitle : cli.postdata.data.subtitle,
+                slug: require('slugify')(cli.postdata.data.title).toLowerCase(),
                 createdBy : db.mongoID(cli.userinfo.userid)
             }, (err, r) => {
                 cli.sendJSON({
