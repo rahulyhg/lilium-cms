@@ -28,7 +28,19 @@ class ContentChains {
         }
 
         if (levels[0] == "bunch") {
-            cclib.getChains(cli, params, sendback);
+            cclib.getChains(cli, params, data => {
+                data.chains.forEach(item => {
+                    let img = item.media.pop();
+                    if (img) {
+                        item.featuredimageurl = img.sizes.square.url;
+                    }
+    
+                    item.featuredimage = undefined;
+                    item.featuredMedia = undefined;
+                });
+
+                sendback && sendback(data);
+            });
         } else if (levels[0] == "deep") {
             cclib.deepFetch(cli._c, { _id : db.mongoID(levels[1]) }, (item) => {
                 sendback(item);
