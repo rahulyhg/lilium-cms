@@ -3,6 +3,7 @@ import { BigList } from '../../widgets/biglist';
 import dateformat from 'dateformat';
 import { Link } from '../../routing/link';
 import { castOverlay } from '../../overlay/overlaywrap';
+import { ButtonWorker } from '../../widgets/form';
 
 class ContentChainListItem extends Component {
     constructor(props) {
@@ -12,15 +13,15 @@ class ContentChainListItem extends Component {
     
     render() {
         return (
-            <div class="card flex">
+            <div class="card flex content-chain-list-item">
                 <div class="image-wrapper">
-                    <Link href={`/chains/edit/${this.props.item._id}`}>
+                    <Link display="block" href={`/chains/edit/${this.props.item._id}`}>
                     {
                         (this.props.item.media) ? (
                             <img src={this.props.item.media.sizes.square.url} alt=""/>
-                            ) : (
-                                <div className="no-image">
-                                No Image
+                        ) : (
+                            <div className="no-image">
+                                <span>No Featured Image</span>
                             </div>
                         )
                     }
@@ -86,7 +87,8 @@ export class ListContentChains extends Component {
     render() {
         return (
             <div id="content-chains-list">
-                <BigList listitem={ContentChainListItem} addComponent={ContentChainListItemAdd} endpoint='/chains/search' toolbar={ListContentChains.TOOLBAR_CONFIG} />
+                <BigList listitem={ContentChainListItem} addComponent={ContentChainListItemAdd}
+                        endpoint='/chains/search' toolbar={ListContentChains.TOOLBAR_CONFIG} />
             </div>
         );
     }

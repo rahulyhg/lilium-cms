@@ -28,7 +28,19 @@ class ContentChains {
         }
 
         if (levels[0] == "bunch") {
-            cclib.bunchLivevar(...arguments);
+            cclib.getChains(cli, params, data => {
+                data.chains.forEach(item => {
+                    let img = item.media.pop();
+                    if (img) {
+                        item.featuredimageurl = img.sizes.square.url;
+                    }
+    
+                    item.featuredimage = undefined;
+                    item.featuredMedia = undefined;
+                });
+
+                sendback && sendback(data);
+            });
         } else if (levels[0] == "deep") {
             cclib.deepFetch(cli._c, { _id : db.mongoID(levels[1]) }, (item) => {
                 sendback(item);
@@ -115,7 +127,8 @@ class ContentChains {
         if (path == "new") {
             cclib.insertNewChain(cli._c, {
                 title : cli.postdata.data.title,
-                subtitle : cli.postdata.data.subtitle,                
+                subtitle : cli.postdata.data.subtitle,
+                slug: require('slugify')(cli.postdata.data.title).toLowerCase(),
                 createdBy : db.mongoID(cli.userinfo.userid)
             }, (err, r) => {
                 cli.sendJSON({
