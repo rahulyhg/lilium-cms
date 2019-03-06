@@ -296,7 +296,7 @@ class EditionEdit extends Component {
                     <p>Deleting an edition is irreversible, and will require you to select an edition to replace this one in case it was assigned to one or many articles.</p>
                     <h3>Replace edition with</h3>
                     <SelectField name="delete-edition-replace" options={
-                        this.props.allEditions.map(x => ({ displayname : x.displayname, value : x._id }))
+                        this.props.allEditions.map(x => ({ displayname : x.lang.en.displayname, value : x._id }))
                     } onChange={(name, value) => this.stage.deleteReplaceWith = value} />
 
                     <ButtonWorker theme="red" type="fill" text="Delete edition" work={this.deleteEdition.bind(this)} />

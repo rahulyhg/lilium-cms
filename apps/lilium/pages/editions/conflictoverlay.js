@@ -64,7 +64,7 @@ class Conflict extends Component {
                     <div class="conflict-new-picker">
                         { this.props.levels.map((lvl, i) => (
                             <SelectField options={[{ displayname : " -- Empty level -- ", value : "" }, ...lvl.editions.map(ed => ({
-                                displayname : ed.displayname, value : ed._id
+                                displayname : ed.lang.en.displayname, value : ed._id
                             }))]} initialValue={this.props.group.newassoc[i] || this.props.group.ids[i]} name={i} onChange={this.pickedNewLevel.bind(this)} />
                         )) }
                     </div>
@@ -175,12 +175,12 @@ export class ConflictOverlay extends Component {
                             resolvedtitle={
                                 group.resolved && group.newassoc.map((id, i) => this.levels[i].editions.find(
                                     ed => ed._id == id
-                                ).displayname).join(' / ')
+                                ).lang.en.displayname).join(' / ')
                             }
                             title={
                                 group.ids.map((id, i) => this.originals[i].find(
                                     ed => ed._id == id
-                                ).displayname).join(' / ')
+                                ).lang.en.displayname).join(' / ')
                             } />
                     )) }
                 </div>
