@@ -364,6 +364,10 @@ textarea {
     border : 1px solid @grayBorderColor;
     box-shadow: @softshadow;
     background: @whiteish;
+
+    &:empty {
+        display: none;
+    }
 }
 
 .stackbox-input-add {

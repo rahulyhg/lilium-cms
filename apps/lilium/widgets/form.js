@@ -333,6 +333,16 @@ export class StackBox extends FormField {
                     onChange={onchange} 
                 />);
 
+            case "stack":
+                return (<StackBox 
+                    placeholder={field.displayname}
+                    name={field.name}
+                    onChange={onchange}
+                    initialValue={value}
+                    value={value} 
+                    schema={field.schema}
+                 />);
+
             case "select": 
                 return (<SelectField 
                     options={[{text:" - " + field.displayname + " - ", value : ""}, ...(field.options || [])]} 

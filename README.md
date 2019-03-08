@@ -1,21 +1,24 @@
-![LML masthead](https://www.narcitymedia.com/wp-content/uploads/2018/08/masthead.png)
+![LML masthead](https://www.narcitymedia.com/wp-content/uploads/2019/02/masthead.png)
 
 # Lilium CMS V4 #
-Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in it intelligent caching engine which reduces CPU usage, RAM, and database access.
+Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in its intelligent caching engine which reduces CPU usage, RAM, and database access.
 
 If server-side rendering is preferred over client-side rendering, Lilium offers a simplified way of generating HTML documents, storing them on disk or RAM, and serving them faster than most HTML preprocessors. It is possible to use either LML2 which ressembles PHP, or LML3 which is an easy to use routine using Javascript template strings.
 
-The platform has its own framework and unique API. Lilium makes it easy to create a mobile app for a website, and is network based. It can hold multiple domains for a single instance, can use multiple different databases, and is compatible with content delivery network services. 
+The platform has its own framework and unique API. Lilium makes it easy to create a mobile app for a website, and is network based. It can hold multiple domains for a single instance, can use multiple different databases. It is compatible with content delivery network services. 
 
-Lilium does not use Express, Mongoose, or other heavy libraries. Instead, it implements its own web server. 
+Lilium does not use Express, Mongoose, or other heavy libraries. Instead, it implements its own web server using native NodeJS libraries.
+
+## Open source details
+Narcity Media is using Lilium CMS in production. However, it is currently using the V3. That means this version is not ready for production just yet. We still invite you to try the CMS and have fun with it, but we recommend to wait until the V4 is stable before deploying a website. 
 
 ## Installation guide
 
-All NodeJS packages are to be installed, and are documented in the package file so you can simply run *npm run setupdev* in the root folder where you setup Lilium.
+All NodeJS packages are to be installed, and are documented in the package file. You can simply run *npm run setupdev* in the Lilium root folder.
 
 ## Automated installation
 
-Lilium was built on Linux, and is meant to be ran on Linux. Even though it will technically work on Mac, Lilium is not guaranteed to be stable on other operation systems. 
+Lilium was built on Linux, and is meant to be run on Linux. Even though it will technically work on Mac, Lilium is not guaranteed to be stable on other operation systems. 
 
 The CMS requires NodeJS v8+, and MongoDB v3+. You can follow online tutorials on how to install both of these before running the npm scripts, but it's a faily simple process. 
 
@@ -60,35 +63,35 @@ And MongoDB should be running. To make sure the installation was successful, you
 
 ### Installing Lilium for development
 
-You can clone Lilium in your favourite installation directory. At Narcity Media, we like to use `/usr/share/lilium` or `~/dev/lilium`. Make sure the directory is owned by you, **not by root**. 
+You can clone Lilium in your favourite installation directory. At Narcity Media, we like to use `/usr/share/lilium` or `~/dev/lilium`. Make sure the directory is owned by you, **not by root**. Also make sure to install it in a directory that is also owned by you since other sibling directories might be needed. 
 
 Simply `cd` to the directory you want to use, and `git clone https://github.com/narcitymedia/lilium-cms`. 
 
-Then, `cd lilium-cms` and `npm run setupdev`.
+Then, `cd lilium-cms` and `npm install && npm run setupdev`.
 
-Once the installation process exists, you can start the CMS using `npm start`. Your browser should load the CMS if you browse to `localhost:8080/lilium`.
+Once the installation process exits, you can start the CMS using `npm start` or `node index.prod.js`. Your browser should load the CMS if you browse to `localhost:8080/lilium`.
 
-The development username and password are : `lilium` and `lilium`.
+The development username and password are : `lilium` and `lilium`. Make sure to change them if you plan on deploying on a production machine. 
 
 ## Web panel for development
-The CMS frontend is located under `/apps/lilium` and is transpiled using Webpack and Babel. 
+The CMS frontend is located under `/apps/lilium`. It is a [Preact app](https://preactjs.com), and is transpiled using Webpack and Babel. 
 
 ### Required dependencies
 **MAC:** 
 `brew install pkg-config cairo libpng jpeg giflib imagemagick redis`
 
 **UBUNTU:**
-`sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick`
+`sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick redis-server`
 
 The dependencies will be installed automatically during the `npm run setupdev` process. You can however install then manually if you prefer. 
 
 ### Localhost connections to MongoDB 
 If mongo still refuses to connect from NodeJS eventhough it works using the terminal cli, you might have to enable or disable authentication from your mongo config file (typically located in `/etc/mongod.conf`, under `security: authentication`). 
 
-This information can be found easily online using search queries such as "Enable MongoDB authentication". 
+This information can be found easily online using search queries such as "Enable MongoDB authentication". We ran into this issue on multiple occasion, and it ended up being a different solution every time. 
 
 ### MongoDB with `brew`
-On Mac, sometimes the MongoDB service will refuse connections from Lilium for obscure reasons. Our temporary solution it to start a `mongod` instance in a seperate terminal and add the desired parameters including the database path and authentation db. You also get an additional output stream from `mongod`.
+On Mac, sometimes the MongoDB service will refuse connections from Lilium for obscure reasons. Our temporary solution it to start a `mongod` instance in a seperate terminal and add the desired parameters including the database path and authentation db. You also get an additional output stream from `mongod`. 
 
 There likely is a better solution to make this work with `brew service`, but like mentionned earlier, we don't actively support MacOS nor do we recommend to run Lilium in production on a different OS than Linux. 
 
@@ -98,18 +101,22 @@ That must mean you're amazing. See the [Lilium CMS Wiki](https://github.com/narc
 ## Script mode
 It is possible to run a Javascript file in script mode. It will prevent Lilium from loading the listeners, CAIJ and other modules related to networking. The websites and databases will still be loaded on a single thread, and the script passed as an argument will be executed. 
 
-`node runscript.js [script.js]`
+`node ./includes/runscript.js [script.js]`
 
 ## Random quote API
+In older version, we used a random quote provider to add a cute message to The Daily Lilium, which is Lilium's newspaper.
+
 http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en
 
 ## Working with nginx
 
-Nginx works well with Lilium. The following configuration is the most simplified version you can use. The config works with a Lilium instance located at `/usr/share/lilium/lilium-cms`, and runs at post `8080`.
+[Nginx](https://www.nginx.com/) works well with Lilium. The following configuration is the most simplified version you can use. The config works with a Lilium instance located at `/usr/share/lilium/lilium-cms`, and runs at port `8080`.
 
 Since Lilium does not handle HTTPS requests, using nginx in front of Lilium makes it possible to have a fully operational SSL website running on Lilium, without the SSL overhead during the local proxy upstream. 
 
-### Experimental configuration file
+Using [Certbot](https://certbot.eff.org/) or [LetsEncrypt](https://letsencrypt.org/), you can quicky generate an HTTPS cert. 
+
+### Basic nginx configuration file
 ```
 upstream lilium_proxy  {
         server 127.0.0.1:8080;
@@ -192,7 +199,7 @@ server {
 ![bitmoji](https://render.bitstrips.com/v2/cpanel/9188364-18598575_8-s1-v1.png?transparent=1&palette=1&width=246)
 
 ## License ##
-This software does not come with a license. 
+Mozilla Public License Version 2.0
 
 ## Copyright ##
 © Narcity Media, 2019

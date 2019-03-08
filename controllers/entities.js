@@ -61,7 +61,7 @@ class Entities {
         if (cli.routeinfo.path[1] == 'me') {
             if (cli.routeinfo.path[2] == "updateOneField") {
                 if (ALLOWED_ME_FIELDS.includes(cli.postdata.data.field)) {
-                    db.update(require('./lib/config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, {
+                    db.update(require('../lib/config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, {
                         [cli.postdata.data.field] : cli.postdata.data.value
                     }, () => {
                         cli.sendJSON({
@@ -79,10 +79,10 @@ class Entities {
                     const newPWD = CryptoJS.SHA256(cli.postdata.data.new).toString(CryptoJS.enc.Hex);
                     const _id = db.mongoID(cli.userinfo.userid);
     
-                    db.findUnique(require('./config').default(), 'entities', { _id: _id }, (err, user) => {
+                    db.findUnique(require('../lib/config').default(), 'entities', { _id: _id }, (err, user) => {
                         if (!err && user) {
                             if (old == user.shhh || user.mustupdatepassword) {
-                                db.update(require('./config').default(), 'entities', { _id, shhh : {$ne : newPWD}, $or : [{shhh : old}, {mustupdatepassword : true}] }, { shhh: newPWD, mustupdatepassword : false }, (err, r) => {
+                                db.update(require('../lib/config').default(), 'entities', { _id, shhh : {$ne : newPWD}, $or : [{shhh : old}, {mustupdatepassword : true}] }, { shhh: newPWD, mustupdatepassword : false }, (err, r) => {
                                     log('Entities', 'Updated entity ' + _id + ' : ' + !!r.matchedCount, 'info');
                                     cli.sendJSON({
                                         updated : !!r.matchedCount
@@ -157,7 +157,7 @@ class Entities {
 
     apiGET(cli) {
         if (cli.routeinfo.path[2] == "list" && cli.hasAPIRight("list-entities")) {
-            db.find(require('./lib/config').default(), 'entities', {}, [], (err, cursor) => {
+            db.find(require('../lib/config').default(), 'entities', {}, [], (err, cursor) => {
                 cursor.project({ displayname : 1, revoked : 1, email : 1, username : 1 })
                     .sort({revoked : 1, displayname : 1})
                     .toArray((err, arr) => {
@@ -191,7 +191,7 @@ class Entities {
                 ], arr => {
                     const rights = arr && arr[0] ? arr[0].rights : [];
 
-                    require('./lib/crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
+                    require('../lib/crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
                         badges : data.badges,
                         huespin : data.huespin, 
                         levels : data.levels, 
@@ -425,7 +425,7 @@ class Entities {
                     phone : cli.postdata.data.phone.replace(/([^0-9])/g, '')
                 }
 
-                db.update(require('./lib/config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, payload, () => {
+                db.update(require('../lib/config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, payload, () => {
                     cli.sendJSON({avatarURL : images.square.url});
                 });
             });

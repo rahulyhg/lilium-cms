@@ -176,50 +176,63 @@ export class Lilium extends Component {
 
         // Fetch current user, admin menus, simple version of all entities
         const originalRequests = [
-            { endpoint : '/me', params : {} },
             { endpoint : "/adminmenus", params : {} },
             { endpoint : "/entities/simple", params : {} }
         ];
 
         fireEvent("sessionWillFetch", originalRequests);
-        API.getMany(originalRequests, (err, resp) => {
-            // If no session found or at least one error detected, abort and output
-            fireEvent('sessionFetched', resp);
+        API.get('/me', {}, (err, json, r) => {
+            if (!json || !json[0]) {
+                return this.setState({ error : err });
+            }
 
-            if (!resp["/me"] || !resp["/me"][0] || Object.keys(err).filter(x => err[x]).length != 0) {
-                fireEvent('sessionFailed', err);
-                this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
-            } else {
-                log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
-                const currentLanguage = resp['/me'][0].preferences && resp['/me'][0].preferences.uiLanguage || 'english';
+            // Create new session object with current user's information
+            liliumcms.session.setUser(json[0]);
+            const currentLanguage = liliumcms.session.preferences && liliumcms.session.preferences.uiLanguage || 'english';
 
-                // Set user language before rendering the UI
-                setLanguage(currentLanguage, () => {
-                    
-                    // Store all entities in session storage as well as mapped version of array
-                    setSession("entities", resp["/entities/simple"]);
-                    setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
+            fireEvent('sessionFetched', liliumcms.sesssion);
 
-                    // Create new session object with current user's information
-                    liliumcms.session.setUser(resp["/me"][0]);
+            fireEvent('liliumWillFetch', originalRequests);
+            API.getMany(originalRequests, (err, resp) => {
+                // If no session found or at least one error detected, abort and output
+                fireEvent('liliumFetched', resp);
 
-                    // Set allowed endpoints according to admin menus, plus hardcoded ones
-                    liliumcms.session.addAllowedEndpoints([
-                        "me", "preferences", "logout", "notifications", "onboarding", 
-                        ...resp["/adminmenus"].map(x => x.absURL.split('/')[1]),
-                    ]);
+                if (Object.keys(err).filter(x => err[x]).length != 0) {
+                    fireEvent('sessionFailed', err);
+                    this.setState({ error : Object.keys(err).map(x => err[x]).join(', '), loading : false });
+                } else {
+                    log('Lilium', 'Hello, ' + liliumcms.session.displayname + '!', 'success');
 
-                    const nextState = {
-                        session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage 
-                    }
+                    // Set user language before rendering the UI
+                    setLanguage(currentLanguage, languageInstance => {
+                        fireEvent('languageLoaded', {
+                            language : currentLanguage,
+                            instance : languageInstance
+                        });
+                        
+                        // Store all entities in session storage as well as mapped version of array
+                        setSession("entities", resp["/entities/simple"]);
+                        setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
 
-                    fireEvent('appWillRender', nextState);
-                    // Let the show begins
-                    this.setState(nextState, () => {
-                        fireEvent('appRendered');
-                    }); 
-                });
-            }   
+
+                        // Set allowed endpoints according to admin menus, plus hardcoded ones
+                        liliumcms.session.addAllowedEndpoints([
+                            "me", "preferences", "logout", "notifications", "onboarding", 
+                            ...resp["/adminmenus"].map(x => x.absURL.split('/')[1]),
+                        ]);
+
+                        const nextState = {
+                            session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage 
+                        }
+
+                        fireEvent('appWillRender', nextState);
+                        // Let the show begins
+                        this.setState(nextState, () => {
+                            fireEvent('appRendered');
+                        }); 
+                    });
+                }   
+            });
         });
     }
 

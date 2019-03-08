@@ -78,6 +78,12 @@ class Builder {
                 path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
                 filename : options.bundlename || "[name].bundle.js"
             },
+            resolve : {
+                modules : options.resolve || [
+                    path.resolve(path.join(liliumroot, 'apps', 'lilium')),
+                    path.resolve(path.join(liliumroot, 'node_modules'))
+                ]
+            },
             optimization : {
                 runtimeChunk: 'single',
                 splitChunks: {

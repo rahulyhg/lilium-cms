@@ -60,6 +60,11 @@ export default class SettingsPage extends Component {
                         <TextField onChange={this.fieldChanged.bind(this)} name="website.catchline" placeholder="Website catchline" initialValue={this.values.website.catchline} />
                     </div>
 
+                    <h2 style={styles.h2}>Font Awesome</h2>
+                    <div style={{ padding : 15 }}>
+                        <TextField onChange={this.fieldChanged.bind(this)} name="fontawesomeprointegrity" placeholder="Font Awesome integrity" initialValue={this.values.fontawesomeprointegrity} />
+                    </div>
+
                     <h2 style={styles.h2}>Content Delivery Network</h2>
                     <div style={{ padding : 15 }}>
                         <TextField onChange={this.fieldChanged.bind(this)} name="content.cdn.domain" placeholder="CDN Domain" initialValue={this.values.content.cdn.domain} />

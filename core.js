@@ -5,8 +5,10 @@ const V4 = require('./lib/v4');
 const OS = require('os');
 const ShellServer = require('./cli/server');
 const metrics = require('./lib/metrics');
+const pathlib = require('path');
 
 global.require_template = require('./lib/templaterequire');
+global.lilium_require = file => require(pathlib.join(liliumroot, file));
 
 const v4 = new V4();
 
@@ -95,7 +97,6 @@ class Core {
 
 const loadHooks = (readyToRock) => {
     log('Hooks', 'Loading hooks', 'info');
-    hooks.bindPluginDisabling();
     hooks.init();
     hooks.bind('init', 100, readyToRock);
 
@@ -160,7 +161,7 @@ const loadEndpoints = () => {
 
     admin.registerAdminEndpoint('me', 'POST', (cli) => {
         cli.touch('admin.POST.me');
-        entities.adminPOST(cli);
+        require('./controllers/entities').adminPOST(cli);
     });
 
     admin.registerAdminEndpoint('me', 'GET', (cli) => {

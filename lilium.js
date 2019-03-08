@@ -22,9 +22,7 @@ class LiliumCMS {
             log('Developer', 'With love; enjoy. <3', 'lilium');
             log();
 
-            if (global.__START_TESTS) {
-                global.__START_TESTS(this, core);
-            }
+            global.__START_TESTS && __START_TESTS(this, core);
         });
 
         return this;
@@ -38,5 +36,5 @@ class LiliumCMS {
 if (typeof process.env.parent != "undefined" || (global.liliumenv && global.liliumenv.mode == "script")) {
     module.exports = LiliumCMS
 } else {
-    require('./log.js')('Lilium', "Lilium started from main class. Please use npm start.", "warn");
+    require('./lib/log.js')('Lilium', "Lilium started from main class. Please use npm start.", "warn");
 }
