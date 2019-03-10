@@ -117,7 +117,7 @@ class Cakepop {
     }
 
     deepFetch(id, sendback) {
-        db.join(require('./lib/config').default(), CAKEPOP_COLLECTION, [
+        db.join(require('../lib/config').default(), CAKEPOP_COLLECTION, [
             {
                 $match : {
                     _id : id
