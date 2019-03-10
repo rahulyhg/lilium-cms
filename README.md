@@ -185,21 +185,36 @@ server {
 4.1.0
 
 ## Founder ##
-* Erik Desjardins
+* [Erik Desjardins](https://github.com/rykdesjardins)
 
 ## Contributors ##
 
-* Erik Desjardins
-* Samuel Rondeau-Millaire
-* Daniel McAuley
-* Era Sinbandith
-* Gabriel Cardinal
-* Narcity Media inc.
+* [Erik Desjardins](https://github.com/rykdesjardins)
+* [Samuel Rondeau-Millaire](https://github.com/samrm111)
+* [Daniel McAuley](https://github.com/DM87)
+* [Gabriel Cardinal](https://github.com/Gaboik)
+* [Narcity Media inc.](https://github.com/narcitymedia)
 
 ![bitmoji](https://render.bitstrips.com/v2/cpanel/9188364-18598575_8-s1-v1.png?transparent=1&palette=1&width=246)
 
 ## License ##
 Mozilla Public License Version 2.0
+
+## About the license
+_TL;DR : You can use the CMS to make money as long as it remains open source. The typical use case involves no additional work._
+
+Both individuals and businesses are allowed to use Lilium CMS. 
+You are allowed to host a copy of Lilium CMS, modify it, redistribute it, create something different with it. 
+
+One important thing to note : you **must** disclose the source code, copyright, and must document any modification done. A copy of the license must be available. However, this does not mean you need to credit Narcity Media on your website or anything of the sort. Simply make the source code available and highlight the modifications if any. 
+
+That being said, you can still use Lilium CMS for almost any purposes. 
+
+Like most open source licenses, Narcity Media is not liable if anything happens with your server, data, etc. Lilium CMS does not come with a warranty. 
+
+The previous information is not legal advice, but should give you a good idea.
+
+Mozilla Public License Version 2.0 is a simple, permissive license with conditions easy to respect. There have a [great FAQ here](https://www.mozilla.org/en-US/MPL/2.0/FAQ/).
 
 ## Copyright ##
 © Narcity Media, 2019

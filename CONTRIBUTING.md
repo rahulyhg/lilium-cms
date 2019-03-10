@@ -40,18 +40,18 @@ I don't know, man. Millennials use those. Carry on.
 
 ## Pull requests
 Once you're done working on something you want merged in this repo, we like to use GitHub's [Pull Request](https://github.com/narcitymedia/lilium-cms/pulls) system. 
-There is no template (yet) since we're not sure how the community will use those. For now, please document as much as possible
-the feature you've been working on, or the bug you fixed. Please reference an issue using the # notation. 
+There is a small, straightforward PR template to fill. Please document as much as possible
+the feature you've been working on, or the bug you've just fixed. You can use the # notation to reference an issue your PR will be closing.
 
 ## Branches
 We're using three main branches plus features branches. 
 
-MASTER < DEV < V4 < FEATURES
+`master < dev < v4 < features`
 
 All feature branches (including the ones from the community) are merged in the current version (v4). 
 Once everything is stable, we're merging v4 into dev for everyone to be able to test. 
 
-If the dev branch is stable enough, we're merging dev into master. We'll probably start using the tags soon.
+If the dev branch is stable, we're merging dev into master.
 
 **Case scenario**
 
@@ -62,7 +62,7 @@ Maria's pull request passes CI, is reviewed by our team, and is merged in v4.
 V4 will at some point be merged in dev, then master. Maria's fix is live. 
 
 ## Setting up a work environment
-Simply close the repo, and follow the README. It's pretty simple, really. 
+Simply clone the repo, and follow the README. It's pretty simple, really. 
 We currently only actively support Linux, but it will work on Mac. If you are interested in helping us support other platforms, 
 feel free to open an issue and propose a solution. The more platform we support, the more love we can spread. 
 
@@ -74,4 +74,4 @@ Don't get us wrong! We LOVE those libraries. It's simply not a good fit for this
 If your pull request adds a new dependency to the project, make sure to document how is benefits the project, why a
 library was used instead of your own code, and why this one amongst all the other libraries. 
 
-Node.JS libraries (backend) are usually fine and won't add that much stress on the CPU, and won't load the RAM with _stuff_. 
+Node.JS libraries (backend) are usually fine, won't add that much stress on the CPU, and won't load the RAM with _stuff_. 
