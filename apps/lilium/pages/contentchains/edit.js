@@ -160,7 +160,7 @@ export class EditContentChain extends Component {
 
                     <h4>Select an edition for this series</h4>
                     <div class="card publishing-card nopad">
-                        <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.edition || []} value={this.state.chain.edition} language={this.state.chain.language || "en"} name="edition" />
+                        <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.editions || []} value={this.state.chain.editions} language={this.state.chain.language || "en"} name="editions" />
                     </div>
 
                     <hr />
