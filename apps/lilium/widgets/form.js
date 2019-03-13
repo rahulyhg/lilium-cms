@@ -343,6 +343,18 @@ export class StackBox extends FormField {
                     schema={field.schema}
                  />);
 
+            case "image": 
+                return (<MediaPickerField
+                    placeholder={field.displayname}
+                    name={field.name}
+                    onChange={(name, value) => {
+                        value && value._id && onchange(name, value._id);
+                    }}
+                    initialValue={value}
+                    size="square"
+                    value={value} 
+                 />);
+
             case "select": 
                 return (<SelectField 
                     options={[{text:" - " + field.displayname + " - ", value : ""}, ...(field.options || [])]} 
