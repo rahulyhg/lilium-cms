@@ -49,6 +49,7 @@ module.exports = cli => {
                         <script src="${buildLocation}/main.bundle.js"></script>
                         <script src="${buildLocation}/preact.bundle.js"></script>
                         <script src="${buildLocation}/runtime.bundle.js"></script>
+                        <script>__start_lilium__();</script>
                     `
                 }
         </html>`.replace(/\n/g, '').replace(/\>\s*\</g, '><').replace(/\s\s+/g, ' ');
