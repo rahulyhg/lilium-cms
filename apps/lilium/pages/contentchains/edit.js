@@ -5,7 +5,9 @@ import { TextField, ButtonWorker, SelectField } from "../../widgets/form";
 import { EditionPicker } from '../../widgets/editionpicker';
 import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
+import { Spinner } from '../../layout/loading';
 import { Picker } from "../../layout/picker";
+import { getTimeAgo } from '../../widgets/timeago';
 
 export class EditContentChain extends Component {
     constructor(props) {
@@ -163,19 +165,47 @@ export class EditContentChain extends Component {
                         <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.editions || []} value={this.state.chain.editions} language={this.state.chain.language || "en"} name="editions" />
                     </div>
 
-                    <hr />
-                    {
-                        this.state.chain.status == 'draft' ? (
-                            <ButtonWorker text='Publish' theme='purple' type='fill' work={this.togglePublishState.bind(this)}  />
-                        ) : (
-                            <ButtonWorker text='Unpublish' theme='red' type='outline' work={this.togglePublishState.bind(this)}  />
-                        )
-                    }
+                    <div class="publication-details-card card">
+                        <div class="detail-head">
+                            <b>About this Content Chain</b>
+                        </div>
+
+                        <div class="detail-list">
+                            <div>
+                                Created: <b>{getTimeAgo(Date.now() - new Date(this.state.chain.createdOn).getTime()).toString()}</b>
+                                 {/* by <b>{this.cachedUsers[this.state.chain.createdBy] ? this.cachedUsers[this.state.chain.createdBy].displayname : " an inactive user"}</b>. */}
+                            </div>
+                            { this.state.chain.lastModified ? (
+                                <div>
+                                    Updated: <b>{getTimeAgo(Date.now() - new Date(this.state.chain.lastModified).getTime()).toString()}</b>.
+                                </div>
+                            ) : null }
+                            { this.state.chain.slug && this.state.chain.status == "live" ? (
+                                <div>
+                                    Slug : <b>{this.state.chain.slug}</b>
+                                </div>
+                            ) : null}
+                            { this.state.chain.status ? (
+                                <div>
+                                    Status : <b>{this.state.chain.status}</b>
+                                </div>
+                            ) : null}
+
+                            <hr />
+                            {
+                                this.state.chain.status == 'draft' ? (
+                                    <ButtonWorker text='Publish' theme='purple' type='fill' work={this.togglePublishState.bind(this)}  />
+                                ) : (
+                                    <ButtonWorker text='Unpublish' theme='red' type='outline' work={this.togglePublishState.bind(this)}  />
+                                )
+                            }
+                        </div>
+                    </div>
                 </div>
             );
         } else {
             return (
-                <p>loading...</p>
+                <Spinner centered />
             );
         }
     }

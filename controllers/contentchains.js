@@ -125,7 +125,7 @@ class ContentChains {
         let path = cli.routeinfo.path[2];   
 
         if (path == "new") {
-            cclib.insertNewChain(cli._c, {
+            cclib.insertNewChain(cli, {
                 title : cli.postdata.data.title,
                 subtitle : cli.postdata.data.subtitle,
                 slug: require('slugify')(cli.postdata.data.title).toLowerCase(),
