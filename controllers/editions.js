@@ -1,5 +1,6 @@
 const db = require('../lib/db');
 const { updatePostsAfterMerge, fieldToRef, getFull } = require('../lib/editions');
+const themelib = require('../lib/themes');
 
 const EDITION_COLLECTION = "editions";
 const SECTION_COLLECTION = "sections";
@@ -215,20 +216,24 @@ class EditionController {
                 });
             } else if (cli.routeinfo.path[2] == "editionfield") {
                 cli.readPostData(payload => {
-                    payload.value = fieldToRef(payload.name, payload.value);
+                    const allowedfields = themelib.getEnabledTheme(cli._c).info.editionForm || [];
+                    const field = allowedfields.find(x => x.name == payload.name);
 
-                    const upd = {
-                        [`lang.${cli.routeinfo.path[3]}.${payload.name}`] : payload.value
-                    };
+                    if (field) {
+                        const upd = {
+                            [`lang.${cli.routeinfo.path[3]}.${payload.name}`] : field.ref ? db.mongoID(payload.value) : payload.value
+                        };
 
-                    db.update(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, upd, (err, r) => {
-                        if (err) {
-                            cli.throwHTTP(500, err, true);
-                        } else {
-                            cli.sendJSON(r)
-                        }
-                    });
-
+                        db.update(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, upd, (err, r) => {
+                            if (err) {
+                                cli.throwHTTP(500, err, true);
+                            } else {
+                                cli.sendJSON(r)
+                            }
+                        });
+                    } else {
+                        cli.throwHTTP(401, undefined, true);
+                    }
                 });
             } else if (cli.routeinfo.path[2] == "mergelanguages") {
                 const _id = db.mongoID(cli.routeinfo.path[3]);
