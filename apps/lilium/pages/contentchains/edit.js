@@ -107,15 +107,30 @@ export class EditContentChain extends Component {
 
     togglePublishState(done) {
         const action = this.state.chain.status == 'draft' ? 'live' : 'unpublish';
-        API.post(`/chains/${action}/${this.state.chain._id}`, {}, (err, data, r) => {
+        const chain = this.state.chain;
+        console.log(chain);
+        
+        if (action == 'live' &&
+            (!chain.articles || !chain.articles.length ||
+            !chain.editions || !chain.editions.length ||
+            !chain.title || !chain.media))
+        {
+            castNotification({
+                title: 'Some fields are missing to publish the content chain',
+                message: 'Make sure you have added a title, a featured image, an edition and at least one article to your chain before publishing',
+                type: 'error'
+            });
+            return done && done();
+        }
+
+        API.post(`/chains/${action}/${chain._id}`, {}, (err, data, r) => {
             if (r.status == 200) {
-                const chain = this.state.chain;
                 chain.status = this.state.chain.status == 'draft' ? 'live' : 'draft';
                 this.setState({ chain }, () => {
                     castNotification({
                         title: `The content chain was ${(this.state.chain.status == 'draft') ? 'unpublished' : 'published'}`,
                         type: 'success'
-                    })
+                    });
                 });
 
                 done();
