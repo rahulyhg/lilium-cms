@@ -121,7 +121,7 @@ class ImageThumbnail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selected : props.selected,
+            selected : props.selected || false,
             uploading : !!props.file,
             progress : 0,
             image : props.image
@@ -152,7 +152,9 @@ class ImageThumbnail extends Component {
     }
 
     componentWillReceiveProps(props) {
-        this.setState({ selected : props.selected });
+        if (props.selected && props.selected != this.state.selected) {
+            this.setState({ selected : props.selected });
+        }
     }
 
     clicked() {
@@ -197,6 +199,8 @@ export class ImagePicker extends Component {
             images : [],
             selectedid : props.options.selected
         };
+        this.nbImagesToLoad = 100;
+        this.nbImagesLoaded = 0;
     }
 
     static tabTitle =  'Uploads';
@@ -205,7 +209,7 @@ export class ImagePicker extends Component {
     componentDidMount() {
         log('ImagePicker', 'Displaying image picker singleton', 'detail');
         const initState = { visible : true, selected : undefined };
-        this.fetchLatest(allImages => {
+        this.fetchNext(allImages => {
             initState.images = allImages;
 
             if (this.state.selectedid) {
@@ -239,8 +243,9 @@ export class ImagePicker extends Component {
         }
     }
 
-    fetchLatest(sendback) {
-        API.get('/uploads', { limit : 100, skip : 0 }, (err, uploads) => {
+    fetchNext(sendback) {
+        API.get('/uploads', { limit : this.nbImagesLoaded, skip : this.nbImagesLoaded }, (err, uploads) => {
+            this.nbImagesLoaded += this.nbImagesToLoad;
             sendback ? sendback(uploads) : this.setState({ images : uploads });
         })
     }
@@ -261,7 +266,7 @@ export class ImagePicker extends Component {
             <div id="image-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
                 <div id="image-picker-flex-wrapper">
                     <div id="image-gallery">
-                        <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
+                        <div className="image-picker-button" onClick={this.castUpload.bind(this)}>
                             <i class="far fa-plus-circle"></i>
                         </div>
 
@@ -271,8 +276,11 @@ export class ImagePicker extends Component {
                             ))
                         }
 
+                        <div className="image-picker-button" onClick={ev => { this.fetchNext(); } }>
+                            <i className="fa fa-chevron-right"></i>
+                        </div>
+
                         <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
-                
                     </div>
 
                     <div id="image-gallery-detail"> 

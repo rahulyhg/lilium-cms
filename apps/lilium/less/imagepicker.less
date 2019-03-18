@@ -13,6 +13,7 @@
 
 #image-gallery {
     flex-grow: 4;
+    align-content: flex-start;
     display: flex;
     flex-wrap: wrap;
     padding: 5px;
@@ -26,7 +27,7 @@
 }
 
 .image-picker-thumb,
-#image-upload-button {
+.image-picker-button {
     width: 150px;
     height: 150px;
     object-fit: cover;
@@ -38,20 +39,20 @@
 }
 
 .image-upload-loading,
-#image-upload-button {
+.image-picker-button {
     background-color: @grayBorderColor;
     font-size: 68px;
     text-align: center;
     transition: none;
 }
 
-#image-upload-button i,
+.image-picker-button i,
 .image-upload-loading i {
     margin-top: 40px;
     color: @whiteish;
 }
 
-#image-upload-button:hover {
+.image-picker-button:hover {
     background-color: @middleGray;
 }
 
@@ -62,6 +63,13 @@
 .image-picker-thumb.selected {
     border: 5px solid darken(@liliumPurple, 20%);
     transform: rotateZ(5deg) scale(1.1);
+}
+
+.image-picker-thumb {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    color: #333;
 }
 
 .image-picker-selected-full {
