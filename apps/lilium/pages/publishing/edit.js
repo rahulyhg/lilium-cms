@@ -1068,6 +1068,10 @@ export default class EditView extends Component {
                             { text : "English", value : "en" },
                             { text : "Français", value : "fr" }
                         ]} />
+                        <SelectField name="culture" placeholder="Culture" initialValue={this.state.post.culture || "ca"} value={this.state.post.culture || "ca"} onChange={this.fieldChanged.bind(this)} options={[
+                            { text : "Canada", value : "ca" },
+                            { text : "United-States", value : "us" }
+                        ]} />
                     </div>      
 
                     <div class="card publishing-card nopad">
