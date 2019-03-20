@@ -4,6 +4,7 @@ import { Picker } from '../layout/picker';
 import { ImagePicker } from '../layout/imagepicker';
 import { PlacePicker } from '../layout/placepicker';
 import { EmbedPicker } from '../layout/embedpicker';
+import { createDeflate } from 'zlib';
 
 function embedToCarouselPreviewElement(embed, isCarousel) {
     let contentNode = document.createElement('div');
@@ -143,6 +144,19 @@ export class TextEditor extends Component {
                     onclick: () => {
                         this.bookmark = editor.selection.getBookmark(2, true);
                         const session =  new Picker.Session({});
+                        const selectedEl = editor.selection.getNode();
+                        console.log('el', selectedEl);
+                        
+                        if (selectedEl && selectedEl.classList.contains('lml-placeholder')) {
+                            session.replaceOld = true;
+                            if (selectedEl.dataset.type == ImagePicker.slug) {
+                                session.options[ImagePicker.slug] = { selected: selectedEl.dataset.id };
+                            }
+                        }
+
+                        console.log('session ', session);
+                        
+
                         Picker.cast(session, embed => {
                             log('TextEditor', "Picker callback received embed: ", embed, 'info');
                             this.bookmark && editor.selection.moveToBookmark(this.bookmark);
