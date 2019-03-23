@@ -195,6 +195,7 @@ class EditionController {
                         };
 
                         if (payload.name == "slug") {
+                            ed.lang[cli.routeinfo.path[4]].slug = payload.value;
                             newed.slugs = Array.from(new Set(Object.keys(ed.lang).map(l => ed.lang[l].slug)));
                         }
 
