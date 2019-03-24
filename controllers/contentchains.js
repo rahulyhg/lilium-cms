@@ -13,7 +13,7 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     createdOn : 1,
     lastModified : 1,
     language : 1,
-    edition : 1,
+    editions: 1,
     media: { $arrayElemAt: ['$media', 0] },
     
     'articles._id': 1,
@@ -105,11 +105,18 @@ class ContentChains {
                         localField : "media",
                         foreignField : "_id",
                         as : "media" }
+                }, {
+                    $lookup : {
+                        from : "editions",
+                        as : "alleditions",
+                        foreignField : "_id",
+                        localField : "editions" }
                 }, { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
             ], items => {
                 if (items.length) {
-                    items[0].articles.forEach(article => { article.title = article.title[0] } );
-                    sendback(items[0]);
+                    const chain = items[0];
+                    chain.articles.forEach(article => { article.title = article.title[0] } );
+                    sendback(chain);
                 } else {
                     cli.throwHTTP(404, 'Content chain not found', true);
                 }
@@ -125,7 +132,7 @@ class ContentChains {
         let path = cli.routeinfo.path[2];   
 
         if (path == "new") {
-            cclib.insertNewChain(cli._c, {
+            cclib.insertNewChain(cli, {
                 title : cli.postdata.data.title,
                 subtitle : cli.postdata.data.subtitle,
                 slug: require('slugify')(cli.postdata.data.title).toLowerCase(),
@@ -162,16 +169,23 @@ class ContentChains {
                     return cli.throwHTTP(404, 'Content chain not found', true);
                 }
 
-                updatedData.status = "live";
-                updatedData.slug = require('slug')(chain.title).toLowerCase();
+                if (chain.editions && chain.editions.length > 0
+                    && chain.articles && chain.articles.length > 0
+                    && chain.media)
+                {
+                    updatedData.status = "live";
+                    updatedData.slug = require('slug')(chain.title).toLowerCase();
 
-                cclib.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
-                    cli.sendJSON({ success: true });
-
-                    cclib.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
-
+                    cclib.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
+                        cli.sendJSON({ success: true });
+    
+                        cclib.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
+                            log('ContentChains', 'Error writing content chain file on disk - ' + error, 'error');
+                        });
                     });
-                });
+                } else {
+                    cli.throwHTTP(400, 'Missing required fields', true);
+                }
             });
         } else if (path == "addpost") {
             let chainid = cli.routeinfo.path[3];

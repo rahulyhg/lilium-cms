@@ -610,9 +610,11 @@ export default class EditView extends Component {
                 this.setState({
                     history : [historyentry, ...this.state.history],
                     post : {...this.state.post, ...{
+                        url : newstate.url,
                         status : newstate.status,
-                        date : newstate.date,
-                        name : newstate.name,
+                        date : newstate.date,	
+                        name : newstate.name,	
+                        aliases : newstate.aliases || [],
                         publishedAt : Date.now()
                     }}
                 }, () => {
@@ -828,12 +830,7 @@ export default class EditView extends Component {
         const tempdiv = document.createElement('div');
         tempdiv.innerHTML = value;
 
-        this.edits.wordcount = [
-            ...Array.from(tempdiv.querySelectorAll('p')).map(p => p.textContent.split(' ').length),
-            ...Array.from(tempdiv.querySelectorAll('h3')).map(p => p.textContent.split(' ').length),
-            ...Array.from(tempdiv.querySelectorAll('h2')).map(p => p.textContent.split(' ').length),
-            ...Array.from(tempdiv.querySelectorAll('h1')).map(p => p.textContent.split(' ').length),
-        ].reduce((prev, cur) => prev + cur, 0);
+        this.edits.wordcount = Array.from(tempdiv.children).filter(x => !x.classList.contains("embed")).map(p => p.textContent.split(' ').filter(x => x.trim()).length).reduce((prev, cur) => prev + cur, 0);
 
         tempdiv.innerHTML = "";
 
@@ -1067,6 +1064,10 @@ export default class EditView extends Component {
                         <SelectField name="language" placeholder="Language" initialValue={this.state.post.language || "en"} value={this.state.post.language || "en"} onChange={this.fieldChanged.bind(this)} options={[
                             { text : "English", value : "en" },
                             { text : "Français", value : "fr" }
+                        ]} />
+                        <SelectField name="culture" placeholder="Culture" initialValue={this.state.post.culture || "ca"} value={this.state.post.culture || "ca"} onChange={this.fieldChanged.bind(this)} options={[
+                            { text : "Canada", value : "ca" },
+                            { text : "United-States", value : "us" }
                         ]} />
                     </div>      
 

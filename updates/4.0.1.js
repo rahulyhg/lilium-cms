@@ -71,10 +71,11 @@ const handleArticleCursor = (col, cur, done) => {
 
         if (article.topic) {
             const v3url = "/" + TOPICS[article.topic.toString()].completeSlug + "/" + article.name;
-            const language = (TOPICS[article.topic.toString()].override.language || "en-ca").substring(0, 2);
+            const language = (TOPICS[article.topic.toString()].override.language || "en").substring(0, 2);
+            const culture = v3url.includes("/us/") ? "us" : "ca";
 
             log('Update', "V3 URL : " + v3url + ' with language ' + language, 'detail');
-            col.updateOne({ _id : article._id }, { $set : { v3url, url : v3url, wordcount : article.contractorTotalWords || 0, language } }, {}, () => {
+            col.updateOne({ _id : article._id }, { $set : { v3url, culture, url : v3url, wordcount : article.contractorTotalWords || 0, language } }, {}, () => {
                 setImmediate(() => handleArticleCursor(col, cur, done));
             });
         } else {

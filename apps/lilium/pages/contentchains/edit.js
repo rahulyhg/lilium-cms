@@ -5,7 +5,9 @@ import { TextField, ButtonWorker, SelectField } from "../../widgets/form";
 import { EditionPicker } from '../../widgets/editionpicker';
 import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
+import { Spinner } from '../../layout/loading';
 import { Picker } from "../../layout/picker";
+import { getTimeAgo } from '../../widgets/timeago';
 
 export class EditContentChain extends Component {
     constructor(props) {
@@ -105,15 +107,30 @@ export class EditContentChain extends Component {
 
     togglePublishState(done) {
         const action = this.state.chain.status == 'draft' ? 'live' : 'unpublish';
-        API.post(`/chains/${action}/${this.state.chain._id}`, {}, (err, data, r) => {
+        const chain = this.state.chain;
+        console.log(chain);
+        
+        if (action == 'live' &&
+            (!chain.articles || !chain.articles.length ||
+            !chain.editions || !chain.editions.length ||
+            !chain.title || !chain.media))
+        {
+            castNotification({
+                title: 'Some fields are missing to publish the content chain',
+                message: 'Make sure you have added a title, a featured image, an edition and at least one article to your chain before publishing',
+                type: 'error'
+            });
+            return done && done();
+        }
+
+        API.post(`/chains/${action}/${chain._id}`, {}, (err, data, r) => {
             if (r.status == 200) {
-                const chain = this.state.chain;
                 chain.status = this.state.chain.status == 'draft' ? 'live' : 'draft';
                 this.setState({ chain }, () => {
                     castNotification({
                         title: `The content chain was ${(this.state.chain.status == 'draft') ? 'unpublished' : 'published'}`,
                         type: 'success'
-                    })
+                    });
                 });
 
                 done();
@@ -160,22 +177,50 @@ export class EditContentChain extends Component {
 
                     <h4>Select an edition for this series</h4>
                     <div class="card publishing-card nopad">
-                        <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.edition || []} value={this.state.chain.edition} language={this.state.chain.language || "en"} name="edition" />
+                        <EditionPicker onChange={this.updateValues.bind(this)} initialValue={this.state.chain.editions || []} value={this.state.chain.editions} language={this.state.chain.language || "en"} name="editions" />
                     </div>
 
-                    <hr />
-                    {
-                        this.state.chain.status == 'draft' ? (
-                            <ButtonWorker text='Publish' theme='purple' type='fill' work={this.togglePublishState.bind(this)}  />
-                        ) : (
-                            <ButtonWorker text='Unpublish' theme='red' type='outline' work={this.togglePublishState.bind(this)}  />
-                        )
-                    }
+                    <div class="publication-details-card card">
+                        <div class="detail-head">
+                            <b>About this Content Chain</b>
+                        </div>
+
+                        <div class="detail-list">
+                            <div>
+                                Created: <b>{getTimeAgo(Date.now() - new Date(this.state.chain.createdOn).getTime()).toString()}</b>
+                                 {/* by <b>{this.cachedUsers[this.state.chain.createdBy] ? this.cachedUsers[this.state.chain.createdBy].displayname : " an inactive user"}</b>. */}
+                            </div>
+                            { this.state.chain.lastModified ? (
+                                <div>
+                                    Updated: <b>{getTimeAgo(Date.now() - new Date(this.state.chain.lastModified).getTime()).toString()}</b>.
+                                </div>
+                            ) : null }
+                            { this.state.chain.slug && this.state.chain.status == "live" ? (
+                                <div>
+                                    Slug : <b>{this.state.chain.slug}</b>
+                                </div>
+                            ) : null}
+                            { this.state.chain.status ? (
+                                <div>
+                                    Status : <b>{this.state.chain.status}</b>
+                                </div>
+                            ) : null}
+
+                            <hr />
+                            {
+                                this.state.chain.status == 'draft' ? (
+                                    <ButtonWorker text='Publish' theme='purple' type='fill' work={this.togglePublishState.bind(this)}  />
+                                ) : (
+                                    <ButtonWorker text='Unpublish' theme='red' type='outline' work={this.togglePublishState.bind(this)}  />
+                                )
+                            }
+                        </div>
+                    </div>
                 </div>
             );
         } else {
             return (
-                <p>loading...</p>
+                <Spinner centered />
             );
         }
     }

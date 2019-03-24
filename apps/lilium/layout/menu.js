@@ -161,7 +161,7 @@ export class LiliumMenu extends Component {
                         this.state.menus.map(menu => (
                             <div key={menu.id} class={"sidebar-menu-item " + (document.location.pathname.includes(menu.absURL) ? "selected" : "")} onClick={this.goTo.bind(this, menu)}>
                                 <i class={"far " + menu.faicon}></i>
-                                <b>{_v(menu.v)}</b>
+                                <b>{_v(menu.v) || menu.v}</b>
                             </div>
                         ))
                     }
@@ -183,7 +183,7 @@ export class LiliumMenu extends Component {
                         this.state.menus.filter(x => x.section == this.state.section).map(menu => (
                             <div key={menu.id} class={"sidebar-menu-item " + (document.location.pathname.includes(menu.absURL) ? "selected" : "")} onClick={this.goTo.bind(this, menu)}>
                                 <i class={"far " + menu.faicon}></i>
-                                <b>{_v(menu.v)}</b>
+                                <b>{_v(menu.v) || menu.v}</b>
                             </div>
                         ))
                     }

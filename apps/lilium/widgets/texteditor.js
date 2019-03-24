@@ -4,6 +4,7 @@ import { Picker } from '../layout/picker';
 import { ImagePicker } from '../layout/imagepicker';
 import { PlacePicker } from '../layout/placepicker';
 import { EmbedPicker } from '../layout/embedpicker';
+import { createDeflate } from 'zlib';
 
 function embedToCarouselPreviewElement(embed, isCarousel) {
     let contentNode = document.createElement('div');
@@ -61,7 +62,8 @@ export class TextEditor extends Component {
             this.savemethod = props.savemethod || "post";
         }
 
-        this.rID = "txt-" + Math.random().toString().substring(2) + Date.now().toString()
+        this.rID = "txt-" + Math.random().toString().substring(2) + Date.now().toString();
+        this.bookmark;
     }
 
     /**
@@ -140,9 +142,25 @@ export class TextEditor extends Component {
                     icon: 'fa fa-image',
                     tooltip: 'Insert an image, a places or an embeds',
                     onclick: () => {
+                        this.bookmark = editor.selection.getBookmark(2, true);
                         const session =  new Picker.Session({});
+                        const selectedEl = editor.selection.getNode();
+                        console.log('el', selectedEl);
+                        
+                        if (selectedEl && selectedEl.classList.contains('lml-placeholder')) {
+                            session.replaceOld = true;
+                            if (selectedEl.dataset.type == ImagePicker.slug) {
+                                session.options[ImagePicker.slug] = { selected: selectedEl.dataset.id };
+                            }
+                        }
+
+                        console.log('session ', session);
+                        
+
                         Picker.cast(session, embed => {
                             log('TextEditor', "Picker callback received embed: ", embed, 'info');
+                            this.bookmark && editor.selection.moveToBookmark(this.bookmark);
+                            this.bookmark = undefined;
                             editor.insertContent(TextEditor.embedToMarkup(embed).outerHTML);
                         });
                     }
@@ -154,14 +172,17 @@ export class TextEditor extends Component {
                     onclick: () => {
                         const oldNode = editor.selection.getNode();
 
+                        this.bookmark = editor.selection.getBookmark(2, true);
+
                         const selectedItems = Array.from(
                             editor.selection.getNode().querySelectorAll(".lml-placeholder")
-                        ).map(x => ({ 
-                            type : x.dataset.type, 
-                            [ImagePicker.slug] : { _id : x.dataset.id, sizes : { square : { url : x.dataset.thumbnail }, facebook : { url : x.dataset.thumbnail } }, size : { width : x.dataset.width, height : x.dataset.height } },
-                            [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.dataset.placename },
-                            [EmbedPicker.slug] : { _id : x.dataset.id, type : x.dataset.embedtype, ...JSON.parse(x.dataset.embedjson) }
-                        }))
+                        ).map(x => {
+                            return { 
+                                type : x.dataset.type, 
+                                [ImagePicker.slug] : { _id : x.dataset.id, sizes : { square : { url : x.dataset.thumbnail }, facebook : { url : x.dataset.thumbnail } }, size : { width : x.dataset.width, height : x.dataset.height } },
+                                [PlacePicker.slug] : { _id : x.dataset.id, displayname : x.dataset.placename },
+                                [EmbedPicker.slug] : { _id : x.dataset.id, type : x.dataset.embedtype, ...JSON.parse(x.dataset.embedjson || '{}') }
+                        }});
 
                         const session = new Picker.Session({ type: 'carousel' });
 
@@ -184,9 +205,12 @@ export class TextEditor extends Component {
                                     carouselElement.appendChild(embed);
                                 });
                             }
-                            
+
+                            this.bookmark && editor.selection.moveToBookmark(this.bookmark);
+                            this.bookmark = undefined;
+
                             carouselPlaceholder.setAttribute('contenteditable', false);
-                            carouselPlaceholder.appendChild(carouselElement)
+                            carouselPlaceholder.appendChild(carouselElement);
                             if (session.replaceOld) {
                                 oldNode.parentElement.insertBefore(
                                     carouselPlaceholder, oldNode
