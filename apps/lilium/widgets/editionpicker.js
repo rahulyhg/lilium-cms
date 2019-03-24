@@ -44,7 +44,7 @@ class EditionLevel extends Component {
             this.clickedOn(this.state.editions[0]._id);
         } else {
             const filter = ev.target.value;
-            this.setState({ editions : this.editions.filter(x => x.displayname.toLowerCase().includes(filter.toLowerCase())) });
+            this.setState({ editions : this.editions.filter(x => x.lang[this.props.language].displayname.toLowerCase().includes(filter.toLowerCase())) });
         }
     }
 
