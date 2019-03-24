@@ -146,7 +146,7 @@ class PublishedReportCard extends Component {
 
         return this.state.visible ? (
             <div style={{ width : PUBLISHED_CARD_CONST_WIDTH }} class={ "card publish-report-card " + (this.state.last ? "last " : " ") }>
-                <a class="image-wrapper" href={"/" + this.props.post.topicslug + "/" + this.props.post.name} target="_blank">
+                <a class="image-wrapper" href={this.props.post.url} target="_blank">
                     <img class="pub-report-card-facebookmedia" src={this.props.post.facebookmedia} />
                 </a>
                 <div class="pub-report-card-headline">{this.props.post.headline}</div>

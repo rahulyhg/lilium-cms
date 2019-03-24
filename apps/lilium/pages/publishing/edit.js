@@ -609,12 +609,7 @@ export default class EditView extends Component {
                 hit();
                 this.setState({
                     history : [historyentry, ...this.state.history],
-                    post : {...this.state.post, ...{
-                        status : newstate.status,
-                        date : newstate.date,
-                        name : newstate.name,
-                        publishedAt : Date.now()
-                    }}
+                    post : {...this.state.post, ...newstate}
                 }, () => {
                     this.coldState.post = this.state.post; 
 
