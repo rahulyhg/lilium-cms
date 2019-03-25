@@ -57,7 +57,7 @@ class PostListItemAdd extends Component {
     render() {
         return (
             <div onClick={this.onClick.bind(this)} class="flex-row publishing-list-item publishing-create-article">
-                <div class="flex-col article-list-image-wrapper gray-background"></div>
+                <div class="flex-col article-list-image-wrapper"><i className="fa fa-plus"></i></div>
                 <div class="flex-col article-list-title">
                     <b>Create new article</b>
                 </div>
