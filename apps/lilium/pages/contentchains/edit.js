@@ -209,6 +209,11 @@ export class EditContentChain extends Component {
                                     Status : <b>{this.state.chain.status}</b>
                                 </div>
                             ) : null}
+                            { this.state.chain.slug ? (
+                                <div>
+                                    Path : <a target='_blank' href={`/series/${this.state.chain.slug}`}>{`/series/${this.state.chain.slug}`}</a>
+                                </div>
+                            ) : null}
 
                             <hr />
                             {
