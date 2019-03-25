@@ -188,8 +188,9 @@ export class Lys extends Component {
                 hashactions : acts
             });
         } else {
+            const otext = text;
             text = text.trim().replace(/\s/g, '');
-            this.searchTimeout = setTimeout(this.fillSearch.bind(this, text), TIMING.LYS_QUICK_SEARCH);
+            this.searchTimeout = setTimeout(this.fillSearch.bind(this, otext), TIMING.LYS_QUICK_SEARCH);
 
             const choices = commands.filter(x => x.command.includes(text));
             const pageChoices = pageCommands.filter(x => x.command.includes(text));
