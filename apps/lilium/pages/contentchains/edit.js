@@ -170,6 +170,10 @@ export class EditContentChain extends Component {
                             { text : "English", value : "en" },
                             { text : "Français", value : "fr" }
                         ]} />
+                        <SelectField name="culture" placeholder="Culture" initialValue={this.state.chain.culture || "ca"} value={this.state.chain.culture || "ca"} onChange={this.updateValues.bind(this)} options={[
+                            { text : "Canada", value : "ca" },
+                            { text : "United-States", value : "us" }
+                        ]} />
                     </div>
 
                     <h4>Select articles for the content chain</h4>
