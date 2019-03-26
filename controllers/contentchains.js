@@ -13,6 +13,7 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     createdOn : 1,
     lastModified : 1,
     language : 1,
+    culture : 1,
     editions: 1,
     media: { $arrayElemAt: ['$media', 0] },
     
