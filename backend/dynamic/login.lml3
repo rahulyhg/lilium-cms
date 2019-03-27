@@ -87,6 +87,14 @@ h1 {
     box-shadow: 0px 3px 3px rgba(0,0,0,0.5);
 }
 
+#loginformfields[data-auth-step="2fa"] input[name="username"],
+#loginformfields[data-auth-step="2fa"] input[name="password"],
+#loginformfields[data-auth-step="2fa"] button#loginbutton,
+#loginformfields[data-auth-step="credentials"] button#submit2fa,
+    #loginformfields[data-auth-step="credentials"] input[name="2fa"] {
+    display: none;
+}
+
 input {
     display: block;
     margin: 12px auto 20px;
@@ -110,7 +118,7 @@ input:focus {
     text-align: left;
 }
 
-#loginbutton {
+button {
     background: #fff;
     border: none;
     padding: 6px 11px;
@@ -135,8 +143,11 @@ input:focus {
 #loginmsg {
     display: none;
     margin-bottom: 20px;
-    color: #fd7c7c;
     font-weight: bold;
+    color: #333;
+}
+#loginmsg.error {
+    color: #fd7c7c;
 }
 
 `;
@@ -159,15 +170,16 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
                     <h1>Lilium CMS</h1>
                     <img src="/static/media/lmllogo.png" id="logo" />
                 </div>
-                <div id="loginformfields">
-                    <input type="text" placeholder="Username" id="txtusername" />
-                    <input type="password" placeholder="Password" id="txtpassword" />
-                    <input type="text" placeholder="2FA Token" id="txt2fa" />
+                <div id="loginformfields" data-auth-step='credentials'>
+                    <input type="text" name='username' placeholder="Username" id="txtusername" />
+                    <input type="password" name='password' placeholder="Password" id="txtpassword" />
+                    <input type="text" name='2fa' placeholder="2FA Token" id="txt2fa" />
 
                     <div id="loginmsg"></div>
 
                     <div id="loginwrap">
                         <button id="loginbutton">Login</button>
+                        <button id="submit2fa">Submit</button>
 
                         <a id="pwdforgot" href="/accesscheckpoint">
                             I have no idea what my password is
@@ -204,7 +216,7 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
             document.getElementById('txtusername').focus();
 
             if (document.location.hash) {
-                document.querySelector('input[name="usr"]').value = document.location.hash.toString().substring(1);
+                document.querySelector('input[name="username"]').value = document.location.hash.toString().substring(1);
                 history.pushState("", document.title, window.location.pathname + window.location.search);
             }
 
@@ -228,16 +240,30 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
                 token2fa.value = "";
 
                 document.getElementById('loginbutton').style.display = "";
-                document.getElementById('loginmsg').style.display = "block";
-                document.getElementById('loginmsg').textContent = msg || "Login failed."
+                var loginMsg = document.getElementById('loginmsg');
+                loginMsg.style.display = "block";
+                loginMsg.classList.add('error');
+                loginMsg.textContent = msg || "Login failed."
             }
 
-            var gotLoginResp = function() {
+            var challenge2fa = function(msg) {
+                var loginMsg = document.getElementById('loginmsg');
+                loginMsg.style.display = "block";
+                loginMsg.classList.remove('error');
+                loginMsg.textContent = msg || "Two factor authentication token required";
+                document.getElementById('txt2fa').focus();
+            }
+
+            var getCredentialsResp = function() {
                 if (this.status == 200) {
                     var resp = JSON.parse(this.responseText);
 
-                    if (resp.success) {
+                    if (resp.status == 'success') {
                         document.location = resp.to;
+                    } else if (resp.status == '2fachallenge') {
+                        var form = document.getElementById('loginformfields');
+                        form.dataset.authStep = '2fa';
+                        challenge2fa(resp.message);
                     } else {
                         failed(resp.message);
                     }
@@ -246,7 +272,7 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
                 }   
             }
 
-            var login = function() {
+            var submitLoginInfo = function() {
                 document.getElementById('loginbutton').style.display = "none";
                 document.getElementById('loginmsg').style.display = "";
 
@@ -258,7 +284,7 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
                     failed();
                 } else {
                     var oReq = new XMLHttpRequest();
-                    oReq.addEventListener("load", gotLoginResp);
+                    oReq.addEventListener("load", getCredentialsResp);
                     oReq.open("POST", "/login" + document.location.search);
                     oReq.setRequestHeader('Content-Type', 'application/json');
                     oReq.send(JSON.stringify({ usr : username, psw : password, token2fa : txt2fa, payloadid : "${Math.random().toString().substring(2)}" }));
@@ -267,7 +293,7 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
 
             var onkeydown = function(ev) {
                 if (ev.keyCode == 13) { 
-                    login();
+                    submitLoginInfo();
 
                     ev.preventDefault();
                     return;
@@ -279,8 +305,10 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
 
             document.getElementById('txtusername').addEventListener('keypress', onkeydown);
             document.getElementById('txtpassword').addEventListener('keypress', onkeydown);
+            document.getElementById('txt2fa').addEventListener('keypress', onkeydown);
 
-            document.getElementById('loginbutton').addEventListener('click', login);
+            document.getElementById('loginbutton').addEventListener('click', submitLoginInfo);
+            document.getElementById('submit2fa').addEventListener('click', submitLoginInfo);
         </script>
 	</body>
 </html>
