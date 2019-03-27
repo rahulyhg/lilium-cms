@@ -134,7 +134,6 @@ var LiveVariables = function() {
         if (cli.routeinfo.path[1] == "v4") {
             // LIVE VARIABLE V4
             let params = cli.routeinfo.params || {};
-            console.log(params);
 
             try {
                 RegisteredLiveVariables[cli.routeinfo.path[2]] ? RegisteredLiveVariables[cli.routeinfo.path[2]].callback(
