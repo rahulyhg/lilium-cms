@@ -85,6 +85,7 @@ h1 {
     padding-top: 15px;
     padding-bottom: 15px;
     box-shadow: 0px 3px 3px rgba(0,0,0,0.5);
+    animation: height 0.5s
 }
 
 #loginformfields[data-auth-step="2fa"] input[name="username"],
@@ -125,6 +126,13 @@ button {
     font-size: 14px;
     width: 100px;
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    display: block;
+    margin: 0 auto;
+    background: #af57e4;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid #8d21cd;
 }
 
 #pwdforgot {
@@ -217,6 +225,7 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
 
             if (document.location.hash) {
                 document.querySelector('input[name="username"]').value = document.location.hash.toString().substring(1);
+                document.querySelector('input[name="password"').focus();
                 history.pushState("", document.title, window.location.pathname + window.location.search);
             }
 
