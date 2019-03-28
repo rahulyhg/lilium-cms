@@ -30,8 +30,13 @@ class Router {
                 cli.routeinfo.path = [""];
             }
 
+            const decodedSearch = decodeURI(pObj.search);
+            if (decodedSearch[1] == '{') {
+                cli.routeinfo.params = JSON.parse(decodedSearch.substring(1));
+            } else {
+                cli.routeinfo.params = pObj.query;
+            }
             cli.routeinfo.relsitepath = "/" + cli.routeinfo.path.join('/');
-            cli.routeinfo.params = pObj.query;
             cli.routeinfo.admin = cli.routeinfo.path[0] === cli._c.paths.admin;
             cli.routeinfo.login = cli.routeinfo.path[0] === cli._c.paths.login;
             cli.routeinfo.front = cli.routeinfo.path[0] === "_";
