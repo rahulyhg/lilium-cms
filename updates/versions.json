@@ -146,5 +146,10 @@
         "codename" : "Feronia",
         "script" : "4.0.2.js",
         "features" : ["Multilang theme settings"]
+    },
+    "4.0.3" : {
+        "codename" : "Feronia",
+        "script" : "4.0.3.js",
+        "features" : ["Parse old Instagram embeds"]
     }
 }
