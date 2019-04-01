@@ -14,16 +14,16 @@ const nextLoop = (conf, cur, done) => {
         }
 
         const content = post.content[0] || "";
-        const dom = new JSDOM(content);
+        const dom = new JSDOM(`<!DOCTYPE html><html><head></head><body>${content}</body></html>`);
         const embeds = dom.window.document.querySelectorAll(selector);
         total += embeds.length;
 
         // Possible rate limit hit from Instagram oembed endpoint
         // It is supposed to be documented here : https://www.instagram.com/developer/limits/
         // But the page throws a 404. 
-        let asyncCount = 0;
+        let asyncCount = -1;
         const nextEmbed = () => {
-            if (asyncCount == embeds.length - 1) {
+            if (++asyncCount == embeds.length - 1) {
                 log('Update', 'Parsed ' + embeds.length + ' embeds for article ' + post._id, 'success');
                 return db.update(conf, 'content', { _id : post._id }, { content : [dom.window.document.body.innerHTML] }, () => {
                     setImmediate(() => nextLoop(conf, cur, done));
@@ -31,6 +31,7 @@ const nextLoop = (conf, cur, done) => {
             }
 
             if (embeds[asyncCount].href.includes('/p/')) {
+                log('Update', 'Fetching instagram using href ' + embeds[asyncCount].href, 'info');
                 embedlib.fetch(conf, firstuser, 'instagram', embeds[asyncCount].href, (err, data) => {
                     if (data) {
                         db.insert(conf, 'embeds', data, err => {
@@ -76,6 +77,8 @@ module.exports = (conf, done) => {
         firstuser = user._id;
 
         db.find(conf, 'content', { "content" : new RegExp(selector) }, [], (err, cur) => {
+            cur.sort({ _id : -1 });
+
             nextLoop(conf, cur, () => {
                 done();
             });
