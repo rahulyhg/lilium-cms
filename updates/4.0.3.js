@@ -6,6 +6,7 @@ const { JSDOM } = require('jsdom');
  
 let total = 0;
 let firstuser;
+let postcounter = 0;
 const nextLoop = (conf, cur, done) => {
     cur.next((err, post) => {
         if (!post) {
@@ -13,6 +14,7 @@ const nextLoop = (conf, cur, done) => {
             return done();
         }
 
+        log('Update', `Working on post ${++postcounter} / ${totalposts}`, 'detail');
         const content = post.content[0] || "";
         const dom = new JSDOM(`<!DOCTYPE html><html><head></head><body>${content}</body></html>`);
         const embeds = dom.window.document.querySelectorAll(selector);
@@ -72,15 +74,21 @@ const nextLoop = (conf, cur, done) => {
     });
 };
 
+let totalposts;
 module.exports = (conf, done) => {
     db.findUnique(configlib.default(), 'entities', {  }, (err, user) => {
         firstuser = user._id;
 
         db.find(conf, 'content', { "content" : new RegExp(selector) }, [], (err, cur) => {
-            cur.sort({ _id : -1 });
+            cur.count((err, total) => {
+                totalposts = total;
+                cur.rewind();
 
-            nextLoop(conf, cur, () => {
-                done();
+                cur.sort({ _id : -1 });
+
+                nextLoop(conf, cur, () => {
+                    done();
+                });
             });
         });
     });
