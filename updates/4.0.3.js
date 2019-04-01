@@ -4,12 +4,14 @@ const embedlib = require('../lib/embed');
 const configlib = require('../lib/config');
 const { JSDOM } = require('jsdom');
  
+const HARD_POST_LIMIT = 1000;
+
 let total = 0;
 let firstuser;
 let postcounter = 0;
 const nextLoop = (conf, cur, done) => {
     cur.next((err, post) => {
-        if (!post) {
+        if (!post || HARD_POST_LIMIT == postcounter) {
             log('Update', 'Finished parsing old embeds into V4 embeds', 'success');
             return done();
         }
