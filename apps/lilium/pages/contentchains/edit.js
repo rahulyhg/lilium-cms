@@ -45,6 +45,10 @@ export class EditContentChain extends Component {
     selectedArticlesChanged(articles) {
         API.post('/chains/updateArticles/' + this.state.chain._id, articles.map(article => article._id), (err, data, r) => {
             if (r.status == 200) {
+                const chain = this.state.chain;
+                chain.articles = articles;
+                this.setState({ chain });
+
                 castNotification({
                     title: 'Modifications saved',
                     message: 'Your modifications to the content chain were saved',
@@ -177,7 +181,7 @@ export class EditContentChain extends Component {
                     </div>
 
                     <h4>Select articles for the content chain</h4>
-                    <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
+                    <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} name='articles' />
 
                     <h4>Select an edition for this series</h4>
                     <div class="card publishing-card nopad">
