@@ -7,6 +7,7 @@ import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
 import { Spinner } from '../../layout/loading';
 import { Picker } from "../../layout/picker";
+import { ImagePicker } from "../../layout/imagepicker";
 import { getTimeAgo } from '../../widgets/timeago';
 
 export class EditContentChain extends Component {
@@ -88,8 +89,7 @@ export class EditContentChain extends Component {
     }
 
     chooseFeaturedImage() {
-        Picker.cast(new Picker.Session({}), selected => {
-            console.log('image picked: ', selected);
+        Picker.cast(new Picker.Session({ accept: [ImagePicker.slug] }), selected => {
             const chain = this.state.chain;
             chain.media = selected.upload;
             this.setState({ chain });
@@ -112,7 +112,6 @@ export class EditContentChain extends Component {
     togglePublishState(done) {
         const action = this.state.chain.status == 'draft' ? 'live' : 'unpublish';
         const chain = this.state.chain;
-        console.log(chain);
         
         if (action == 'live' &&
             (!chain.articles || !chain.articles.length ||
