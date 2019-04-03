@@ -282,7 +282,8 @@ export class EmbedPicker extends Component {
                             onChange={this.newEmbedFieldChanged.bind(this)} />
                     </div>
                     <div style={{ textAlign : 'right' }}>
-                        <ButtonWorker text="Generate embed" type="outline" theme="white" work={this.fetchEmbed.bind(this)} />
+                        <ButtonWorker text="Cancel" type="outline" theme="red" sync={true} work={() => { this.setState({ newModalOpen: false }); }} />
+                        <ButtonWorker text="Generate embed" type="fill" theme="purple" work={this.fetchEmbed.bind(this)} />
                     </div>
                 </Modal>
             </div>
