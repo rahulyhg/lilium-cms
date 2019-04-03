@@ -52,6 +52,10 @@ class PickerSession {
 }
 
 let _singleton;
+/**
+ * Sinleton that is used troughout the application to allow users to select different types of media.
+ * To control how the picker is display, use the Picker.PickerSession class.
+ */
 export class Picker extends Component {
     constructor(props) {
         super(props);
@@ -67,6 +71,12 @@ export class Picker extends Component {
 
     static Session = PickerSession;
 
+    /**
+     * 
+     * @param {Picker.PickerSession} session options relative to the desired session for the Picker that will be cast
+     * @param {callback} done Executed when the user ends his selection in the picker
+     * @param {}
+     */
     static cast(session, done) {
         if (session) {
             log('Picker', 'Casting picker singleton', 'detail');
@@ -79,10 +89,20 @@ export class Picker extends Component {
         }
     }
 
+    /**
+     * 
+     * @param {string} name Name of the embed type to register
+     * @param {Component} pickerComponent The preact component to associate to the trgistered embed type. WIll be shown to the user to 
+     * allow them to pick an entity of the registered type
+     * @param {Component} carouselPreviewComponent The preact component to display as a preview when the registered embed type is inserted in a carousel
+     */
     static registerEmbedType(name, pickerComponent, carouselPreviewComponent) {
         Picker.PickerMap[name] = { pickerComponent, carouselPreviewComponent };
     }
 
+    /**
+     * Closes the picker
+     */
     static dismiss() {
         log('Picker', 'Dismissing picker singleton', 'detail');
         _singleton.setState({ visible : false });
