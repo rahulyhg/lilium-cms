@@ -18,8 +18,6 @@ const bindNativeEvent = eventName => {
         nativeEventsMap[eventName] = handleNativeEvent;
         document.addEventListener(eventName, handleNativeEvent);
     }
-
-    console.log('Native events', nativeEventsMap);
 };
 
 /**
