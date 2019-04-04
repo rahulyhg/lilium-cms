@@ -86,7 +86,7 @@ class Category extends Component {
             if (r.status == 200) {
                 const passwords = this.state.passwords;
                 passwords.push(data.inserted);
-                this.setState({ passwords, createPasswordModalVisible: false });
+                this.setState({ passwords, createPasswordModalVisible: false, newPasswordName: '', newPasswordPlaintext: '' });
                 done && done();
             } else {
                 castNotification({
@@ -162,7 +162,7 @@ class Category extends Component {
                     }
                     {
                         this.state.passwords.map(password => (
-                            <Password name={password.name} plaintext={password.plaintext} id={password._id} deletePassword={this.deletePassword.bind(this)} />    
+                            <Password name={password.name} key={password._id} plaintext={password.plaintext} id={password._id} deletePassword={this.deletePassword.bind(this)} />    
                         ))
                     }
                 </div>
@@ -266,7 +266,7 @@ export default class PwManager extends Component {
                 <div class="leader-content classic">
                 {
                     this.state.categories.map(category => (
-                        <Category {...category} removeCategory={this.removeCategory.bind(this)} />
+                        <Category {...category} removeCategory={this.removeCategory.bind(this)} key={category._id} />
                     ))
                 }
                 </div>
