@@ -146,7 +146,7 @@ export class Lys extends Component {
     keyDown(ev) {
         if (ev.keyCode == 16) {
             this.shiftDown = true;
-        } else if (ev.keyCode == 32 && this.shiftDown && !this.state.visible) {
+        } else if (ev.keyCode == 32 && this.shiftDown && !this.state.visible && ev.target.nodeName != "INPUT") {
             this.display();
             ev.preventDefault();
         } else if (this.state.visible && ev.keyCode == 27) {
