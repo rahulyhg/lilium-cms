@@ -201,6 +201,9 @@ export class Picker extends Component {
                 <div id="picker-overlay" ref={x => (this.overlayEl = x)} onClick={this.maybeCloseOnClick.bind(this)}>
                     <div id="picker-wrapper">
                         <div id="picker" className={state.session.type == 'carousel' && 'carousel-session'}>
+                            <div className="picker-close-button" title='Close' onClick={() => { Picker.dismiss(); }}>
+                                <i className="fa fa-times"></i>
+                            </div>
                             <TabView hidesingletab noshadow id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex} onTabSelected={this.tabChanged.bind(this)}>
                                 {
                                     state.tabs.map((SubPicker) => (
