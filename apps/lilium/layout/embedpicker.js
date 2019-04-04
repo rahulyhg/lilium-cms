@@ -246,14 +246,14 @@ export class EmbedPicker extends Component {
     render() {
         if (this.state.loading) {
             return (
-                <div onKeyDown={this.props.onKeyDown.bind(this)}>
+                <div>
                     <Spinner centered />
                 </div>
             );
         }
 
         return (
-            <div id="embed-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
+            <div id="embed-picker">
                 <div class="embed-picker-list">
                     <div class="embed-add embed-single card flex" onClick={() => this.setState({ newModalOpen : true })}>
                         <i class="fal fa-plus"></i>
@@ -282,7 +282,8 @@ export class EmbedPicker extends Component {
                             onChange={this.newEmbedFieldChanged.bind(this)} />
                     </div>
                     <div style={{ textAlign : 'right' }}>
-                        <ButtonWorker text="Generate embed" type="outline" theme="white" work={this.fetchEmbed.bind(this)} />
+                        <ButtonWorker text="Cancel" type="outline" theme="red" sync={true} work={() => { this.setState({ newModalOpen: false }); }} />
+                        <ButtonWorker text="Generate embed" type="fill" theme="purple" work={this.fetchEmbed.bind(this)} />
                     </div>
                 </Modal>
             </div>
