@@ -92,7 +92,7 @@ export class PlacePicker extends Component {
 
     render() {
         return (
-            <div id="place-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
+            <div id="place-picker">
                 <div id="place-picker-search-pane">
                     <h1 className="title">Pick a place</h1>
                     <div id="search-content-wrapper" className='scroll-x'>

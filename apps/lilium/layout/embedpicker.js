@@ -246,14 +246,14 @@ export class EmbedPicker extends Component {
     render() {
         if (this.state.loading) {
             return (
-                <div onKeyDown={this.props.onKeyDown.bind(this)}>
+                <div>
                     <Spinner centered />
                 </div>
             );
         }
 
         return (
-            <div id="embed-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
+            <div id="embed-picker">
                 <div class="embed-picker-list">
                     <div class="embed-add embed-single card flex" onClick={() => this.setState({ newModalOpen : true })}>
                         <i class="fal fa-plus"></i>

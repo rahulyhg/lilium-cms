@@ -83,7 +83,7 @@ export class Picker extends Component {
             const tabs = session.accept.map(x => PickerMap[x]);
             if (!session.options) session.options = {};
             _singleton.changeState({ session: session, visible: true, tabs, callback: done });
-            document.addEventListener('keydown', _singleton.keydown_bound);
+            window.liliumcms.bindFirst('keydown', _singleton.keydown_bound);
         } else {
             log('Picker', 'Cannot cast Picker without a Session object', 'error');
         }
@@ -106,7 +106,7 @@ export class Picker extends Component {
     static dismiss() {
         log('Picker', 'Dismissing picker singleton', 'detail');
         _singleton.setState({ visible : false });
-        document.removeEventListener('keydown', _singleton.keydown_bound);
+        window.liliumcms.unbind('keydown', _singleton.keydown_bound);
 
         // _singleton.state.callback && _singleton.state.callback(_singleton.state.selectedElement);
     }
@@ -205,7 +205,7 @@ export class Picker extends Component {
                                 {
                                     state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]}
+                                            <SubPicker isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]}
                                                         selected={state.session.options[SubPicker.slug].selected} />
                                         </Tab>
                                     ))

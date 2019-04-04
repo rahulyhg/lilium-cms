@@ -89,6 +89,7 @@ import { NotificationWrapper, castNotification } from 'layout/notifications';
 import { fireEvent } from 'interactive/events';
 import { setLanguage } from 'data/vocab';
 import { CakepopWrapper } from 'layout/cakepopsmanager';
+import { bind, bindFirst, unbind } from './syntheticEvents';
 
 import API from 'data/api';
 
@@ -99,6 +100,12 @@ liliumcms.connected = true;
 
 // Create `log` function
 makeGlobalLogger();
+
+// Make synthetic events library global in window.liliumcms
+log('Lilium', "Making synthetic events library global in window.liliumcms", 'lilium');
+window.liliumcms.bind = bind;
+window.liliumcms.bindFirst = bindFirst;
+window.liliumcms.unbind = unbind;
 
 // If in dev mode, initialize dev functions
 if (liliumcms.env == "dev") {
