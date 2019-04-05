@@ -1,6 +1,7 @@
 const db = require('../lib/db');
 const { updatePostsAfterMerge, fieldToRef, getFull } = require('../lib/editions');
 const themelib = require('../lib/themes');
+const hooks = require('../lib/hooks');
 
 const EDITION_COLLECTION = "editions";
 const SECTION_COLLECTION = "sections";
@@ -53,6 +54,7 @@ class EditionController {
             edition.lang.en = edition.lang.fr = langconf;
 
             db.insert(cli._c, 'editions', edition, () => {
+                hooks.fireSite(cli._c, 'edition_created', { edition });
                 cli.sendJSON({ edition });
             });
         } else if (act == "section") {
@@ -203,6 +205,7 @@ class EditionController {
                             if (err) {
                                 cli.throwHTTP(500, err, true);
                             } else {
+                                hooks.fireSite(cli._c, 'edition_updated', { edition : newed });
                                 cli.sendJSON(r)
                             }
                         });
@@ -229,7 +232,10 @@ class EditionController {
                             if (err) {
                                 cli.throwHTTP(500, err, true);
                             } else {
-                                cli.sendJSON(r)
+                                db.findUnique(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, (err, editions) => {
+                                    hooks.fireSite(cli._c, 'editions_updated', { editions });
+                                    cli.sendJSON(r)
+                                });
                             }
                         });
                     } else {
