@@ -8,6 +8,7 @@ class Password extends Component {
     constructor(props) {
         super(props);
         this.values = {};
+        this.state = { confirmPWRemoveModalVisible: false };
     }
 
     /**
@@ -57,7 +58,18 @@ class Password extends Component {
     render() {
         return (
             <div className="password">
-                <i onClick={this.props.deletePassword.bind(this, this.props.id)} className="delete-password fal fa-trash"></i>
+                <Modal visible={this.state.confirmPWRemoveModalVisible} title='Confirm Password Removal' onClose={() => { this.setState({ confirmPWRemoveModalVisible: false }) }}>
+                    <h2>{`Are you sure you want to remove the '${this.props.name}' password?`}</h2>
+                    <p>Before removing this password, please, make sure it is <b>no longer in use</b>. This action <b>cannot be reversed</b></p>
+                    <p>In order to <b>preserve</b> the password, click the <b>Cancel</b> button.</p>
+                    <p>If you wish to <b>continue with the deletion</b>, click on the <b>I understand, remove</b> button.</p>
+                    <div style={{ textAlign: 'right' }}>
+                        <ButtonWorker work={() => { this.setState({ confirmPWRemoveModalVisible: false }) }} sync={true} text='Cancel' type='outline' theme='blue' />
+                        <ButtonWorker work={this.props.deletePassword.bind(this, this.props.id)} text='I understand, remove' type='fill' theme='red' />
+                    </div>
+                </Modal>
+
+                <i onClick={() => { this.setState({ confirmPWRemoveModalVisible: true }); }} className="delete-password fal fa-trash"></i>
                 <div className="password-name">
                     <EditableText initialValue={this.props.name} name='name' placeholder='Name' placeholderType='inside' onChange={this.updateValue.bind(this)} />
                 </div>
