@@ -205,7 +205,7 @@ class EditionController {
                             if (err) {
                                 cli.throwHTTP(500, err, true);
                             } else {
-                                hooks.fireSite(cli._c, 'edition_updated', { edition : newed });
+                                hooks.fireSite(cli._c, 'edition_updated', { edition : Object.assign(ed, newed) });
                                 cli.sendJSON(r)
                             }
                         });
