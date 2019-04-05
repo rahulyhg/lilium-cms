@@ -7,6 +7,7 @@ import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
 import { Spinner } from '../../layout/loading';
 import { Picker } from "../../layout/picker";
+import { ImagePicker } from "../../layout/imagepicker";
 import { getTimeAgo } from '../../widgets/timeago';
 
 export class EditContentChain extends Component {
@@ -45,6 +46,10 @@ export class EditContentChain extends Component {
     selectedArticlesChanged(articles) {
         API.post('/chains/updateArticles/' + this.state.chain._id, articles.map(article => article._id), (err, data, r) => {
             if (r.status == 200) {
+                const chain = this.state.chain;
+                chain.articles = articles;
+                this.setState({ chain });
+
                 castNotification({
                     title: 'Modifications saved',
                     message: 'Your modifications to the content chain were saved',
@@ -84,8 +89,7 @@ export class EditContentChain extends Component {
     }
 
     chooseFeaturedImage() {
-        Picker.cast(new Picker.Session({}), selected => {
-            console.log('image picked: ', selected);
+        Picker.cast(new Picker.Session({ accept: [ImagePicker.slug] }), selected => {
             const chain = this.state.chain;
             chain.media = selected.upload;
             this.setState({ chain });
@@ -108,7 +112,6 @@ export class EditContentChain extends Component {
     togglePublishState(done) {
         const action = this.state.chain.status == 'draft' ? 'live' : 'unpublish';
         const chain = this.state.chain;
-        console.log(chain);
         
         if (action == 'live' &&
             (!chain.articles || !chain.articles.length ||
@@ -177,7 +180,7 @@ export class EditContentChain extends Component {
                     </div>
 
                     <h4>Select articles for the content chain</h4>
-                    <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
+                    <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} name='articles' />
 
                     <h4>Select an edition for this series</h4>
                     <div class="card publishing-card nopad">

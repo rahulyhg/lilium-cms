@@ -4,24 +4,32 @@ export default class Modal extends Component {
     constructor(props) {
         super(props);
         this.state = { visible: false };
+        this.bodyEl;
+        this.backgroundEl;
+        this.handleKeyDownBound = this.handleKeyDown.bind(this);
     }
 
     componentDidMount() {
-        this.props.visible && this.show();
+        if (this.props.visible) {
+            this.show();
+        }
     }
-
+    
     fireClose() {
         this.props.onClose && this.props.onClose();
     }
-
+    
     close() {
+        window.liliumcms.unbind('keydown', this.handleKeyDownBound);
         this.bodyEl && this.bodyEl.classList.remove("shown");
         setTimeout(() => this.setState({ visible: false }), 200);
     }
-
+    
     show() {
         this.setState({ visible: true }, () => {
+            window.liliumcms.bindFirst('keydown', this.handleKeyDownBound);
             this.bodyEl && setTimeout(() => this.bodyEl && this.bodyEl.classList.add("shown"), 200);
+            this.bodyEl.focus();
         });
     }
 
@@ -33,8 +41,15 @@ export default class Modal extends Component {
         }
     }
     
-    handleKeyUp(ev) {
+    handleKeyDown(ev) {
         if (ev.which == 27 || ev.keyCode == 27) {
+            this.props.onClose ? this.props.onClose() : this.close();
+            return false;
+        }
+    }
+
+    handleOutsideClick(e) {
+        if (e.target == this.backgroundEl) {
             this.props.onClose ? this.props.onClose() : this.close();
         }
     }
@@ -44,8 +59,9 @@ export default class Modal extends Component {
             return null;
         } else {
             return (
-                <div className="modal-bg" onKeyUp={this.handleKeyUp.bind(this)}>
-                    <div className="modal-body" ref={x => (this.bodyEl = x)}>
+                <div className="modal-bg" onClick={this.handleOutsideClick.bind(this)} ref={e => { this.backgroundEl = e }}>
+                    {/* Tabindex of -1 to allow for programmatic focus the element */}
+                    <div tabindex='-1' className="modal-body" ref={x => (this.bodyEl = x)}>
                         <div className="modal-header">
                             <h3 className="modal-title">{this.props.title}</h3>
                             { this.props.onClose ? (

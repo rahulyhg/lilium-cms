@@ -52,6 +52,10 @@ class PickerSession {
 }
 
 let _singleton;
+/**
+ * Sinleton that is used troughout the application to allow users to select different types of media.
+ * To control how the picker is display, use the Picker.PickerSession class.
+ */
 export class Picker extends Component {
     constructor(props) {
         super(props);
@@ -67,26 +71,42 @@ export class Picker extends Component {
 
     static Session = PickerSession;
 
+    /**
+     * 
+     * @param {Picker.PickerSession} session options relative to the desired session for the Picker that will be cast
+     * @param {callback} done Executed when the user ends his selection in the picker
+     * @param {}
+     */
     static cast(session, done) {
         if (session) {
             log('Picker', 'Casting picker singleton', 'detail');
             const tabs = session.accept.map(x => PickerMap[x]);
             if (!session.options) session.options = {};
             _singleton.changeState({ session: session, visible: true, tabs, callback: done });
-            document.addEventListener('keydown', _singleton.keydown_bound);
+            window.liliumcms.bindFirst('keydown', _singleton.keydown_bound);
         } else {
             log('Picker', 'Cannot cast Picker without a Session object', 'error');
         }
     }
 
+    /**
+     * 
+     * @param {string} name Name of the embed type to register
+     * @param {Component} pickerComponent The preact component to associate to the trgistered embed type. WIll be shown to the user to 
+     * allow them to pick an entity of the registered type
+     * @param {Component} carouselPreviewComponent The preact component to display as a preview when the registered embed type is inserted in a carousel
+     */
     static registerEmbedType(name, pickerComponent, carouselPreviewComponent) {
         Picker.PickerMap[name] = { pickerComponent, carouselPreviewComponent };
     }
 
+    /**
+     * Closes the picker
+     */
     static dismiss() {
         log('Picker', 'Dismissing picker singleton', 'detail');
         _singleton.setState({ visible : false });
-        document.removeEventListener('keydown', _singleton.keydown_bound);
+        window.liliumcms.unbind('keydown', _singleton.keydown_bound);
 
         // _singleton.state.callback && _singleton.state.callback(_singleton.state.selectedElement);
     }
@@ -181,11 +201,14 @@ export class Picker extends Component {
                 <div id="picker-overlay" ref={x => (this.overlayEl = x)} onClick={this.maybeCloseOnClick.bind(this)}>
                     <div id="picker-wrapper">
                         <div id="picker" className={state.session.type == 'carousel' && 'carousel-session'}>
+                            <div className="picker-close-button" title='Close' onClick={() => { Picker.dismiss(); }}>
+                                <i className="fa fa-times"></i>
+                            </div>
                             <TabView hidesingletab noshadow id={"picker_" + (state.session.id ? state.session.id : "global")} selectedIndex={selectedTabIndex} onTabSelected={this.tabChanged.bind(this)}>
                                 {
                                     state.tabs.map((SubPicker) => (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker onKeyDown={this.keydown.bind(this)} isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]}
+                                            <SubPicker isCarousel={state.session.type == 'carousel'} options={state.session.options[SubPicker.slug]}
                                                         selected={state.session.options[SubPicker.slug].selected} />
                                         </Tab>
                                     ))

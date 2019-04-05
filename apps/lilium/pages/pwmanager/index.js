@@ -8,6 +8,7 @@ class Password extends Component {
     constructor(props) {
         super(props);
         this.values = {};
+        this.state = { confirmPWRemoveModalVisible: false };
     }
 
     /**
@@ -57,7 +58,18 @@ class Password extends Component {
     render() {
         return (
             <div className="password">
-                <i onClick={this.props.deletePassword.bind(this, this.props.id)} className="delete-password fal fa-trash"></i>
+                <Modal visible={this.state.confirmPWRemoveModalVisible} title='Confirm Password Removal' onClose={() => { this.setState({ confirmPWRemoveModalVisible: false }) }}>
+                    <h2>{`Are you sure you want to remove the '${this.props.name}' password?`}</h2>
+                    <p>Before removing this password, please, make sure it is <b>no longer in use</b>. This action <b>cannot be reversed</b></p>
+                    <p>In order to <b>preserve</b> the password, click the <b>Cancel</b> button.</p>
+                    <p>If you wish to <b>continue with the deletion</b>, click on the <b>I understand, remove</b> button.</p>
+                    <div style={{ textAlign: 'right' }}>
+                        <ButtonWorker work={() => { this.setState({ confirmPWRemoveModalVisible: false }) }} sync={true} text='Cancel' type='outline' theme='blue' />
+                        <ButtonWorker work={this.props.deletePassword.bind(this, this.props.id)} text='I understand, remove' type='fill' theme='red' />
+                    </div>
+                </Modal>
+
+                <i onClick={() => { this.setState({ confirmPWRemoveModalVisible: true }); }} className="delete-password fal fa-trash"></i>
                 <div className="password-name">
                     <EditableText initialValue={this.props.name} name='name' placeholder='Name' placeholderType='inside' onChange={this.updateValue.bind(this)} />
                 </div>
@@ -86,7 +98,7 @@ class Category extends Component {
             if (r.status == 200) {
                 const passwords = this.state.passwords;
                 passwords.push(data.inserted);
-                this.setState({ passwords, createPasswordModalVisible: false });
+                this.setState({ passwords, createPasswordModalVisible: false, newPasswordName: '', newPasswordPlaintext: '' });
                 done && done();
             } else {
                 castNotification({
@@ -131,22 +143,33 @@ class Category extends Component {
     render() {
         return (
             <div className="category card">
-                {
-                    this.state.createPasswordModalVisible ? (
-                        <Modal visible={this.state.createPasswordModalVisible} title='Create a new password' onClose={() => {  this.setState({ createPasswordModalVisible: false })}}>
-                            <TextField name='newPasswordName' placeholder='Name' onChange={this.updateValue.bind(this)} value={this.state.newPasswordName} />
-                            <TextField name='newPasswordPlaintext' placeholder="Password (make sure it's secure)" value={this.state.newPasswordPlaintext}
-                                         onChange={this.updateValue.bind(this)} />
-                            <div className="button blue outline" onClick={this.autoGeneratePassword.bind(this)}>Generate Password</div>
-                            <p>
-                                If you click on 'Generate Password', Lilium will attempt to autogenerate a password for you but it's possible that your browser does not support 
-                                the necessary features. In that case, it's advised that you use a random string generator to generate a password
-                                that is not vulnerable to dictionnary attacks and that is impossible to guess.
-                            </p>
-                            <ButtonWorker text='Create' work={this.createPassword.bind(this)} theme='purple' type='fill' />
-                        </Modal>
-                    ) : null
-                }
+                <Modal visible={this.state.confirmRemoveModalVisible} title='Confirm Category Removal' onClose={() => { this.setState({ confirmRemoveModalVisible: false }) }}>
+                    <h2>{`Do you really want to remove the '${this.props.name}' category?`}</h2>
+                    <p>
+                        If you choose to remove this category, it will be deleted along with <b>{`all the ${this.props.passwords.length || ''} passwords`}</b> it contains.
+                        Please, before removing this category, make sure that all the passwords it contains are <b>no longer in use</b>.
+                        This action <b>cannot be reversed</b>.
+                    </p>
+                    <p>In order to <b>preserve</b> the category, click the <b>Cancel</b> button.</p>
+                    <p>If you wish to <b>continue with the deletion</b>, click on the <b>I understand, remove</b> button.</p>
+                    <div style={{ textAlign: 'right' }} >
+                        <ButtonWorker theme='blue' type='outline' text='Cancel' sync={true} work={() => this.setState({ confirmRemoveModalVisible: false })} />
+                        <ButtonWorker theme='red' type='fill' text='I understand, remove' work={this.props.removeCategory.bind(this, this.props._id)} />
+                    </div>
+                </Modal>
+
+                <Modal visible={this.state.createPasswordModalVisible} title='Create a new password' onClose={() => {  this.setState({ createPasswordModalVisible: false })}}>
+                    <TextField name='newPasswordName' placeholder='Name' onChange={this.updateValue.bind(this)} value={this.state.newPasswordName} />
+                    <TextField name='newPasswordPlaintext' placeholder="Password (make sure it's secure)" value={this.state.newPasswordPlaintext}
+                                    onChange={this.updateValue.bind(this)} />
+                    <div className="button blue outline" onClick={this.autoGeneratePassword.bind(this)}>Generate Password</div>
+                    <p>
+                        If you click on 'Generate Password', Lilium will attempt to autogenerate a password for you but it's possible that your browser does not support 
+                        the necessary features. In that case, it's advised that you use a random string generator to generate a password
+                        that is not vulnerable to dictionnary attacks and that is impossible to guess.
+                    </p>
+                    <ButtonWorker text='Create' work={this.createPassword.bind(this)} theme='purple' type='fill' />
+                </Modal>
 
                 <div class="detail-head">
                     <div class="bubble-wrap">
@@ -162,13 +185,13 @@ class Category extends Component {
                     }
                     {
                         this.state.passwords.map(password => (
-                            <Password name={password.name} plaintext={password.plaintext} id={password._id} deletePassword={this.deletePassword.bind(this)} />    
+                            <Password name={password.name} key={password._id} plaintext={password.plaintext} id={password._id} deletePassword={this.deletePassword.bind(this)} />    
                         ))
                     }
                 </div>
                 <footer>
                     <span className="clickable" onClick={() => {this.setState({ createPasswordModalVisible: true })}}><i className="fal fa-plus"></i> Create a new password</span>
-                    <span className='clickable red' onClick={this.props.removeCategory.bind(this, this.props._id)}><i className="fal fa-trash"></i> Remove Category</span>
+                    <span className='clickable red' onClick={() => { this.setState({ confirmRemoveModalVisible: true }) }}><i className="fal fa-trash"></i> Remove Category</span>
                 </footer>
             </div>
         );
@@ -266,7 +289,7 @@ export default class PwManager extends Component {
                 <div class="leader-content classic">
                 {
                     this.state.categories.map(category => (
-                        <Category {...category} removeCategory={this.removeCategory.bind(this)} />
+                        <Category {...category} removeCategory={this.removeCategory.bind(this)} key={category._id} />
                     ))
                 }
                 </div>

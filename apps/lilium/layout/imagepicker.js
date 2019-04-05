@@ -263,7 +263,7 @@ export class ImagePicker extends Component {
 
     render() {
         return (
-            <div id="image-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
+            <div id="image-picker">
                 <div id="image-picker-flex-wrapper">
                     <div id="image-gallery">
                         <div className="image-picker-button" onClick={this.castUpload.bind(this)}>

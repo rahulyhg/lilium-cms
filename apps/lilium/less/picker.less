@@ -17,6 +17,24 @@
     z-index: @z_aimagePicker;
     background-color: rgba(0,0,0,0.7);
     animation: fadein 0.2s;
+
+    .picker-close-button {
+        @closeBtnDimension: 16px;
+        cursor: pointer;
+        background: white;
+        border-radius: 50%;
+        border: 2px solid @liliumPurple;
+        color: @liliumPurple;
+        color: @liliumPurple;
+        width: @closeBtnDimension;
+        height: @closeBtnDimension;
+        position: absolute;
+        right: -@closeBtnDimension / 2;
+        top: -@closeBtnDimension / 2;
+        align-content: center;
+        justify-content: center;
+        display: flex;
+    }
 }
 
 @keyframes picker-anim {
