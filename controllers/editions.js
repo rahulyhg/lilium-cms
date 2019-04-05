@@ -232,7 +232,7 @@ class EditionController {
                             if (err) {
                                 cli.throwHTTP(500, err, true);
                             } else {
-                                db.findUnique(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, (err, editions) => {
+                                db.findToArray(cli._c, 'editions', { _id : { $in : payload.ids.map(x => db.mongoID(x)) } }, (err, editions) => {
                                     hooks.fireSite(cli._c, 'editions_updated', { editions });
                                     cli.sendJSON(r)
                                 });
