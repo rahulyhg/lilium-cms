@@ -246,6 +246,7 @@ class EditionEdit extends Component {
                         <TextField onChange={this.nativeFieldChanged.bind(this)} placeholder="Display name" name="displayname" initialValue={this.props.editions[0].lang[this.state.language].displayname} />
                         <TextField onChange={this.nativeFieldChanged.bind(this)} placeholder="URL slug" name="slug" initialValue={this.props.editions[0].lang[this.state.language].slug} />
                         <TextEditor onChange={this.nativeFieldChanged.bind(this)} placeholder="Description" name="description" content={this.props.editions[0].lang[this.state.language].description || ""} />
+                        <TextField onChange={this.nativeFieldChanged.bind(this)} placeholder="SEO description" name="seodescription" initialValue={this.props.editions[0].lang[this.state.language].seodescription || ""} />
                         <MediaPickerField onChange={this.nativeFieldChanged.bind(this)} placeholder="Icon" name="icon" initialValue={this.props.editions[0].lang[this.state.language].icon} size="small" />
                         <MediaPickerField onChange={this.nativeFieldChanged.bind(this)} placeholder="Featured image" name="featuredimage" initialValue={this.props.editions[0].lang[this.state.language].featuredimage} />
                     </div>
