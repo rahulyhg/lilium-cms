@@ -116,7 +116,13 @@ export class EditStyledPage extends Component {
                     <TextField name='description' autosave={false} placeholder='Description' initialValue={this.state.styledPage.description} onChange={this.updateValues.bind(this)} />
                     <SelectField name='status' options={EditStyledPage.visibilityOptions} autosave={false} placeholder='Visibility' initialValue={this.state.styledPage.status}
                                 onChange={this.updateValues.bind(this)} />
+
+                { this.state.styledPage.staticfile ? (
+                    <TextField name='content' autosave={false} placeholder='Static text' multiline={true} initialValue={this.state.styledPage.content} onChange={this.updateValues.bind(this)} />
+                ) : (
                     <TextEditor name='content' autosave={false} placeholder='Presentation' content={this.state.styledPage.content} onChange={this.updateValues.bind(this)} />
+                ) }
+
                     <SelectField name="language" placeholder="Language" initialValue={this.state.styledPage.language || "en"} value={this.state.styledPage.language || "en"} onChange={this.updateValues.bind(this)} options={[
                         { text : "English", value : "en" },
                         { text : "Français", value : "fr" }
