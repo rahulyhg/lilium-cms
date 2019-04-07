@@ -137,7 +137,7 @@ class Entities {
                 }
             })
         } else if (cli.routeinfo.path[2] == "impersonate") {
-            require('./backend/login.js').impersonate(cli);
+            require('../backend/login.js').impersonate(cli);
         } else if (cli.routeinfo.path[2] == "restore") {
             cli.hasRightOrRefuse('create-entities') && elib.restore(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data.address, () => { 
                 elib.sendNewMagicEmail(cli, db.mongoID(cli.routeinfo.path[3]), () => { 
