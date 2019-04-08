@@ -28,6 +28,7 @@ const LOCALSTORAGE_PREFIX = "LF_";
  *      keyid : List item key for Preact mapping. Defaults to : _id.
  *      addComponent : First component to appear in the big list. Can be used as a "add" handle.
  *      emptyComponent : Shown when no list items are available.
+ *      batchsize : The numbers of elements to request from the server, defaults to 30
  *      liststyle : Style of the inner container wrapping the list items.
  * }
  */
