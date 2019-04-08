@@ -130,7 +130,7 @@ export default class ListView extends Component {
 
         return (
             <BigList listitem={PostListItem} endpoint="/publishing/biglist" loadmoreButton={LoadMoreArticles}
-                    toolbar={this.state.toolbarConfig} addComponent={PostListItemAdd} />
+                    toolbar={this.state.toolbarConfig} addComponent={PostListItemAdd}  batchsize={50} />
         )
     }
 }
