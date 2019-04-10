@@ -6,17 +6,19 @@ import { PlacePicker } from '../layout/placepicker';
 import { EmbedPicker } from '../layout/embedpicker';
 import { createDeflate } from 'zlib';
 
-function embedToCarouselPreviewElement(embed, isCarousel) {
+function embedToPreviewElement(embed, isCarousel) {
     let contentNode = document.createElement('div');
     contentNode.className = (isCarousel ? "embed-carousel-preview " : "embed-preview ") + embed.embed.type;
 
     switch (embed.embed.type) {
         case "instagram":
+            let img = document.createElement('img');
+
         case "igvideo":
         case "igcarousel":
-            let img = document.createElement('img');
-            img.className = "lml-embed-carousel-v4-preview";
-            img.src = embed.embed.urlpath;
+            let igcimg = document.createElement('img');
+            igcimg.className = "lml-embed-carousel-v4-preview";
+            igcimg.src = embed.embed.urlpath;
             contentNode.appendChild(img);
             break;
 
@@ -68,7 +70,7 @@ export class TextEditor extends Component {
 
     /**
      * Parses an embed object and returns markup to be inserted in the article body.
-     * This markup is to be used bi the theme as an article is displayed by a client
+     * This markup is to be used by the theme as an article is displayed by a client
      * @param {object} embed The embed object to serialize as markup
      */
     static embedToMarkup(embed, isCarousel) {
@@ -111,7 +113,7 @@ export class TextEditor extends Component {
             node.dataset.embedtype = embed[EmbedPicker.slug].type;
             node.dataset.embedjson = JSON.stringify(embed[EmbedPicker.slug]);
 
-            let elContent = embedToCarouselPreviewElement(embed, isCarousel);
+            let elContent = embedToPreviewElement(embed, isCarousel);
             node.appendChild(elContent);
         }
 
@@ -145,7 +147,6 @@ export class TextEditor extends Component {
                         this.bookmark = editor.selection.getBookmark(2, true);
                         const session =  new Picker.Session({});
                         const selectedEl = editor.selection.getNode();
-                        console.log('el', selectedEl);
                         
                         if (selectedEl && selectedEl.classList.contains('lml-placeholder')) {
                             session.replaceOld = true;
@@ -153,9 +154,6 @@ export class TextEditor extends Component {
                                 session.options[ImagePicker.slug] = { selected: selectedEl.dataset.id };
                             }
                         }
-
-                        console.log('session ', session);
-                        
 
                         Picker.cast(session, embed => {
                             log('TextEditor', "Picker callback received embed: ", embed, 'info');
