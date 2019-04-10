@@ -230,7 +230,8 @@ export class ImagePicker extends Component {
     }
 
     prepareUpload(ev) {
-        const files = ev.target.files;
+        const files = Array.from(ev.target.files);
+
         if (files && files.length > 0) {
             log("ImagePicker", "Initiating upload sequence", "detail");
 
@@ -247,7 +248,7 @@ export class ImagePicker extends Component {
         API.get('/uploads', { limit : this.nbImagesLoaded, skip : this.nbImagesLoaded }, (err, uploads) => {
             this.nbImagesLoaded += this.nbImagesToLoad;
             sendback ? sendback(uploads) : this.setState({ images : uploads });
-        })
+        });
     }
 
     componentWillReceiveProps(props) {

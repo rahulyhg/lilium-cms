@@ -6,20 +6,65 @@ import { PlacePicker } from '../layout/placepicker';
 import { EmbedPicker } from '../layout/embedpicker';
 import { createDeflate } from 'zlib';
 
-function embedToCarouselPreviewElement(embed, isCarousel) {
+/**
+ * Returns markup for the 'top bar' showing the post author information which is common to all instagram embeds
+ * @param {object} author Instagram post author object
+ * @param {boolean} author.verified Whether or not the author is verified, default false
+ * @param {string} author.avatar The avatar URL of the post author
+ * @param {string} author.author Author name of the post author
+ */
+const getInstagramCreditMarkup = author => {
+    const creditDiv = document.createElement('div');
+    creditDiv.className = 'ig-image-credit';
+    
+    let displayNameEl;
+    if (author.authorurl) {
+        displayNameEl = document.createElement('a');
+        displayNameEl.href = author.authorurl;
+    } else {
+        displayNameEl = document.createElement('p');
+    }
+
+    displayNameEl.className = 'ig-display-name';
+    displayNameEl.innerText = author.author ? `@${author.author}`  : 'Unknown Author';
+    
+    const avatarWrapper = document.createElement('div');
+    avatarWrapper.className = 'ig-avatar-wrapper';
+
+    const avatarImg = document.createElement('img');
+    avatarImg.className = 'ig-avatar'
+    avatarImg.src = author.avatar || '/static/media/ck-instagram-icon.png/';
+
+    avatarWrapper.appendChild(avatarImg);
+    creditDiv.append(avatarWrapper, displayNameEl);
+
+    if (author.verified) {
+        const checkmark = document.createElement('i');
+        checkmark.className = 'fa fa-check-circle';
+    }
+
+    return creditDiv;
+}
+
+function embedToPreviewElement(embed, isCarousel) {
     let contentNode = document.createElement('div');
     contentNode.className = (isCarousel ? "embed-carousel-preview " : "embed-preview ") + embed.embed.type;
-
+    console.log(embed.embed);
+    
     switch (embed.embed.type) {
         case "instagram":
         case "igvideo":
         case "igcarousel":
-            let img = document.createElement('img');
-            img.className = "lml-embed-carousel-v4-preview";
-            img.src = embed.embed.urlpath;
-            contentNode.appendChild(img);
-            break;
+            const credit = getInstagramCreditMarkup({ ...embed.embed.fullauthor, author: embed.embed.author, authorurl: embed.embed.authorurl});
 
+            let igcimg = document.createElement('img');
+            igcimg.className = "lml-embed-carousel-v4-preview";
+            igcimg.src = embed.embed.urlpath;
+
+            contentNode.appendChild(credit);
+            contentNode.appendChild(igcimg);
+            
+            break;
         case "vimeo":
             let vimg = document.createElement('img');
             vimg.className = "lml-embed-carousel-v4-preview";
