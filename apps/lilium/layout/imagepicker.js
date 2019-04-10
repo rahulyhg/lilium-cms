@@ -238,11 +238,16 @@ export class ImagePicker extends Component {
     }
 
     prepareUpload(ev) {
-        const files = ev.target.files;
+        const files = Array.from(ev.target.files);
+        
         if (files && files.length > 0) {
             log("ImagePicker", "Initiating upload sequence", "detail");
 
-            const ffs = Array.from(files).map(f => { return { 
+            files.forEach(f => {
+                if (f.name) f.name == f.name.toLowerCase();
+            });
+
+            const ffs = files.map(f => { return { 
                 uploading : true, 
                 file : f,
                 uploadId : Math.random().toString().substring(2)
