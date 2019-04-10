@@ -216,7 +216,7 @@ export class EmbedPicker extends Component {
         fbpost: new RegExp('facebook\.com\/[a-zA-Z0-9]+\/posts\/[0-9]{10,}'),
         fbvideo: new RegExp('facebook\.com\/[a-zA-Z0-9]+\/videos\/[0-9]{10,}'),
         youtube: new RegExp('youtube\.com\/watch'),
-        vimeo: new RegExp(),
+        vimeo: new RegExp('vimeo.com'),
         twitter: new RegExp('twitter\.com\/[a-zA-Z0-9]+\/status\/[0-9]{10,}'),
         soundcloud: new RegExp('soundcloud\.com\/[a-zA-Z0-9]+\/[a-zA-Z0-9]+'),
         reddit: new RegExp('reddit.com'),
