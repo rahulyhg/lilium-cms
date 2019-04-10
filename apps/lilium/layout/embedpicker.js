@@ -215,7 +215,7 @@ export class EmbedPicker extends Component {
         igcarousel: new RegExp('instagram\.com\/p\/[a-zA-Z0-9]{6,}'),
         fbpost: new RegExp('facebook\.com\/[a-zA-Z0-9]+\/posts\/[0-9]{10,}'),
         fbvideo: new RegExp('facebook\.com\/[a-zA-Z0-9]+\/videos\/[0-9]{10,}'),
-        youtube: new RegExp('youtube\.com\/watch\?v=[a-zA-Z0-9]{6,}'),
+        youtube: new RegExp('youtube\.com\/watch'),
         vimeo: new RegExp(),
         twitter: new RegExp('twitter\.com\/[a-zA-Z0-9]+\/status\/[0-9]{10,}'),
         soundcloud: new RegExp('soundcloud\.com\/[a-zA-Z0-9]+\/[a-zA-Z0-9]+'),
