@@ -239,7 +239,6 @@ export class ImagePicker extends Component {
 
     prepareUpload(ev) {
         const files = Array.from(ev.target.files);
-        console.log(ev.target.files);
         
         if (files && files.length > 0) {
             log("ImagePicker", "Initiating upload sequence", "detail");
