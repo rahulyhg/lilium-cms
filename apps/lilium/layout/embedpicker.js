@@ -4,6 +4,7 @@ import API from '../data/api';
 import { Spinner } from '../layout/loading';
 import Modal from '../widgets/modal';
 import { TextField, SelectField, ButtonWorker } from '../widgets/form';
+import { castNotification } from './notifications';
 
 const EmbedTypeInstagram = props => (<div>
     <div class="embed-topbanner instagram">
@@ -273,6 +274,12 @@ export class EmbedPicker extends Component {
                     done();
                 } else {
                     log('Embed', "There was an error embedding this resources.", "err");
+                    castNotification({
+                        type: 'error',
+                        title: 'Error while fetching embed',
+                        message: 'There was an error fetching this embed. Make sure you selected the correct embed type and that your URL is valid'
+                    });
+                    done && done();
                 }
             });
         } else {
