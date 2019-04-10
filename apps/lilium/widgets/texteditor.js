@@ -19,7 +19,7 @@ function embedToPreviewElement(embed, isCarousel) {
             let igcimg = document.createElement('img');
             igcimg.className = "lml-embed-carousel-v4-preview";
             igcimg.src = embed.embed.urlpath;
-            contentNode.appendChild(img);
+            contentNode.appendChild(igcimg);
             break;
 
         case "vimeo":
