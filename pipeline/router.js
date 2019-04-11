@@ -37,11 +37,11 @@ class Router {
                 cli.routeinfo.params = pObj.query;
             }
             cli.routeinfo.relsitepath = "/" + cli.routeinfo.path.join('/');
-            cli.routeinfo.admin = cli.routeinfo.path[0] === cli._c.paths.admin;
-            cli.routeinfo.login = cli.routeinfo.path[0] === cli._c.paths.login;
+            cli.routeinfo.admin = cli.routeinfo.path[0] === "admin";
+            cli.routeinfo.login = cli.routeinfo.path[0] === "login";
             cli.routeinfo.front = cli.routeinfo.path[0] === "_";
             cli.routeinfo.api = cli.routeinfo.path[0] === "api";
-            cli.routeinfo.livevars = cli.routeinfo.path[0] === cli._c.paths.livevars;
+            cli.routeinfo.livevars = cli.routeinfo.path[0] === "livevars";
             cli.routeinfo.root = cli.routeinfo.relsitepath.relsitepath == "/";
             cli.routeinfo.async = cli.routeinfo.params.async || false;
 
