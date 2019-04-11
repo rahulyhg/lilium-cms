@@ -3,6 +3,7 @@ import { Link } from '../../routing/link';
 import API from "../../data/api";
 import { BigList, BigListToolBarBuilder } from '../../widgets/biglist';
 import { castOverlay } from '../../overlay/overlaywrap';
+import { ButtonWorker } from '../../widgets/form';
 import { getSession } from '../../data/cache';
 import { POST_STATUS } from '../../data/const'
 
@@ -66,6 +67,12 @@ class PostListItemAdd extends Component {
     }
 }
 
+const LoadMoreArticles = props => (
+    <div onClick={props.onClick && props.onClick.bind(this)} style={{ textAlign: 'center' }}>
+        <ButtonWorker text='Load More' type='fill' theme='blue' sync={true} />
+    </div>
+)
+
 export default class ListView extends Component {
     constructor(props) {
         super(props);
@@ -122,7 +129,9 @@ export default class ListView extends Component {
         }
 
         return (
-            <BigList listitem={PostListItem} endpoint="/publishing/biglist" toolbar={this.state.toolbarConfig} addComponent={PostListItemAdd} />
+            <BigList listitem={PostListItem} endpoint="/publishing/biglist" loadmoreButton={LoadMoreArticles}
+                    toolbar={this.state.toolbarConfig} addComponent={PostListItemAdd}  batchsize={50} />
         )
     }
 }
+

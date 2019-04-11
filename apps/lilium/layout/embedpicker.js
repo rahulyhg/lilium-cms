@@ -4,6 +4,7 @@ import API from '../data/api';
 import { Spinner } from '../layout/loading';
 import Modal from '../widgets/modal';
 import { TextField, SelectField, ButtonWorker } from '../widgets/form';
+import { castNotification } from './notifications';
 
 const EmbedTypeInstagram = props => (<div>
     <div class="embed-topbanner instagram">
@@ -198,7 +199,8 @@ export class EmbedPicker extends Component {
         this.state = {
             embeds : [],
             batchIndex : 0,
-            loading : true
+            loading : true,
+            errorMessage: ''
         };
 
         this.stage = {};
@@ -206,6 +208,20 @@ export class EmbedPicker extends Component {
 
     static tabTitle = 'Embed';
     static slug = 'embed';
+
+    static embedRegexMap = {
+        // Not sure if instagram IDs are of constant length but the seem to never be less than 6
+        instagram: new RegExp('instagram\.com\/p\/[a-zA-Z0-9]{6,}'),
+        igvideo: new RegExp('instagram\.com\/p\/[a-zA-Z0-9]{6,}'),
+        igcarousel: new RegExp('instagram\.com\/p\/[a-zA-Z0-9]{6,}'),
+        fbpost: new RegExp('facebook\.com\/[a-zA-Z0-9]+\/posts\/[0-9]{10,}'),
+        fbvideo: new RegExp('facebook\.com\/[a-zA-Z0-9]+\/videos\/[0-9]{10,}'),
+        youtube: new RegExp('youtube\.com\/watch'),
+        vimeo: new RegExp('vimeo.com'),
+        twitter: new RegExp('twitter\.com\/[a-zA-Z0-9]+\/status\/[0-9]{10,}'),
+        soundcloud: new RegExp('soundcloud\.com\/[a-zA-Z0-9]+\/[a-zA-Z0-9]+'),
+        reddit: new RegExp('reddit.com'),
+    }
 
     fetchNextBatch() {
         API.get('/embed/bunch', {
@@ -223,8 +239,31 @@ export class EmbedPicker extends Component {
         this.fetchNextBatch();
     }
 
+    getErrorMessageIfAny() {
+        const val = this.stage['modal-embed-text'];
+        const embedType = this.stage['modal-embed-type'];
+        console.log(embedType);
+        console.log(val);
+        
+        if (val) {
+            const exp = EmbedPicker.embedRegexMap[embedType];
+            console.log(exp.test(val));
+            
+            if (exp) {
+                if (!exp.test(val)) {
+                    return 'The URL you have entered appears to not be a valid embed URL'
+                }
+            }
+        }
+
+        return '';
+    }
+
     newEmbedFieldChanged(name, value) {
-        this.stage[name] = value
+        this.stage[name] = value;
+        this.setState({ errorMessage: this.getErrorMessageIfAny() });
+        console.log(this.state);
+        
     }
 
     fetchEmbed(done) {
@@ -235,6 +274,12 @@ export class EmbedPicker extends Component {
                     done();
                 } else {
                     log('Embed', "There was an error embedding this resources.", "err");
+                    castNotification({
+                        type: 'error',
+                        title: 'Error while fetching embed',
+                        message: 'There was an error fetching this embed. Make sure you selected the correct embed type and that your URL is valid'
+                    });
+                    done && done();
                 }
             });
         } else {
@@ -264,7 +309,7 @@ export class EmbedPicker extends Component {
                 <Modal visible={this.state.newModalOpen} title="New embed" onClose={() => { this.setState({ newModalOpen : false }); this.stage = {}; }}>
                     <div>
                         <SelectField name="modal-embed-type" placeholder="Embed type" options={[
-                            { text: "Instagram photo", value : "instagram" },
+                            { text: "Instagram photo", value : "instagram"},
                             { text: "Instagram video", value: "igvideo"},
                             { text: "Instagram carousel", value: "igcarousel"},
                             { text: "Facebook Post", value: "fbpost"},
@@ -279,8 +324,17 @@ export class EmbedPicker extends Component {
 
                         <TextField 
                             name="modal-embed-text" placeholder="URL of embed resources" 
-                            onChange={this.newEmbedFieldChanged.bind(this)} />
+                            onChange={this.newEmbedFieldChanged.bind(this)}
+                            value={this.stage['modal-embed-text']}
+                            type='url' />
                     </div>
+
+                    {
+                        this.state.errorMessage ? (
+                            <p id="embed-error-message">{this.state.errorMessage}</p>
+                        ) : null
+                    }
+
                     <div style={{ textAlign : 'right' }}>
                         <ButtonWorker text="Cancel" type="outline" theme="red" sync={true} work={() => { this.setState({ newModalOpen: false }); }} />
                         <ButtonWorker text="Generate embed" type="fill" theme="purple" work={this.fetchEmbed.bind(this)} />

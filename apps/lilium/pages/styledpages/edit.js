@@ -116,7 +116,22 @@ export class EditStyledPage extends Component {
                     <TextField name='description' autosave={false} placeholder='Description' initialValue={this.state.styledPage.description} onChange={this.updateValues.bind(this)} />
                     <SelectField name='status' options={EditStyledPage.visibilityOptions} autosave={false} placeholder='Visibility' initialValue={this.state.styledPage.status}
                                 onChange={this.updateValues.bind(this)} />
+
+                { this.state.styledPage.staticfile ? (
+                    <TextField name='content' autosave={false} placeholder='Static text' multiline={true} initialValue={this.state.styledPage.content} onChange={this.updateValues.bind(this)} />
+                ) : (
                     <TextEditor name='content' autosave={false} placeholder='Presentation' content={this.state.styledPage.content} onChange={this.updateValues.bind(this)} />
+                ) }
+
+                    <SelectField name="language" placeholder="Language" initialValue={this.state.styledPage.language || "en"} value={this.state.styledPage.language || "en"} onChange={this.updateValues.bind(this)} options={[
+                        { text : "English", value : "en" },
+                        { text : "Français", value : "fr" }
+                    ]} />
+                    <SelectField name="culture" placeholder="Culture" initialValue={this.state.styledPage.culture || "ca"} value={this.state.styledPage.culture || "ca"} onChange={this.updateValues.bind(this)} options={[
+                        { text : "Canada", value : "ca" },
+                        { text : "United-States", value : "us" }
+                    ]} />
+
                     <TextField name='customcss' autosave={false} placeholder='Custom CSS' multiline={true} initialValue={this.state.styledPage.customcss} onChange={this.updateValues.bind(this)} />
                     <TextField name='customjs' autosave={false} placeholder='Custom JS' multiline={true} initialValue={this.state.styledPage.customjs} onChange={this.updateValues.bind(this)} />
                     <CheckboxField name='skiplayout' autosave={false} placeholder='Skip Layout' initialValue={this.state.styledPage.skiplayout} onChange={this.updateValues.bind(this)} />

@@ -141,20 +141,28 @@ class ImageThumbnail extends Component {
             ratio != 100 ? this.setState({ progress : ratio }) : this.setState({ loading : true, progress : ratio, uploading : false });
         }, (err, image) => {
             if (!err) {
-                this.setState({ uploading : false, loading : false, progress : 100, image }, () => {
-                    this.clicked();
+                this.setState({ uploading : false, loading : false, progress : 100 }, () => {
+                    this.props.onUploadFinished(undefined, image, this.props.uploadId);
                 });
             } else {
                 log('ImagePicker', 'Upload failed : ' + err, 'err');
                 this.setState({ uploading : false, loading : false, error : err });
+                this.props.onUploadFinished(err);
             }
         });
     }
 
     componentWillReceiveProps(props) {
+        const newState = {};
         if (props.selected && props.selected != this.state.selected) {
-            this.setState({ selected : props.selected });
+            newState.selected = props.selected;
         }
+
+        if (props.image && props.image != this.state.image) {
+            newState.image = props.image;
+        }
+        
+        Object.keys(newState).length != 0 && this.setState(newState);
     }
 
     clicked() {
@@ -231,11 +239,23 @@ export class ImagePicker extends Component {
 
     prepareUpload(ev) {
         const files = Array.from(ev.target.files);
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 3ab50902a8014b37429630c4da8865f438a48af3
         if (files && files.length > 0) {
             log("ImagePicker", "Initiating upload sequence", "detail");
 
-            const ffs = Array.from(files).map(f => { return { uploading : true, file : f }; });
+            files.forEach(f => {
+                if (f.name) f.name == f.name.toLowerCase();
+            });
+
+            const ffs = files.map(f => { return { 
+                uploading : true, 
+                file : f,
+                uploadId : Math.random().toString().substring(2)
+            }; });
             const images = this.state.images;
             images.unshift(...ffs);
 
@@ -262,6 +282,19 @@ export class ImagePicker extends Component {
         this.setState({ selected });
     }
 
+    uploadFinished(err, image, uploadId) {
+        if (err) {
+            
+        } else {
+            const indexOfImage = this.state.images.findIndex(x => x.uploadId == uploadId);
+            if (indexOfImage != -1) {
+                const images = this.state.images;
+                images[indexOfImage] = image;
+                this.setState({ images })
+            } 
+        }
+    }
+
     render() {
         return (
             <div id="image-picker">
@@ -272,8 +305,8 @@ export class ImagePicker extends Component {
                         </div>
 
                         {
-                            this.state.images.map(x => (
-                                <ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageSelected.bind(this)} />
+                            this.state.images.map((x, i) => (
+                                <ImageThumbnail key={x.file || x._id} uploadId={x.uploadId} onUploadFinished={this.uploadFinished.bind(this)} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageSelected.bind(this)} />
                             ))
                         }
 

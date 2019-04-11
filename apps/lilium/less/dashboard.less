@@ -108,7 +108,7 @@
     display: flex;
     border-radius: 10px;
     overflow: hidden;
-    height: @sideTabHeight * 4;
+    height: 500px;
     box-shadow: @softshadow;
 
     .dashboard-side-tabs {
@@ -118,7 +118,6 @@
             display: block;
             padding: 15px;
             width: 240px;
-            background: @lesswhiteish;
             cursor: pointer;
             height: @sideTabHeight;
             box-sizing: border-box;
@@ -148,10 +147,6 @@
                 &.red {
                     background: @red;
                 }
-            }
-
-            &:not(:last-child) {
-                border-bottom: 1px solid #e0cddf;
             }
 
             .dashboard-side-tab-text {

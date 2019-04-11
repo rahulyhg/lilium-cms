@@ -155,7 +155,7 @@ server {
                 try_files $uri $uri.html @lilium;
         }
 
-        location /(admin|login)/ {
+        location /(lilium|login)/ {
                 try_files @lilium =404;
         }
 

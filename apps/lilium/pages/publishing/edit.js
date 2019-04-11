@@ -511,7 +511,7 @@ export default class EditView extends Component {
     }
 
     socketArticleUpdateEvent(ev) {
-        if (ev.by != liliumcms.session._id) {
+        if (ev.by != liliumcms.session._id && ev.articleid == this.state.post._id) {
             this.setState({ history : [ev.historyentry, ...this.state.history] });
             castNotification({
                 type : "info",
