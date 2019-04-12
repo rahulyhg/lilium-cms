@@ -46,6 +46,7 @@ const getInstagramCreditMarkup = author => {
     return creditDiv;
 }
 
+
 function embedToPreviewElement(embed, isCarousel) {
     let contentNode = document.createElement('div');
     contentNode.className = (isCarousel ? "embed-carousel-preview " : "embed-preview ") + embed.embed.type;
@@ -53,8 +54,6 @@ function embedToPreviewElement(embed, isCarousel) {
     
     switch (embed.embed.type) {
         case "instagram":
-            let img = document.createElement('img');
-
         case "igvideo":
         case "igcarousel":
             const credit = getInstagramCreditMarkup({ ...embed.embed.fullauthor, author: embed.embed.author, authorurl: embed.embed.authorurl});
@@ -72,8 +71,28 @@ function embedToPreviewElement(embed, isCarousel) {
             vimg.className = "lml-embed-carousel-v4-preview";
             vimg.src = embed.embed.thumbnailplay;
             contentNode.appendChild(vimg);
+            
             break;
+        case "fbvideo":
+        case "fbpost":
+            const fbPlaceholderText = `Facebook ${embembed.type == 'fbpost' ? 'Post' : 'Video'}`;
+            const placeholderP = document.createElement('p');
+            placeholderP.className = 'fb-placeholder-text';
+            placeholderP.innerText = fbPlaceholderText;
+        
+            const imagePlaceholder = document.createElement('div');
+            imagePlaceholder.className = 'fb-image-placeholder';
+            imagePlaceholder.appendChild(placeholderP);
 
+            contentNode.appendChild(imagePlaceholder);
+
+            const content = embed.embed.html && embed.embed.html.trim();
+            if (content) {
+                const postContent = document.createElement('template');
+                postContent.content
+            }
+
+            break;
         default:
             contentNode.innerHTML = embed.embed.html;
             let iframe = contentNode.querySelector('iframe');
