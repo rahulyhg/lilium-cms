@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { setPageCommands } from '../../layout/lys';
 import { getTimeAgo } from '../../widgets/timeago';
 import { TextEditor } from '../../widgets/texteditor';
-import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField, DatePicker } from '../../widgets/form';
 import { EditionPicker } from '../../widgets/editionpicker';
 import { getSession } from '../../data/cache';
 import { navigateTo } from '../../routing/link';
@@ -180,6 +180,7 @@ class PublishingActions extends Component {
                 dropacts.push(
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
+                    { color : "black", text : "Change publication date", work : this.props.actions.triggerChangeDate.bind(this) },
                     { color : "black", text : "Add to series", work : this.props.actions.triggerAddToSeries.bind(this) },
                     { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "black", text : "Email preview link", work : this.props.actions.triggerSendPreview.bind(this) },
@@ -483,6 +484,7 @@ export default class EditView extends Component {
             triggerPreviewLinkChange : this.triggerPreviewLinkChange.bind(this),
             triggerAddToSeries : this.triggerAddToSeries.bind(this),
             triggerSendPreview: this.triggerSendPreview.bind(this),
+            triggerChangeDate : this.triggerChangeDate.bind(this),
             commitchanges : this.commitchanges.bind(this),
             unpublish : this.unpublish.bind(this),
             refuse : this.refuse.bind(this)
@@ -951,6 +953,24 @@ export default class EditView extends Component {
         });
     }
 
+    triggerChangeDate() {
+        this.setState({ changeDateModalVisible : true })
+    }
+
+    changeDate(done) {
+        savePost(this.coldState.post._id, { date : this.stage.date }, (err, { historyentry }, r) => {
+            this.setState({
+                history : [historyentry, ...this.state.history],
+                post : {...this.state.post, ...this.edits},
+                changeDateModalVisible : false
+            }, () => {
+                delete this.stage.date;
+
+                done && done();
+            });
+        });
+    }
+
     updateSlug() {
         this.handleDetailsAction("name", this.stage.name);
         this.setState({
@@ -1116,6 +1136,13 @@ export default class EditView extends Component {
                     <p>Are you sure you want to <b>destroy</b> this article permanently?</p>
                     <ButtonWorker theme="red"  type="fill" text="Yes, destroy" work={this.destroy.bind(this)} />
                     <ButtonWorker theme="blue"  type="outline" text="No, I want to keep it" sync={true} work={() => { this.setState({ destroyModalVisible: false }) }} />
+                </Modal>
+
+                <Modal title='Change publication date' visible={this.state.changeDateModalVisible} onClose={() => { this.setState({ changeDateModalVisible: false }) }}>
+                    <p>Changing the publication date of this post will also change its position on the various pages it appears on.</p>
+                    <DatePicker name="pubdate" placeholder='Publication date' onChange={(name, value) => { this.stage.date = value; }} initialValue={new Date(this.state.post.date)} />
+                    <ButtonWorker theme="blue"  type="fill" text="Set publication date" work={this.changeDate.bind(this)} />
+                    <ButtonWorker theme="red"  type="outline" text="Cancel" sync={true} work={() => { this.setState({ changeDateModalVisible: false }) }} />
                 </Modal>
 
                 <Modal title="Send preview via email" visible={this.state.showSendPreview} onClose={() => { this.setState({ showSendPreview : false }) }} >
