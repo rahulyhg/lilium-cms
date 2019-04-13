@@ -180,7 +180,7 @@ class PublishingActions extends Component {
                 dropacts.push(
                     { color : "black", text : "Change author", work : this.props.actions.triggerAuthorChange.bind(this) },
                     { color : "black", text : "Change slug", work : this.props.actions.triggerSlugChange.bind(this) },
-                    { color : "black", text : "Change publication date", work : this.props.actions.triggerChangeDate.bind(this) },
+                    { color : "black", text : "Change date", work : this.props.actions.triggerChangeDate.bind(this) },
                     { color : "black", text : "Add to series", work : this.props.actions.triggerAddToSeries.bind(this) },
                     { color : "black", text : "Invalidate preview link", work : this.props.actions.triggerPreviewLinkChange.bind(this) },
                     { color : "black", text : "Email preview link", work : this.props.actions.triggerSendPreview.bind(this) },
