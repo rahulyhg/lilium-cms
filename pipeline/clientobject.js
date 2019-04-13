@@ -55,14 +55,8 @@ class ClientObject {
        
         code >= 400 && log('ClientObject', code + ' => ' + (this._c ? this._c.server.url : "//") + this.routeinfo.fullpath + " from " + this.ip + " with agent " + this.request.headers["user-agent"], 'info');
 
-        if (hard) {
-            this.response.writeHead(code, headers);
-            this.response.end(message || undefined);
-        } else if (code >= 400 && code < 500) {
-            require('./filelogic.js').serveErrorPage(this, code);
-        } else {
-            this.debug();
-        }
+        this.response.writeHead(code, headers);
+        this.response.end(message || undefined);
     };
 
     debug  () {
