@@ -231,7 +231,17 @@ export class Lilium extends Component {
 
                         const nextState = {
                             session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage,
-                            stripePopupVisible: true //&& liliumcms.session.roles.includes('contractor') && !liliumcms.session.stripeuserid
+                        }
+
+                        if (true || liliumcms.session.roles.includes('contractor') && !liliumcms.session.stripeuserid) {
+                            nextState.stripePopupVisible= true;
+                            API.get('/entities/stripeoauthurl', {}, (err, data, r) => {
+                                if (!err && data && data.url) {
+                                    liliumcms.session.stripeoauthurl = data.url;
+                                } else {
+                                    log('Lilium', 'There was an error fetching the Stripe OAuth URL', 'err');
+                                }
+                            });
                         }
 
                         fireEvent('appWillRender', nextState);
@@ -252,7 +262,7 @@ export class Lilium extends Component {
             return (<LoadingView />);
         }
 
-        console.log(liliumcms);
+        console.log(liliumcms.session.stripeoauthurl);
         
 
         // Error view incase bootstrapping fails
@@ -270,7 +280,8 @@ export class Lilium extends Component {
                 <Modal visible={this.state.stripePopupVisible} title='Link your Stripe account'>
                     <h1>Link your Stripe account to Lilium CMS</h1>
                     <p>Your account has thr role <b>contractor</b>, in order to be able 
-                    to be paid for the articles you write in Lilium, please <a href="">link your Stripe account</a></p>
+                    to be paid for the articles you write in Lilium, please, link your Stripe account to Lilium</p>
+                    <a href={liliumcms.session.stripeoauthurl} className="button purple fill">Link Stripe Account</a>
                 </Modal>
                 <Header session={this.state.session} />
                 <LiliumMenu menus={this.state.menus} />
