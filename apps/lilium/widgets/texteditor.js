@@ -85,7 +85,7 @@ export class TextEditor extends Component {
         node.dataset.type = embed.type;
         if (embed.type == ImagePicker.slug) {
             let imagepreview = document.createElement('img');
-            imagepreview.src = embed[ImagePicker.slug].sizes.facebook.url;
+            imagepreview.src = embed[ImagePicker.slug].sizes.content.url;
             imagepreview.className = "lml-content-image lml-upload-v4";
             imagepreview.dataset.width = embed[ImagePicker.slug].size.width;
             imagepreview.dataset.height = embed[ImagePicker.slug].size.height;
