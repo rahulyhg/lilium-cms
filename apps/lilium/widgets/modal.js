@@ -7,6 +7,7 @@ export default class Modal extends Component {
         this.bodyEl;
         this.backgroundEl;
         this.handleKeyDownBound = this.handleKeyDown.bind(this);
+        this.canDismiss = !!this.props.canDismiss;
     }
 
     componentDidMount() {
@@ -49,7 +50,7 @@ export default class Modal extends Component {
     }
 
     handleOutsideClick(e) {
-        if (e.target == this.backgroundEl) {
+        if (this.canDismiss && e.target == this.backgroundEl) {
             this.props.onClose ? this.props.onClose() : this.close();
         }
     }

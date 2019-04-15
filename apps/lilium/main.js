@@ -92,6 +92,7 @@ import { CakepopWrapper } from 'layout/cakepopsmanager';
 import { bind, bindFirst, unbind } from './syntheticEvents';
 
 import API from 'data/api';
+import Modal from './widgets/modal';
 
 // Global access to session, connection state, URL
 window.liliumcms = window.liliumcms || {};
@@ -229,7 +230,8 @@ export class Lilium extends Component {
                         ]);
 
                         const nextState = {
-                            session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage 
+                            session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage,
+                            stripePopupVisible: true //&& liliumcms.session.roles.includes('contractor') && !liliumcms.session.stripeuserid
                         }
 
                         fireEvent('appWillRender', nextState);
@@ -250,6 +252,9 @@ export class Lilium extends Component {
             return (<LoadingView />);
         }
 
+        console.log(liliumcms);
+        
+
         // Error view incase bootstrapping fails
         if (this.state.error) {
             log('Lilium', 'Rendering Lilium error overlay', 'lilium');
@@ -262,6 +267,11 @@ export class Lilium extends Component {
         // Marvelous chaos 
         return (
             <div id="lilium">
+                <Modal visible={this.state.stripePopupVisible} title='Link your Stripe account'>
+                    <h1>Link your Stripe account to Lilium CMS</h1>
+                    <p>Your account has thr role <b>contractor</b>, in order to be able 
+                    to be paid for the articles you write in Lilium, please <a href="">link your Stripe account</a></p>
+                </Modal>
                 <Header session={this.state.session} />
                 <LiliumMenu menus={this.state.menus} />
                 <URLRenderer session={this.state.session} />
