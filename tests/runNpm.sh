@@ -18,7 +18,8 @@ mongo liliumtestdatabase --quiet --eval "db.dropUser('liliumtest');"
 mongo liliumtestdatabase --quiet --eval "db.createUser({user: 'liliumtest', pwd: 'liliumtest', roles: ['readWrite']});"
 
 echo "> Running tests from main.js"
-cd .. && node tests/app/main.js && cd tests
+cd .. && node tests/app/main.js 
+cd tests
 
 echo "> Removing test config from websites"
 rm ../sites/default.json
