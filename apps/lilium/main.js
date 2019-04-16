@@ -233,25 +233,30 @@ export class Lilium extends Component {
                             session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage,
                         }
 
-                        if (true || liliumcms.session.roles.includes('contractor') && !liliumcms.session.stripeuserid) {
-                            nextState.stripePopupVisible= true;
+                        if (liliumcms.session.roles.includes('contractor') && !liliumcms.session.stripeuserid) {
                             API.get('/entities/stripeoauthurl', {}, (err, data, r) => {
                                 if (!err && data && data.url) {
                                     liliumcms.session.stripeoauthurl = data.url;
+                                    nextState.stripePopupVisible= true;
+                                    return this.renderApplication(nextState);
                                 } else {
                                     log('Lilium', 'There was an error fetching the Stripe OAuth URL', 'err');
                                 }
                             });
                         }
 
-                        fireEvent('appWillRender', nextState);
-                        // Let the show begins
-                        this.setState(nextState, () => {
-                            fireEvent('appRendered');
-                        }); 
+                        this.renderApplication(nextState);
                     });
                 }   
             });
+        });
+    }
+
+    renderApplication(nextState) {
+        fireEvent('appWillRender', nextState);
+        // Let the show begins
+        this.setState(nextState, () => {
+            fireEvent('appRendered');
         });
     }
 
