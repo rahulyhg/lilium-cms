@@ -26,7 +26,7 @@ class File {
     fromPostData(req, done) {
         mkdirp(this.baseDirectory, () => {
             const fileStream = fs.createWriteStream(this.absolutePath, { flags: 'w+', encoding: 'binary' });
-    
+
             fileStream.on('close', () => {
                 fileStream.destroy();
                 done && done();
@@ -86,8 +86,8 @@ class ImageFile extends File {
 class MediaUpload {
 
     handleImageUpload(cli) {
-        if (SUPPORTEDFILETYPES.includes(cli.routeinfo.path[2])) {
-            let newImage = new ImageFile(cli.routeinfo.path[2]);
+        if (cli.routeinfo.path[2] && SUPPORTEDFILETYPES.includes(cli.routeinfo.path[2].toLowerCase())) {
+            let newImage = new ImageFile(cli.routeinfo.path[2].toLowerCase());
             newImage.fromPostData(cli.request, () => {
                 newImage.generateResizedVersions(cli, (err, upload) => {
                     if (!err) {
@@ -102,7 +102,6 @@ class MediaUpload {
             cli.throwHTTP(400, 'Invalid or no file extention was provided', true);
         }
     }
-
 }
 
 module.exports = new MediaUpload();
