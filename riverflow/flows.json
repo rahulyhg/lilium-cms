@@ -543,6 +543,10 @@
             "endpoint" : "contractorinvoice",
             "support" : ["get"]
         }, {
+            "module" : "controllers/contractorspayments.js",
+            "endpoint" : "liliumstripecallback",
+            "support" : ["get"]
+        }, {
             "module" : "controllers/creditcards.js",
             "endpoint" : "creditcards",
             "support" : ["admin_post", "admin_put", "admin_delete", "livevar"]

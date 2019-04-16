@@ -4,6 +4,7 @@ const _c = require('../lib/config');
 const dateFormat = require('dateformat');
 const Money = require("../lib/money");
 const twoFactor = require('../lib/twoFactor');
+const contractorsLib = require('../lib/contractorspayments');
 
 const money = new Money();
 
@@ -160,6 +161,14 @@ class ContractorHandler {
                     sendback({ items: items });
                 });
             }
+        }
+    }
+
+    get(cli) {
+        if (cli.reouteinfo.levels[0]) {
+            contractorsLib.stripeCallback(cli);
+        } else {
+            cli.throwHTTP(404, undefined, true);
         }
     }
 
