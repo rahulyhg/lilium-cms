@@ -77,7 +77,7 @@ export class CakepopWrapper extends Component {
         super(props);
         this.state = { cakepops: [] }
     }
-    
+
     componentDidMount() {
         API.get('/cakepop/latests', {}, (err, data, r) => {
             if (r.status == 200 ) {

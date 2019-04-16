@@ -92,6 +92,7 @@ import { CakepopWrapper } from 'layout/cakepopsmanager';
 import { bind, bindFirst, unbind } from './syntheticEvents';
 
 import API from 'data/api';
+import Modal from './widgets/modal';
 
 // Global access to session, connection state, URL
 window.liliumcms = window.liliumcms || {};
@@ -229,17 +230,33 @@ export class Lilium extends Component {
                         ]);
 
                         const nextState = {
-                            session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage 
+                            session : liliumcms.session, menus : resp["/adminmenus"], loading : false, currentLanguage,
                         }
 
-                        fireEvent('appWillRender', nextState);
-                        // Let the show begins
-                        this.setState(nextState, () => {
-                            fireEvent('appRendered');
-                        }); 
+                        if (liliumcms.session.roles.includes('contractor') && !liliumcms.session.stripeuserid) {
+                            API.get('/entities/stripeoauthurl', {}, (err, data, r) => {
+                                if (!err && data && data.url) {
+                                    liliumcms.session.stripeoauthurl = data.url;
+                                    nextState.stripePopupVisible= true;
+                                    return this.renderApplication(nextState);
+                                } else {
+                                    log('Lilium', 'There was an error fetching the Stripe OAuth URL', 'err');
+                                }
+                            });
+                        }
+
+                        this.renderApplication(nextState);
                     });
                 }   
             });
+        });
+    }
+
+    renderApplication(nextState) {
+        fireEvent('appWillRender', nextState);
+        // Let the show begins
+        this.setState(nextState, () => {
+            fireEvent('appRendered');
         });
     }
 
@@ -249,6 +266,9 @@ export class Lilium extends Component {
             log('Lilium', 'Rendering Lilium loading overlay', 'lilium');
             return (<LoadingView />);
         }
+
+        console.log(liliumcms.session.stripeoauthurl);
+        
 
         // Error view incase bootstrapping fails
         if (this.state.error) {
@@ -262,6 +282,12 @@ export class Lilium extends Component {
         // Marvelous chaos 
         return (
             <div id="lilium">
+                <Modal visible={this.state.stripePopupVisible} title='Stripe'>
+                    <h2>Link your Stripe account</h2>
+                    <p>Your account has the role <b>contractor</b>. In order to be able 
+                    to be paid for the articles you write in Lilium, please log in with your Stripe account.</p>
+                    <a href={liliumcms.session.stripeoauthurl} className="button purple fill">Link Stripe Account</a>
+                </Modal>
                 <Header session={this.state.session} />
                 <LiliumMenu menus={this.state.menus} />
                 <URLRenderer session={this.state.session} />
