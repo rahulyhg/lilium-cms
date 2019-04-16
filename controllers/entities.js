@@ -190,10 +190,18 @@ class Entities {
                     if (!err) {
                         const stripeConfig = JSON.parse(data);
                         
-                        if (stripeConfig.oauth) {
-                            sendback({ url: stripeConfig.oauth });
+                        if (cli._c.env == 'dev') {
+                            if (stripeConfig.test_oauth) {
+                                sendback({ url: stripeConfig.test_oauth });
+                            } else {
+                                cli.throwHTTP(404, 'Stripe test oauth URL not found in config file', true);
+                            }
                         } else {
-                            cli.throwHTTP(404, 'Stripe oauth URL not found in config file', true);
+                            if (stripeConfig.oauth) {
+                                sendback({ url: stripeConfig.oauth });
+                            } else {
+                                cli.throwHTTP(404, 'Stripe oauth URL not found in config file', true);
+                            }
                         }
                     } else {
                         cli.throwHTTP(500, 'Error while reading stripe configuration file', true);
