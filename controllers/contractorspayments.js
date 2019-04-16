@@ -23,35 +23,39 @@ const STATUSES = {
 
 class ContractorHandler {
     GET(cli) {
-        if (!cli.isLoggedIn || !cli.routeinfo.path[1] || isNaN(cli.routeinfo.path[1])) {
-            return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
-        }
-
-        const $match = { number : parseInt(cli.routeinfo.path[1]) };
-        if (!cli.hasRight('manage-contractors')) {
-            $match.to = db.mongoID(cli.userinfo.userid);
-        }
-
-        db.findUnique(require("../lib/config").default(), 'contractorinvoices', $match, (err, invoice) => {
-            if (!invoice) {
-                return cli.throwHTTP(404, undefined, true);
+        if (!cli.isLoggedIn) {
+            cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
+        } else if (cli.routeinfo.path[0] == "liliumstripecallback" && cli.routeinfo.params.code) {
+            contractorsLib.stripeCallback(cli);
+        } else if (!isNaN(cli.routeinfo.path[1])) {
+            const $match = { number : parseInt(cli.routeinfo.path[1]) };
+            if (!cli.hasRight('manage-contractors')) {
+                $match.to = db.mongoID(cli.userinfo.userid);
             }
-            
-            db.findUnique(
-                require("../lib/config").default(), 
-                'entities', 
-                { _id : invoice.to },
-            (err, contractor) => {
-                require(liliumroot + "/lml3/compiler").compile(
-                    cli._c, 
-                    liliumroot + "/backend/dynamic/invoice.lml3",
-                    { invoice, contractor },
-                    markup => {
-                        cli.sendHTML(markup, 200);
-                    }
-                );
+
+            db.findUnique(require("../lib/config").default(), 'contractorinvoices', $match, (err, invoice) => {
+                if (!invoice) {
+                    return cli.throwHTTP(404, undefined, true);
+                }
+                
+                db.findUnique(
+                    require("../lib/config").default(), 
+                    'entities', 
+                    { _id : invoice.to },
+                (err, contractor) => {
+                    require(liliumroot + "/lml3/compiler").compile(
+                        cli._c, 
+                        liliumroot + "/backend/dynamic/invoice.lml3",
+                        { invoice, contractor },
+                        markup => {
+                            cli.sendHTML(markup, 200);
+                        }
+                    );
+                });
             });
-        });
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
     }
 
     adminPOST(cli) {
@@ -161,14 +165,6 @@ class ContractorHandler {
                     sendback({ items: items });
                 });
             }
-        }
-    }
-
-    get(cli) {
-        if (cli.reouteinfo.levels[0]) {
-            contractorsLib.stripeCallback(cli);
-        } else {
-            cli.throwHTTP(404, undefined, true);
         }
     }
 

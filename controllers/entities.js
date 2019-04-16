@@ -192,13 +192,13 @@ class Entities {
                         
                         if (cli._c.env == 'dev') {
                             if (stripeConfig.test_oauth) {
-                                sendback({ url: stripeConfig.test_oauth });
+                                sendback({ url: stripeConfig.test_oauth + cli._c.server.protocol + cli._c.server.url + "/liliumstripecallback" });
                             } else {
                                 cli.throwHTTP(404, 'Stripe test oauth URL not found in config file', true);
                             }
                         } else {
                             if (stripeConfig.oauth) {
-                                sendback({ url: stripeConfig.oauth });
+                                sendback({ url: stripeConfig.oauth + cli._c.server.protocol + cli._c.server.url + "/liliumstripecallback" });
                             } else {
                                 cli.throwHTTP(404, 'Stripe oauth URL not found in config file', true);
                             }
@@ -429,6 +429,7 @@ class Entities {
                     ], arr => {
                         const rights = arr && arr[0] ? arr[0].rights : [];
                         user.rights = Array.from(new Set(rights.filter(x => x)));
+                        user.shhh = undefined;
 
                         callback([ user ]);
                     });

@@ -282,10 +282,10 @@ export class Lilium extends Component {
         // Marvelous chaos 
         return (
             <div id="lilium">
-                <Modal visible={this.state.stripePopupVisible} title='Link your Stripe account'>
-                    <h1>Link your Stripe account to Lilium CMS</h1>
-                    <p>Your account has thr role <b>contractor</b>, in order to be able 
-                    to be paid for the articles you write in Lilium, please, link your Stripe account to Lilium</p>
+                <Modal visible={this.state.stripePopupVisible} title='Stripe'>
+                    <h2>Link your Stripe account</h2>
+                    <p>Your account has the role <b>contractor</b>. In order to be able 
+                    to be paid for the articles you write in Lilium, please log in with your Stripe account.</p>
                     <a href={liliumcms.session.stripeoauthurl} className="button purple fill">Link Stripe Account</a>
                 </Modal>
                 <Header session={this.state.session} />
