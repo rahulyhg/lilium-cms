@@ -59,11 +59,18 @@
     .version {
         display: flex;
 
+        .version-column {
+            display: flex;
+            align-items: center;
+        }
         .version-medium {
             flex: 0 0 15%;
         }
         .version-destination {
             flex-grow: 1;
+        }
+        .version-clicks {
+            span { margin-top: 2px; }
         }
         .version-remove,
         .version-copy {

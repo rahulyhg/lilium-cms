@@ -44,6 +44,7 @@ export class VersionsList extends Component {
                 <div className="version version-header">
                     <div className="version-medium"><h4>Medium</h4></div>
                     <div className="version-destination"><h4>Destination</h4></div>
+                    <div className="version-clicks"></div>
                     <div className="version-copy"></div>
                     <div className="version-remove"></div>
                 </div>
@@ -62,7 +63,7 @@ const Version = props => {
     const questPos = props.destination.indexOf('?');
     const destination = props.destination.substring(0, questPos == -1 ? props.destination.length : questPos);
     const redirlink = liliumcms.url + "/pong/" + props.ponglink.hash + "/" + props.hash
-
+    
     return (
         <div className='version'>
             <div className="version-medium">
@@ -83,10 +84,13 @@ const Version = props => {
                     )
                 }
             </div>
-            <div className="version-copy">
+            <div className="version-column version-clicks">
+                <span>{`${props.clicks} ${props.clicks == 1 ? 'click' : 'clicks'}`}</span>
+            </div>
+            <div className="version-column version-copy">
                 <i className="far fa-copy" onClick={copy.bind(this, redirlink)} title='Copy'></i>
             </div>
-            <div className="version-remove">
+            <div className="version-column version-remove">
                 {
                     props.editable ? (
                         <i className="fal fa-trash red" onClick={props.onRemove.bind(this, props.hash)}></i>
