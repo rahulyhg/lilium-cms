@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 var _c = configs = require('../lib/config');
 
 var db = require('../lib/db.js');
@@ -182,6 +184,32 @@ class Entities {
             }, function(err, arr) { 
                 sendback(arr); 
             });
+        } else if (levels[0] == "stripeoauthurl") {
+            try {
+                fs.readFile(path.join(liliumroot, '..', 'keys', 'stripe.json'), (err, data) => {
+                    if (!err) {
+                        const stripeConfig = JSON.parse(data);
+                        
+                        if (cli._c.env == 'dev') {
+                            if (stripeConfig.test_oauth) {
+                                sendback({ url: stripeConfig.test_oauth + cli._c.server.protocol + cli._c.server.url + "/liliumstripecallback" });
+                            } else {
+                                cli.throwHTTP(404, 'Stripe test oauth URL not found in config file', true);
+                            }
+                        } else {
+                            if (stripeConfig.oauth) {
+                                sendback({ url: stripeConfig.oauth + cli._c.server.protocol + cli._c.server.url + "/liliumstripecallback" });
+                            } else {
+                                cli.throwHTTP(404, 'Stripe oauth URL not found in config file', true);
+                            }
+                        }
+                    } else {
+                        cli.throwHTTP(500, 'Error while reading stripe configuration file', true);
+                    }
+                });
+            } catch (e) {
+                cli.throwHTTP(500, 'Error while reading stripe configuration file', true);
+            }
         } else if (levels[0] == "me") {
             db.findUnique(_c.default(), "entities", { _id : db.mongoID(cli.userinfo.userid) }, (err, user) => {
                 db.join(_c.default(), 'roles', [
@@ -401,6 +429,7 @@ class Entities {
                     ], arr => {
                         const rights = arr && arr[0] ? arr[0].rights : [];
                         user.rights = Array.from(new Set(rights.filter(x => x)));
+                        user.shhh = undefined;
 
                         callback([ user ]);
                     });

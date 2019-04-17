@@ -1,6 +1,7 @@
 const lessLib = require('less');
 const fs = require('fs');
 const pathLib = require('path');
+const hooks = require('../lib/hooks');
 
 const filequeue = [];
 
@@ -13,7 +14,10 @@ class CSSBuilder {
                 log('Less', 'Failed to compile Less, missing directory : ' + inputdir, 'err');
                 done && done(err);
             } else {
-                const filestring = files.filter(x => x.endsWith('.less')).map(x => `@import "${pathLib.join(inputdir, x)}";`).join('\n');
+                const thirdpartyfiles = [];
+                hooks.fire('less_will_compile', { files : thirdpartyfiles });
+                const filestring = files.filter(x => x.endsWith('.less')).map(x => `@import "${pathLib.join(inputdir, x)}";`).join('\n') + "\n" +
+                                   thirdpartyfiles.map(x => `@import "${x}";`).join('\n');
 
                 lessLib.render(filestring, { compress : options.compress || false }, (err, result) => {
                     if (err) {
