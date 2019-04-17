@@ -212,7 +212,7 @@ export default class PonglinkInsight extends Component {
         }
     }
 
-    render() {        
+    render() {
         if (!this.state.loading) {
             const { lineLabels, lineClicks } = this.buildDailyClicksDataSet();
             const { pieLabels, pieClicks } = this.buildClicksPerMediumDataSet();
