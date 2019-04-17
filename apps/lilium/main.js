@@ -279,7 +279,7 @@ export class Lilium extends Component {
         // Marvelous chaos 
         return (
             <div id="lilium">
-                <Modal visible={this.state.stripePopupVisible} title='Stripe'>
+                <Modal visible={this.state.stripePopupVisible} title='Stripe' onClose={() => { this.setState({ stripePopupVisible: false }) }}>
                     <h2>Link your Stripe account</h2>
                     <p>Your account has the role <b>contractor</b>. In order to be able 
                     to be paid for the articles you write in Lilium, please log in with your Stripe account.</p>

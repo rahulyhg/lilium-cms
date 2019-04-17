@@ -7,7 +7,7 @@ export default class Modal extends Component {
         this.bodyEl;
         this.backgroundEl;
         this.handleKeyDownBound = this.handleKeyDown.bind(this);
-        this.canDismiss = !!this.props.canDismiss;
+        this.canDismiss = typeof props.canDismiss !== 'undefined' ? props.canDismiss : true;
     }
 
     componentDidMount() {
