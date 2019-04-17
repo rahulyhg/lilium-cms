@@ -472,10 +472,10 @@ export class EditableText extends FormField {
         const oldValue = this.value;
 
         if (this.value != ev.target.value) {
-            this.value = ev.target.value;
-            this.props.onChange && this.props.onChange(this.props.name, ev.target.value, oldValue);
+            this.value = ev.target.value || this.props.defaultValue;
+            this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue);
         }
-  
+
         this.setState({ editing: false });
     }
 
@@ -491,7 +491,7 @@ export class EditableText extends FormField {
                                     onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)}>{this.value || ""}</textarea>) :
                             ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""}
                                     class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
-                                    onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)} />))
+                                    onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)} min={this.props.min} max={this.props.max} />))
                         : ( <span onClick={() => { this.setState({ editing: true }, () => { this.textInput.focus(); }); }}
                                 title='Click to edit' style={{ cursor: 'text', hover: { border:'1px solid #333' } }}>{this.value}</span> )
                 }
