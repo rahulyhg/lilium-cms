@@ -267,9 +267,6 @@ export class Lilium extends Component {
             return (<LoadingView />);
         }
 
-        console.log(liliumcms.session.stripeoauthurl);
-        
-
         // Error view incase bootstrapping fails
         if (this.state.error) {
             log('Lilium', 'Rendering Lilium error overlay', 'lilium');
