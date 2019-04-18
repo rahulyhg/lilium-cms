@@ -112,6 +112,56 @@ export class PaymentsManagement extends Component {
         }
     }
 
+    changeArticleWorth(contractorId, articleId, name, val) {
+        if (typeof val !== 'undefined' && val >= 0) {
+            API.put('/contractorspayments/changeArticleWorth/' + articleId, { worth: val }, (err, data, r) => {
+                if (!err && data.success) {
+                    const pendingPayments = this.state.pendingPayments;
+                    const contractorPayment = pendingPayments.find(c => c._id == contractorId);
+
+                    if (contractorPayment) {
+                        const article = contractorPayment.articles.find(a => a._id == articleId);
+    
+                        if (article) {
+                            article.worth = parseInt(val);
+                            const total = contractorPayment.articles.reduce((acc, cur) => acc + (cur.worth || 0), 0);
+                            contractorPayment.owed = total;
+                            this.setState({ pendingPayments });
+    
+                            castNotification({
+                                title: 'Article worth was changed',
+                                type: 'success'
+                            });
+                        } else {
+                            castNotification({
+                                title: 'State error updating article worth',
+                                message: 'Could not find article',
+                                type: 'error'
+                            });
+                        }
+                    } else {
+                        castNotification({
+                            title: 'State error updating article worth',
+                            message: 'Could not find contractor payment',
+                            type: 'error'
+                        });
+                    }
+                } else {
+                    castNotification({
+                        title: 'Error updating article worth',
+                        type: 'error'
+                    });
+                }
+            });
+        } else {
+            castNotification({
+                title: 'Wrong value in article worth',
+                message: 'Can only change article worth to a positive number',
+                tupe: 'warning'
+            });
+        }
+    }
+
     render(props, state) {
         const payout = PaymentsManagement.calculateTotalPayout(state.selectedPayments);
         return (
@@ -143,10 +193,12 @@ export class PaymentsManagement extends Component {
                     {
                         state.selectedPayments.length > 1 ? (
                             <PaymentsBreakdown contractorPayments={state.selectedPayments} payContractors={this.castPaymentModal.bind(this)}
+                                                changeArticleWorth={this.changeArticleWorth.bind(this)}
                                                 totalCAD={payout.totalCAD} totalUSD={payout.totalUSD} />
                         ) : (
                             state.selectedPayments.length != 0 ? (
-                                <PaymentDetails contractorPayment={state.selectedPayments[0]} payContractors={this.castPaymentModal.bind(this)} />
+                                <PaymentDetails contractorPayment={state.selectedPayments[0]} payContractors={this.castPaymentModal.bind(this)}
+                                                changeArticleWorth={this.changeArticleWorth.bind(this)} />
                             ) : (
                                 <PaymentNothingSelected />
                             )

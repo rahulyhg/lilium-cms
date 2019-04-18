@@ -537,7 +537,7 @@
         }, {
             "module" : "controllers/contractorspayments.js",
             "endpoint" : "contractorspayments",
-            "support" : ["admin_post", "livevar"]
+            "support" : ["admin_post", "admin_put", "livevar"]
         }, {
             "module" : "controllers/contractorspayments.js",
             "endpoint" : "contractorinvoice",

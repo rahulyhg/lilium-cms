@@ -1,5 +1,5 @@
 import { h, Component } from 'preact'
-import { ButtonWorker } from '../../widgets/form';
+import { ButtonWorker, EditableText } from '../../widgets/form';
 import dateformat from 'dateformat';
 
 /**
@@ -78,7 +78,7 @@ export class PaymentDetails extends Component {
                     </div>
                 </div>
 
-                <PaymentArticlesSummary contractor={props.contractorPayment} />
+                <PaymentArticlesSummary contractor={props.contractorPayment} changeArticleWorth={this.props.changeArticleWorth.bind(this)} />
             </div>
         );
     }
@@ -117,7 +117,10 @@ class PaymentArticlesSummary extends Component {
                                     <td title={article.title}>{article.title}</td>
                                     <td>{article.pages}</td>
                                     <td>{formatDate(article.date)}</td>
-                                    <td>{article.worth}</td>
+                                    <td>
+                                        <EditableText initialValue={article.worth} name='worth' type='number' min={0} defaultValue={0}
+                                                         onChange={this.props.changeArticleWorth.bind(this, this.props.contractor._id, article._id)} />
+                                    </td>
                                 </tr>
                             ))
                         }
@@ -176,7 +179,7 @@ export class PaymentsBreakdown extends Component {
                 <div id="payment-breakdown-list">
                     {
                         props.contractorPayments.map(contractor => (
-                            <PaymentArticlesSummary contractor={contractor} key={contractor._id} displayContractorInfo />
+                            <PaymentArticlesSummary contractor={contractor} key={contractor._id} changeArticleWorth={this.props.changeArticleWorth.bind(this)} displayContractorInfo />
                         ))
                     }
                 </div>
