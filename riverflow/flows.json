@@ -37,7 +37,7 @@
             "faicon": "fa-dollar-sign",
             "displayname": "Payments Dashboard",
             "priority": 3000,
-            "rights": ["hr"],
+            "rights": ["manage-contractors"],
             "absURL": "/paymentdashboard",
             "section" : "home"            
         },
@@ -48,7 +48,7 @@
             "faicon": "fa-history",
             "displayname": "Payments Reports",
             "priority": 3001,
-            "rights": ["hr"],
+            "rights": ["manage-contractors"],
             "absURL": "/paymentshistory",
             "section" : "home"            
         },
