@@ -101,6 +101,32 @@ class ContractorHandler {
         }
     }
 
+    adminPUT(cli) {
+        if (cli.routeinfo.path[2] == "changeArticleWorth") {
+            if (cli.routeinfo.path[2] && db.isValidMongoID(cli.routeinfo.path[3])) {
+                cli.readPostData(postdata => {
+                    if (postdata.worth >= 0) {
+                        if (cli.hasRightOrRefuse('manage-contractors')) {
+                            contractorsLib.changeArticleWorth(cli, cli.routeinfo.path[3], postdata.worth, err => {
+                                if (!err) {
+                                    cli.sendJSON({ success: true });
+                                } else {
+                                    cli.throwHTTP(500, 'Error updating article worth', true);
+                                }
+                            });
+                        }
+                    } else {
+                        cli.throwHTTP(400, 'Positive integer article worth required', true);
+                    }
+                });
+            } else {
+                cli.throwHTTP(400, 'ArticleId parameter required', true);
+            }
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
+    }
+
     livevarManage(cli, levels, params, sendback) {
         if (!cli.hasRight("manage-contractors")) {
             return cli.refuse();
