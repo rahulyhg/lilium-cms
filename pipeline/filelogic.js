@@ -476,21 +476,18 @@ class FileLogic {
             }
             return typeof fs.accessSync(fullpath, fs.F_OK) == 'undefined';
         } else {
-            let dirpath = fullpath.substring(0, fullpath.lastIndexOf('/'));
-            mkdirp(dirpath, () =>  {
-                fs.lstat(fullpath,  (err, stats)  => {
-                    if (err) {
-                        cb(false);
-                        return;
-                    }
+            fs.lstat(fullpath,  (err, stats)  => {
+                if (err) {
+                    cb(false);
+                    return;
+                }
 
-                    if (stats.isDirectory()) {
-                        fullpath += "/index.html";
-                    }
+                if (stats.isDirectory()) {
+                    fullpath += "/index.html";
+                }
 
-                    fs.access(fullpath, fs.F_OK,  (err)  => {
-                        cb(!err);
-                    });
+                fs.access(fullpath, fs.F_OK, (err)  => {
+                    cb(!err);
                 });
             });
         }
