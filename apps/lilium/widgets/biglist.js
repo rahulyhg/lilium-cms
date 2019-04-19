@@ -234,10 +234,10 @@ class BigListToolBar extends Component {
     }
 
     fieldChanged(ev) {
-        this.coldValues[ev.target.name] = ev.target.value;
+        this.coldValues[ev.target.name] = ev.target.type == "checkbox" ? (ev.target.checked) : ev.target.value;
         storeLocal(LOCALSTORAGE_PREFIX + this.props.id, this.coldValues);
 
-        this.props.fieldChanged && this.props.fieldChanged(ev.target.name, ev.target.value);
+        this.props.fieldChanged && this.props.fieldChanged(ev.target.name, this.coldValues[ev.target.name]);
     }
 
     makeField(field) {
@@ -259,7 +259,7 @@ class BigListToolBar extends Component {
                 return (
                     <div class="big-list-tool-wrap">
                         <b>{field.title}</b>
-                        <input checked={this.coldValues[field.name] || false} type="checkbox" onChange={this.fieldChanged.bind(this)} name={field.name} />
+                        <input checked={this.coldValues[field.name]} type="checkbox" onChange={this.fieldChanged.bind(this)} name={field.name} />
                     </div>
                 );
             } break;
@@ -269,7 +269,7 @@ class BigListToolBar extends Component {
                 return (
                     <div class="big-list-tool-wrap">
                         <b>{field.title}</b>
-                        <input value={this.coldValues[field.name] || ""} type="text" onKeyUp={this.fieldChanged.bind(this)} name={field.name} />
+                        <input value={this.coldValues[field.name]} type="text" onKeyUp={this.fieldChanged.bind(this)} name={field.name} />
                     </div>
                 );
             }
