@@ -99,7 +99,7 @@ export class ContractorTab extends Component {
     static get tabprops() {
         return {
             text : _v("payments"),
-            right : "contractor",
+            right : "contractor-dashboard",
             id : "contractor-payment"
         }
     }
