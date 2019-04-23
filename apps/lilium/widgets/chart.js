@@ -4,17 +4,17 @@ const minPastel = 100;
 const maxPastel = 255;
 
 const getRandPastelRGBA = () => {
-    return minPastel + Math.random() *(maxPastel - minPastel);
+    return minPastel + Math.random() * (maxPastel - minPastel);
 };
 
 export class ChartGraph extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            datasets : props.datasets,
-            data : props.data,
-            labels : props.labels || ["Data"],
-            options : Object.assign({}, props.options || {}),
+            datasets: props.datasets,
+            data: props.data,
+            labels: props.labels || ["Data"],
+            options: Object.assign({}, props.options || {}),
             title: props.title
         }
 
@@ -26,7 +26,7 @@ export class ChartGraph extends Component {
     }
 
     resize() {
-        this.canvas.width = this.canvas.parentElement.getBoundingClientRect().width;  
+        this.canvas.width = this.canvas.parentElement.getBoundingClientRect().width;
     }
 
     componentWillReceiveProps(props) {
@@ -44,26 +44,26 @@ export class ChartGraph extends Component {
     componentDidMount() {
         this.ctx = this.canvas.getContext('2d');
         const opt = this.props.chart || {
-            type : this.props.type || "line",
-            data : {
-                labels : this.state.labels,
-                datasets : [{
-                    label : this.state.title || "Data",
-                    data : this.state.data,
+            type: this.props.type || "line",
+            data: {
+                labels: this.state.labels,
+                datasets: [{
+                    label: this.state.title || "Data",
+                    data: this.state.data,
                     ...(Object.assign({
-                        backgroundColor : this.getDefaultBackgroundColors(),
-                        borderColor : "rgb(202, 80, 258)"
+                        backgroundColor: this.getDefaultBackgroundColors(),
+                        borderColor: "rgb(202, 80, 258)"
                     }, this.props.lineStyle))
                 }]
             },
-            labels : this.state.labels || null,
-            options : this.state.options
+            labels: this.state.labels || null,
+            options: this.state.options
         };
 
         this.chart = new Chart(this.ctx, opt);
         log('Chart', 'Created chart object using a canvas\' 2d context', 'success');
 
-        this.resize();
+        () => this.resize();
         window.addEventListener('resize', this.resize_bound);
     }
 
