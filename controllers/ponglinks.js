@@ -113,7 +113,14 @@ class PongLinks {
                         { $project : {
                             version : "$_id", clicks : 1, _id : 0
                         } }
-                    ], (versions) => {
+                    ], versions => {
+                        link.versions.forEach(version => {
+                            const groupedVersion = versions.find(v => version.hash == v.version);
+                            
+                            if (groupedVersion) {
+                                version.clicks = groupedVersion.clicks;
+                            }
+                        });
                         sendback({ link, daily, versions });
                     });
                 });

@@ -7,6 +7,7 @@ export default class Modal extends Component {
         this.bodyEl;
         this.backgroundEl;
         this.handleKeyDownBound = this.handleKeyDown.bind(this);
+        this.canDismiss = typeof props.canDismiss !== 'undefined' ? props.canDismiss : true;
     }
 
     componentDidMount() {
@@ -27,7 +28,7 @@ export default class Modal extends Component {
     
     show() {
         this.setState({ visible: true }, () => {
-            window.liliumcms.bindFirst('keydown', this.handleKeyDownBound);
+            if (this.canDismiss) window.liliumcms.bindFirst('keydown', this.handleKeyDownBound);
             this.bodyEl && setTimeout(() => this.bodyEl && this.bodyEl.classList.add("shown"), 200);
             this.bodyEl.focus();
         });
@@ -42,14 +43,14 @@ export default class Modal extends Component {
     }
     
     handleKeyDown(ev) {
-        if (ev.which == 27 || ev.keyCode == 27) {
+        if (this.canDismiss && ev.which == 27 || ev.keyCode == 27) {
             this.props.onClose ? this.props.onClose() : this.close();
             return false;
         }
     }
 
     handleOutsideClick(e) {
-        if (e.target == this.backgroundEl) {
+        if (this.canDismiss && e.target == this.backgroundEl) {
             this.props.onClose ? this.props.onClose() : this.close();
         }
     }

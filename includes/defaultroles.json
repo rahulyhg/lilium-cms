@@ -8,7 +8,8 @@
     { "name" : "author", "displayname" : "Author", "power" : 5000, "pluginID" : false, "rights" : [ "dash", "publish", "preferences", "upload", "list-uploads", "dashboard", "list-articles", "publish-articles", "create-articles", "publish", "author", "list-secrets", "list-categories" ] },
     { "name" : "contributor", "displayname" : "Contributor", "power" : 6000, "rights" : [ "dash", "preferences", "upload", "list-uploads", "dashboard", "list-articles", "create-articles", "list-categories", "create-articles", "contributor" ] },
     { "name" : "stylist", "displayname" : "Stylist", "power" : 5000, "rights" : [ "styledpages", "stylist" ] },
-    { "name" : "contractor", "displayname" : "Contractor", "power" : 7000, "rights" : [ "contractor" ] },
+    { "name" : "contractor", "displayname" : "Contractor", "power" : 7000, "rights" : [ "contractor", "contractor-dashboard" ] },
+    { "name" : "formercontractor", "displayname" : "Former contractor", "power" : 6000, "rights" : [ "contractor-dashboard" ] },
     { "name" : "contractor-manager", "displayname" : "Contractor manager", "power" : 1000, "rights" : [ "contractor-manager", "manage-contractors", "dash", "dashboard" ] },
     { "name" : "analyst", "displayname" : "Analyst", "power" : 2000, "rights" : [ "analyst" ] },
     { "name" : "hr", "displayname" : "Human Resources", "rights" : [ "list-entities", "create-entities", "edit-entities", "revoke-access" ] }

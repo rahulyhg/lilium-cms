@@ -91,6 +91,7 @@
     "emitter": "0.0.5",
     "entities": "latest",
     "flatpickr": "^4.5.1",
+    "forever": "^1.0.0",
     "fs": "latest",
     "glob": "^7.1.2",
     "gm": "latest",

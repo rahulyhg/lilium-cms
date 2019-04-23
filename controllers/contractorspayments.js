@@ -4,6 +4,7 @@ const _c = require('../lib/config');
 const dateFormat = require('dateformat');
 const Money = require("../lib/money");
 const twoFactor = require('../lib/twoFactor');
+const contractorsLib = require('../lib/contractorspayments');
 
 const money = new Money();
 
@@ -22,35 +23,39 @@ const STATUSES = {
 
 class ContractorHandler {
     GET(cli) {
-        if (!cli.isLoggedIn || !cli.routeinfo.path[1] || isNaN(cli.routeinfo.path[1])) {
-            return cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
-        }
-
-        const $match = { number : parseInt(cli.routeinfo.path[1]) };
-        if (!cli.hasRight('manage-contractors')) {
-            $match.to = db.mongoID(cli.userinfo.userid);
-        }
-
-        db.findUnique(require("../lib/config").default(), 'contractorinvoices', $match, (err, invoice) => {
-            if (!invoice) {
-                return cli.throwHTTP(404, undefined, true);
+        if (!cli.isLoggedIn) {
+            cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
+        } else if (cli.routeinfo.path[0] == "liliumstripecallback" && cli.routeinfo.params.code) {
+            contractorsLib.stripeCallback(cli);
+        } else if (!isNaN(cli.routeinfo.path[1])) {
+            const $match = { number : parseInt(cli.routeinfo.path[1]) };
+            if (!cli.hasRight('manage-contractors')) {
+                $match.to = db.mongoID(cli.userinfo.userid);
             }
-            
-            db.findUnique(
-                require("../lib/config").default(), 
-                'entities', 
-                { _id : invoice.to },
-            (err, contractor) => {
-                require(liliumroot + "/lml3/compiler").compile(
-                    cli._c, 
-                    liliumroot + "/backend/dynamic/invoice.lml3",
-                    { invoice, contractor },
-                    markup => {
-                        cli.sendHTML(markup, 200);
-                    }
-                );
+
+            db.findUnique(require("../lib/config").default(), 'contractorinvoices', $match, (err, invoice) => {
+                if (!invoice) {
+                    return cli.throwHTTP(404, undefined, true);
+                }
+                
+                db.findUnique(
+                    require("../lib/config").default(), 
+                    'entities', 
+                    { _id : invoice.to },
+                (err, contractor) => {
+                    require(liliumroot + "/lml3/compiler").compile(
+                        cli._c, 
+                        liliumroot + "/backend/dynamic/invoice.lml3",
+                        { invoice, contractor },
+                        markup => {
+                            cli.sendHTML(markup, 200);
+                        }
+                    );
+                });
             });
-        });
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
     }
 
     adminPOST(cli) {
@@ -93,6 +98,32 @@ class ContractorHandler {
             }
         } else {
             cli.refuse();
+        }
+    }
+
+    adminPUT(cli) {
+        if (cli.routeinfo.path[2] == "changeArticleWorth") {
+            if (cli.routeinfo.path[2] && db.isValidMongoID(cli.routeinfo.path[3])) {
+                cli.readPostData(postdata => {
+                    if (postdata.worth >= 0) {
+                        if (cli.hasRightOrRefuse('manage-contractors')) {
+                            contractorsLib.changeArticleWorth(cli, cli.routeinfo.path[3], postdata.worth, err => {
+                                if (!err) {
+                                    cli.sendJSON({ success: true });
+                                } else {
+                                    cli.throwHTTP(500, 'Error updating article worth', true);
+                                }
+                            });
+                        }
+                    } else {
+                        cli.throwHTTP(400, 'Positive integer article worth required', true);
+                    }
+                });
+            } else {
+                cli.throwHTTP(400, 'ArticleId parameter required', true);
+            }
+        } else {
+            cli.throwHTTP(404, undefined, true);
         }
     }
 
