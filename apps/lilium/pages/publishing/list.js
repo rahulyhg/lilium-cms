@@ -100,7 +100,8 @@ export default class ListView extends Component {
                     { value : "published", text : "Published" },
                     { value : "reviewing", text : "Pending review" },
                     { value : "deleted", text : "Set back to draft" }
-                ] }
+                ] },
+                { type : "checkbox", name : "isSponsored", title : "Sponsored" }
             ]
         };
     }

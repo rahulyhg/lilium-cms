@@ -557,7 +557,7 @@ export default class EditView extends Component {
                         done && done();
                     });
                 } else {
-                    castNotification({
+                    r.status != 200 && castNotification({
                         type : "warning",
                         title : "Article did not save",
                         message : `[${r.status}] Error message from Lilium.`
