@@ -84,9 +84,13 @@ const Version = props => {
                     )
                 }
             </div>
-            <div className="version-column version-clicks">
-                <span>{`${props.clicks} ${props.clicks == 1 ? 'click' : 'clicks'}`}</span>
-            </div>
+            {
+                typeof props.clicks !== 'undefined' ? (
+                    <div className="version-column version-clicks">
+                        <span>{`${props.clicks} ${props.clicks == 1 ? 'click' : 'clicks'}`}</span>
+                    </div>
+                ) : null
+            }
             <div className="version-column version-copy">
                 <i className="far fa-copy" onClick={copy.bind(this, redirlink)} title='Copy'></i>
             </div>
