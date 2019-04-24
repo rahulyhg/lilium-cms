@@ -29,7 +29,10 @@ const sendPost = (session, query) => {
     db.findUnique(session._c, 'content', {
         $or : [
             { _id : db.mongoID(query) },
-            { title : new RegExp(query) }
+            { name : query },
+            { url : query },
+            { aliases : query },
+            { title : new RegExp(query) },
         ]
     }, (err, postdata) => {
         if (postdata) {
