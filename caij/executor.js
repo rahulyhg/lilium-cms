@@ -13,7 +13,7 @@ const analyticsLib = require('../lib/analytics.js');
 const CDN = require('../lib/cdn');
 
 const janitorJobs = [
-    "cacheTopic", "batchCacheArticle", "cacheEntity"
+    // "cacheTopic", "batchCacheArticle", "cacheEntity"
 ];
 
 const janitorSites = [];

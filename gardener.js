@@ -23,7 +23,8 @@ class ProcessManager {
         process.on('SIGINT', this.onExit.bind(this));
 
 	    try {
-            this.networkConfig = require('./sites/default.json').network;
+            this.networkSite = require('./sites/default.json');
+            this.networkConfig = this.networkSite.network;
 	    } catch (err) {
             return this.fireupInitialServer();
         }
@@ -120,7 +121,7 @@ class GardenerCluster extends ProcessManager {
     
                 io.adapter(redis());
     
-                if (this.networkConfig.caij) {
+                if (this.networkSite.caij) {
                     log('Network', "Starting CAIJ", 'lilium');
                     this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash", logname : "JNTOR"})
                     this.caijProc.on('message', this.broadcast.bind(this));
