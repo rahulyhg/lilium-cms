@@ -120,9 +120,11 @@ class GardenerCluster extends ProcessManager {
     
                 io.adapter(redis());
     
-                log('Network', "Starting CAIJ", 'lilium');
-                this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash", logname : "JNTOR"})
-                this.caijProc.on('message', this.broadcast.bind(this));
+                if (this.networkConfig.caij) {
+                    log('Network', "Starting CAIJ", 'lilium');
+                    this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash", logname : "JNTOR"})
+                    this.caijProc.on('message', this.broadcast.bind(this));
+                }
 
                 log('Network', 'Starting ' + lmlinstances + ' processes', 'lilium');
                 for (let i = 0; i < lmlinstances; i++) {
