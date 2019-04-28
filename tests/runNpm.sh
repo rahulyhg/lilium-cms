@@ -16,6 +16,10 @@ echo "> Creating test databases at liliumtest"
 mongo liliumtestdatabase --quiet --eval 'db.dropDatabase();'
 mongo liliumtestdatabase --quiet --eval "db.dropUser('liliumtest');"
 mongo liliumtestdatabase --quiet --eval "db.createUser({user: 'liliumtest', pwd: 'liliumtest', roles: ['readWrite']});"
+mongo liliumtestdatabase --quiet --eval "db.themes.insert({ uName : 'lilium-violet-theme', active : true });"
+
+echo "> Cloning Violet theme"
+cd ../flowers && git clone https://github.com/narcitymedia/lilium-violet-theme && cd ../tests
 
 echo "> Running tests from main.js"
 cd .. && node tests/app/main.js 
