@@ -19,39 +19,30 @@
  *                                                                                                       *
  *********************************************************************************************************/
 
-var db = require('../lib/db.js');
-
-var hooks = require('../lib/hooks');
+const hooks = require('../lib/hooks');
 const metrics = require('../lib/metrics');
+const RegisteredLiveVariables = {}; 
 
-var RegisteredLiveVariables = {}; 
-
-var LiveVariables = function() {
-    var preparePackage = function(cli) {
-        return {
-            livevars: cli.livevars
-        };
-    };
-
-    var createEndpoint = function(callback, rights) {
+class LiveVariables {
+    createEndpoint(callback, rights) {
         return {
             callback: callback,
             rights: rights || [] 
         };
     };
 
-    var secondLevelVars = function(cli, params, next) {
-        var keys = Object.keys(params);
-        var keyIndex = 0;
+    secondLevelVars(cli, params, next) {
+        const keys = Object.keys(params);
+        let keyIndex = 0;
 
-        var nextVar = function() {
+        const nextVar = () =>  {
             if (keys.length < keyIndex) {
-                var key = keys[keyIndex];
-                var levels = params[key].toString().split('.');
+                const key = keys[keyIndex];
+                const levels = params[key].toString().split('.');
                 keyIndex++;
 
                 if (typeof RegisteredLiveVariables[levels[0]] !== 'undefined') {
-                    RegisteredLiveVariables[levels[0]].callback(cli, levels, params, function(val) {
+                    RegisteredLiveVariables[levels[0]].callback(cli, levels, params, (val) =>  {
                         params[key] = val;
                         nextVar();
                     });
@@ -65,19 +56,19 @@ var LiveVariables = function() {
         nextVar();
     };
 
-    var handleOneVar = function(cli, varObj, assoc, response, next) {
-        var varName = varObj.varname;
-        var params = varObj.params;
-        var levels = varName.split('.');
-        var topLevel = levels.shift();
+    handleOneVar(cli, varObj, assoc, response, next) {
+        const varName = varObj.varname;
+        const params = varObj.params;
+        const levels = varName.split('.');
+        const topLevel = levels.shift();
 
-        secondLevelVars(cli, params, function(params) {
+        this.secondLevelVars(cli, params, (params) =>  {
             if (typeof RegisteredLiveVariables[topLevel] !== 'undefined') {
-                var entityLib = require('../lib/entities.js');
-                var entity = cli.userinfo;
+                const entityLib = require('../lib/entities.js');
+                const entity = cli.userinfo;
 
                 if (entityLib.isAllowed(entity, RegisteredLiveVariables[topLevel].rights)) {
-                    RegisteredLiveVariables[topLevel].callback(cli, levels, params, function(val) {
+                    RegisteredLiveVariables[topLevel].callback(cli, levels, params, (val) =>  {
                         assoc[varName] = val;
                         next(true);
                     });
@@ -100,17 +91,17 @@ var LiveVariables = function() {
         });
     };
 
-    var startLoop = function(cli, varNames, assoc, callback) {
-        var index = -1;
-        var max = varNames.length;
-        var now = new Date().getTime();
-        var response = {
+    startLoop(cli, varNames, assoc, callback) {
+        let index = -1;
+        let max = varNames.length;
+        let now = new Date().getTime();
+        const response = {
             code: 200,
             valid: true,
             message: "OK"
         };
 
-        var checkForCompletion = function() {
+        const checkForCompletion = () =>  {
             if (++index == max) {
                 response.timer = (new Date().getTime()) - now;
                 callback(response);
@@ -118,16 +109,12 @@ var LiveVariables = function() {
         };
 
         checkForCompletion();
-        for (var i = 0; i < max; i++) {
-            (function(i) {
-                setTimeout(function() {
-                    handleOneVar(cli, varNames[i], assoc, response, checkForCompletion);
-                }, 0);
-            })(i)
+        for (let i = 0; i < max; i++) {
+            this.handleOneVar(cli, varNames[i], assoc, response, checkForCompletion);
         }
     };
 
-    this.handleRequest = function(cli) {
+    handleRequest(cli) {
         metrics.plusDeep('endpointsreq', "livevar/" + cli.routeinfo.path[2]);
         hooks.fireSite(cli._c, 'livevar_handled', cli);
 
@@ -148,7 +135,7 @@ var LiveVariables = function() {
         } else {
             // LEGACY LIVE VARIABLE HANDLING LOGIC
             try {
-                var liveVars = JSON.parse(cli.routeinfo.params.vars);
+                const liveVars = JSON.parse(cli.routeinfo.params.vars);
                 cli.livevars = {};
 
                 try {
@@ -157,7 +144,7 @@ var LiveVariables = function() {
                     cli.details = {};
                 }
 
-                var callback = function(response) {
+                const callback = (response) =>  {
                     cli.sendJSON({
                         livevars: cli.livevars,
                         response: response
@@ -165,7 +152,7 @@ var LiveVariables = function() {
                 };
 
                 if (typeof liveVars === 'object') {
-                    startLoop(cli, liveVars, cli.livevars, callback);
+                    this.startLoop(cli, liveVars, cli.livevars, callback);
                 } else {
                     callback();
                 }
@@ -176,19 +163,17 @@ var LiveVariables = function() {
         }
     };
 
-    this.registerDebugEndpoint = function() {
+    registerDebugEndpoint() {
 
     };
 
-    // Function must follow format : function(client, levels, params, callback)
+    // Function must follow format : (client, levels, params, callback) => 
     // Callback must be called, and must contain an array
-    this.registerLiveVariable = function(endpoint, func, rights) {
-        rights = rights || new Array();
-
+    registerLiveVariable(endpoint, func, rights = []) {
         metrics.setDeep('endpointsreq', "livevar/" + endpoint, 0);
         log('LiveVariables', 'Registering livevar endpoint : ' + endpoint, 'info');
         if (!RegisteredLiveVariables[endpoint]) {
-            RegisteredLiveVariables[endpoint] = createEndpoint(func, rights);
+            RegisteredLiveVariables[endpoint] = this.createEndpoint(func, rights);
         } else {
             log('LiveVariables', new Error("[LiveVariables] Tried to register an already defined endpoint : " + endpoint));
         }
@@ -197,11 +182,11 @@ var LiveVariables = function() {
         return this;
     };
 
-    this.getAll = function() {
+    getAll() {
         return Object.freeze(RegisteredLiveVariables);
     };
 
-    this.init = function() {
+    init() {
         return this;
     };
 };

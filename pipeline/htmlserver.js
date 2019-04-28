@@ -1,13 +1,12 @@
 const filelogic = require('./filelogic');
 const fs = require('fs');
-var sharedcache = require("../lib/sharedcache.js");
-var styledpages = require('../lib/styledpages.js');
-var editions = require('../controllers/editions');
-var _conf = require('../lib/config');
-var articleLib = require('../lib/content.js');
-var ipevents = require('../lib/ipevents.js');
-var db = require('../lib/db');
-var noop = function() {};
+const sharedcache = require("../lib/sharedcache.js");
+const styledpages = require('../lib/styledpages.js');
+const editions = require('../controllers/editions');
+const _conf = require('../lib/config');
+const articleLib = require('../lib/content.js');
+const db = require('../lib/db');
+const noop = () => {};
 
 
 const MIMES = {
@@ -73,8 +72,8 @@ class HTMLServer {
 		cli.touch('htmlserver.serveStatic');
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
-        var filepath = cli._c.server.html + cli.routeinfo.relsitepath;
-        fs.stat(filepath, function(err, exists) {
+        const filepath = cli._c.server.html + cli.routeinfo.relsitepath;
+        fs.stat(filepath, (err, exists) => {
             if (!err) {
                 const stream = fs.createReadStream(filepath);
                 stream.on('error', () => { cli.throwHTTP(404, undefined, true); });
@@ -90,10 +89,10 @@ class HTMLServer {
 
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
-		var filename = cli._c.server.html + cli.routeinfo.relsitepath;
-		var htmlFile = filename + ".html";
+		let filename = cli._c.server.html + cli.routeinfo.relsitepath;
+		let htmlFile = filename + ".html";
 
-		fs.stat(htmlFile, function (err, fileExists){
+		fs.stat(htmlFile, (err, fileExists) =>{
 			if (!err) {
 				cli.routeinfo.isStatic = true;
                 fs.readFile(htmlFile, { encoding : 'utf8' }, (err, ctn) => {
@@ -101,7 +100,7 @@ class HTMLServer {
                     cli.sendHTML(ctn);
 				});
 			} else {
-				fs.stat(filename, function (err, fileExists){
+				fs.stat(filename, (err, fileExists) =>{
 					if (!err) {
 						// If html page requested from root
 						if (cli.routeinfo.path.length == 1 && cli.routeinfo.relsitepath.indexOf('.html') !== -1) {
@@ -113,20 +112,20 @@ class HTMLServer {
 							});
 						}
 					} else {
-                        styledpages.serveOrFallback(cli, function() {
+                        styledpages.serveOrFallback(cli, () => {
                             log('HTMLServer', "Styledpages fellback", 'details');
 
-                            editions.serveOrFallback(cli, function() {
+                            editions.serveOrFallback(cli, () => {
                                 log('HTMLServer', "Editions fellback", 'details');
 
-                                var name = cli.routeinfo.path[cli.routeinfo.path.length - 1];
-                                var pageIndex = -1;
+                                const name = cli.routeinfo.path[cli.routeinfo.path.length - 1];
+                                let pageIndex = -1;
                                 if (!isNaN(name)) {
                                     pageIndex = parseInt(name);
                                     name = cli.routeinfo.path[cli.routeinfo.path.length - 2];
                                 }
 
-                                articleLib.generateOrFallback(cli, name, function(success, redirection) {
+                                articleLib.generateOrFallback(cli, name, (success, redirection) => {
                                     if (success) {
                                         if (redirection) {
                                             log('HTMLServer', 'Article generated with redirection from cli', 'details');
@@ -143,24 +142,22 @@ class HTMLServer {
                                         that.botresponder.handle(cli);
                                     } else {
                                         log('HTMLServer', '404 => ' + cli._c.server.url + cli.routeinfo.fullpath + " from " + cli.ip + " with agent " + cli.request.headers["user-agent"], 'warn');
-                                        var cachekey = "404_html_" + cli._c.uid;
+                                        const cachekey = "404_html_" + cli._c.uid;
     
-                                        sharedcache.get(cachekey, function(html) {
+                                        sharedcache.get(cachekey, (html) => {
                                             if (html) {
                                                 cli.response.writeHead(404, {"content-type" : "text/html"});
                                                 cli.response.end(html);
                                             } else {
-                                                filelogic.renderThemeLML(cli, '404', '404.html', {}, function(content) {
+                                                filelogic.renderThemeLML(cli, '404', '404.html', {}, (content) => {
                                                     cli.response.writeHead(404, {"content-type" : "text/html"});
                                                     cli.response.end(content);
             
-                                                    var setobj = {};
+                                                    const setobj = {};
                                                     setobj[cachekey] = content;
                                                     sharedcache.set(setobj);
                                                 });
                                             }
-    
-                                            // ipevents.push(cli._c, cli.ip, 404, cli.request.url, {agent : cli.request.headers["user-agent"]});
                                         });
                                     }
                                 }, true, pageIndex)

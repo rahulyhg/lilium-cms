@@ -19,6 +19,7 @@ const ApiEndpoints = new EndpointMethods();
 const SESSION_COLLECTION = "apisessions";
 
 const s4 = () => Math.random().toString(16).substring(2);
+const noop = () => {};
 
 class LiliumAPI {
 	serveApi(cli) {
@@ -70,7 +71,7 @@ class LiliumAPI {
     pushInCache(key, value, done) {
         sharedcache.set({
             ["api_" + key] : value
-        }, done || function() {});
+        }, done || noop);
     };
 
     fetchFromCache(key, done) {

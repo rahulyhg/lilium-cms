@@ -228,8 +228,6 @@ class ClientObject {
 
     parseCookie  () {
         var cookieString = this.request.headers.cookie;
-        var that = this;
-
         if (cookieString) {
             cookieString.split(';').forEach(cookie => {
                 var keyVal = cookie.split('=');
@@ -242,13 +240,13 @@ class ClientObject {
                     return this.throwHTTP(400, 'That is one weird cookie.', true);
                 }
 
-                if (!that.cookies[keyName]) {
-                    that.cookies[keyName] = keyVal;
-                } else if (that.cookies[keyName] === 'object') {
-                    that.cookies[keyName].push(keyVal);
+                if (!this.cookies[keyName]) {
+                    this.cookies[keyName] = keyVal;
+                } else if (this.cookies[keyName] === 'object') {
+                    this.cookies[keyName].push(keyVal);
                 } else {
-                    var str = that.cookies[keyName];
-                    that.cookies[keyName] = [str, keyVal];
+                    var str = this.cookies[keyName];
+                    this.cookies[keyName] = [str, keyVal];
                 }
             });
         }
@@ -259,10 +257,9 @@ class ClientObject {
     };
 
     bindEnd (cb) {
-        var that = this;
-        this.response.on('finish', function() {
-            that.requestduration = new Date() - that.createdAt;
-            cb(that);
+        this.response.on('finish', () => {
+            this.requestduration = new Date() - this.createdAt;
+            cb(this);
         });
     };
 }

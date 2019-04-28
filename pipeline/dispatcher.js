@@ -1,14 +1,13 @@
-var Admin = require('../backend/admin.js');
-var HTMLServer = require('./htmlserver.js');
-var Endpoints = require('./endpoints.js');
-var LiveVars = require('./livevars.js');
-var entities = require('../lib/entities.js');
-var api = require('./api.js');
-var rewriter = require('./rewriter.js');
-var hooks = require('../lib/hooks');
+const Admin = require('../backend/admin.js');
+const HTMLServer = require('./htmlserver.js');
+const Endpoints = require('./endpoints.js');
+const LiveVars = require('./livevars.js');
+const entities = require('../lib/entities.js');
+const rewriter = require('./rewriter.js');
+const hooks = require('../lib/hooks');
 
-var Dispatcher = function () {
-    this.dispatch = function (cli) {
+class Dispatcher {
+    dispatch(cli) {
         cli.touch('dispatcher.dispatch');
         hooks.fire('request_dispatched', cli);
 
@@ -48,7 +47,7 @@ var Dispatcher = function () {
         }
     };
 
-    this.disput = function(cli) {
+    disput(cli) {
         cli.touch('dispatcher.disput');
         hooks.fire('request_dispatched', cli);
 
@@ -78,7 +77,7 @@ var Dispatcher = function () {
         }
     }
 
-    this.disdel = function(cli) {
+    disdel(cli) {
         cli.touch('dispatcher.disdel');
         hooks.fire('request_dispatched', cli);
 
@@ -108,7 +107,7 @@ var Dispatcher = function () {
         }
     }
 
-    this.dispost = function (cli) {
+    dispost(cli) {
         cli.touch("dispatcher.dispost");
         hooks.fire('request_dispatched', cli);
 

@@ -1,27 +1,22 @@
-var Router = require('./router.js');
-var Dispatcher = require('./dispatcher.js');
-var inspect = require('util').inspect;
-var Busboy = require('busboy');
-var config = require('../lib/config');
-var fs = require('fs');
+const Router = require('./router.js');
+const Dispatcher = require('./dispatcher.js');
+const inspect = require('util').inspect;
+const Busboy = require('busboy');
+const fs = require('fs');
 const filelogic = require('./filelogic');
-var htmlserver = require('./htmlserver.js');
-var db = require('../lib/db.js');
-var imageSize = require('image-size');
-var eventEmitter = new require('events').EventEmitter();
 const hooks = require('../lib/hooks');
 const mediaUpload = require('./mediaupload');
 
-var Handler = function () {
-    var GET = function (cli) {
+class Handler {
+    GET(cli) {
         cli.touch('handler.GET');
 
-        Router.parseClientObject(cli, function(loggedin) {
+        Router.parseClientObject(cli, (loggedin) => {
             Dispatcher.dispatch(cli);
         });
     };
 
-    var PUT = function(cli) {
+    PUT(cli) {
         cli.touch('handler.PUT');
 
         Router.parseClientObject(cli, loggedin => {
@@ -29,7 +24,7 @@ var Handler = function () {
         });
     }
 
-    var DEL = function(cli) {
+    DEL(cli) {
         cli.touch('handler.DEL');
 
         Router.parseClientObject(cli, loggedin => {
@@ -37,10 +32,10 @@ var Handler = function () {
         });
     }
 
-    var POST = function (cli) {
+    POST(cli) {
         cli.touch('handler.POST');
 
-        Router.parseClientObject(cli, function(loggedin) { 
+        Router.parseClientObject(cli, (loggedin) => { 
             if (cli._c.allowAnonymousPOST && !loggedin && !cli.routeinfo.login) {
                 // Do not read post data yet
                 Dispatcher.dispost(cli);
@@ -58,11 +53,11 @@ var Handler = function () {
                 if (req.headers["content-type"] == "application/json") {
                     var chunks = "";
 
-                    req.on('data', function(jsonchunk) {
+                    req.on('data', (jsonchunk) => {
                         chunks += jsonchunk;
                     });
 
-                    req.on('end', function() {
+                    req.on('end', () => {
                         try {
                             cli.postdata.data = JSON.parse(chunks);
                         } catch (ex) {
@@ -79,7 +74,7 @@ var Handler = function () {
                            headers: req.headers
                        });
                        // File upload
-                       busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+                       busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
                            if (!cli.hasRight('editor') && parseInt(cli.request.headers['content-length']) > parseInt(cli._c.server.fileMaxSize)) {
                                file.resume();
                                hasFile = false;
@@ -87,7 +82,7 @@ var Handler = function () {
                                return cli.throwHTTP(413, 'File is too large', true);
 
                            } else {
-                               if (mimeTypeIsSupported(mimetype, cli)) {
+                               if (this.mimeTypeIsSupported(mimetype, cli)) {
                                    hasFile = true;
            
                                    require('../media').getDirectoryForNew(cli._c, updir => {
@@ -99,7 +94,7 @@ var Handler = function () {
 
                                        file.pipe(fs.createWriteStream(saveTo));
 
-                                       file.on('end', function () {
+                                       file.on('end', () => {
                                            cli.postdata.data[fieldname] = name;
                                        });
                                    });
@@ -112,11 +107,11 @@ var Handler = function () {
             
                         });
             
-                        busboy.on('field', function (fieldname, val, fieldnameTruncated, valTruncated) {
-                            parsePOSTField(cli, fieldname, val);
+                        busboy.on('field', (fieldname, val, fieldnameTruncated, valTruncated) => {
+                            this.parsePOSTField(cli, fieldname, val);
                         });
             
-                        busboy.on('finish', function () {
+                        busboy.on('finish', () => {
                             if (!finishedCalled) {
                                 finishedCalled = true;
 
@@ -136,11 +131,11 @@ var Handler = function () {
             }
         });
     };
-    var mimeTypeIsSupported = function (mimetype, cli) {
-        return getMimeByMimeType(mimetype, cli) ? true : false;
+    mimeTypeIsSupported(mimetype, cli) {
+        return this.getMimeByMimeType(mimetype, cli) ? true : false;
     }
 
-    var getMimeByMimeType = function (mimeType, cli) {
+    getMimeByMimeType(mimeType, cli) {
         var mimes = cli._c.MIMES;
         for (var prop in mimes) {
             if (mimes.hasOwnProperty(prop)) {
@@ -150,7 +145,7 @@ var Handler = function () {
         }
     }
 
-    var parsePOSTField = function (cli, fieldname, val) {
+    parsePOSTField(cli, fieldname, val) {
         var isBool = false;
         if (val == "on") {
             val = true;
@@ -199,7 +194,7 @@ var Handler = function () {
         }
     };
 
-    var OPTIONS = function(cli) {
+    OPTIONS(cli) {
         if (!cli._c) {
             require('../lib/config').fetchConfigFromCli(cli);
         }
@@ -219,47 +214,47 @@ var Handler = function () {
         cli.response.end();
     };
 
-    var notSupported = function (cli) {
+    notSupported(cli) {
         cli.throwHTTP(405, 'Method Not Allowed : ' + cli.method, true);
     };
 
-    var parseMethod = function (cli) {
+    parseMethod(cli) {
         cli.touch('handler.parseMethod');
 
         switch (cli.method) {
-            case 'GET':     GET(cli); break;
-            case 'POST':    POST(cli); break;
-            case 'PUT':     PUT(cli);  break;
-            case 'DELETE' : DEL(cli); break;
-            case 'OPTIONS': OPTIONS(cli); break;
+            case 'GET':     this.GET(cli); break;
+            case 'POST':    this.POST(cli); break;
+            case 'PUT':     this.PUT(cli);  break;
+            case 'DELETE' : this.DEL(cli); break;
+            case 'OPTIONS': this.OPTIONS(cli); break;
 
-            default:        notSupported(cli);
+            default:        this.notSupported(cli);
         }
     };
 
-    var handleAPI = function(cli) {
+    handleAPI(cli) {
         Router.parseClientObject(cli, (loggedin) => {
             require('./api.js').serveApi(cli);
         });
     };
 
-    const handleMediaUpload = (cli) => {
+    handleMediaUpload(cli) {
         Router.parseClientObject(cli, (loggedin) => {
             mediaUpload.handleImageUpload(cli);
         });
     };
 
-    this.handle = function (cli) {
+    handle(cli) {
         cli.touch('handler.handle');
 
         hooks.fire('request_handled', cli);
         try {
             if (cli.request.url.startsWith('/admin/mediaUpload') && cli.method == 'POST') {
-                handleMediaUpload(cli);
+                this.handleMediaUpload(cli);
             } else if (cli.request.url.startsWith('/api') /*&& cli.method == "OPTIONS"*/) {
-                handleAPI(cli);
+                this.handleAPI(cli);
             } else {
-                parseMethod(cli);
+                this.parseMethod(cli);
             }
         } catch (err) {
             log('Handler', 'Handler could not fulfill request', 'err');
