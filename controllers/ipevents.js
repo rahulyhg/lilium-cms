@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 
-class IPEvents {
+class IPEvents extends Controller {
     livevar(cli, levels, params, send) {
         switch (levels[0]) {
             case "top":

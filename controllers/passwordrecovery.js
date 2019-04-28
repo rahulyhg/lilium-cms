@@ -1,9 +1,10 @@
+const Controller = require('../base/controller');
 const path = require('path');
 const LML3 = require('../lml3/compiler');
 const sharedcache = require('../lib/sharedcache');
 const plib = require('../lib/passwordrecovery');
 
-class PasswordRecovery {
+class PasswordRecovery extends Controller {
     GET(cli) {
         const maybeusername = cli.routeinfo.path[1];
         if (maybeusername) {
@@ -44,10 +45,6 @@ class PasswordRecovery {
                 cli.sendHTML(markup);
             });
         }
-    }
-
-    POST(cli) {
-
     }
 }
 

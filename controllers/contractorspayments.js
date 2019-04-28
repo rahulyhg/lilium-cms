@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const filelogic = require('../pipeline/filelogic');
 const db = require('../lib/db');
 const _c = require('../lib/config');
@@ -21,7 +22,7 @@ const STATUSES = {
     reviewing : "Pending review"
 };
 
-class ContractorHandler {
+class ContractorHandler extends Controller {
     GET(cli) {
         if (!cli.isLoggedIn) {
             cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");

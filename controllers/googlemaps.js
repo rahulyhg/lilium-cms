@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const googleMapsClient = require('@google/maps');
 const xxh = require('xxhashjs')
 const db = require('../lib/db.js');
@@ -7,11 +8,7 @@ const cacheServer = require('../lib/sharedcache');
 const GM_CACHE_COLLECTION = 'googleplacescache';
 const GM_CACHE_PREFIX = 'gm_query_autocomplete';
 
-class GoogleMapsController {
-    constructor() {
-        this.googleClient = undefined;
-    }
-
+class GoogleMapsController extends Controller {
     livevar(cli, levels, params, sendback) {
         if (this.googleClient) {
             if (levels[0] == 'autocompletequery') {

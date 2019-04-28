@@ -1,9 +1,10 @@
+const Controller = require('../base/controller');
 const config = require('../lib/config');
 const db = require('../lib/db');
 const filelogic = require('../pipeline/filelogic');
 const slib = require('../lib/sites');
 
-class SiteController {
+class SiteController extends Controller {
     livevar(cli, levels, params, cb) {
         var len = levels.length;
         if (len > 0 && levels[0] == 'all') {

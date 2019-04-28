@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const vocab = require('../lib/vocab');
 
-class Translations {
+class Translations extends Controller {
     livevar(cli, levels, params, sendback) {
         if (levels[0] == 'getSupportedLanguages') {
             sendback(vocab.getSupportedLanguages());

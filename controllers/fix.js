@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const config = require('../lib/config');
@@ -8,7 +9,7 @@ const PRIORITIES = fixlib.PRIORITIES;
 const MODULES = fixlib.MODULES;
 const TYPES = fixlib.TYPES;
 
-class Fix {
+class Fix extends Controller {
     livevar(cli, levels, params, send) {
         if (levels[0] == "all") {
             db.findToArray(config.default(), 'fix', {type : "issue", status : {$ne : "closed"}}, (err, issues) => {

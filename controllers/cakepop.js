@@ -27,6 +27,7 @@
  *
  *************************************************************************************************************************/
 
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const config = require('../lib/config');
@@ -34,7 +35,7 @@ const hooks = require('../lib/hooks');
 
 const CAKEPOP_COLLECTION = "cakepops";
 
-class Cakepop {
+class Cakepop extends Controller {
     adminGET(cli) {
         if (cli.routeinfo.path[2] == "edit") {
             filelogic.serveAdminLML3(cli, true);

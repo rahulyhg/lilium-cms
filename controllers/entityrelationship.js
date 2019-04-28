@@ -1,8 +1,9 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const EntityRelationship = require('../lib/entityrelationship');
 
-class ERModule {
+class ERModule extends Controller {
     adminGET(cli) {
         if (!cli.hasRight('entityrelationship')) {
             return cli.throwHTTP(403);

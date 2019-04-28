@@ -1,10 +1,11 @@
+const Controller = require('../base/controller');
 const themelib = require('../lib/themes');
 const fs = require('fs');
 const _c = require('../lib/config');
 const db = require('../lib/db');
 const pathLib = require('path');
 
-class ThemeControllers {
+class ThemeControllers extends Controller {
     adminPOST(cli) {
         if (cli.hasRightOrRefuse("manage-themes")) {
             if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {

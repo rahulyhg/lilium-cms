@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const fs = require('fs');
 const request = require('request');
 const pathlib = require('path');
@@ -6,7 +7,7 @@ const dateformat = require('dateformat');
 const db = require('../lib/db.js');
 const embedlib = require('../lib/embed');
 
-class EmbedController {
+class EmbedController extends Controller {
     livevar(cli, levels, params, sendback) {
         const action = levels[0];
         const network = levels[1];

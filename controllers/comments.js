@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 
 const LIVEVAR_COMMENT_BATCHSIZE = 50;
@@ -47,7 +48,7 @@ const THREAD_WITH_REPLIES_PROJECTION = {
     commenters : 1
 }
 
-class LiliumComments {
+class LiliumComments extends Controller {
     adminPOST(cli) {
         
     }  

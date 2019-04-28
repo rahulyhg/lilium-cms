@@ -1,8 +1,9 @@
+const Controller = require('../base/controller');
 const Session = require('../lib/session');
 const db = require('../lib/db');
 const _c = require('../lib/config');
 
-class SessionController {
+class SessionController extends Controller {
     livevar(cli, levels, params, callback) {
         const _id = db.mongoID(cli.userinfo.userid);
         if (_id) {

@@ -1,9 +1,10 @@
+const Controller = require('../base/controller');
 const configLib = require('../lib/config');
 const db = require('../lib/db');
 
 const { terminate, restore, update, getSimple, getFull } = require('../lib/staffing');
 
-class Staffing {
+class Staffing extends Controller {
     adminDELETE(cli) {
         if (!cli.hasRight('manage-staff')) {
             return cli.throwHTTP(401, undefined, true);
@@ -16,10 +17,6 @@ class Staffing {
         } else {
             cli.throwHTTP(404, undefined, true);
         }
-    }
-
-    adminPOST(cli) {
-
     }
 
     adminPUT(cli) {

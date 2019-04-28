@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 
 const LIVEVAR_POSTER_LOOKUP = {
@@ -33,19 +34,7 @@ const LIVEVAR_PROJECT = {
     "article.date"          : 1
 }
 
-class Flagging {
-    POST(cli) {
-        
-    }
-
-    adminPOST(cli) {
-        
-    }
-
-    adminPUT(cli) {
-
-    }
-
+class Flagging extends Controller {
     adminDELETE(cli) {
         if (cli.routeinfo.path[2] == "close") {
             if (!cli.routeinfo.path[3]) {

@@ -1,9 +1,10 @@
+const Controller = require('../base/controller');
 const pluginsLib = require('../lib/plugins');
 const _c = require('../lib/config');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 
-class PluginsController {
+class PluginsController extends Controller {
     adminGET(cli) {
         cli.touch("plugins.serveAdminList");
         if (!cli.hasRightOrRefuse("site-admin")) {return;} 

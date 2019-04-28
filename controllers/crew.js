@@ -1,9 +1,10 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const config = require('../lib/config');
 const crewlib = require('../lib/crew');
 
-class CrewControllers {
+class CrewControllers extends Controller {
     adminGET(cli) {
         let action = cli.routeinfo.path[2];
         let extra = {

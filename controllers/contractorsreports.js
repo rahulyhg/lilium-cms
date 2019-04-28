@@ -1,21 +1,10 @@
+const Controller = require('../base/controller');
 const ContractorReport = require('../lib/contractorsreports');
 const db = require('../lib/db');
 
 const REPORT_PRESET_COLLECTION = "ctorreppresets";
 
-class ContractorReportController {
-    adminPOST(cli) {
-
-    }
-
-    adminPUT(cli) {
-
-    }
-
-    adminDELETE(cli) {
-
-    }
-
+class ContractorReportController extends Controller {
     livevar(cli, levels, params, sendback) {
         if (cli.hasRight('generate-reports') && cli.hasRight('manage-contractors')) {
             if (levels[0] == "generate") {

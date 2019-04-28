@@ -1,7 +1,8 @@
+const Controller = require('../base/controller');
 const CSSBuilder = require('../make/cssbuilder');
 const pathLib = require('path');
 
-class CSSBuilderController {
+class CSSBuilderController extends Controller {
     adminPOST(cli) {
         if (cli.hasRightOrRefuse('lilium')) {
             if (cli.routeinfo.path[2] == "lilium") {

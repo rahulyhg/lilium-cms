@@ -1,7 +1,8 @@
+const Controller = require('../base/controller');
 var db = require('../lib/db.js');
 const _c = require('../lib/config');
 
-class Preferences {
+class Preferences extends Controller {
     adminPOST(cli) {
         cli.touch('Preferences.adminPOST');
         if (cli.routeinfo.path[2] == 'updatePreference') {

@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const blib = require('../lib/badges');
 const db = require('../lib/db');
 const config = require('../lib/config');
@@ -5,7 +6,7 @@ const hooks = require('../lib/hooks');
 
 const DEFAULT_HOOKS_PRIO = 10000;
 
-class BadgesController {
+class BadgesController extends Controller {
     adminGET(cli) {
         let action = cli.routeinfo.path[2];
         switch (action) {

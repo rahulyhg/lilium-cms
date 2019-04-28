@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const filelogic = require('../pipeline/filelogic');
 const conf = require('../lib/config');
 const db = require('../lib/db.js');
@@ -5,7 +6,7 @@ const mongo = require('mongodb');
 
 const rlib = require('../lib/role');
 
-class RoleController {
+class RoleController extends Controller {
     adminPOST(cli) {
         if (!cli.hasRight('edit-roles')) {
             cli.refuse();

@@ -1,11 +1,8 @@
+const Controller = require('../base/controller');
 const fs = require('fs');
 const pathLib = require('path');
 
-class Settings {
-    adminGET (cli) {
-        return;
-    };
-
+class Settings extends Controller {
     adminPOST(cli) {
         cli.touch('settings.handlePOST');
         if (cli.hasRight('admin')) {
@@ -34,10 +31,6 @@ class Settings {
         } else {
             cli.throwHTTP(403, 'Unauthorized');
         }
-    };
-
-    form() {
-
     };
 
     livevar(cli, levels, params, callback) {

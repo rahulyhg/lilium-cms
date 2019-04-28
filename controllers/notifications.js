@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 
-class NotificationController {
+class NotificationController extends Controller {
     adminPOST(cli) {
         switch (cli.routeinfo.path[2]) {
             case "seeall" : {

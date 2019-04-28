@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const networkinfo = require('../network/info.js');
@@ -5,7 +6,7 @@ const hooks = require('../lib/hooks');
 
 const splib = require('../lib/styledpages');
 
-class StyledPages {
+class StyledPages extends Controller {
     apiGET(cli) {
         db.findUnique(cli._c, 'styledpages', { slug : cli.routeinfo.path[2], status : "public" }, (err, page) => {
             page ? cli.sendJSON({

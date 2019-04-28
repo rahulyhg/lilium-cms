@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const articleLib = require('../lib/content.js');
@@ -22,7 +23,7 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     'articles.date': 1
 };
 
-class ContentChains {
+class ContentChains extends Controller {
     livevar(cli, levels, params, sendback) {
         if (!cli.hasRight('editor')) {
             return sendback();

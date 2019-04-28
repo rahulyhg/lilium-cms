@@ -1,10 +1,11 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 const dateformat = require('dateformat');
 const tdllib = require('../lib/thedailylilium');
 
 const SERVER_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
 
-class TheDailyLilium {
+class TheDailyLilium extends Controller {
     adminPOST(cli) {
         const action = cli.routeinfo.path[2];
         const _id = db.mongoID(cli.routeinfo.path[3]);

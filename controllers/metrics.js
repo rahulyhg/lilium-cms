@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const metricslib = require('../lib/metrics');
 
-class Metrics {
+class Metrics extends Controller {
     livevar(cli, levels, params, sendback) {
         if (!cli.hasRight('admin')) {
             return cli.refuse();

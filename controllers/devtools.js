@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 var Admin = require('../backend/admin.js');
 const filelogic = require('../pipeline/filelogic');
 var lml = require('../lml/lml.js');
@@ -7,7 +8,7 @@ var configs = require('../lib/config');
 var fs = require('fs');
 var db = require('../lib/db.js');
 
-class DevTools {
+class DevTools extends Controller {
     adminGET (cli) {
         if (!cli.hasRightOrRefuse("develop")) {return;} 
 

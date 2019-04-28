@@ -1,7 +1,8 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 const darkskylib = require('../lib/darksky');
 
-class Darksky {
+class Darksky extends Controller {
     setup() {
         darkskylib.loadKey();
     }

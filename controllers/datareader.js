@@ -1,10 +1,11 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db')
 const filelogic = require('../pipeline/filelogic');
 const ReportGenerator = require('../lib/datareader');
 
 const DR_COLLECTION = "datareaderreports";
 
-class DataReader { 
+class DataReader extends Controller { 
     adminGET(cli) {
         const path = cli.routeinfo.path[2];
         if (!path) {

@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 const { updatePostsAfterMerge, fieldToRef, getFull } = require('../lib/editions');
 const themelib = require('../lib/themes');
@@ -6,7 +7,7 @@ const hooks = require('../lib/hooks');
 const EDITION_COLLECTION = "editions";
 const SECTION_COLLECTION = "sections";
 
-class EditionController {
+class EditionController extends Controller {
     adminPOST(cli) {
         if (!cli.hasRight('manage-editions')) {
             return cli.refuse();

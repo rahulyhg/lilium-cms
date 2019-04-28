@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const configlib = require('../lib/config');
 const db = require('../lib/db');
 const xxh = require('xxhashjs')
@@ -24,7 +25,7 @@ const AUDIENCES_COLLECTION = 'audiences';
 // { 'hashed_params': <Audience Object> }
 let CACHED_RESPONSES = {};
 
-class LiliumAudiences {
+class LiliumAudiences extends Controller {
     GET(cli) {
         const cultureString = cli.routeinfo.params.culture;
         if (cultureString) {

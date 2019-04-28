@@ -1,7 +1,8 @@
+const Controller = require('../base/controller');
 const AMPlib = require('../lib/amp');
 const articleLib = require('../lib/content.js');
 
-class AMPController {
+class AMPController extends Controller {
     GET(cli) {
         // Contains the article name from the URL
         let articleName = cli.routeinfo.path[cli.routeinfo.path.length - 1];

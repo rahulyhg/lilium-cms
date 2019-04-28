@@ -1,7 +1,10 @@
+const Controller = require('../base/controller');
 const CC = require('../lib/creditcards');
 
-class CreditCardController {
+class CreditCardController extends Controller {
     constructor() {
+        super();
+
         this.ccManager = require('../lib/creditcards');
     }
 

@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const galib = require('../lib/analytics');
 const sharedcache = require('../lib/sharedcache.js');
 const builder = require('../make/build');
@@ -6,7 +7,7 @@ const db = require('../lib/db');
 const GoogleAnalyticsRequest = galib.GoogleAnalyticsRequest;
 const StatsBeautifier = galib.StatsBeautifier;
 
-class GoogleAnalyticsController {
+class GoogleAnalyticsController extends Controller {
     setup() {
         log('Analytics', "Analytics controller setup");
 
@@ -145,7 +146,7 @@ class GoogleAnalyticsController {
             switch (action) {
                 case undefined:
                 case "":
-                    require('../lml3/compiler').compile(cli._c, liliumroot + '/backend/dynamic/analytics.lml3', {}, markup => {
+                    require('../lml3/compiler').compile(cli._c, liliumroot + '/apps/networkboard/index.lml3', {}, markup => {
                         cli.sendHTML(markup);
                     });
                     break;

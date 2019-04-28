@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const crypto = require('crypto');
 const _c =require('../lib/config');
 const db = require('../lib/db');
@@ -16,8 +17,10 @@ const PwManager = require('../lib/pwmanager');
  *      DELETE /categories/{categoryId}
  *      DELETE /passwords/{passwordId}
  */
-class PwManagerController {
+class PwManagerController extends Controller {
     constructor() {            
+        super();
+
         this.PwManager = new PwManager({
             algorithm: 'aes256',
             key: _c.default().signature.privatehash.substring(0, 32),

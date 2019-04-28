@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const fs = require('fs');
 const path = require('path');
 var _c = configs = require('../lib/config');
@@ -30,7 +31,7 @@ const ME_PROJECTION = {
     username : 1, currency: 1
 };
 
-class Entities {
+class Entities extends Controller {
     adminGET  (cli) {
         cli.touch('entities.handleGET');
         if (!cli.hasRightOrRefuse("list-entities")) {return;}

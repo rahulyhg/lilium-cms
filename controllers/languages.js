@@ -1,9 +1,10 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 
 const SL_COLLECTION = 'supportedlanguages';
 const ALL_LANGUAGES = require('../lists/languages');
 
-class LiliumLanguages {
+class LiliumLanguages extends Controller {
     adminPOST(cli) {
         const lang = ALL_LANGUAGES.find(x => x.isocode == cli.routeinfo.path[2]);
 

@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 
-class AdsController {
+class AdsController extends Controller {
     adminPOST(cli) {
         if (!cli.hasRight('admin')) {
             return cli.throwHTTP(403);

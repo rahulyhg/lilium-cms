@@ -1,10 +1,11 @@
+const Controller = require('../base/controller');
 const twofalib = require('../lib/twoFactor');
 const configlib = require('../lib/config');
 const qrcode = require('qrcode');
 const base32Encode = require('base32-encode');
 const optlib = require('otplib');
 
-class twoFactor {
+class twoFactor extends Controller {
     adminPOST(cli) {
         cli.touch("twoFactor.adminPOST");
         if (cli.postdata.data.token2fa) {

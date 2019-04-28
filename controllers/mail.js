@@ -1,8 +1,9 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const filelogic = require('../pipeline/filelogic');
 const LMLMail = require('../lib/mail');
 
-class MailController {
+class MailController extends Controller {
     livevar(cli, levels, params, sendback) {
         if (cli.hasRight('edit-emails')) {
             if (levels[0] == "search") {

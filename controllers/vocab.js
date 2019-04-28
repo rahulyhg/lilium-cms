@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const vocablib = require('../lib/vocab');
 
-class VocabController {
+class VocabController extends Controller {
     adminPOST(cli) {
         if (cli.routeinfo.path[2] == "builddico" && cli.hasRight('admin')) {
             vocablib.preloadDicos(err => {

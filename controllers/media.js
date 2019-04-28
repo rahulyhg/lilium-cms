@@ -1,10 +1,11 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db.js');
 const mongo = require('mongodb');
 const livevars = require('../pipeline/livevars');
 
 const mlib = require('../lib/media');
 
-class MediaController {
+class MediaController extends Controller {
     adminPOST(cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {

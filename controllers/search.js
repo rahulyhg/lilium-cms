@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const slib = require('../lib/search');
 
-class ContentSearch {
+class ContentSearch extends Controller {
     livevar(cli, levels, params, send) {
         if (levels[0] == "dashboard") {
             slib.generateReport({

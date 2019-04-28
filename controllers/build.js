@@ -1,6 +1,7 @@
+const Controller = require('../base/controller');
 const builder = require('../make/build');
 
-class BuildController {
+class BuildController extends Controller {
     adminPOST(cli) {
         if (cli.hasRightOrRefuse('lilium')) {
             if (cli.routeinfo.path[2] == "lilium") {

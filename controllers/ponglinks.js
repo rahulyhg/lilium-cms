@@ -1,3 +1,4 @@
+const Controller = require('../base/controller');
 const db = require('../lib/db');
 const sharedcache = require('../lib/sharedcache');
 const isElder = require('../network/info').isElderChild();
@@ -9,7 +10,7 @@ const ALLOWED_EDIT_FIELDS = [
 
 const plib = require('../lib/ponglinks');
 
-class PongLinks {
+class PongLinks extends Controller {
     adminGET(cli) {
         if (!cli.hasRight('ponglinks')) {
             return cli.refuse();
