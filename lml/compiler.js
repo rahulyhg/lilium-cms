@@ -2,7 +2,7 @@ const Stream = require("stream");
 
 const configs = require('../lib/config');
 const lmllib = require('./lmllib.js');
-const filelogic = require('../pipeline/filelogic');
+const fs = require('fs');
 const CDN = require('../lib/cdn.js');
 const opChar = '{';
 const clChar = '}';
@@ -531,7 +531,7 @@ class LMLTagParser {
                 fullpath = ctx.extra.rootDir + "/" + petalname + ".petal";
 
                 if (toCompile) {
-                    filelogic.readFile(fullpath, (ctn) => {
+                    fs.readFile(fullpath, { encoding : 'utf8' }, (err, ctn) => {
                         if (typeof ctn == "undefined") {
                             ctx.readable.push(new Error("[LMLPetalExceltion] Undefined content for file " + fullpath).toString());
                             return nextPetal();
@@ -544,7 +544,7 @@ class LMLTagParser {
                         }) 
                     }, false, 'utf8');
                 } else {
-                    filelogic.readFile(fullpath, (ctn) => {
+                    fs.readFile(fullpath, { encoding : 'utf8' }, (err, ctn) => {
                         ctx.readable.push(
                             typeof ctn == "undefined" ? 
                                 new Error("[LMLPetalException] Undefined content for file " + fullpath) : 
@@ -777,21 +777,17 @@ class LMLCompiler {
 
     compileToFile(lmlfile, savepath, cb, extra) {
         let that = this;
-        filelogic.readFile(lmlfile, (content = "") => {
+        fs.readFile(lmlfile, { encoding : 'utf8' }, (err, content = "") => {
             extra = extra || {};
             extra.rootDir = lmlfile.substring(0, lmlfile.lastIndexOf('/'));
 
-            filelogic.createDirIfNotExists(savepath, () => {
-                const stream = filelogic.getOutputFileHandle(savepath, 'w+');
+            fs.mkdir(savepath, { recursive : true }, () => {
+                const stream = fs.createWriteStream(savepath, { flags : 'w+' });
                 log('LML2', 'Compiling file ' + lmlfile, 'info');
                 let now = new Date();
                 that.compile(extra.config.id, content, stream, extra, () => {
                     log('LML2', 'Compiled file to ' + savepath + " in " + (new Date - now) + "ms", "success");
-                    if (extra.minify) {
-                        filelogic.minifyHTML(savepath, cb);
-                    } else {
-                        cb && cb();
-                    }
+                    cb && cb();
                 });
             });
         });

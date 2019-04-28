@@ -1,4 +1,5 @@
 const filelogic = require('./filelogic');
+const fs = require('fs');
 var sharedcache = require("../lib/sharedcache.js");
 var styledpages = require('../lib/styledpages.js');
 var editions = require('../controllers/editions');
@@ -73,9 +74,11 @@ class HTMLServer {
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
         var filepath = cli._c.server.html + cli.routeinfo.relsitepath;
-        filelogic.fileExists(filepath, function(exists) {
-            if (exists) {
-                filelogic.pipeFileToClient(cli, filepath, noop);
+        fs.stat(filepath, function(err, exists) {
+            if (!err) {
+                const stream = fs.createReadStream(filepath);
+                stream.on('error', () => { cli.throwHTTP(404, undefined, true); });
+                stream.pipe(cli.response);
             } else {
                 cli.throwHTTP(404, 'Not found', true);
             }
@@ -90,20 +93,22 @@ class HTMLServer {
 		var filename = cli._c.server.html + cli.routeinfo.relsitepath;
 		var htmlFile = filename + ".html";
 
-		filelogic.fileExists(htmlFile, function (fileExists){
-			if (fileExists) {
+		fs.stat(htmlFile, function (err, fileExists){
+			if (!err) {
 				cli.routeinfo.isStatic = true;
-				filelogic.pipeFileToClient(cli, htmlFile, function() {
+                fs.readFile(htmlFile, { encoding : 'utf8' }, (err, ctn) => {
 					cli.touch('htmlserver.serveClient.callback');
+                    cli.sendHTML(ctn);
 				});
 			} else {
-				filelogic.fileExists(filename, function (fileExists){
-					if (fileExists) {
+				fs.stat(filename, function (err, fileExists){
+					if (!err) {
 						// If html page requested from root
 						if (cli.routeinfo.path.length == 1 && cli.routeinfo.relsitepath.indexOf('.html') !== -1) {
 							cli.redirect(cli._c.server.url + cli.routeinfo.fullpath.slice(-5), true);
 						} else {
-							filelogic.pipeFileToClient(cli, filename, function (){
+                            fs.readFile(filename, { encoding : 'utf8' }, (err, ctn) => {
+                                cli.response.end(ctn);
 								cli.touch('htmlserver.serveClient.callback');
 							});
 						}
@@ -129,7 +134,8 @@ class HTMLServer {
                                         } else {
                                             log('HTMLServer', 'Article generated from cli', 'details');
                                             cli.routeinfo.isStatic = true;
-                                            filelogic.pipeFileToClient(cli, filename + '.html', function () {
+                                            fs.readFile(filename + '.html', { encoding : 'utf8' }, (err, markup) => {
+                                                cli.sendHTML(markup);
                                                 cli.touch('htmlserver.serveClient.callback');
                                             });
                                         }

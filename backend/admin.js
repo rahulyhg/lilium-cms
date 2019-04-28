@@ -8,6 +8,7 @@ const AdminEndpoints = {
 const AdminMenus = [];
 
 const filelogic = require('../pipeline/filelogic');
+const fs = require('fs');
 const LML2 = require('../lml/compiler.js');
 const LML3 = require('../lml3/compiler');
 const hooks = require('../lib/hooks');
@@ -47,12 +48,9 @@ class Admin {
             LML2.compileToFile(cli._c.server.base + "/backend/dynamic/admin/welcome.lml",
                 cli._c.server.html + "/static/tmp/welcome.html",
                 () => {
-                    require('../filelogic.js').pipeFileToClient(
-                        cli, 
-                        cli._c.server.html + "/static/tmp/welcome.html", 
-                        function() {}, 
-                        true
-                    );
+                    fs.readFile(cli._c.server.html + "/static/tmp/welcome.html", { encoding : 'utf8' }, (err, markup) => {
+                        err ? cli.throwHTTP(404, undefined, true) : cli.sendHTML(markup);
+                    });
                 }, {
                     config : cli._c
                 }
@@ -76,7 +74,7 @@ class Admin {
 			this.executeEndpoint(cli);
 		} else {
             cli.did('request', '404', {url : cli.routeinfo.fullpath});
-            filelogic.serveErrorPage(cli, '404');
+            cli.throwHTTP(404, undefined, true);
 		}
 	};
 

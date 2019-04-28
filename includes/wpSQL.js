@@ -413,7 +413,7 @@ var ftPosts = function(siteid, mysqldb, done) {
 var ftUploads = function(siteid, mysqldb, done) {
     var Media = require('../media.js');
     var cconf = require('../lib/config').fetchConfig(siteid);
-    const fu = require('./pipeline/filelogic');
+    const fu = require('../pipeline/filelogic');
 
     var oUrl = cconf.wordpress.originalurl;
     if (oUrl.charAt(oUrl.length-1) == "/") {

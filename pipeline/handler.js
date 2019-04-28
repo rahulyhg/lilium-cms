@@ -92,7 +92,7 @@ var Handler = function () {
            
                                    require('../media').getDirectoryForNew(cli._c, updir => {
                                        var mime = getMimeByMimeType(mimetype, cli);
-                                       //Gen random name
+                                       // Gen random name
                                        filename = filelogic.genRandomNameFile(filename);
                                        var saveTo = updir + filename + mime;
                                        var name = filename + mime;

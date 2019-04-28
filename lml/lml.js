@@ -20,7 +20,7 @@
  *********************************************************************************************************/
 
 var LMLContext = require('./lmlcontext.js');
-const filelogic = require('../pipeline/filelogic');
+const fs = require('fs');
 var _c = require('../lib/config');
 
 var LML = function () {
@@ -152,7 +152,7 @@ var LML = function () {
                 } else {
                     var fullpath = LMLSlang.pulloutVar(context, fullpath.substring(1));
 
-                    filelogic.readFile(fullpath, function (fContent) {
+                    fs.readFile(fullpath, { encoding : 'utf8' }, function (fContent) {
                         context.w(fContent || ("[LMLIncludeException] File not found : " + fullpath));
                         currentIndex++;
                         next();
@@ -790,7 +790,7 @@ var LML = function () {
 
         if (typeof context === 'undefined') {
             context = new LMLContext();
-            context.rootDir = filelogic.dirname(rootpath);
+            context.rootDir = require('path').dirname(rootpath);
             context.config = extra.config;
             context.theme = extra.theme;
             context.setStream(outputstream);
@@ -837,9 +837,9 @@ var LML = function () {
     };
 
     this.executeToContext = function (rootpath, context, callback) {
-        filelogic.fileExists(rootpath, function (exists) {
-            if (exists) {
-                filelogic.readFile(rootpath, function (content) {
+        fs.stat(rootpath, (err, exists) => {
+            if (!err) {
+                fs.readFile(rootpath, { encoding : 'utf8' }, function (err, content) {
                     that.parseContent(rootpath, content, callback, context);
                 }, false, 'utf8');
             } else {
@@ -878,7 +878,7 @@ var LML = function () {
             }   
         })();
 
-        filelogic.readFile(rootpath, function (content) {
+        fs.readFile(rootpath, { encoding : 'utf8' }, function (err, content) {
             var verifyEnd = function () {
                 log('LML', 'Compiled File : ' + rootpath + ' in ' + (new Date() - timeStamp) + 'ms', 'success');
                 callback(buffer._c);
@@ -893,26 +893,23 @@ var LML = function () {
 
         var timeStamp = new Date();
         // TODO create a temp file first
-        filelogic.createDirIfNotExists(compilepath, function (dirExists) {
+        fs.mkdir(compilepath, { recursive : true }, function (dirExists) {
             if (!dirExists) throw new Error("LMLAccessException - Could not create directory for " + compilepath);
 
-            filelogic.readFile(rootpath, function (content) {
-                var fileHandle = filelogic.getOutputFileHandle(compilepath, 'w+', 'utf8');
+            fs.readFile(rootpath, { encoding : 'utf8' }, function (err, content) {
+                var fileHandle = fs.createWriteStream(compilepath, { flags : 'w+', encoding : 'utf8'});
                 var context = that.parseContent(rootpath, content, function(context) {
                     context.flagEnd();
                 }, undefined, extra, false, fileHandle);
 
                 context.bindFinished(function (context) {
-                    filelogic.closeFileHandle(fileHandle);
+                    fileHandle.close();
+                    fileHandle.destroy();
 
                     log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms', 'success');
 
                     var willMinify = !extra || extra.minify;
-                    if (willMinify) {
-                        filelogic.minifyHTML(compilepath, callback);
-                    } else {
-                        callback();
-                    }
+                    callback();
                 });
 
             }, false, 'utf8');

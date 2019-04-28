@@ -1,4 +1,5 @@
 const hooks = require('./lib/hooks');
+const fs = require('fs');
 const db = require('./lib/db.js');
 const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./lib/v4');
@@ -367,7 +368,6 @@ const prepareDefaultSiteCreation = (cb) => {
 const validateNetworkSite = () => {
     try {
         const dconf = require('./sites/default');
-        // TODO : More network site validation
     } catch (err) {
         log('Core', "[FATAL] Error in network site config : " + err, 'err');
         return false;
@@ -380,13 +380,12 @@ const loadWebsites = (loadEverything) => {
     sites = require('./lib/sites.js');
 
     const currentRoot = __dirname;
-    const fss = require('./pipeline/filelogic');
 
     log('Core', 'Reading sites directory', 'info');
-    fss.dirExists(currentRoot + "/sites", (exists) => {
-        if (exists) {
-            fss.fileExists(currentRoot + "/sites/default.json", (exists) => {
-                if (exists && validateNetworkSite()) {
+    fs.stat(currentRoot + "/sites", (err, exists) => {
+        if (!err) {
+            fs.stat(currentRoot + "/sites/default.json", (err, exists) => {
+                if (!err && validateNetworkSite()) {
                     sites.loadSites(loadEverything);
                 } else {
                     prepareDefaultSiteCreation(loadEverything);

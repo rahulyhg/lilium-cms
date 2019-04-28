@@ -1,5 +1,5 @@
 var lmllib = require('./lmllib.js');
-const filelogic = require('../pipeline/filelogic');
+const fs = require('fs');
 
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot
@@ -130,8 +130,9 @@ LMLContext.prototype.write = LMLContext.prototype.w = function(str) {
     this.linesToWrite++;
 
     if (str && str.length !== 0) {
-        var that = this;
-        filelogic.writeToFile(this.outputstream, str.toString(), function() {that.lineWritten(false)}, 'utf8');
+        this.outputstream.write(str.toString(), 'utf8', () => {
+            this.lineWritten(false);
+        });
     } else {
         this.lineWritten(false);
     }

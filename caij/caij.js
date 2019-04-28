@@ -1,6 +1,6 @@
 const net = require('net');
 
-const filelogic = require('../pipeline/filelogic');
+const fs = require('fs');
 
 const taskscheduler = require('./taskscheduler.js');
 const AI = require('./ai.js');
@@ -57,7 +57,7 @@ class ConsoleArtificialIntelligenceJanitor {
     }
 
     createServer() {
-        filelogic.deleteFile(__dirname + "/caij.sock", () => {
+        fs.unlink(__dirname + "/caij.sock", () => {
             this.server = net.createServer(this.incoming.bind(this));
             this.server.on('error', this.error);
             this.server.listen(CAIJport ? {port : CAIJport, exclusive : true, host: "localhost"} : {

@@ -138,10 +138,6 @@ class DevTools extends Controller {
             }
 
             cb(arr); 
-        } else if (levels[0] == "scripts") {
-            require('.:/lib/filelogic.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
-                cb(list);
-            });
         } else if (levels[0] == "htmlfiles") {
             listAllCachedFiles(cli, levels, params, cb);
         }
