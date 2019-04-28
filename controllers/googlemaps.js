@@ -76,7 +76,7 @@ class GoogleMapsController extends Controller {
     }
 
     initClient() {
-        const apiKey = require('../../keys/placesapi.json').key;
+        const apiKey = require(liliumkeys + '/placesapi.json').key;
         if (!apiKey) throw new Error('Google Maps API key was null');
         this.googleClient = googleMapsClient.createClient({
             key: apiKey

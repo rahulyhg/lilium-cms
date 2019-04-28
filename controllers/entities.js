@@ -187,7 +187,7 @@ class Entities extends Controller {
             });
         } else if (levels[0] == "stripeoauthurl") {
             try {
-                fs.readFile(path.join(liliumroot, '..', 'keys', 'stripe.json'), (err, data) => {
+                fs.readFile(path.join(liliumkeys, 'stripe.json'), (err, data) => {
                     if (!err) {
                         const stripeConfig = JSON.parse(data);
                         

@@ -22,8 +22,8 @@ const getDeps = (file, pass = 0) => {
 
                 deps[file].push(filename);
 
-                if (pass < 10) {
-                    // getDeps(filename, pass + 1);
+                if (pass < 5) {
+                    getDeps(filename, pass + 1);
                 }
             }
         });

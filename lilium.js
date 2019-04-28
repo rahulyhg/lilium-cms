@@ -1,7 +1,10 @@
+const pathlib = require('path')
+
 class LiliumCMS {
     init() {
         global.log = require('./lib/log');
         global.liliumroot = __dirname;
+        global.liliumkeys = pathlib.join(__dirname, '..', 'keys');
         log('Lilium', 'Starting up...', 'lilium');
 
         let startupTime = Date.now();
