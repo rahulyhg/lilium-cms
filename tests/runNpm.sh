@@ -32,8 +32,8 @@ echo "> Moving back existing sites into their origin directory"
 mv oldsites/* ../sites/
 
 echo "> Removing test database"
-mongo liliumtestdatabase --quiet --eval 'db.dropDatabase();'
 mongo liliumtestdatabase --quiet --eval "db.dropUser('liliumtest');"
+mongo liliumtestdatabase --quiet --eval 'db.dropDatabase();'
 
 echo 
 echo "> All done!"

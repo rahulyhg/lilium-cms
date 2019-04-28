@@ -36,7 +36,7 @@ class Runner {
 
     createTestEnv(then) {
         db.remove(configlib.default(), 'roles', {}, () => {
-            db.insert(configlib.default(), 'roles', require('./roles'), () => {
+            db.insert(configlib.default(), 'roles', require(liliumroot + '/includes/defaultroles'), () => {
                 then();
             });
         });
