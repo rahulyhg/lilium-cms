@@ -248,15 +248,19 @@ export class TextEditor extends Component {
 
     componentDidMount() {
         this.createEditor();
+        if (this.props.saveinterval) {
+            this.saveinterval = setInterval(() => this.handleBlur(), this.props.saveinterval);
+        }
     }
 
     componentWillUnmount() {
         log('TextEditor', 'Destroying a TinyMCE instance', 'detail');
+        this.saveinterval && clearInterval(this.saveinterval);
         this.texteditor && this.texteditor.destroy();
     }
 
     componentWillReceiveProps(props) {
-        if (props.content && this.texteditor) {
+        if (props.content && this.texteditor && this.getContent() != props.content) {
             log('TextEditor', 'Content set via new props', 'detail');
             this.texteditor.setContent(props.content);
             this.oldValue = props.content;

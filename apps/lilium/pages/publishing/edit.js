@@ -464,6 +464,7 @@ class PostDetails extends Component {
     }
 }
 
+const AUTO_SAVE_INTERVAL = 1000 * 60;
 export default class EditView extends Component {
     constructor(props) {
         super(props);
@@ -494,6 +495,7 @@ export default class EditView extends Component {
         this.edits = {};
         this.modalStage = {};
         this.stage = {};
+        this.autosaveTimer;
 
         this.socketArticleUpdateEvent_bound = this.socketArticleUpdateEvent.bind(this);
         this.onPageKeyPress = this.onPageKeyPress.bind(this);
@@ -502,10 +504,12 @@ export default class EditView extends Component {
     componentDidMount() {
         this.requestArticle(this.props.postid);
         bindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound);
+        // this.autosaveTimer = setInterval(() => this.autosave(), AUTO_SAVE_INTERVAL);
     }
 
     componentWillUnmount() {
         unbindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound);
+        // clearInterval(this.autosaveTimer);
     }
 
     onPageKeyPress(ev) {
@@ -521,6 +525,20 @@ export default class EditView extends Component {
                 message : "This article has just been edited by another user."
             })
         }
+    }
+
+    autosave() {
+        savePost(this.coldState.post._id, this.edits, (err, { historyentry }, r) => {
+            if (historyentry) {
+                this.setState({
+                    history : [historyentry, ...this.state.history],
+                    post : {...this.state.post, ...this.edits}
+                }, () => {
+                    this.edits = {};
+                    this.coldState.post = this.state.post;
+                });
+            }
+        });
     }
 
     save(done) {
@@ -836,7 +854,7 @@ export default class EditView extends Component {
 
         tempdiv.innerHTML = "";
 
-        this.save();
+        this.autosave();
     }
 
     imageChanged(name, image) {
@@ -1073,7 +1091,7 @@ export default class EditView extends Component {
                     </div>
                     
                     <div style={{ margin: "auto", maxWidth: 1200 }}>
-                        <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} />
+                        <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} saveinterval={AUTO_SAVE_INTERVAL} />
                     </div>
 
                     <div class="card publishing-card">

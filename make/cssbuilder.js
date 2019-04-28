@@ -30,7 +30,7 @@ class CSSBuilder {
                                 done && done(err);
                             } else {
                                 log('Less', 'Compiled Less file into CSS in ' + (Date.now() - now) + 'ms', 'success');
-                                done && done();
+                                done && done(undefined, result);
                             }
                         });
                     }
