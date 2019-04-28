@@ -57,12 +57,12 @@ class MediaController extends Controller {
     }
 
     setup() {
-        livevars.registerLiveVariable('media', function (cli, levels, params, callback) {
+        livevars.registerLiveVariable('media', (cli, levels, params, callback) => {
             var wholeDico = levels.length === 0;
             if (wholeDico) {
                 db.singleLevelFind(cli._c, 'uploads', callback);
             } else if (levels[0] == 'getUrlFromId') {
-                db.findToArray(cli._c, 'uploads', {_id : db.mongoID(params.id)}, function(err, arr){
+                db.findToArray(cli._c, 'uploads', {_id : db.mongoID(params.id)}, (err, arr) => {
                     if (arr.length > 0) {
                         callback({url: arr[0].url});
                     } else {
@@ -78,7 +78,7 @@ class MediaController extends Controller {
             }
         }, ["list-uploads"]);
 
-        livevars.registerLiveVariable('uploads', function (cli, levels, params, callback) {
+        livevars.registerLiveVariable('uploads', (cli, levels, params, callback) => {
             var allMedia = levels.length === 0;
 
             if (allMedia) {
@@ -87,14 +87,14 @@ class MediaController extends Controller {
 
                 db.aggregate(cli._c, 'uploads', [
                     {$sort : {_id : -1}}, {$skip : skip}, {$limit: limit}
-                ], function(data) {
+                ], (data) => {
                     callback(data);
                 });
             } else if (levels[0] == "single") {
-                db.find(cli._c, 'uploads', {_id : db.mongoID(levels[1])}, [], function(err, cur) {
-                    cur.hasNext(function(err, nxt) {
+                db.find(cli._c, 'uploads', {_id : db.mongoID(levels[1])}, [], (err, cur) => {
+                    cur.hasNext((err, nxt) => {
                         if (nxt) {
-                            cur.next(function(err, img) {
+                            cur.next((err, img) => {
                                 callback(img);
                             });
                         } else {

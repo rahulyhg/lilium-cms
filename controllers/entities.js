@@ -182,7 +182,7 @@ class Entities extends Controller {
         if (allEntities) {
             db.findToArray(_c.default(), 'entities', cli.hasRight('list-entities') ? {} : {
                 _id : db.mongoID(cli.session.data._id)
-            }, function(err, arr) { 
+            }, (err, arr) => { 
                 sendback(arr); 
             });
         } else if (levels[0] == "stripeoauthurl") {
@@ -271,8 +271,8 @@ class Entities extends Controller {
                 sendback({ exists : !!user, user });
             }, {_id : 1, displayname : 1, username : 1, avatarURL : 1 });
         } else if (levels[0] == "chat") {
-            db.find(_c.default(), 'entities', {revoked : {$ne : true}}, [], function(err, cur) {
-                cur.sort({fullname : 1}).toArray(function(err, arr) {
+            db.find(_c.default(), 'entities', {revoked : {$ne : true}}, [], (err, cur) => {
+                cur.sort({fullname : 1}).toArray((err, arr) => {
                     sendback(err || arr);
                 });
             }, {
@@ -309,7 +309,7 @@ class Entities extends Controller {
                 });
             });
         } else if (levels[0] == "cached") {
-            db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, function(e, a) {sendback(a);}, {displayname : 1, avatarURL : 1});
+            db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, (e, a) => {sendback(a);}, {displayname : 1, avatarURL : 1});
         } else if (levels[0] == "simple") {
             var simpProj = {
                 displayname : 1,
@@ -324,8 +324,8 @@ class Entities extends Controller {
                 match.revoked = {$ne : true};
             }
 
-            db.find(_c.default(), 'entities', match, [], function(err, cur) {
-                cur.project(simpProj).sort({displayname : 1}).toArray(function(err, arr) {
+            db.find(_c.default(), 'entities', match, [], (err, cur) => {
+                cur.project(simpProj).sort({displayname : 1}).toArray((err, arr) => {
                     let revoked = [];
                     let active = [];
                     arr.forEach(x => {
@@ -355,7 +355,7 @@ class Entities extends Controller {
                 qObj._id = cli.session.data._id;
             }
 
-            db.findToArray(_c.default(), 'entities', queryInfo, function (err, arr) {
+            db.findToArray(_c.default(), 'entities', queryInfo, (err, arr) => {
                 sendback(err || arr);
             });
         } else if (levels[0] == 'table') {
@@ -382,7 +382,7 @@ class Entities extends Controller {
                 $skip : params.skip || 0
             }, {
                 $limit : params.max || 20
-            }], function (data) {
+            }], (data) => {
                 if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
                     for (var i = 0; i < data.length; i++) if (data[i].avatarURL) {
                         data[i].avatarURL = data[i].avatarURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
@@ -418,7 +418,7 @@ class Entities extends Controller {
     };
 
     setup () {
-        livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
+        livevars.registerLiveVariable('me', (cli, levels, params, callback) => {
             db.findUnique(_c.default(), 'entities', {
                 _id: db.mongoID(cli.session.data._id)
             }, (err, user) => {

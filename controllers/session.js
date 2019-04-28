@@ -8,7 +8,7 @@ class SessionController extends Controller {
         const _id = db.mongoID(cli.userinfo.userid);
         if (_id) {
             db.findUnique(_c.default(), 'entities', { _id }, (err, dat) => {
-                db.findToArray(_c.default(), "roles", {name : {$in : dat.roles}}, function(err, arr) {
+                db.findToArray(_c.default(), "roles", {name : {$in : dat.roles}}, (err, arr) => {
                     const rights = [];
                     arr.forEach(role => rights.push( ...role.rights ));
 

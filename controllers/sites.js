@@ -8,7 +8,7 @@ class SiteController extends Controller {
     livevar(cli, levels, params, cb) {
         var len = levels.length;
         if (len > 0 && levels[0] == 'all') {
-            db.findToArray(config.default(), 'entities', {_id : cli.userinfo.userid}, function(err, arr) {
+            db.findToArray(config.default(), 'entities', {_id : cli.userinfo.userid}, (err, arr) => {
                 var sites = arr[0].sites;
                 var ignore = arr[0].roles.indexOf('admin') !== -1 || arr[0].roles.indexOf('lilium') !== -1;
 
@@ -97,9 +97,9 @@ class SiteController extends Controller {
         
         switch (param) {
             case "launch":
-                db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function (success, err) {
+                db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, (success, err) => {
                     if (success) {
-                        slib.createSite(cli, dat, function () {
+                        slib.createSite(cli, dat, () => {
                             log('Sites', 'Redirecting network admin to site list');
                             cli.did('sites', 'created', dat.websitename);
                             cli.redirect(cli._c.server.url + "admin/sites/", false);

@@ -9,7 +9,7 @@ class ThemeControllers extends Controller {
     adminPOST(cli) {
         if (cli.hasRightOrRefuse("manage-themes")) {
             if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
-                themelib.enableTheme(cli._c, cli.postdata.data.uName, function () {
+                themelib.enableTheme(cli._c, cli.postdata.data.uName, () => {
                     cli.sendJSON({
                         success: true
                     });
@@ -35,7 +35,7 @@ class ThemeControllers extends Controller {
         
         if (cli.hasRightOrRefuse("manage-themes")) {
             if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
-                themelib.enableTheme(cli._c, cli.postdata.data.uName, function () {
+                themelib.enableTheme(cli._c, cli.postdata.data.uName, () => {
                     cli.sendJSON({
                         success: true
                     });

@@ -57,9 +57,9 @@ class RoleController extends Controller {
                 callback({ items : roles, total : roles.length });
             }); 
         } else {
-            db.findToArray(conf.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
+            db.findToArray(conf.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, (err, roles) => {
                 if (allContent || levels[0] == "all") {
-                    db.findToArray(conf.default(), 'roles', { }, function (err, arr) {
+                    db.findToArray(conf.default(), 'roles', { }, (err, arr) => {
                         callback(arr);
                     });
                 } else {
