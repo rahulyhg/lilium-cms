@@ -62,7 +62,7 @@ class AuthenticationTest extends Test {
             this.addTask(new Request("Valid credentials but no 2FA token").to('POST', '/login').setPostData({ 
                 usr : this.twoFaUser.username,
                 psw : this.twoFaUser.plaintextpwd
-            }).expect((err, r, body) => !body.success));
+            }).expect((err, r, body) => body.success && body.status == "2fachallenge"));
 
             this.addTask(new Request("Valid credentials with valid 2FA token, should receive lmlsid cookie").to('POST', '/login').setPostData({ 
                 usr : this.twoFaUser.username,
@@ -71,8 +71,6 @@ class AuthenticationTest extends Test {
                     base32Encode(Buffer.from(this.twoFaUser._id.toString() + configLib.default().signature.privatehash), 'RFC4648').substring(0, 32)
                 )
             }).expect((err, r, body) => {
-                console.log(r)
-                console.log(body)
                 return body.success && r.headers["set-cookie"] && r.headers["set-cookie"][0] && r.headers["set-cookie"][0].startsWith("lmlsid") }
             ));
 

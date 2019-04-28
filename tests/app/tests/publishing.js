@@ -44,7 +44,7 @@ class PublicationTest extends Test {
 
                 this.addTask(new Request("Article validated by author, should report missing fields").to('PUT', 
                     () => '/admin/publishing/validate/' + authorArticleId
-                ).as(authorUser._id).expect((err, r, body) => r.statusCode == 401));
+                ).as(authorUser._id).expect((err, r, body) => r.statusCode == 400));
 
                 this.addTask(new Request("Article edited by author, should help pass validation").to('PUT', () => '/admin/publishing/save/' + authorArticleId).setPostData({
                     editions : [edition._id], media : db.mongoID()
