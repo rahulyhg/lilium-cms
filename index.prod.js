@@ -42,5 +42,6 @@
 
 global.__STARTUPSTAMP = Date.now();
 global.liliumroot = __dirname;
+global.liliumkeys = require('path').join(__dirname, '..', 'keys');
 global.psmanager = "cluster";
 require('./gardener.js');
